@@ -21,6 +21,7 @@ open import Categories.Functor.Bifunctor
 open import Categories.Comonad
 open import Categories.Category.Construction.CoKleisli
 open import Categories.NaturalTransformation as NT using (ntHelper)
+open import Categories.NaturalTransformation.NaturalIsomorphism hiding (refl; sym; trans)
 import Categories.Category.Equivalence as E
 
 private
@@ -313,7 +314,12 @@ and prove that the functor `_ × I` is a comonad, providing all the structure.
     ; commute = λ f → refl
     ; sym-commute = λ f → refl }
 ```
-Easy as co-pie! Now, where is the `coKleisli` module...?
+Easy as co-pie! Now, where is the `coKleisli` module...? Oh, you say you don't have it yet.
+
+[...a few weeks of frantic, painful agda sessions later...]
+
+tada!
+
 ```
 
 cokleisli-I : {I : Set} → Category _ _ _
@@ -325,32 +331,39 @@ teorema : {I : Set} → E.StrongEquivalence (Slice I) (cokleisli-I {I})
 teorema {I} = record
   { F = F
   ; G = G
-  ; weak-inverse = record
-    { F∘G≈id = record { F⇒G = ntHelper (record { η = {!   !}
-                                               ; commute = λ f → {!   !} })
-                      ; F⇐G = ntHelper (record { η = {!   !}
-                                               ; commute = λ f → {!   !} })
-                      ; iso = λ X → record { isoˡ = {!   !} ; isoʳ = {!   !} } }
-    ; G∘F≈id = record { F⇒G = ntHelper (record { η = {!   !}
-                                               ; commute = {!   !} })
-                      ; F⇐G = ntHelper (record { η = {!   !}
-                                               ; commute = {!   !} })
-                      ; iso = λ X → record { isoˡ = {!   !} ; isoʳ = {!   !} } } }
+  ; weak-inverse = winv
   }
-     where F : Functor (Slice I) (cokleisli-I {I})
-           F = record
-              { F₀ = λ { (sliceobj {Y} _) → Y }
-              ; F₁ = λ { (slicearr {h} _) (x , i) → h x }
-              ; identity = refl
-              ; homomorphism = refl
-              ; F-resp-≈ = λ { refl → refl }
-              }
-           G : Functor (cokleisli-I {I}) (Slice I)
-           G = record
-              { F₀ = λ s → sliceobj {Y = s × I} proj₂
-              ; F₁ = λ f → slicearr {h = λ x → (f x , proj₂ x)} refl
-              ; identity = refl
-              ; homomorphism = refl
-              ; F-resp-≈ = λ { refl → refl }
-              }
+  where
+  F : Functor (Slice I) (cokleisli-I {I})
+  F = record
+   { F₀ = λ { (sliceobj {Y} _) → Y }
+   ; F₁ = λ { (slicearr {h} _) (x , i) → h x }
+   ; identity = refl
+   ; homomorphism = refl
+   ; F-resp-≈ = λ { refl → refl }
+   }
+  G : Functor (cokleisli-I {I}) (Slice I)
+  G = record
+   { F₀ = λ s → sliceobj {Y = s × I} proj₂
+   ; F₁ = λ f → slicearr {h = λ x → (f x , proj₂ x)} refl
+   ; identity = refl
+   ; homomorphism = refl
+   ; F-resp-≈ = λ { refl → refl }
+   }
+  winv : E.WeakInverse F G
+  winv = record
+   { F∘G≈id = niHelper (record
+     { η = λ X x → {!   !}
+     ; η⁻¹ = λ X x → x
+     ; commute = {!   !}
+     ; iso = {!   !}
+     })
+   ; G∘F≈id = niHelper (record
+     { η = λ X → {!   !}
+     ; η⁻¹ = {!   !}
+     ; commute = {!   !}
+     ; iso = {!   !}
+     })
+   }
+
 ```
