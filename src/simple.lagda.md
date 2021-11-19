@@ -7,7 +7,6 @@ The first obligatory step is some boilerplate code: let's keep this to a minimum
 module simple where
 
 open import Categories.Category
-open import Categories.NaturalTransformation.Core as NT
 open import Categories.Category.Cartesian.Bundle
 open import Categories.Category.CartesianClosed.Canonical
 open import Categories.Category.Core
@@ -19,6 +18,10 @@ open import Relation.Binary.PropositionalEquality
 open Relation.Binary.PropositionalEquality.≡-Reasoning
 open import Categories.Functor
 open import Categories.Functor.Bifunctor
+open import Categories.Comonad
+open import Categories.Category.Construction.CoKleisli
+open import Categories.NaturalTransformation as NT using (ntHelper)
+import Categories.Category.Equivalence as E
 
 private
   variable
@@ -276,8 +279,8 @@ open import Categories.Comonad
 ```
 and prove that the functor `_ × I` is a comonad, providing all the structure.
 ```
-_×I : {I : Set} → Comonad SetC
-_×I {I} =
+─×_ : (I : Set) → Comonad SetC
+─× I =
  record
   { F = F {I}
   ; ε = eps
@@ -311,3 +314,43 @@ _×I {I} =
     ; sym-commute = λ f → refl }
 ```
 Easy as co-pie! Now, where is the `coKleisli` module...?
+```
+
+cokleisli-I : {I : Set} → Category _ _ _
+cokleisli-I {I} = CoKleisli (─× I)
+
+open import Categories.Category.Slice SetC
+
+teorema : {I : Set} → E.StrongEquivalence (Slice I) (cokleisli-I {I})
+teorema {I} = record
+  { F = F
+  ; G = G
+  ; weak-inverse = record
+    { F∘G≈id = record { F⇒G = ntHelper (record { η = {!   !}
+                                               ; commute = λ f → {!   !} })
+                      ; F⇐G = ntHelper (record { η = {!   !}
+                                               ; commute = λ f → {!   !} })
+                      ; iso = λ X → record { isoˡ = {!   !} ; isoʳ = {!   !} } }
+    ; G∘F≈id = record { F⇒G = ntHelper (record { η = {!   !}
+                                               ; commute = {!   !} })
+                      ; F⇐G = ntHelper (record { η = {!   !}
+                                               ; commute = {!   !} })
+                      ; iso = λ X → record { isoˡ = {!   !} ; isoʳ = {!   !} } } }
+  }
+     where F : Functor (Slice I) (cokleisli-I {I})
+           F = record
+              { F₀ = λ { (sliceobj {Y} _) → Y }
+              ; F₁ = λ { (slicearr {h} _) (x , i) → h x }
+              ; identity = refl
+              ; homomorphism = refl
+              ; F-resp-≈ = λ { refl → refl }
+              }
+           G : Functor (cokleisli-I {I}) (Slice I)
+           G = record
+              { F₀ = λ s → sliceobj {Y = s × I} proj₂
+              ; F₁ = λ f → slicearr {h = λ x → (f x , proj₂ x)} refl
+              ; identity = refl
+              ; homomorphism = refl
+              ; F-resp-≈ = λ { refl → refl }
+              }
+```
