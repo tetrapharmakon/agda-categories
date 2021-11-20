@@ -377,26 +377,30 @@ Slice≃CoEilenbergMoore─×I {I} = record
   where
   F : Functor (Slice I) (CoEilenbergMoore (─× I))
   F = record
-   { F₀ = λ { (sliceobj {Y} arr) → record { A = Y
-                                          ; coaction = λ z → z , arr z
-                                          ; commute = refl
-                                          ; identity = refl } }
-   ; F₁ = λ { (slicearr {h} Δ) → record { arr = λ x → h x
-                                        ; commute = cong (λ x x₁ → h x₁ , x x₁) Δ  } }
+   { F₀ = λ { (sliceobj {Y} arr) →
+     record { A = Y
+            ; coaction = λ z → z , arr z
+            ; commute = refl
+            ; identity = refl } }
+   ; F₁ = λ { (slicearr {h} Δ) → record
+     { arr = λ x → h x
+     ; commute = cong (λ x x₁ → h x₁ , x x₁) Δ  } }
    ; identity = refl
    ; homomorphism = refl
    ; F-resp-≈ = λ { refl → refl }
    }
   G : Functor (CoEilenbergMoore (─× I)) (Slice I)
   G = record
-   { F₀ = λ { record { A = A
-                     ; coaction = coaction
-                     ; commute = commute
-                     ; identity = identity
-                     } → sliceobj λ x → proj₂ (coaction x) }
-   ; F₁ = λ { record { arr = arr
-                     ; commute = commute
-                     } → slicearr {h = arr} (cong (λ x x₁ → proj₂ (x x₁)) commute) }
+   { F₀ = λ { record
+     { A = A
+     ; coaction = coaction
+     ; commute = commute
+     ; identity = identity
+     } → sliceobj λ x → proj₂ (coaction x) }
+   ; F₁ = λ { record
+     { arr = arr
+     ; commute = commute
+     } → slicearr {h = arr} (cong (λ x x₁ → proj₂ (x x₁)) commute) }
    ; identity = refl
    ; homomorphism = refl
    ; F-resp-≈ = λ { refl → refl }
@@ -404,26 +408,31 @@ Slice≃CoEilenbergMoore─×I {I} = record
   winv : E.WeakInverse F G
   winv = record
    { F∘G≈id = niHelper (record
-     { η = λ { record { A = A
-                      ; coaction = coaction
-                      ; commute = commute
-                      ; identity = identity
-                      } → record { arr = λ a → proj₁ (coaction a)
-                                 ; commute = cong (λ x x₁ → coaction (x x₁)) identity } }
-     ; η⁻¹ = λ { record { A = A
-                        ; coaction = coaction
-                        ; commute = commute
-                        ; identity = identity
-                        } → record { arr = λ z → z
-                                   ; commute = cong (λ x x₁ → x x₁ , proj₂ (coaction x₁) ) (sym identity) } }
-     ; commute = λ { record { arr = arr
-                            ; commute = commute
-                            } → cong (λ x x₁ → proj₁ (x x₁)) commute }
-     ; iso = λ { record { A = A
-                        ; coaction = coaction
-                        ; commute = commute
-                        ; identity = identity
-                        } → record { isoˡ = identity ; isoʳ = identity } }
+     { η = λ { record
+       { A = A
+       ; coaction = coaction
+       ; commute = commute
+       ; identity = identity
+       } → record { arr = λ a → proj₁ (coaction a)
+                  ; commute = cong (λ x x₁ → coaction (x x₁)) identity } }
+     ; η⁻¹ = λ { record
+       { A = A
+       ; coaction = coaction
+       ; commute = commute
+       ; identity = identity
+       } → record { arr = λ z → z
+                  ; commute =
+                    cong (λ x x₁ → x x₁ , proj₂ (coaction x₁) ) (sym identity) } }
+     ; commute = λ { record
+       { arr = arr
+       ; commute = commute
+       } → cong (λ x x₁ → proj₁ (x x₁)) commute }
+     ; iso = λ { record
+       { A = A
+       ; coaction = coaction
+       ; commute = commute
+       ; identity = identity
+       } → record { isoˡ = identity ; isoʳ = identity } }
      })
    ; G∘F≈id = niHelper (record
      { η = λ arr → slicearr refl
