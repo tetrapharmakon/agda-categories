@@ -18,13 +18,6 @@ private
   open HomReasoning
   open Equiv
 
-<<<<<<< HEAD
--- helper for composition in diagrammatic order: bad idea?
-_؛_ : {A B C : Obj} → (f : A ⇒ B) → (g : B ⇒ C) → (A ⇒ C)
-f ؛ g = g ∘ f
-
-=======
->>>>>>> 1c027debdb615b4f941f08b81647c9be504a75b2
 record Comodule : Set (o ⊔ ℓ ⊔ e) where
   field
     A        : Obj
@@ -68,8 +61,4 @@ CoEilenbergMoore =
        F₁ (f.arr ∘ g.arr) ∘ Comodule.coaction X  ∎
     }
     where module f = Comodule⇒ f
-<<<<<<< HEAD
           module g = Comodule⇒ g
-=======
-          module g = Comodule⇒ g
->>>>>>> 1c027debdb615b4f941f08b81647c9be504a75b2
