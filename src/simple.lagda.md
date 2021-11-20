@@ -1,5 +1,8 @@
 # Fibrations in agda
 
+(Note: this is a literate agda file: [src](stuff/simple.lagda.md))
+
+
 I have recently decided to iron all the kinks of a few proofs left as exercises in Bart Jacobs' book _Categorical logic and type theory_, by proving them in agda (and in particular, using <a href="https://github.com/agda/agda-categories">agda-categories</a>).
 
 The first obligatory step is some boilerplate code: let's keep this to a minimum.
@@ -323,7 +326,8 @@ tada!
 ```
 open import Categories.Category.Construction.CoKleisli
 
-fiber-of-simple≃CoKleisli─×I : {I : Set} → E.StrongEquivalence (fiber-of-simple {I}) (CoKleisli (─× I))
+fiber-of-simple≃CoKleisli─×I : {I : Set} →
+  E.StrongEquivalence (fiber-of-simple {I}) (CoKleisli (─× I))
 fiber-of-simple≃CoKleisli─×I = record
  { F = F
  ; G = G
@@ -368,7 +372,8 @@ The meat of the proof is in proving that the ordinary slice `𝔹/I` is the coEi
 open import Categories.Category.Construction.CoEilenbergMoore
 open import Categories.Category.Slice SetC
 
-Slice≃CoEilenbergMoore─×I : {I : Set} → E.StrongEquivalence (Slice I) (CoEilenbergMoore (─× I))
+Slice≃CoEilenbergMoore─×I : {I : Set} →
+  E.StrongEquivalence (Slice I) (CoEilenbergMoore (─× I))
 Slice≃CoEilenbergMoore─×I {I} = record
   { F = F
   ; G = G
