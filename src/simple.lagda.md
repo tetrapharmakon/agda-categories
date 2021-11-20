@@ -321,6 +321,11 @@ Easy as co-pie! Now, where is the `coKleisli` module...? Oh, you say you don't h
 tada!
 
 ```
+-- lemmaδ : {A I : Set} {t : Comonad.F.F₀ (─× I) A} → proj₂ (Comonad.δ.η (─× I) A t) ≡ proj₂ (proj₁ (Comonad.δ.η (─× I) A t))
+-- lemmaδ = {!   !}
+
+lemmaδ : {A I : Set} → (λ t → proj₂ (Comonad.δ.η (─× I) A t)) ≡ (λ t → proj₂ (proj₁ (Comonad.δ.η (─× I) A t)))
+lemmaδ = refl
 
 cokleisli-I : {I : Set} → Category _ _ _
 cokleisli-I {I} = CoKleisli (─× I)
@@ -345,7 +350,7 @@ teorema {I} = record
   G : Functor (cokleisli-I {I}) (Slice I)
   G = record
    { F₀ = λ s → sliceobj {Y = s × I} proj₂
-   ; F₁ = λ f → slicearr {h = λ x → (f x , proj₂ x)} refl
+   ; F₁ = λ {A} {_} f → slicearr {h = λ x → map₁ f (Comonad.δ.η (─× I) A x)} refl
    ; identity = refl
    ; homomorphism = refl
    ; F-resp-≈ = λ { refl → refl }
@@ -353,17 +358,21 @@ teorema {I} = record
   winv : E.WeakInverse F G
   winv = record
    { F∘G≈id = niHelper (record
-     { η = λ X x → {!   !}
+     { η = λ X x → proj₁ (proj₁ x)
      ; η⁻¹ = λ X x → x
-     ; commute = {!   !}
-     ; iso = {!   !}
+     ; commute = comm
+     ; iso = λ X → {!   !}
      })
    ; G∘F≈id = niHelper (record
      { η = λ X → {!   !}
-     ; η⁻¹ = {!   !}
-     ; commute = {!   !}
+     ; η⁻¹ = λ X → {!   !}
+     ; commute = λ f → {!   !}
      ; iso = {!   !}
      })
    }
+   where
+   comm : {X Y : Set} (f : Σ X (λ x → I) → Y) →
+      (λ a → f (proj₁ a)) ≡ (λ a → f (proj₁ (proj₁ a) , proj₂ a))
+   comm {X} {Y} f rewrite (lemmaδ {X} {I}) = {!   !}
 
 ```
