@@ -17,8 +17,8 @@ open import Data.Product
 open import Function using (const)
 open import Level
 open import Relation.Binary.Core using (Rel)
-open import Relation.Binary.PropositionalEquality
-open Relation.Binary.PropositionalEquality.≡-Reasoning
+open import Relation.Binary.PropositionalEquality as Eq
+open Eq.≡-Reasoning
 open import Categories.Functor
 open import Categories.Functor.Bifunctor
 open import Categories.Comonad
@@ -446,4 +446,30 @@ Slice≃CoEilenbergMoore─×I {I} = record
      ; iso = λ X → record { isoˡ = refl ; isoʳ = refl }
      })
    }
+```
+
+Now let's venture to define the family fibration -say, over `SetC`-
+
+```
+fam : Category a b c → Category _ _ _
+fam C = record
+ { Obj = Σ Set λ I → (I → Obj)
+ ; _⇒_ = λ {(I , x) (J , y) → Σ[ u ∈ (I → J) ] (∀ {i : I} → x i ⇒ y (u i)) }
+ ; _≈_ = λ { {I , x} {J , y} (u , f) (v , g) → Σ (u Eq.≡ v) (λ {Eq.refl → f ≈ g})}
+ ; id = (λ x → x) , C.id
+ ; _∘_ = λ {(I , x) (J , y) → (λ z → I (J z)) , x ∘ y }
+ ; assoc = refl , C.assoc
+ ; sym-assoc = refl , C.sym-assoc
+ ; identityˡ = refl , C.identityˡ
+ ; identityʳ = refl , C.identityʳ
+ ; identity² = refl , identity²
+ ; equiv = record
+   { refl = refl , C.Equiv.refl
+   ; sym = λ x → (sym (proj₁ x)) , {!   !}
+   ; trans = λ eq eq' → trans (proj₁ eq) (proj₁ eq') , {!   !}
+   }
+ ; ∘-resp-≈ = λ { {u , f} {v , g} {w , h} {z , i} eq eq' → {!   !} , {!   !} }
+ } where module C = Category C
+         open C
+
 ```
