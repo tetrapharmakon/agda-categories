@@ -4,10 +4,9 @@ I have recently decided to iron all the kinks of a few proofs left as exercises 
 
 The first obligatory step is some boilerplate code: let's keep this to a minimum.
 ```
-module simple where
+module simple {I : Set} where
 
 open import Categories.Category
-open import Categories.NaturalTransformation.Core as NT
 open import Categories.Category.Cartesian.Bundle
 open import Categories.Category.CartesianClosed.Canonical
 open import Categories.Category.Core
@@ -19,6 +18,11 @@ open import Relation.Binary.PropositionalEquality
 open Relation.Binary.PropositionalEquality.≡-Reasoning
 open import Categories.Functor
 open import Categories.Functor.Bifunctor
+open import Categories.Comonad
+open import Categories.Category.Construction.CoEilenbergMoore
+open import Categories.NaturalTransformation as NT using (ntHelper)
+open import Categories.NaturalTransformation.NaturalIsomorphism hiding (refl; sym; trans)
+import Categories.Category.Equivalence as E
 
 private
   variable
@@ -276,8 +280,8 @@ open import Categories.Comonad
 ```
 and prove that the functor `_ × I` is a comonad, providing all the structure.
 ```
-_×I : {I : Set} → Comonad SetC
-_×I {I} =
+─×_ : (I : Set) → Comonad SetC
+─× I =
  record
   { F = F {I}
   ; ε = eps
@@ -310,4 +314,122 @@ _×I {I} =
     ; commute = λ f → refl
     ; sym-commute = λ f → refl }
 ```
-Easy as co-pie! Now, where is the `coKleisli` module...?
+Easy as co-pie! Now, where is the `coKleisli` module...? Oh, you say you don't have it yet.
+
+[...a few weeks of frantic, painful agda sessions later...]
+
+tada!
+
+```
+open import Categories.Category.Construction.CoKleisli
+
+fiber-of-simple≃CoKleisli─×I : {I : Set} → E.StrongEquivalence (fiber-of-simple {I}) (CoKleisli (─× I))
+fiber-of-simple≃CoKleisli─×I = record
+ { F = F
+ ; G = G
+ ; weak-inverse = winv
+ }
+ where
+ F : {I : Set} → Functor (fiber-of-simple {I}) (CoKleisli (─× I))
+ F = record
+      { F₀ = λ A → A
+      ; F₁ = λ f → f
+      ; identity = refl
+      ; homomorphism = refl
+      ; F-resp-≈ = λ x → x
+      }
+ G : {I : Set} → Functor (CoKleisli (─× I)) (fiber-of-simple {I})
+ G = record
+      { F₀ = λ z → z
+      ; F₁ = λ f → f
+      ; identity = refl
+      ; homomorphism = refl
+      ; F-resp-≈ = λ x → x
+      }
+ winv : {I : Set} → E.WeakInverse (F {I}) G
+ winv = record
+  { F∘G≈id = niHelper (record
+    { η = λ X → proj₁
+    ; η⁻¹ = λ X → proj₁
+    ; commute = λ f → refl
+    ; iso = λ X → record { isoˡ = refl ; isoʳ = refl } })
+  ; G∘F≈id = niHelper (record
+    { η = λ X x → proj₁ x
+    ; η⁻¹ = λ X x → proj₁ x
+    ; commute = λ f → refl
+    ; iso = λ X → record { isoˡ = refl ; isoʳ = refl } })
+  }
+
+```
+
+The meat of the proof is in proving that the ordinary slice `𝔹/I` is the coEilenberg-Moore category of the `-×I` comonad:
+
+```
+open import Categories.Category.Construction.CoEilenbergMoore
+open import Categories.Category.Slice SetC
+
+Slice≃CoEilenbergMoore─×I : {I : Set} → E.StrongEquivalence (Slice I) (CoEilenbergMoore (─× I))
+Slice≃CoEilenbergMoore─×I {I} = record
+  { F = F
+  ; G = G
+  ; weak-inverse = winv
+  }
+  where
+  F : Functor (Slice I) (CoEilenbergMoore (─× I))
+  F = record
+   { F₀ = λ { (sliceobj {Y} arr) → record { A = Y
+                                          ; coaction = λ z → z , arr z
+                                          ; commute = refl
+                                          ; identity = refl } }
+   ; F₁ = λ { (slicearr {h} Δ) → record { arr = λ x → h x
+                                        ; commute = cong (λ x x₁ → h x₁ , x x₁) Δ  } }
+   ; identity = refl
+   ; homomorphism = refl
+   ; F-resp-≈ = λ { refl → refl }
+   }
+  G : Functor (CoEilenbergMoore (─× I)) (Slice I)
+  G = record
+   { F₀ = λ { record { A = A
+                     ; coaction = coaction
+                     ; commute = commute
+                     ; identity = identity
+                     } → sliceobj λ x → proj₂ (coaction x) }
+   ; F₁ = λ { record { arr = arr
+                     ; commute = commute
+                     } → slicearr {h = arr} (cong (λ x x₁ → proj₂ (x x₁)) commute) }
+   ; identity = refl
+   ; homomorphism = refl
+   ; F-resp-≈ = λ { refl → refl }
+   }
+  winv : E.WeakInverse F G
+  winv = record
+   { F∘G≈id = niHelper (record
+     { η = λ { record { A = A
+                      ; coaction = coaction
+                      ; commute = commute
+                      ; identity = identity
+                      } → record { arr = λ a → proj₁ (coaction a)
+                                 ; commute = cong (λ x x₁ → coaction (x x₁)) identity } }
+     ; η⁻¹ = λ { record { A = A
+                        ; coaction = coaction
+                        ; commute = commute
+                        ; identity = identity
+                        } → record { arr = λ z → z
+                                   ; commute = cong (λ x x₁ → x x₁ , proj₂ (coaction x₁) ) (sym identity) } }
+     ; commute = λ { record { arr = arr
+                            ; commute = commute
+                            } → cong (λ x x₁ → proj₁ (x x₁)) commute }
+     ; iso = λ { record { A = A
+                        ; coaction = coaction
+                        ; commute = commute
+                        ; identity = identity
+                        } → record { isoˡ = identity ; isoʳ = identity } }
+     })
+   ; G∘F≈id = niHelper (record
+     { η = λ arr → slicearr refl
+     ; η⁻¹ = λ obj → slicearr refl
+     ; commute = λ arr → refl
+     ; iso = λ X → record { isoˡ = refl ; isoʳ = refl }
+     })
+   }
+```
