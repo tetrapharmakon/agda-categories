@@ -125,7 +125,14 @@ q* = record
 D : Cocartesian 𝒞 → Functor Graphs aNets
 D coc = record
   { F₀ = λ {(graphobj {E} {V} s t) → anetobj {E + V} [ i₂ ∘ s , i₂ ] [ i₂ ∘ t , i₂ ]}
-  ; F₁ = λ {(graphmor fE fV s-eqv t-eqv) → anetmor (fE +₁ fV) {!   !} {!   !}}
+  ; F₁ = λ { {A} {B} (graphmor fE fV s-eqv t-eqv) → anetmor (fE +₁ fV) 
+    (begin [ i₁ ∘ fE ,  i₂ ∘ fV ] ∘ [ i₂ ∘ s A , i₂ ] ≈⟨ ∘-distribˡ-[] ⟩ 
+           [ ([ i₁ ∘ fE ,  i₂ ∘ fV ]) ∘ i₂ ∘ s A , ([ i₁ ∘ fE ,  i₂ ∘ fV ]) ∘ i₂ ] ≈⟨ {!   !} ⟩ 
+           [ ([ i₁ ∘ fE ,  i₂ ∘ fV ] ∘ i₂) ∘ s A , ([ i₁ ∘ fE ,  i₂ ∘ fV ]) ∘ i₂ ] ≈⟨ {!   !} ⟩ 
+           [ (i₂ ∘ fV) ∘ s A ,  i₂ ∘ fV ] ≈⟨ {!   !} ⟩ 
+           [ i₂ ∘ (fV ∘ s A) ,  i₂ ∘ fV ] ≈⟨ {!   !} ⟩ 
+           [ i₂ ∘ (s B ∘ fE) ,  i₂ ∘ fV ] ≈⟨ {!   !} ⟩ 
+           [ i₂ ∘ s B , i₂ ] ∘ [ i₁ ∘ fE ,  i₂ ∘ fV ] ∎) {!   !}}
   ; identity = identity -+-
   ; homomorphism = homomorphism -+-
   ; F-resp-≈ = λ { {A} {B} {u} {v} (fst , snd) → F-resp-≈ -+- (fst , snd) }
@@ -133,9 +140,18 @@ D coc = record
           open Functor
 
 thm : {coc : Cocartesian 𝒞} → D coc ⊣ q*
-thm = record
-  { unit = {!   !}
-  ; counit = {!   !}
+thm {coc} = record
+  { unit = record 
+    { η = λ { (graphobj {E} {V} s t) → graphmor i₁ i₂ {!   !} {!   !} }
+    ; commute = {!   !} 
+    ; sym-commute = {!   !} 
+    }
+  ; counit = record 
+    { η = λ { (anetobj {X} s t) → anetmor [ s , t ] {!   !} {!   !} }
+    ; commute = {!   !} 
+    ; sym-commute = {!   !} 
+    }
   ; zig = {!   !}
   ; zag = {!   !}
-  }
+  } where open Cocartesian coc
+          open Functor
