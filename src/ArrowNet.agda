@@ -125,33 +125,46 @@ q* = record
 D : Cocartesian 𝒞 → Functor Graphs aNets
 D coc = record
   { F₀ = λ {(graphobj {E} {V} s t) → anetobj {E + V} [ i₂ ∘ s , i₂ ] [ i₂ ∘ t , i₂ ]}
-  ; F₁ = λ { {A} {B} (graphmor fE fV s-eqv t-eqv) → anetmor (fE +₁ fV) 
-    (begin [ i₁ ∘ fE ,  i₂ ∘ fV ] ∘ [ i₂ ∘ s A , i₂ ] ≈⟨ ∘-distribˡ-[] ⟩ 
-           [ ([ i₁ ∘ fE ,  i₂ ∘ fV ]) ∘ i₂ ∘ s A , ([ i₁ ∘ fE ,  i₂ ∘ fV ]) ∘ i₂ ] ≈⟨ {!   !} ⟩ 
-           [ ([ i₁ ∘ fE ,  i₂ ∘ fV ] ∘ i₂) ∘ s A , ([ i₁ ∘ fE ,  i₂ ∘ fV ]) ∘ i₂ ] ≈⟨ {!   !} ⟩ 
-           [ (i₂ ∘ fV) ∘ s A ,  i₂ ∘ fV ] ≈⟨ {!   !} ⟩ 
-           [ i₂ ∘ (fV ∘ s A) ,  i₂ ∘ fV ] ≈⟨ {!   !} ⟩ 
-           [ i₂ ∘ (s B ∘ fE) ,  i₂ ∘ fV ] ≈⟨ {!   !} ⟩ 
-           [ i₂ ∘ s B , i₂ ] ∘ [ i₁ ∘ fE ,  i₂ ∘ fV ] ∎) {!   !}}
+  ; F₁ = λ { {A} {B} (graphmor fE fV s-eqv t-eqv) → anetmor (fE +₁ fV)
+    (begin [ i₁ ∘ fE ,  i₂ ∘ fV ] ∘ [ i₂ ∘ s A , i₂ ]                            ≈⟨ ∘-distribˡ-[] ⟩
+           [ [ i₁ ∘ fE ,  i₂ ∘ fV ] ∘ i₂ ∘ s A , [ i₁ ∘ fE ,  i₂ ∘ fV ] ∘ i₂ ]   ≈⟨ []-congʳ (sym assoc) ⟩
+           [ ([ i₁ ∘ fE ,  i₂ ∘ fV ] ∘ i₂) ∘ s A , [ i₁ ∘ fE ,  i₂ ∘ fV ] ∘ i₂ ] ≈⟨ []-cong₂ (inject₂ ⟩∘⟨refl) inject₂ ⟩
+           [ (i₂ ∘ fV) ∘ s A ,  i₂ ∘ fV ]                                        ≈⟨ []-congʳ assoc ⟩
+           [ i₂ ∘ (fV ∘ s A) ,  i₂ ∘ fV ]                                        ≈⟨ []-congʳ (refl⟩∘⟨ s-eqv) ⟩
+           [ i₂ ∘ (s B ∘ fE) ,  i₂ ∘ fV ]                                        ≈⟨ []-congʳ (sym assoc) ⟩
+           [ (i₂ ∘ s B) ∘ fE ,  i₂ ∘ fV ]                                        ≈⟨ []-cong₂ (sym (inject₁ ⟩∘⟨refl)) (sym (inject₂ ⟩∘⟨refl)) ⟩
+           [ ([ i₂ ∘ s B , i₂ ] ∘ i₁) ∘ fE ,  ([ i₂ ∘ s B , i₂ ] ∘ i₂) ∘ fV ]    ≈⟨ []-cong₂ assoc assoc ⟩
+           [ [ i₂ ∘ s B , i₂ ] ∘ i₁ ∘ fE ,  [ i₂ ∘ s B , i₂ ] ∘ i₂ ∘ fV ]        ≈⟨ sym ∘-distribˡ-[] ⟩
+           [ i₂ ∘ s B , i₂ ] ∘ [ i₁ ∘ fE ,  i₂ ∘ fV ] ∎)
+    (begin [ i₁ ∘ fE ,  i₂ ∘ fV ] ∘ [ i₂ ∘ t A , i₂ ]                            ≈⟨ ∘-distribˡ-[] ⟩
+           [ [ i₁ ∘ fE ,  i₂ ∘ fV ] ∘ i₂ ∘ t A , [ i₁ ∘ fE ,  i₂ ∘ fV ] ∘ i₂ ]   ≈⟨ []-congʳ (sym assoc) ⟩
+           [ ([ i₁ ∘ fE ,  i₂ ∘ fV ] ∘ i₂) ∘ t A , [ i₁ ∘ fE ,  i₂ ∘ fV ] ∘ i₂ ] ≈⟨ []-cong₂ (inject₂ ⟩∘⟨refl) inject₂ ⟩
+           [ (i₂ ∘ fV) ∘ t A ,  i₂ ∘ fV ]                                        ≈⟨ []-congʳ assoc ⟩
+           [ i₂ ∘ (fV ∘ t A) ,  i₂ ∘ fV ]                                        ≈⟨ []-congʳ (refl⟩∘⟨ t-eqv) ⟩
+           [ i₂ ∘ (t B ∘ fE) ,  i₂ ∘ fV ]                                        ≈⟨ []-congʳ (sym assoc) ⟩
+           [ (i₂ ∘ t B) ∘ fE ,  i₂ ∘ fV ]                                        ≈⟨ []-cong₂ (sym (inject₁ ⟩∘⟨refl)) (sym (inject₂ ⟩∘⟨refl)) ⟩
+           [ ([ i₂ ∘ t B , i₂ ] ∘ i₁) ∘ fE ,  ([ i₂ ∘ t B , i₂ ] ∘ i₂) ∘ fV ]    ≈⟨ []-cong₂ assoc assoc ⟩
+           [ [ i₂ ∘ t B , i₂ ] ∘ i₁ ∘ fE ,  [ i₂ ∘ t B , i₂ ] ∘ i₂ ∘ fV ]        ≈⟨ sym ∘-distribˡ-[] ⟩
+           [ i₂ ∘ t B , i₂ ] ∘ [ i₁ ∘ fE ,  i₂ ∘ fV ] ∎)}
   ; identity = identity -+-
   ; homomorphism = homomorphism -+-
   ; F-resp-≈ = λ { {A} {B} {u} {v} (fst , snd) → F-resp-≈ -+- (fst , snd) }
   } where open Cocartesian coc
           open Functor
 
-thm : {coc : Cocartesian 𝒞} → D coc ⊣ q*
-thm {coc} = record
-  { unit = record 
-    { η = λ { (graphobj {E} {V} s t) → graphmor i₁ i₂ {!   !} {!   !} }
-    ; commute = {!   !} 
-    ; sym-commute = {!   !} 
-    }
-  ; counit = record 
-    { η = λ { (anetobj {X} s t) → anetmor [ s , t ] {!   !} {!   !} }
-    ; commute = {!   !} 
-    ; sym-commute = {!   !} 
-    }
-  ; zig = {!   !}
-  ; zag = {!   !}
-  } where open Cocartesian coc
-          open Functor
+-- thm : {coc : Cocartesian 𝒞} → D coc ⊣ q*
+-- thm {coc} = record
+--   { unit = record
+--     { η = λ { (graphobj {E} {V} s t) → graphmor i₁ i₂ {!   !} {!   !} }
+--     ; commute = {!   !}
+--     ; sym-commute = {!   !}
+--     }
+--   ; counit = record
+--     { η = λ { (anetobj {X} s t) → anetmor [ s , t ] {!   !} {!   !} }
+--     ; commute = {!   !}
+--     ; sym-commute = {!   !}
+--     }
+--   ; zig = {!   !}
+--   ; zag = {!   !}
+--   } where open Cocartesian coc
+--           open Functor
