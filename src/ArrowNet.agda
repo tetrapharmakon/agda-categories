@@ -164,8 +164,8 @@ forget = record
 -- the discrete graph on a set: Ø ⇉ S
 disc : Cocartesian ℂ → Functor ℂ Graphs
 disc coc = record
-  { F₀ = λ S → graphobj {⊥} {S} (Cocartesian.¡ coc) (Cocartesian.¡ coc)
-  ; F₁ = λ {A} {B} u → graphmor id u (Cocartesian.¡-unique₂ coc (u ∘ ¡) (¡ ∘ id)) (Cocartesian.¡-unique₂ coc (u ∘ ¡) (¡ ∘ id))
+  { F₀ = λ S → graphobj {⊥} {S} ¡ ¡
+  ; F₁ = λ {A} {B} u → graphmor id u (¡-unique₂ (u ∘ ¡) (¡ ∘ id)) (¡-unique₂ (u ∘ ¡) (¡ ∘ id))
   ; identity = refl , refl
   ; homomorphism = sym identity² , refl
   ; F-resp-≈ = λ x → refl , x
