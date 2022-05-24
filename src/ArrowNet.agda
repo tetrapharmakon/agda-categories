@@ -185,11 +185,20 @@ codisc : Cartesian ℂ → Functor ℂ Graphs
 codisc c = record
   { F₀ = λ S → graphobj {A×B products} {S} (π₁ products) (π₂ products)
   ; F₁ = λ {A} {B} u → graphmor ((products ⁂ u) u) u (sym (π₁∘⁂ products)) (sym (π₂∘⁂ products))
-  ; identity = {!   !} , refl
+  ; identity = 
+    (begin 
+      Product.⟨ product products , id ∘ π₁ (product products) ⟩ (id ∘ π₂ (product products)) ≈⟨ BinaryProducts.⟨⟩-cong₂ products identityˡ identityˡ ⟩  
+      Product.⟨ product products , π₁ (product products) ⟩ (π₂ (product products))           ≈⟨ BinaryProducts.η products ⟩  
+      id
+    ∎) , refl
    -- trans (⁂-cong₂ products identityˡ identityˡ) ? , refl
-  ; homomorphism = {!   !} , refl
+  ; homomorphism = λ { {X} {Y} {Z} {f} {g} → 
+    (begin 
+      Product.⟨ product products , (g ∘ f) ∘ π₁ (product products) ⟩ ((g ∘ f) ∘ π₂ (product products)) ≈⟨ {!   !} ⟩ 
+      Product.⟨ product products , g ∘ π₁ (product products) ⟩ (g ∘ π₂ (product products)) ∘ Product.⟨ product products , f ∘ π₁ (product products) ⟩ (f ∘ π₂ (product products)) 
+    ∎) , refl }
   ; F-resp-≈ = λ {A} {B} {u} {v} u≈v → ⁂-cong₂ products u≈v u≈v , u≈v
   } where open Cartesian c
           open Functor
           open Categories.Object.Product.Product
-          open BinaryProducts
+          open BinaryProducts 
