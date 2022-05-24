@@ -2,21 +2,20 @@
 open import Categories.Category.Core
 open import Data.Product
 
-module ArrowNet {o ℓ e} (𝒞 : Category o ℓ e) where
+module ArrowNet {o ℓ e} (CC : Category o ℓ e) where
 
-open Category 𝒞
+open Category CC
 open HomReasoning
 open Equiv
 
 open import Level
 
-open import Categories.Morphism.Reasoning 𝒞
+open import Categories.Morphism.Reasoning CC
 open import Categories.Functor.Core
 open import Categories.Category.Cocartesian as cc
 open import Categories.Object.Coproduct
 open import Categories.Adjoint
--- open import Categories.Adjoint.Properties
-
+open import Categories.Functor.Limits
 
 record ANetObj : Set (o ⊔ ℓ) where
   constructor anetobj
@@ -97,7 +96,11 @@ Graphs = record
   ; identityˡ = identityˡ , identityˡ
   ; identityʳ = identityʳ , identityʳ
   ; identity² = identity² , identity²
-  ; equiv = record { refl = refl , refl ; sym = λ x → (sym (proj₁ x)) , (sym (proj₂ x)) ; trans = λ p q → (trans (proj₁ p) (proj₁ q)) , (trans (proj₂ p) (proj₂ q)) }
+  ; equiv = record 
+    { refl = refl , refl 
+    ; sym = λ x → (sym (proj₁ x)) , (sym (proj₂ x)) 
+    ; trans = λ p q → (trans (proj₁ p) (proj₁ q)) , (trans (proj₂ p) (proj₂ q)) 
+    }
   ; ∘-resp-≈ = λ p q → (∘-resp-≈ (proj₁ p) (proj₁ q)) , (∘-resp-≈ (proj₂ p) (proj₂ q))
   }
   where
@@ -122,7 +125,7 @@ q* = record
 
 
 -- a functor Graphs -> aNets, if the ambient category has coproducts
-D : Cocartesian 𝒞 → Functor Graphs aNets
+D : Cocartesian CC → Functor Graphs aNets
 D coc = record
   { F₀ = λ {(graphobj {E} {V} s t) → anetobj {E + V} [ i₂ ∘ s , i₂ ] [ i₂ ∘ t , i₂ ]}
   ; F₁ = λ { {A} {B} (graphmor fE fV s-eqv t-eqv) → anetmor (fE +₁ fV)
@@ -152,14 +155,15 @@ D coc = record
   } where open Cocartesian coc
           open Functor
 
--- thm : {coc : Cocartesian 𝒞} → D coc ⊣ q*
+-- thm : {coc : Cocartesian CC} → D coc ⊣ q*
 -- thm {coc} = record
 --   { unit = record
---     { η = λ { (graphobj {E} {V} s t) → graphmor i₁ i₂ {!   !} {!   !} }
---     ; commute = {!   !}
---     ; sym-commute = {!   !}
+--     { η = λ { (graphobj {E} {V} s t) → graphmor i₁ i₂ (sym inject₁) (sym inject₁) }
+--     ; commute = λ {(graphmor fE fV s-eqv t-eqv) → sym inject₁ , sym inject₂ }
+--     ; sym-commute = λ {(graphmor fE fV s-eqv t-eqv) → inject₁ , inject₂ }
 --     }
 --   ; counit = record
+--     -- there seems to be no way to define a counit!
 --     { η = λ { (anetobj {X} s t) → anetmor [ s , t ] {!   !} {!   !} }
 --     ; commute = {!   !}
 --     ; sym-commute = {!   !}
@@ -168,3 +172,15 @@ D coc = record
 --   ; zag = {!   !}
 --   } where open Cocartesian coc
 --           open Functor
+
+-- ..but D looks like a left adjoint
+
+thm' : ∀ {o ℓ e} {coc : Cocartesian CC} → Cocontinuous o ℓ e (D coc)
+thm' {coc = coc} record { initial = initial } = record 
+  { ! = record 
+    { arr = anetmor {!   !} {!   !} {!   !} 
+    ; commute = {!   !} 
+    } 
+  ; !-unique = {!   !} 
+  } where open Cocartesian coc
+          open Functor
