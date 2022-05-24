@@ -152,6 +152,7 @@ D coc = record
   } where open Cocartesian coc
           open Functor
 
+-- gives the object of vertices
 forget : Functor aNets ℂ
 forget = record
   { F₀ = λ { (anetobj {X} _ _) → X }
@@ -159,6 +160,16 @@ forget = record
   ; identity = λ {A} → refl
   ; homomorphism = refl
   ; F-resp-≈ = λ x → x
+  }
+
+-- same, but for graphs
+forget' : Functor Graphs ℂ
+forget' = record
+  { F₀ = λ { (graphobj {_} {V} _ _) → V }
+  ; F₁ = λ { (graphmor fE fV s-eqv t-eqv) → fV }
+  ; identity = refl
+  ; homomorphism = refl
+  ; F-resp-≈ = λ { (_ , snd) → snd }
   }
 
 -- the discrete graph on a set: Ø ⇉ S
@@ -172,6 +183,16 @@ disc coc = record
   } where open Cocartesian coc
           open Functor
 
+-- the graph with a single loop for every vertex in a set S
+loop : Functor ℂ Graphs
+loop = record
+  { F₀ = λ S → graphobj {S} {S} id id
+  ; F₁ = λ {A} {B} u → graphmor u u id-comm id-comm
+  ; identity = refl , refl
+  ; homomorphism = refl , refl
+  ; F-resp-≈ = λ x → x , x
+  }
+
 -- the codiscrete graph on a set: S × S ⇉ S
 codisc : Cartesian ℂ → Functor ℂ Graphs
 codisc c = record
@@ -180,6 +201,47 @@ codisc c = record
   ; identity = (⟨⟩-cong₂ identityˡ identityˡ ○ η) , refl
   ; homomorphism = sym ⁂∘⁂ , refl
   ; F-resp-≈ = λ u≈v → ⁂-cong₂ u≈v u≈v , u≈v
+  } where open Cartesian c
+          open Functor
+          open BinaryProducts products
+
+disc⊣forget : {coc : Cocartesian ℂ} → disc coc ⊣ forget'
+disc⊣forget {coc} = record
+  { unit = record
+    { η = λ A → id
+    ; commute = λ f → id-comm-sym
+    ; sym-commute = λ f → id-comm
+    }
+  ; counit = record
+    { η = λ { (graphobj {E} {V} s t) → graphmor ¡ id (¡-unique₂ (id ∘ ¡) (s ∘ ¡)) (¡-unique₂ (id ∘ ¡) (t ∘ ¡)) }
+    ; commute = λ { (graphmor fE fV s-eqv t-eqv) → trans identityʳ (¡-unique _) , id-comm-sym }
+    ; sym-commute = λ f → trans (sym (¡-unique _)) (sym identityʳ) , id-comm
+    }
+  ; zig = ⊥-id (¡ ∘ id) , identity²
+  ; zag = identity²
+  } where open Cocartesian coc
+          open Functor
+
+forget⊣codisc : {c : Cartesian ℂ} → forget' ⊣ codisc c
+forget⊣codisc {c} = record
+  { unit = record
+    { η = λ { (graphobj {E} {V} s t) → graphmor ⟨ s , t ⟩ id (sym (project₁ ○ sym identityˡ)) (sym (project₂ ○ sym identityˡ)) }
+    ; commute = λ { {graphobj {E} {V} s t} {graphobj {E'} {V'} s' t'} (graphmor fE fV s-eqv t-eqv) →
+      (begin ⟨ s' , t' ⟩ ∘ fE ≈⟨ ⟨⟩∘ ⟩
+             ⟨ s' ∘ fE , t' ∘ fE  ⟩ ≈⟨ sym (⟨⟩-cong₂ s-eqv t-eqv) ⟩
+             ⟨ fV ∘ s , fV ∘ t ⟩ ≈⟨ sym ⁂∘⟨⟩ ⟩
+             ⟨ fV ∘ π₁ , fV ∘ π₂ ⟩ ∘ ⟨ s , t ⟩
+      ∎)
+      , id-comm-sym }
+    ; sym-commute = λ { {X} {Y} (graphmor fE fV s-eqv t-eqv) → {!   !} , id-comm }
+    }
+  ; counit = record
+    { η = λ { X → id }
+    ; commute = λ f → id-comm-sym
+    ; sym-commute = λ f → id-comm
+    }
+  ; zig = identity²
+  ; zag = {!   !} , identity²
   } where open Cartesian c
           open Functor
           open BinaryProducts products
