@@ -233,7 +233,12 @@ forget⊣codisc {c} = record
              ⟨ fV ∘ π₁ , fV ∘ π₂ ⟩ ∘ ⟨ s , t ⟩
       ∎)
       , id-comm-sym }
-    ; sym-commute = λ { {X} {Y} (graphmor fE fV s-eqv t-eqv) → {!   !} , id-comm }
+    ; sym-commute = λ { {graphobj {E} {V} s t} {graphobj {E'} {V'} s' t'} (graphmor fE fV s-eqv t-eqv) →
+      sym (begin ⟨ s' , t' ⟩ ∘ fE ≈⟨ ⟨⟩∘ ⟩
+             ⟨ s' ∘ fE , t' ∘ fE  ⟩ ≈⟨ sym (⟨⟩-cong₂ s-eqv t-eqv) ⟩
+             ⟨ fV ∘ s , fV ∘ t ⟩ ≈⟨ sym ⁂∘⟨⟩ ⟩
+             ⟨ fV ∘ π₁ , fV ∘ π₂ ⟩ ∘ ⟨ s , t ⟩
+      ∎) , id-comm }
     }
   ; counit = record
     { η = λ { X → id }
@@ -241,7 +246,13 @@ forget⊣codisc {c} = record
     ; sym-commute = λ f → id-comm
     }
   ; zig = identity²
-  ; zag = {!   !} , identity²
+  ; zag =
+    (begin
+      ⟨ id ∘ π₁ , id ∘ π₂ ⟩ ∘ ⟨ π₁ , π₂ ⟩ ≈⟨ refl⟩∘⟨ η ⟩
+      ⟨ id ∘ π₁ , id ∘ π₂ ⟩ ∘ id ≈⟨ ⟨⟩-cong₂ identityˡ identityˡ ⟩∘⟨refl ⟩
+      ⟨ π₁ , π₂ ⟩ ∘ id ≈⟨ η ⟩∘⟨refl ○ identity² ⟩
+      id
+    ∎) , identity²
   } where open Cartesian c
           open Functor
           open BinaryProducts products
