@@ -14,7 +14,7 @@ open import Categories.Morphism.Reasoning ℂ
 open import Categories.Functor.Core
 open import Categories.Functor.Bifunctor using (Bifunctor)
 open import Categories.Category.Cartesian as c
-open import Categories.Category.BinaryProducts 
+open import Categories.Category.BinaryProducts
 open import Categories.Category.Cocartesian as cc
 open import Categories.Object.Coproduct
 open import Categories.Object.Product
@@ -101,10 +101,10 @@ Graphs = record
   ; identityˡ = identityˡ , identityˡ
   ; identityʳ = identityʳ , identityʳ
   ; identity² = identity² , identity²
-  ; equiv = record 
-    { refl = refl , refl 
-    ; sym = λ x → (sym (proj₁ x)) , (sym (proj₂ x)) 
-    ; trans = λ p q → (trans (proj₁ p) (proj₁ q)) , (trans (proj₂ p) (proj₂ q)) 
+  ; equiv = record
+    { refl = refl , refl
+    ; sym = λ x → (sym (proj₁ x)) , (sym (proj₂ x))
+    ; trans = λ p q → (trans (proj₁ p) (proj₁ q)) , (trans (proj₂ p) (proj₂ q))
     }
   ; ∘-resp-≈ = λ p q → (∘-resp-≈ (proj₁ p) (proj₁ q)) , (∘-resp-≈ (proj₂ p) (proj₂ q))
   }
@@ -137,21 +137,15 @@ D coc = record
     (begin [ i₁ ∘ fE ,  i₂ ∘ fV ] ∘ [ i₂ ∘ s A , i₂ ]                            ≈⟨ ∘-distribˡ-[] ⟩
            [ [ i₁ ∘ fE ,  i₂ ∘ fV ] ∘ i₂ ∘ s A , [ i₁ ∘ fE ,  i₂ ∘ fV ] ∘ i₂ ]   ≈⟨ []-congʳ (sym assoc) ⟩
            [ ([ i₁ ∘ fE ,  i₂ ∘ fV ] ∘ i₂) ∘ s A , [ i₁ ∘ fE ,  i₂ ∘ fV ] ∘ i₂ ] ≈⟨ []-cong₂ (inject₂ ⟩∘⟨refl) inject₂ ⟩
-           [ (i₂ ∘ fV) ∘ s A ,  i₂ ∘ fV ]                                        ≈⟨ []-congʳ assoc ⟩
-           [ i₂ ∘ (fV ∘ s A) ,  i₂ ∘ fV ]                                        ≈⟨ []-congʳ (refl⟩∘⟨ s-eqv) ⟩
-           [ i₂ ∘ (s B ∘ fE) ,  i₂ ∘ fV ]                                        ≈⟨ []-congʳ (sym assoc) ⟩
-           [ (i₂ ∘ s B) ∘ fE ,  i₂ ∘ fV ]                                        ≈⟨ []-cong₂ (sym (inject₁ ⟩∘⟨refl)) (sym (inject₂ ⟩∘⟨refl)) ⟩
-           [ ([ i₂ ∘ s B , i₂ ] ∘ i₁) ∘ fE ,  ([ i₂ ∘ s B , i₂ ] ∘ i₂) ∘ fV ]    ≈⟨ []-cong₂ assoc assoc ⟩
+           [ (i₂ ∘ fV) ∘ s A ,  i₂ ∘ fV ]                                        ≈⟨ []-congʳ (pullʳ s-eqv ○ sym assoc) ⟩
+           [ (i₂ ∘ s B) ∘ fE ,  i₂ ∘ fV ]                                        ≈⟨ []-cong₂ (sym (inject₁ ⟩∘⟨refl) ○ assoc) (sym (inject₂ ⟩∘⟨refl) ○ assoc) ⟩
            [ [ i₂ ∘ s B , i₂ ] ∘ i₁ ∘ fE ,  [ i₂ ∘ s B , i₂ ] ∘ i₂ ∘ fV ]        ≈⟨ sym ∘-distribˡ-[] ⟩
            [ i₂ ∘ s B , i₂ ] ∘ [ i₁ ∘ fE ,  i₂ ∘ fV ] ∎)
     (begin [ i₁ ∘ fE ,  i₂ ∘ fV ] ∘ [ i₂ ∘ t A , i₂ ]                            ≈⟨ ∘-distribˡ-[] ⟩
            [ [ i₁ ∘ fE ,  i₂ ∘ fV ] ∘ i₂ ∘ t A , [ i₁ ∘ fE ,  i₂ ∘ fV ] ∘ i₂ ]   ≈⟨ []-congʳ (sym assoc) ⟩
            [ ([ i₁ ∘ fE ,  i₂ ∘ fV ] ∘ i₂) ∘ t A , [ i₁ ∘ fE ,  i₂ ∘ fV ] ∘ i₂ ] ≈⟨ []-cong₂ (inject₂ ⟩∘⟨refl) inject₂ ⟩
-           [ (i₂ ∘ fV) ∘ t A ,  i₂ ∘ fV ]                                        ≈⟨ []-congʳ assoc ⟩
-           [ i₂ ∘ (fV ∘ t A) ,  i₂ ∘ fV ]                                        ≈⟨ []-congʳ (refl⟩∘⟨ t-eqv) ⟩
-           [ i₂ ∘ (t B ∘ fE) ,  i₂ ∘ fV ]                                        ≈⟨ []-congʳ (sym assoc) ⟩
-           [ (i₂ ∘ t B) ∘ fE ,  i₂ ∘ fV ]                                        ≈⟨ []-cong₂ (sym (inject₁ ⟩∘⟨refl)) (sym (inject₂ ⟩∘⟨refl)) ⟩
-           [ ([ i₂ ∘ t B , i₂ ] ∘ i₁) ∘ fE ,  ([ i₂ ∘ t B , i₂ ] ∘ i₂) ∘ fV ]    ≈⟨ []-cong₂ assoc assoc ⟩
+           [ (i₂ ∘ fV) ∘ t A ,  i₂ ∘ fV ]                                        ≈⟨ []-congʳ (pullʳ t-eqv ○ sym assoc) ⟩
+           [ (i₂ ∘ t B) ∘ fE ,  i₂ ∘ fV ]                                        ≈⟨ []-cong₂ (sym (inject₁ ⟩∘⟨refl) ○ assoc) (sym (inject₂ ⟩∘⟨refl) ○ assoc) ⟩
            [ [ i₂ ∘ t B , i₂ ] ∘ i₁ ∘ fE ,  [ i₂ ∘ t B , i₂ ] ∘ i₂ ∘ fV ]        ≈⟨ sym ∘-distribˡ-[] ⟩
            [ i₂ ∘ t B , i₂ ] ∘ [ i₁ ∘ fE ,  i₂ ∘ fV ] ∎)}
   ; identity = identity -+-
@@ -169,7 +163,7 @@ forget = record
   ; F-resp-≈ = λ x → x
   }
 
--- the discrete graph on a set: Ø ⇉ S 
+-- the discrete graph on a set: Ø ⇉ S
 disc : Cocartesian ℂ → Functor ℂ Graphs
 disc coc = record
   { F₀ = λ S → graphobj {⊥} {S} (Cocartesian.¡ coc) (Cocartesian.¡ coc)
@@ -180,24 +174,15 @@ disc coc = record
   } where open Cocartesian coc
           open Functor
 
--- the codiscrete graph on a set: S × S ⇉ S 
+-- the codiscrete graph on a set: S × S ⇉ S
 codisc : Cartesian ℂ → Functor ℂ Graphs
 codisc c = record
   { F₀ = λ S → graphobj {A×B products} {S} (π₁ products) (π₂ products)
   ; F₁ = λ {A} {B} u → graphmor ((products ⁂ u) u) u (sym (π₁∘⁂ products)) (sym (π₂∘⁂ products))
-  ; identity = 
-    (begin 
-      Product.⟨ product products , id ∘ π₁ (product products) ⟩ (id ∘ π₂ (product products)) ≈⟨ BinaryProducts.⟨⟩-cong₂ products identityˡ identityˡ ⟩  
-      Product.⟨ product products , π₁ (product products) ⟩ (π₂ (product products))           ≈⟨ BinaryProducts.η products ⟩  
-      id
-    ∎) , refl
-  ; homomorphism = λ { {X} {Y} {Z} {f} {g} → 
-    (begin 
-      Product.⟨ product products , (g ∘ f) ∘ π₁ (product products) ⟩ ((g ∘ f) ∘ π₂ (product products)) ≈⟨ {!   !} ⟩ 
-      Product.⟨ product products , g ∘ π₁ (product products) ⟩ (g ∘ π₂ (product products)) ∘ Product.⟨ product products , f ∘ π₁ (product products) ⟩ (f ∘ π₂ (product products)) 
-    ∎) , refl }
+  ; identity = (BinaryProducts.⟨⟩-cong₂ products identityˡ identityˡ ○ BinaryProducts.η products) , refl
+  ; homomorphism = λ { {X} {Y} {Z} {f} {g} → sym (⁂∘⁂ products) , refl }
   ; F-resp-≈ = λ {A} {B} {u} {v} u≈v → ⁂-cong₂ products u≈v u≈v , u≈v
   } where open Cartesian c
           open Functor
           open Categories.Object.Product.Product
-          open BinaryProducts 
+          open BinaryProducts
