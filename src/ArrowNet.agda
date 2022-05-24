@@ -17,8 +17,6 @@ open import Categories.Category.Cartesian as c
 open import Categories.Category.BinaryProducts
 open import Categories.Category.Cocartesian as cc
 open import Categories.Object.Coproduct
-open import Categories.Object.Product
-open import Categories.Object.Product.Core
 open import Categories.Adjoint
 open import Categories.Functor.Limits
 
@@ -177,12 +175,11 @@ disc coc = record
 -- the codiscrete graph on a set: S × S ⇉ S
 codisc : Cartesian ℂ → Functor ℂ Graphs
 codisc c = record
-  { F₀ = λ S → graphobj {A×B products} {S} (π₁ products) (π₂ products)
-  ; F₁ = λ {A} {B} u → graphmor ((products ⁂ u) u) u (sym (π₁∘⁂ products)) (sym (π₂∘⁂ products))
-  ; identity = (BinaryProducts.⟨⟩-cong₂ products identityˡ identityˡ ○ BinaryProducts.η products) , refl
-  ; homomorphism = λ { {X} {Y} {Z} {f} {g} → sym (⁂∘⁂ products) , refl }
-  ; F-resp-≈ = λ {A} {B} {u} {v} u≈v → ⁂-cong₂ products u≈v u≈v , u≈v
+  { F₀ = λ S → graphobj {A×B} {S} π₁ π₂
+  ; F₁ = λ u → graphmor (u ⁂ u) u (sym π₁∘⁂) (sym π₂∘⁂)
+  ; identity = (⟨⟩-cong₂ identityˡ identityˡ ○ η) , refl
+  ; homomorphism = sym ⁂∘⁂ , refl
+  ; F-resp-≈ = λ u≈v → ⁂-cong₂ u≈v u≈v , u≈v
   } where open Cartesian c
           open Functor
-          open Categories.Object.Product.Product
-          open BinaryProducts
+          open BinaryProducts products
