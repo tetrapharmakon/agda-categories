@@ -2,18 +2,23 @@
 open import Categories.Category.Core
 open import Data.Product
 
-module ArrowNet {o ℓ e} (CC : Category o ℓ e) where
+module ArrowNet {o ℓ e} (ℂ : Category o ℓ e) where
 
-open Category CC
+open Category ℂ
 open HomReasoning
 open Equiv
 
 open import Level
 
-open import Categories.Morphism.Reasoning CC
+open import Categories.Morphism.Reasoning ℂ
 open import Categories.Functor.Core
+open import Categories.Functor.Bifunctor using (Bifunctor)
+open import Categories.Category.Cartesian as c
+open import Categories.Category.BinaryProducts 
 open import Categories.Category.Cocartesian as cc
 open import Categories.Object.Coproduct
+open import Categories.Object.Product
+open import Categories.Object.Product.Core
 open import Categories.Adjoint
 open import Categories.Functor.Limits
 
@@ -125,7 +130,7 @@ q* = record
 
 
 -- a functor Graphs -> aNets, if the ambient category has coproducts
-D : Cocartesian CC → Functor Graphs aNets
+D : Cocartesian ℂ → Functor Graphs aNets
 D coc = record
   { F₀ = λ {(graphobj {E} {V} s t) → anetobj {E + V} [ i₂ ∘ s , i₂ ] [ i₂ ∘ t , i₂ ]}
   ; F₁ = λ { {A} {B} (graphmor fE fV s-eqv t-eqv) → anetmor (fE +₁ fV)
@@ -155,32 +160,36 @@ D coc = record
   } where open Cocartesian coc
           open Functor
 
--- thm : {coc : Cocartesian CC} → D coc ⊣ q*
--- thm {coc} = record
---   { unit = record
---     { η = λ { (graphobj {E} {V} s t) → graphmor i₁ i₂ (sym inject₁) (sym inject₁) }
---     ; commute = λ {(graphmor fE fV s-eqv t-eqv) → sym inject₁ , sym inject₂ }
---     ; sym-commute = λ {(graphmor fE fV s-eqv t-eqv) → inject₁ , inject₂ }
---     }
---   ; counit = record
---     -- there seems to be no way to define a counit!
---     { η = λ { (anetobj {X} s t) → anetmor [ s , t ] {!   !} {!   !} }
---     ; commute = {!   !}
---     ; sym-commute = {!   !}
---     }
---   ; zig = {!   !}
---   ; zag = {!   !}
---   } where open Cocartesian coc
---           open Functor
+forget : Functor aNets ℂ
+forget = record
+  { F₀ = λ { (anetobj {X} _ _) → X }
+  ; F₁ = λ (anetmor f _ _) → f
+  ; identity = λ {A} → refl
+  ; homomorphism = refl
+  ; F-resp-≈ = λ x → x
+  }
 
--- ..but D looks like a left adjoint
-
-thm' : ∀ {o ℓ e} {coc : Cocartesian CC} → Cocontinuous o ℓ e (D coc)
-thm' {coc = coc} record { initial = initial } = record 
-  { ! = record 
-    { arr = anetmor {!   !} {!   !} {!   !} 
-    ; commute = {!   !} 
-    } 
-  ; !-unique = {!   !} 
+-- the discrete graph on a set: Ø ⇉ S 
+disc : Cocartesian ℂ → Functor ℂ Graphs
+disc coc = record
+  { F₀ = λ S → graphobj {⊥} {S} (Cocartesian.¡ coc) (Cocartesian.¡ coc)
+  ; F₁ = λ {A} {B} u → graphmor id u (Cocartesian.¡-unique₂ coc (u ∘ ¡) (¡ ∘ id)) (Cocartesian.¡-unique₂ coc (u ∘ ¡) (¡ ∘ id))
+  ; identity = refl , refl
+  ; homomorphism = sym identity² , refl
+  ; F-resp-≈ = λ x → refl , x
   } where open Cocartesian coc
           open Functor
+
+-- the codiscrete graph on a set: S × S ⇉ S 
+codisc : Cartesian ℂ → Functor ℂ Graphs
+codisc c = record
+  { F₀ = λ S → graphobj {A×B products} {S} (π₁ products) (π₂ products)
+  ; F₁ = λ {A} {B} u → graphmor ((products ⁂ u) u) u (sym (π₁∘⁂ products)) (sym (π₂∘⁂ products))
+  ; identity = {!   !} , refl
+   -- trans (⁂-cong₂ products identityˡ identityˡ) ? , refl
+  ; homomorphism = {!   !} , refl
+  ; F-resp-≈ = λ {A} {B} {u} {v} u≈v → ⁂-cong₂ products u≈v u≈v , u≈v
+  } where open Cartesian c
+          open Functor
+          open Categories.Object.Product.Product
+          open BinaryProducts
