@@ -191,7 +191,6 @@ codisc c = record
       Product.⟨ product products , π₁ (product products) ⟩ (π₂ (product products))           ≈⟨ BinaryProducts.η products ⟩  
       id
     ∎) , refl
-   -- trans (⁂-cong₂ products identityˡ identityˡ) ? , refl
   ; homomorphism = λ { {X} {Y} {Z} {f} {g} → 
     (begin 
       Product.⟨ product products , (g ∘ f) ∘ π₁ (product products) ⟩ ((g ∘ f) ∘ π₂ (product products)) ≈⟨ {!   !} ⟩ 
