@@ -79,19 +79,18 @@ aNets = record
   where
   comp : {A B C : ANetObj} → ANetMor B C → ANetMor A B → ANetMor A C
   comp {A} {B} {C} (anetmor f eqs eqt) (anetmor g eqs' eqt') = anetmor (f ∘ g)
-    (begin (f ∘ g) ∘ ANetObj.s A  ≈⟨ pullʳ eqs' ○ sym assoc ⟩
-           (f ∘ ANetObj.s B) ∘ g  ≈⟨ pushˡ eqs ⟩
-            ANetObj.s C ∘ f ∘ g   ∎)
-    (begin (f ∘ g) ∘ ANetObj.t A  ≈⟨ pullʳ eqt' ○ sym assoc ⟩
-           (f ∘ ANetObj.t B) ∘ g  ≈⟨ pushˡ eqt ⟩
-            ANetObj.t C ∘ f ∘ g   ∎)
-
+    (begin (f ∘ g) ∘ s A  ≈⟨ pullʳ eqs' ○ sym assoc ⟩
+           (f ∘ s B) ∘ g  ≈⟨ pushˡ eqs ⟩
+           s C ∘ f ∘ g    ∎)
+    (begin (f ∘ g) ∘ t A  ≈⟨ pullʳ eqt' ○ sym assoc ⟩
+           (f ∘ t B) ∘ g  ≈⟨ pushˡ eqt ⟩
+           t C ∘ f ∘ g    ∎)
 
 Graphs : Category _ _ _
 Graphs = record
   { Obj = GraphObj
   ; _⇒_ = λ G H → GraphMor G H
-  ; _≈_ = λ u v → (GraphMor.fE u ≈ GraphMor.fE v) × (GraphMor.fV u ≈ GraphMor.fV v)
+  ; _≈_ = λ u v → (fE u ≈ fE v) × (fV u ≈ fV v)
   ; id = graphmor id id id-comm-sym id-comm-sym
   ; _∘_ = comp
   ; assoc = assoc , assoc
@@ -119,13 +118,12 @@ Graphs = record
 -- a "tautological" functor aNets -> Graphs
 q* : Functor aNets Graphs
 q* = record
-  { F₀ = λ {record { X = X ; s = s ; t = t } → record { s = s ; t = t }}
+  { F₀ = λ { (anetobj {X} s t) → graphobj s t}
   ; F₁ = λ {(anetmor f seqv teqv) → graphmor f f seqv teqv}
   ; identity = refl , refl
   ; homomorphism = refl , refl
   ; F-resp-≈ = λ x → x , x
   }
-
 
 -- a functor Graphs -> aNets, if the ambient category has coproducts
 D : Cocartesian ℂ → Functor Graphs aNets
@@ -148,7 +146,7 @@ D coc = record
            [ i₂ ∘ t B , i₂ ] ∘ [ i₁ ∘ fE ,  i₂ ∘ fV ] ∎)}
   ; identity = identity -+-
   ; homomorphism = homomorphism -+-
-  ; F-resp-≈ = λ { {A} {B} {u} {v} (fst , snd) → F-resp-≈ -+- (fst , snd) }
+  ; F-resp-≈ = λ { (fst , snd) → F-resp-≈ -+- (fst , snd) }
   } where open Cocartesian coc
           open Functor
 
@@ -157,7 +155,7 @@ forget : Functor aNets ℂ
 forget = record
   { F₀ = λ { (anetobj {X} _ _) → X }
   ; F₁ = λ (anetmor f _ _) → f
-  ; identity = λ {A} → refl
+  ; identity = refl
   ; homomorphism = refl
   ; F-resp-≈ = λ x → x
   }
@@ -166,7 +164,7 @@ forget = record
 forget' : Functor Graphs ℂ
 forget' = record
   { F₀ = λ { (graphobj {_} {V} _ _) → V }
-  ; F₁ = λ { (graphmor fE fV s-eqv t-eqv) → fV }
+  ; F₁ = λ { (graphmor _ fV _ _) → fV }
   ; identity = refl
   ; homomorphism = refl
   ; F-resp-≈ = λ { (_ , snd) → snd }
@@ -175,8 +173,8 @@ forget' = record
 -- the discrete graph on a set: Ø ⇉ S
 disc : Cocartesian ℂ → Functor ℂ Graphs
 disc coc = record
-  { F₀ = λ S → graphobj {⊥} {S} ¡ ¡
-  ; F₁ = λ {A} {B} u → graphmor id u (¡-unique₂ (u ∘ ¡) (¡ ∘ id)) (¡-unique₂ (u ∘ ¡) (¡ ∘ id))
+  { F₀ = λ S → graphobj {_} {S} ¡ ¡
+  ; F₁ = λ u → graphmor id u (¡-unique₂ (u ∘ ¡) (¡ ∘ id)) (¡-unique₂ (u ∘ ¡) (¡ ∘ id))
   ; identity = refl , refl
   ; homomorphism = sym identity² , refl
   ; F-resp-≈ = λ x → refl , x
@@ -187,7 +185,7 @@ disc coc = record
 loop : Functor ℂ Graphs
 loop = record
   { F₀ = λ S → graphobj {S} {S} id id
-  ; F₁ = λ {A} {B} u → graphmor u u id-comm id-comm
+  ; F₁ = λ u → graphmor u u id-comm id-comm
   ; identity = refl , refl
   ; homomorphism = refl , refl
   ; F-resp-≈ = λ x → x , x
@@ -208,9 +206,9 @@ codisc c = record
 disc⊣forget : {coc : Cocartesian ℂ} → disc coc ⊣ forget'
 disc⊣forget {coc} = record
   { unit = record
-    { η = λ A → id
-    ; commute = λ f → id-comm-sym
-    ; sym-commute = λ f → id-comm
+    { η = λ _ → id
+    ; commute = λ _ → id-comm-sym
+    ; sym-commute = λ _ → id-comm
     }
   ; counit = record
     { η = λ { (graphobj {E} {V} s t) → graphmor ¡ id (¡-unique₂ (id ∘ ¡) (s ∘ ¡)) (¡-unique₂ (id ∘ ¡) (t ∘ ¡)) }
@@ -225,34 +223,35 @@ disc⊣forget {coc} = record
 forget⊣codisc : {c : Cartesian ℂ} → forget' ⊣ codisc c
 forget⊣codisc {c} = record
   { unit = record
-    { η = λ { (graphobj {E} {V} s t) → graphmor ⟨ s , t ⟩ id (sym (project₁ ○ sym identityˡ)) (sym (project₂ ○ sym identityˡ)) }
-    ; commute = λ { {graphobj {E} {V} s t} {graphobj {E'} {V'} s' t'} (graphmor fE fV s-eqv t-eqv) →
-      (begin ⟨ s' , t' ⟩ ∘ fE ≈⟨ ⟨⟩∘ ⟩
-             ⟨ s' ∘ fE , t' ∘ fE  ⟩ ≈⟨ sym (⟨⟩-cong₂ s-eqv t-eqv) ⟩
-             ⟨ fV ∘ s , fV ∘ t ⟩ ≈⟨ sym ⁂∘⟨⟩ ⟩
-             ⟨ fV ∘ π₁ , fV ∘ π₂ ⟩ ∘ ⟨ s , t ⟩
-      ∎)
+    { η = λ { (graphobj s t) → graphmor ⟨ s , t ⟩ id (sym (project₁ ○ sym identityˡ)) (sym (project₂ ○ sym identityˡ)) }
+    ; commute = λ { {graphobj s t} {graphobj s' t'} (graphmor fE fV s-eqv t-eqv) →
+      (begin
+        ⟨ s' , t' ⟩ ∘ fE                  ≈⟨ ⟨⟩∘ ⟩
+        ⟨ s' ∘ fE , t' ∘ fE  ⟩            ≈⟨ sym (⟨⟩-cong₂ s-eqv t-eqv) ⟩
+        ⟨ fV ∘ s , fV ∘ t ⟩               ≈⟨ sym ⁂∘⟨⟩ ⟩
+        ⟨ fV ∘ π₁ , fV ∘ π₂ ⟩ ∘ ⟨ s , t ⟩ ∎)
       , id-comm-sym }
-    ; sym-commute = λ { {graphobj {E} {V} s t} {graphobj {E'} {V'} s' t'} (graphmor fE fV s-eqv t-eqv) →
-      sym (begin ⟨ s' , t' ⟩ ∘ fE ≈⟨ ⟨⟩∘ ⟩
-             ⟨ s' ∘ fE , t' ∘ fE  ⟩ ≈⟨ sym (⟨⟩-cong₂ s-eqv t-eqv) ⟩
-             ⟨ fV ∘ s , fV ∘ t ⟩ ≈⟨ sym ⁂∘⟨⟩ ⟩
-             ⟨ fV ∘ π₁ , fV ∘ π₂ ⟩ ∘ ⟨ s , t ⟩
-      ∎) , id-comm }
+    ; sym-commute = λ { {graphobj s t} {graphobj s' t'} (graphmor fE fV s-eqv t-eqv) →
+      sym (begin
+             ⟨ s' , t' ⟩ ∘ fE                  ≈⟨ ⟨⟩∘ ⟩
+             ⟨ s' ∘ fE , t' ∘ fE  ⟩            ≈⟨ sym (⟨⟩-cong₂ s-eqv t-eqv) ⟩
+             ⟨ fV ∘ s , fV ∘ t ⟩               ≈⟨ sym ⁂∘⟨⟩ ⟩
+             ⟨ fV ∘ π₁ , fV ∘ π₂ ⟩ ∘ ⟨ s , t ⟩ ∎)
+      , id-comm }
     }
   ; counit = record
-    { η = λ { X → id }
-    ; commute = λ f → id-comm-sym
-    ; sym-commute = λ f → id-comm
+    { η = λ { _ → id }
+    ; commute = λ _ → id-comm-sym
+    ; sym-commute = λ _ → id-comm
     }
   ; zig = identity²
   ; zag =
     (begin
       ⟨ id ∘ π₁ , id ∘ π₂ ⟩ ∘ ⟨ π₁ , π₂ ⟩ ≈⟨ refl⟩∘⟨ η ⟩
-      ⟨ id ∘ π₁ , id ∘ π₂ ⟩ ∘ id ≈⟨ ⟨⟩-cong₂ identityˡ identityˡ ⟩∘⟨refl ⟩
-      ⟨ π₁ , π₂ ⟩ ∘ id ≈⟨ η ⟩∘⟨refl ○ identity² ⟩
-      id
-    ∎) , identity²
+      ⟨ id ∘ π₁ , id ∘ π₂ ⟩ ∘ id          ≈⟨ ⟨⟩-cong₂ identityˡ identityˡ ⟩∘⟨refl ⟩
+      ⟨ π₁ , π₂ ⟩ ∘ id                    ≈⟨ η ⟩∘⟨refl ○ identity² ⟩
+      id                                  ∎)
+    , identity²
   } where open Cartesian c
           open Functor
           open BinaryProducts products
