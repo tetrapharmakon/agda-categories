@@ -125,6 +125,33 @@ q* = record
   ; F-resp-≈ = λ x → x , x
   }
 
+q0* : Functor aNets Graphs
+q0* = record
+  { F₀ = λ { (anetobj {X} _ _) → graphobj {X} {X} id id}
+  ; F₁ = λ { (anetmor f _ _) → graphmor f f id-comm id-comm}
+  ; identity = refl , refl
+  ; homomorphism = refl , refl
+  ; F-resp-≈ = λ x → x , x
+  }
+
+qs* : Functor aNets Graphs
+qs* = record
+  { F₀ = λ { (anetobj {X} s _) → graphobj {X} {X} s s}
+  ; F₁ = λ { (anetmor f s-eqv _) → graphmor f f s-eqv s-eqv}
+  ; identity = refl , refl
+  ; homomorphism = refl , refl
+  ; F-resp-≈ = λ x → x , x
+  }
+
+qt* : Functor aNets Graphs
+qt* = record
+  { F₀ = λ { (anetobj {X} _ t) → graphobj {X} {X} t t}
+  ; F₁ = λ { (anetmor f _ t-eqv) → graphmor f f t-eqv t-eqv}
+  ; identity = refl , refl
+  ; homomorphism = refl , refl
+  ; F-resp-≈ = λ x → x , x
+  }
+
 -- a functor Graphs -> aNets, if the ambient category has coproducts
 D : Cocartesian ℂ → Functor Graphs aNets
 D coc = record
@@ -255,3 +282,21 @@ forget⊣codisc {c} = record
   } where open Cartesian c
           open Functor
           open BinaryProducts products
+
+-- was I wrong again?!
+D⊣qs* : {coc : Cocartesian ℂ} → D coc ⊣ qs*
+D⊣qs* {coc} = record
+  { unit = record
+    { η = λ { (graphobj {E} {V} s t) → graphmor (i₂ ∘ s) i₂ {!   !} {!   !}}
+    ; commute = {!   !}
+    ; sym-commute = {!   !}
+    }
+  ; counit = record
+    { η = λ { (anetobj {X} s t) → anetmor {!   !} {!   !} {!   !}}
+    ; commute = {!   !}
+    ; sym-commute = {!   !}
+    }
+  ; zig = {!   !}
+  ; zag = {!   !}
+  } where open Cocartesian coc
+          open Functor
