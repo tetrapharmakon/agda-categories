@@ -19,6 +19,9 @@ open import Categories.Category.Cocartesian as cc
 open import Categories.Object.Coproduct
 open import Categories.Adjoint
 open import Categories.Functor.Limits
+open import Categories.Diagram.Equalizer ℂ
+open import Categories.Category.Complete.Finitely ℂ
+open import Categories.Diagram.Pullback
 
 record ANetObj : Set (o ⊔ ℓ) where
   constructor anetobj
@@ -283,20 +286,14 @@ forget⊣codisc {c} = record
           open Functor
           open BinaryProducts products
 
--- was I wrong again?!
-D⊣qs* : {coc : Cocartesian ℂ} → D coc ⊣ qs*
-D⊣qs* {coc} = record
-  { unit = record
-    { η = λ { (graphobj {E} {V} s t) → graphmor (i₂ ∘ s) i₂ {!   !} {!   !}}
-    ; commute = {!   !}
-    ; sym-commute = {!   !}
-    }
-  ; counit = record
-    { η = λ { (anetobj {X} s t) → anetmor {!   !} {!   !} {!   !}}
-    ; commute = {!   !}
-    ; sym-commute = {!   !}
-    }
-  ; zig = {!   !}
-  ; zag = {!   !}
-  } where open Cocartesian coc
-          open Functor
+-- another functor
+R : {fc : FinitelyComplete} → Functor aNets Graphs
+R {fc} = record
+  { F₀ = λ { (anetobj {X} s t) → graphobj {obj (equalizer fc s t)} {P (pullback fc s (arr (equalizer fc s t)))} {!   !} {!   !}}
+  ; F₁ = λ { {anetobj {A} s t} {anetobj {B} s' t'} (anetmor f s-eqv t-eqv) → graphmor (equalize ((equalizer fc s' t')) {!   !}) {!   !} {!   !} {!   !}}
+  ; identity = {!   !}
+  ; homomorphism = {!   !}
+  ; F-resp-≈ = {!   !}
+  } where open Equalizer
+          open FinitelyComplete
+          open Pullback
