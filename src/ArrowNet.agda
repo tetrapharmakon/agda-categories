@@ -322,12 +322,36 @@ E' ⇉ V' → π₀K' = coequalizer.obj fcoc s' t'
            ((coequalizer.arr fcoc s' t') ∘ fV) ∘ t  ∎)}
   ; identity = λ { {graphobj {E} {V} s t} → sym (unique (coequalizer fcoc s t) id-comm) }
   ; homomorphism = λ { {graphobj {E} {V} s t} {graphobj {E'} {V'} s' t'} {graphobj {E''} {V''} s'' t''} {graphmor fE₁ fV₁ s-eqv₁ t-eqv₁} {graphmor fE₂ fV₂ s-eqv₂ t-eqv₂} → sym (unique (coequalizer fcoc s t)
-    (begin coequalizer.arr fcoc s'' t'' ∘ fV₂ ∘ fV₁ ≈⟨ {!   !} ⟩
-           (coequalize (coequalizer fcoc s' t') {!   !} ∘ coequalize (coequalizer fcoc s t) {!   !}) ∘ coequalizer.arr fcoc s t ∎))}
-  ; F-resp-≈ = λ { (fst , snd) → {!   !}}
+    (begin coequalizer.arr fcoc s'' t'' ∘ fV₂ ∘ fV₁ ≈⟨ sym assoc ⟩
+           (coequalizer.arr fcoc s'' t'' ∘ fV₂) ∘ fV₁ ≈⟨ universal (coequalizer fcoc s' t') ⟩∘⟨refl ⟩
+           ((coequalize (coequalizer fcoc s' t') (pf1 {graphobj s t} {_} {_} {graphmor fE₁ fV₁ s-eqv₁ t-eqv₁} {_})) ∘ coequalizer.arr fcoc s' t') ∘ fV₁ ≈⟨ assoc ⟩
+           (coequalize (coequalizer fcoc s' t') (pf1 {graphobj s t} {_} {_} {graphmor fE₁ fV₁ s-eqv₁ t-eqv₁} {_})) ∘ coequalizer.arr fcoc s' t' ∘ fV₁ ≈⟨ refl⟩∘⟨ universal (coequalizer fcoc s t) ⟩
+           (coequalize (coequalizer fcoc s' t') (pf1 {graphobj s t} {_} {_} {graphmor fE₁ fV₁ s-eqv₁ t-eqv₁} {_})) ∘ (coequalize (coequalizer fcoc s t) (pf2 {_} {_} {graphobj s'' t''} {_} {graphmor fE₂ fV₂ s-eqv₂ t-eqv₂})) ∘ coequalizer.arr fcoc s t ≈⟨ sym assoc ⟩
+           ((coequalize (coequalizer fcoc s' t') (pf1 {graphobj s t} {_} {_} {graphmor fE₁ fV₁ s-eqv₁ t-eqv₁} {_})) ∘ (coequalize (coequalizer fcoc s t) (pf2 {_} {_} {graphobj s'' t''} {_} {graphmor fE₂ fV₂ s-eqv₂ t-eqv₂}))) ∘ coequalizer.arr fcoc s t ∎))}
+  ; F-resp-≈ = λ { {graphobj s t} (_ , snd) → coequalize-resp-≈ (coequalizer fcoc s t) (refl⟩∘⟨ snd)}
   } where open FinitelyCocomplete
           open Coequalizer
+          pf1 : {X Y Z : Category.Obj Graphs} {f : GraphMor X Y} {g  : GraphMor Y Z} → (coequalizer.arr fcoc (s Z) (t Z) ∘ fV g) ∘ s Y ≈ (coequalizer.arr fcoc (s Z) (t Z) ∘ fV g) ∘ t Y
+          pf1 {graphobj {E} {V} s t} {graphobj {E'} {V'} s' t'} {graphobj {E''} {V''} s'' t''} {graphmor fE₁ fV₁ s-eqv₁ t-eqv₁} {graphmor fE₂ fV₂ s-eqv₂ t-eqv₂} = 
+            begin (coequalizer.arr fcoc s'' t'' ∘ fV₂) ∘ s' ≈⟨ assoc ⟩ 
+                  coequalizer.arr fcoc s'' t'' ∘ fV₂ ∘ s' ≈⟨ (refl⟩∘⟨ s-eqv₂) ⟩ 
+                  coequalizer.arr fcoc s'' t'' ∘ s'' ∘ fE₂ ≈⟨ sym assoc ⟩ 
+                  (coequalizer.arr fcoc s'' t'' ∘ s'') ∘ fE₂ ≈⟨ equality ((coequalizer fcoc s'' t'')) ⟩∘⟨refl ⟩ 
+                  (coequalizer.arr fcoc s'' t'' ∘ t'') ∘ fE₂ ≈⟨ assoc ⟩ 
+                  coequalizer.arr fcoc s'' t'' ∘ t'' ∘ fE₂ ≈⟨ (refl⟩∘⟨ sym t-eqv₂) ⟩ 
+                  coequalizer.arr fcoc s'' t'' ∘ fV₂ ∘ t' ≈⟨ sym assoc ⟩ 
+                  (coequalizer.arr fcoc s'' t'' ∘ fV₂) ∘ t' ∎
+          pf2 : {X Y Z : Category.Obj Graphs} {f : GraphMor X Y} {g  : GraphMor Y Z} → (coequalizer.arr fcoc (s Y) (t Y) ∘ fV f) ∘ s X ≈ (coequalizer.arr fcoc (s Y) (t Y) ∘ fV f) ∘ t X
+          pf2 {graphobj {E} {V} s t} {graphobj {E'} {V'} s' t'} {graphobj {E''} {V''} s'' t''} {graphmor fE₁ fV₁ s-eqv₁ t-eqv₁} {graphmor fE₂ fV₂ s-eqv₂ t-eqv₂} = 
+            begin (coequalizer.arr fcoc s' t' ∘ fV₁) ∘ s ≈⟨ assoc ⟩ 
+                  coequalizer.arr fcoc s' t' ∘ fV₁ ∘ s ≈⟨ (refl⟩∘⟨ s-eqv₁) ⟩ 
+                  coequalizer.arr fcoc s' t' ∘ s' ∘ fE₁  ≈⟨ sym assoc ⟩ 
+                  (coequalizer.arr fcoc s' t' ∘ s') ∘ fE₁  ≈⟨ equality ((coequalizer fcoc s' t')) ⟩∘⟨refl ⟩
+                  (coequalizer.arr fcoc s' t' ∘ t') ∘ fE₁  ≈⟨ assoc ⟩ 
+                  coequalizer.arr fcoc s' t' ∘ t' ∘ fE₁  ≈⟨ (refl⟩∘⟨ sym t-eqv₁) ⟩ 
+                  coequalizer.arr fcoc s' t' ∘ fV₁ ∘ t ≈⟨ sym assoc ⟩ 
+                  (coequalizer.arr fcoc s' t' ∘ fV₁) ∘ t ∎
 
 -- todo
 -- define pi0
--- define triequaliser
+-- define triequaliser 
