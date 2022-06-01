@@ -20,8 +20,10 @@ open import Categories.Object.Coproduct
 open import Categories.Adjoint
 open import Categories.Functor.Limits
 open import Categories.Diagram.Equalizer ℂ
+open import Categories.Diagram.Coequalizer ℂ
 open import Categories.Category.Complete.Finitely ℂ
 open import Categories.Diagram.Pullback
+open import Categories.Category.Cocomplete.Finitely ℂ
 
 record ANetObj : Set (o ⊔ ℓ) where
   constructor anetobj
@@ -287,13 +289,45 @@ forget⊣codisc {c} = record
           open BinaryProducts products
 
 -- another functor
-R : {fc : FinitelyComplete} → Functor aNets Graphs
-R {fc} = record
-  { F₀ = λ { (anetobj {X} s t) → graphobj {obj (equalizer fc s t)} {P (pullback fc s (arr (equalizer fc s t)))} {!   !} {!   !}}
-  ; F₁ = λ { {anetobj {A} s t} {anetobj {B} s' t'} (anetmor f s-eqv t-eqv) → graphmor (equalize ((equalizer fc s' t')) {!   !}) {!   !} {!   !} {!   !}}
-  ; identity = {!   !}
-  ; homomorphism = {!   !}
-  ; F-resp-≈ = {!   !}
-  } where open Equalizer
-          open FinitelyComplete
-          open Pullback
+-- R : {fc : FinitelyComplete} → Functor aNets Graphs
+-- R {fc} = record
+--   { F₀ = λ { (anetobj {X} s t) → graphobj {obj (equalizer fc s t)} {P (pullback fc s (arr (equalizer fc s t)))} {!   !} {!   !}}
+--   ; F₁ = λ { {anetobj {A} s t} {anetobj {B} s' t'} (anetmor f s-eqv t-eqv) → graphmor (equalize ((equalizer fc s' t')) {!   !}) {!   !} {!   !} {!   !}}
+--   ; identity = {!   !}
+--   ; homomorphism = {!   !}
+--   ; F-resp-≈ = {!   !}
+--   } where open Equalizer
+--           open FinitelyComplete
+--           open Pullback
+
+{-
+
+E  ⇉ V  → π₀K = coequalizer.obj fcoc s t
+↓    ↓     ↓
+E' ⇉ V' → π₀K' = coequalizer.obj fcoc s' t'
+
+-}
+
+π₀ : {fcoc : FinitelyCocomplete} → Functor Graphs ℂ
+π₀ {fcoc} = record
+  { F₀ = λ { (graphobj s t) → coequalizer.obj fcoc s t}
+  ; F₁ = λ { {graphobj {E} {V} s t} {graphobj {E'} {V'} s' t'} (graphmor fE fV s-eqv t-eqv) → coequalize (coequalizer fcoc s t)
+    (begin ((coequalizer.arr fcoc s' t') ∘ fV) ∘ s  ≈⟨ assoc ⟩
+           (coequalizer.arr fcoc s' t') ∘ fV ∘ s    ≈⟨ refl⟩∘⟨ s-eqv ⟩
+           (coequalizer.arr fcoc s' t') ∘ s' ∘ fE   ≈⟨ sym assoc ⟩
+           ((coequalizer.arr fcoc s' t') ∘ s') ∘ fE ≈⟨ equality (coequalizer fcoc s' t') ⟩∘⟨refl ⟩
+           ((coequalizer.arr fcoc s' t') ∘ t') ∘ fE ≈⟨ assoc ⟩
+           (coequalizer.arr fcoc s' t') ∘ t' ∘ fE   ≈⟨ (refl⟩∘⟨ sym t-eqv) ⟩
+           (coequalizer.arr fcoc s' t') ∘ fV ∘ t    ≈⟨ sym assoc ⟩
+           ((coequalizer.arr fcoc s' t') ∘ fV) ∘ t  ∎)}
+  ; identity = λ { {graphobj {E} {V} s t} → sym (unique (coequalizer fcoc s t) id-comm) }
+  ; homomorphism = λ { {graphobj {E} {V} s t} {graphobj {E'} {V'} s' t'} {graphobj {E''} {V''} s'' t''} {graphmor fE₁ fV₁ s-eqv₁ t-eqv₁} {graphmor fE₂ fV₂ s-eqv₂ t-eqv₂} → sym (unique (coequalizer fcoc s t)
+    (begin coequalizer.arr fcoc s'' t'' ∘ fV₂ ∘ fV₁ ≈⟨ {!   !} ⟩
+           (coequalize (coequalizer fcoc s' t') {!   !} ∘ coequalize (coequalizer fcoc s t) {!   !}) ∘ coequalizer.arr fcoc s t ∎))}
+  ; F-resp-≈ = λ { (fst , snd) → {!   !}}
+  } where open FinitelyCocomplete
+          open Coequalizer
+
+-- todo
+-- define pi0
+-- define triequaliser

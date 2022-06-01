@@ -1,0 +1,6 @@
+make --dry-run --always-make --keep-going --print-directory
+make: Entering directory '/home/fouche/repos/agda-categories'
+git ls-tree --full-tree -r --name-only HEAD | grep '^src/[^\.]*.agda' | sed -e 's|^src/[/]*|import |' -e 's|/|.|g' -e 's/.agda//' -e '/import Everything/d' | LC_COLLATE='C' sort > Everything.agda
+agda +RTS -M6G -A128M -RTS --auto-inline -Werror -i. Everything.agda
+make: Leaving directory '/home/fouche/repos/agda-categories'
+ 
