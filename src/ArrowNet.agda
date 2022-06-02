@@ -21,8 +21,8 @@ open import Categories.Adjoint
 open import Categories.Functor.Limits
 open import Categories.Diagram.Equalizer ℂ
 open import Categories.Diagram.Coequalizer ℂ
+open import Categories.Diagram.Pullback ℂ
 open import Categories.Category.Complete.Finitely ℂ
-open import Categories.Diagram.Pullback
 open import Categories.Category.Cocomplete.Finitely ℂ
 
 record ANetObj : Set (o ⊔ ℓ) where
@@ -65,6 +65,27 @@ record GraphMor (G H : GraphObj) : Set (ℓ ⊔ e) where
     t-eqv : fV ∘ G.t ≈ H.t ∘ fE
 
 open GraphMor
+
+-- triqualizers
+record isTriqualizer {X Y} (f g h : X ⇒ Y) : Set (o ⊔ ℓ ⊔ e) where 
+  private 
+    module E = Equalizer
+    module P = Pullback
+  field 
+    {obj} : Obj
+    arr   : obj ⇒ X
+    e12 : Equalizer f g 
+    e23 : Equalizer g h
+    pb123 : Pullback (E.arr e12) (E.arr e23)
+    triq : IsPullback {obj} (P.p₁ pb123) (P.p₂ pb123) (E.arr e12) (E.arr e23)
+    -- equality : E.arr e12 ∘ P.p₁ pb123 ≈ arr
+
+record Triback {X Y Z trg} (f : X ⇒ trg) (g : Y ⇒ trg) (h : Z ⇒ trg) : Set (o ⊔ ℓ ⊔ e) where 
+  private 
+    module P = Pullback
+  field
+    {obj} : Obj 
+    
 
 aNets : Category _ _ _
 aNets = record
