@@ -67,26 +67,61 @@ record GraphMor (G H : GraphObj) : Set (ℓ ⊔ e) where
 open GraphMor
 
 -- triqualizers
-record isTriqualizer {X Y} (f g h : X ⇒ Y) : Set (o ⊔ ℓ ⊔ e) where 
-  private 
-    module E = Equalizer
-    module P = Pullback
-  field 
-    {obj} : Obj
-    arr   : obj ⇒ X
-    e12 : Equalizer f g 
-    e23 : Equalizer g h
-    pb123 : Pullback (E.arr e12) (E.arr e23)
-    triq : IsPullback {obj} (P.p₁ pb123) (P.p₂ pb123) (E.arr e12) (E.arr e23)
-    -- equality : E.arr e12 ∘ P.p₁ pb123 ≈ arr
-
-record Triback {X Y Z trg} (f : X ⇒ trg) (g : Y ⇒ trg) (h : Z ⇒ trg) : Set (o ⊔ ℓ ⊔ e) where 
-  private 
-    module P = Pullback
+record IsTriqualizer {X Y obj E12 E23} (f g h : X ⇒ Y) 
+  (e12 : E12 ⇒ X)
+  (e23 : E23 ⇒ X)
+  (p1 : obj ⇒ E12)
+  (p2 : obj ⇒ E23) : Set (o ⊔ ℓ ⊔ e) where 
   field
-    {obj} : Obj 
-    
+    isEq-fg : IsEqualizer e12 f g 
+    isEq-gh : IsEqualizer e23 g h 
+    isPb    : IsPullback p1 p2 e12 e23
+  
+  arr : obj ⇒ X 
+  arr = e12 ∘ p1
 
+record Triqualizer {X Y}  (f g h : X ⇒ Y) : Set (o ⊔ ℓ ⊔ e) where
+  field
+    {obj E12 E23} : Obj
+    e12 : E12 ⇒ X
+    e23 : E23 ⇒ X
+    p1 : obj ⇒ E12
+    p2 : obj ⇒ E23
+    isTriqualizer : IsTriqualizer f g h e12 e23 p1 p2
+
+  open IsTriqualizer isTriqualizer public
+
+record IsTriback {X Y Z trg obj P12 P23} 
+  (f : X ⇒ trg) 
+  (g : Y ⇒ trg) 
+  (h : Z ⇒ trg) 
+  (p₁ : P12 ⇒ X) (p₂ : P12 ⇒ Y)
+  (q₁ : P23 ⇒ Y) (q₂ : P23 ⇒ Z) 
+  (r₁ : obj ⇒ P12) (r₂ : obj ⇒ P23) : Set (o ⊔ ℓ ⊔ e) where 
+  field
+    pb1 : IsPullback p₁ p₂ f g 
+    pb2 : IsPullback q₁ q₂ g h 
+    tripb : IsPullback r₁ r₂ p₂ q₁
+  
+  arr : obj ⇒ Y 
+  arr = p₂ ∘ r₁ 
+    
+record Triback {X Y Z trg} 
+  (f : X ⇒ trg) 
+  (g : Y ⇒ trg) 
+  (h : Z ⇒ trg) : Set (o ⊔ ℓ ⊔ e) where
+  field 
+    {obj P12 P23} : Obj
+    p₁ : P12 ⇒ X
+    p₂ : P12 ⇒ Y
+    q₁ : P23 ⇒ Y
+    q₂ : P23 ⇒ Z
+    r₁ : obj ⇒ P12
+    r₂ : obj ⇒ P23
+    isTriback : IsTriback f g h p₁ p₂ q₁ q₂ r₁ r₂
+  
+  open IsTriback isTriback public
+    
 aNets : Category _ _ _
 aNets = record
   { Obj = ANetObj
@@ -202,6 +237,20 @@ D coc = record
   ; F-resp-≈ = λ { (fst , snd) → F-resp-≈ -+- (fst , snd) }
   } where open Cocartesian coc
           open Functor
+
+-- the almighty adjoint to D
+R : {fc : FinitelyComplete} → Functor aNets Graphs 
+R {fc} = record
+  { F₀ = λ {(anetobj {X} s t) → graphobj {obj {!   !}} {{!   !}} {!   !} {!   !}}
+  ; F₁ = {!   !}
+  ; identity = {!   !}
+  ; homomorphism = {!   !}
+  ; F-resp-≈ = {!   !}
+  } where open FinitelyComplete fc
+          open Triqualizer
+          open Triback
+
+
 
 -- gives the object of vertices
 forget : Functor aNets ℂ
