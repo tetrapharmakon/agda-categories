@@ -235,6 +235,42 @@ codisc c = record
           open Functor
           open BinaryProducts products
 
+π₀ : {fcoc : FinitelyCocomplete} → Functor Graphs ℂ
+π₀ {fcoc} = record
+  { F₀ = λ { (graphobj s t) → coequalizer.obj s t}
+  ; F₁ = λ { {graphobj s t} {graphobj s' t'} (graphmor fE fV s-eqv t-eqv) → coequalizer.coequalize s t
+    (let open module S'T' = Coequalizer (coequalizer s' t') in
+     begin (S'T'.arr ∘ fV) ∘ s  ≈⟨ pullʳ s-eqv ⟩
+           S'T'.arr ∘ s' ∘ fE   ≈⟨ pullˡ (equality (coequalizer s' t')) ⟩
+           (S'T'.arr ∘ t') ∘ fE ≈⟨ pullʳ (sym t-eqv) ○ sym assoc ⟩
+           (S'T'.arr ∘ fV) ∘ t  ∎) }
+  ; identity = λ { {graphobj s t} → sym (unique (coequalizer s t) id-comm) }
+  ; homomorphism = λ { {graphobj s t} {graphobj s' t'} {graphobj s'' t''} {graphmor _ fV₁ _ _} {graphmor _ fV₂ _ _} →
+      sym (unique (coequalizer s t)
+        (let open module ST     = Coequalizer (coequalizer s t)
+             open module S'T'   = Coequalizer (coequalizer s' t')
+             open module S''T'' = Coequalizer (coequalizer s'' t'') in
+          begin S''T''.arr ∘ fV₂ ∘ fV₁                                      ≈⟨ pullˡ S'T'.universal ⟩
+               (S'T'.coequalize proof-eq ∘ S'T'.arr) ∘ fV₁                  ≈⟨ pullʳ ST.universal ○ sym assoc ⟩
+               (S'T'.coequalize proof-eq ∘ ST.coequalize proof-eq) ∘ ST.arr ∎))
+              }
+  ; F-resp-≈ =
+    λ { {graphobj s t} (_ , snd) →
+     let open module ST = Coequalizer (coequalizer s t) in
+       ST.coequalize-resp-≈ (refl⟩∘⟨ snd)
+    }
+  } where open FinitelyCocomplete fcoc
+          proof-eq : ∀ {X Y} {f : GraphMor X Y} →
+            (coequalizer.arr (s Y) (t Y) ∘ fV f) ∘ s X ≈ (coequalizer.arr (s Y) (t Y) ∘ fV f) ∘ t X
+          proof-eq {graphobj s t} {graphobj s' t'} {graphmor fE fV s-eqv t-eqv} =
+            begin (arr ∘ fV) ∘ s  ≈⟨ pullʳ s-eqv ⟩
+                   arr ∘ s' ∘ fE  ≈⟨ pullˡ equality ⟩
+                  (arr ∘ t') ∘ fE ≈⟨ pullʳ (sym t-eqv) ○ sym assoc ⟩
+                  (arr ∘ fV) ∘ t  ∎
+              where open module M {f} {g} = Coequalizer (coequalizer f g)
+          open Coequalizer
+
+-- various adjunctions
 disc⊣forget : {coc : Cocartesian ℂ} → disc coc ⊣ forget'
 disc⊣forget {coc} = record
   { unit = record
@@ -287,72 +323,3 @@ forget⊣codisc {c} = record
   } where open Cartesian c
           open Functor
           open BinaryProducts products
-
--- another functor
--- R : {fc : FinitelyComplete} → Functor aNets Graphs
--- R {fc} = record
---   { F₀ = λ { (anetobj {X} s t) → graphobj {obj (equalizer fc s t)} {P (pullback fc s (arr (equalizer fc s t)))} {!   !} {!   !}}
---   ; F₁ = λ { {anetobj {A} s t} {anetobj {B} s' t'} (anetmor f s-eqv t-eqv) → graphmor (equalize ((equalizer fc s' t')) {!   !}) {!   !} {!   !} {!   !}}
---   ; identity = {!   !}
---   ; homomorphism = {!   !}
---   ; F-resp-≈ = {!   !}
---   } where open Equalizer
---           open FinitelyComplete
---           open Pullback
-
-{-
-
-E  ⇉ V  → π₀K = coequalizer.obj fcoc s t
-↓    ↓     ↓
-E' ⇉ V' → π₀K' = coequalizer.obj fcoc s' t'
-
--}
-
-π₀ : {fcoc : FinitelyCocomplete} → Functor Graphs ℂ
-π₀ {fcoc} = record
-  { F₀ = λ { (graphobj s t) → coequalizer.obj s t}
-  ; F₁ = λ { {graphobj {E} {V} s t} {graphobj {E'} {V'} s' t'} (graphmor fE fV s-eqv t-eqv) → coequalizer.coequalize s t
-    (let open module S'T' = Coequalizer (coequalizer s' t') in
-      begin  (S'T'.arr ∘ fV) ∘ s  ≈⟨ assoc ⟩
-             S'T'.arr ∘ fV ∘ s    ≈⟨ refl⟩∘⟨ s-eqv ⟩
-             S'T'.arr ∘ s' ∘ fE   ≈⟨ sym assoc ⟩
-             (S'T'.arr ∘ s') ∘ fE ≈⟨ equality (coequalizer s' t') ⟩∘⟨refl ⟩
-             (S'T'.arr ∘ t') ∘ fE ≈⟨ assoc ⟩
-             S'T'.arr ∘ t' ∘ fE   ≈⟨ (refl⟩∘⟨ sym t-eqv) ⟩
-             S'T'.arr ∘ fV ∘ t    ≈⟨ sym assoc ⟩
-             (S'T'.arr ∘ fV) ∘ t  ∎) }
-  ; identity = λ { {graphobj {E} {V} s t} → sym (unique (coequalizer s t) id-comm) }
-  ; homomorphism = λ { {graphobj s t} {graphobj s' t'} {graphobj s'' t''} {graphmor _ fV₁ _ _} {graphmor _ fV₂ _ _} →
-   sym (unique (coequalizer s t)
-    (let open module ST     = Coequalizer (coequalizer s t)
-         open module S'T'   = Coequalizer (coequalizer s' t')
-         open module S''T'' = Coequalizer (coequalizer s'' t'') in
-      begin S''T''.arr ∘ fV₂ ∘ fV₁ ≈⟨ sym assoc ⟩
-           (S''T''.arr ∘ fV₂) ∘ fV₁ ≈⟨ S'T'.universal ⟩∘⟨refl ⟩
-           ((S'T'.coequalize proof-eq) ∘ S'T'.arr) ∘ fV₁ ≈⟨ assoc ⟩
-           (S'T'.coequalize proof-eq) ∘ S'T'.arr ∘ fV₁ ≈⟨ refl⟩∘⟨ ST.universal ⟩
-           (S'T'.coequalize proof-eq) ∘ ST.coequalize proof-eq ∘ ST.arr ≈⟨ sym assoc ⟩
-           ((S'T'.coequalize proof-eq) ∘ ST.coequalize proof-eq) ∘ ST.arr ∎))}
-  ; F-resp-≈ =
-    λ { {graphobj s t} (_ , snd) →
-        let open module ST = Coequalizer (coequalizer s t) in
-          ST.coequalize-resp-≈ (refl⟩∘⟨ snd)
-      }
-  } where open FinitelyCocomplete fcoc
-          proof-eq : ∀ {X Y} {f : GraphMor X Y} → (coequalizer.arr (s Y) (t Y) ∘ fV f) ∘ s X ≈ (coequalizer.arr (s Y) (t Y) ∘ fV f) ∘ t X
-          proof-eq {graphobj s t} {graphobj s' t'} {graphmor fE₁ fV₁ s-eqv₁ t-eqv₁} =
-            begin (arr ∘ fV₁) ∘ s ≈⟨ assoc ⟩
-                  arr ∘ fV₁ ∘ s ≈⟨ (refl⟩∘⟨ s-eqv₁) ⟩
-                  arr ∘ s' ∘ fE₁  ≈⟨ sym assoc ⟩
-                  (arr ∘ s') ∘ fE₁  ≈⟨ equality ⟩∘⟨refl ⟩
-                  (arr ∘ t') ∘ fE₁  ≈⟨ assoc ⟩
-                  arr ∘ t' ∘ fE₁  ≈⟨ (refl⟩∘⟨ sym t-eqv₁) ⟩
-                  arr ∘ fV₁ ∘ t ≈⟨ sym assoc ⟩
-                  (arr ∘ fV₁) ∘ t ∎
-              where
-                open module M {f} {g} = Coequalizer (coequalizer f g)
-          open Coequalizer
-
--- todo
--- define pi0
--- define triequaliser
