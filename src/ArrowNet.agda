@@ -33,14 +33,6 @@ record ANetObj : Set (o ⊔ ℓ) where
 
 open ANetObj
 
-record GraphObj : Set (o ⊔ ℓ) where
-  constructor graphobj
-  field
-    {E V} : Obj
-    s t : E ⇒ V
-
-open GraphObj
-
 record ANetMor (G H : ANetObj) : Set (ℓ ⊔ e) where
   constructor anetmor
   private
@@ -52,6 +44,14 @@ record ANetMor (G H : ANetObj) : Set (ℓ ⊔ e) where
     t-eqv : f ∘ G.t ≈ H.t ∘ f
 
 open ANetMor
+
+record GraphObj : Set (o ⊔ ℓ) where
+  constructor graphobj
+  field
+    {E V} : Obj
+    s t : E ⇒ V
+
+open GraphObj
 
 record GraphMor (G H : GraphObj) : Set (ℓ ⊔ e) where
   constructor graphmor
@@ -66,62 +66,86 @@ record GraphMor (G H : GraphObj) : Set (ℓ ⊔ e) where
 
 open GraphMor
 
--- triqualizers
-record IsTriqualizer {X Y obj E12 E23} (f g h : X ⇒ Y) 
-  (e12 : E12 ⇒ X)
-  (e23 : E23 ⇒ X)
-  (p1 : obj ⇒ E12)
-  (p2 : obj ⇒ E23) : Set (o ⊔ ℓ ⊔ e) where 
+record RGraphObj : Set (o ⊔ ℓ ⊔ e) where
+  constructor rgraphobj
   field
-    isEq-fg : IsEqualizer e12 f g 
-    isEq-gh : IsEqualizer e23 g h 
-    isPb    : IsPullback p1 p2 e12 e23
-  
-  arr : obj ⇒ X 
-  arr = e12 ∘ p1
+    {E V} : Obj
+    s t : E ⇒ V
+    i : V ⇒ E
+    eq-s : s ∘ i ≈ id
+    eq-t : t ∘ i ≈ id
 
-record Triqualizer {X Y}  (f g h : X ⇒ Y) : Set (o ⊔ ℓ ⊔ e) where
+open RGraphObj
+
+record RGraphMor (G H : RGraphObj) : Set (ℓ ⊔ e) where
+  constructor rgraphmor
+  private
+    module G = RGraphObj G
+    module H = RGraphObj H
   field
-    {obj E12 E23} : Obj
-    e12 : E12 ⇒ X
-    e23 : E23 ⇒ X
-    p1 : obj ⇒ E12
-    p2 : obj ⇒ E23
-    isTriqualizer : IsTriqualizer f g h e12 e23 p1 p2
+    fE : G.E ⇒ H.E
+    fV : G.V ⇒ H.V
+    s-eqv : fV ∘ G.s ≈ H.s ∘ fE
+    t-eqv : fV ∘ G.t ≈ H.t ∘ fE
 
-  open IsTriqualizer isTriqualizer public
+open RGraphMor
 
-record IsTriback {X Y Z trg obj P12 P23} 
-  (f : X ⇒ trg) 
-  (g : Y ⇒ trg) 
-  (h : Z ⇒ trg) 
-  (p₁ : P12 ⇒ X) (p₂ : P12 ⇒ Y)
-  (q₁ : P23 ⇒ Y) (q₂ : P23 ⇒ Z) 
-  (r₁ : obj ⇒ P12) (r₂ : obj ⇒ P23) : Set (o ⊔ ℓ ⊔ e) where 
-  field
-    pb1 : IsPullback p₁ p₂ f g 
-    pb2 : IsPullback q₁ q₂ g h 
-    tripb : IsPullback r₁ r₂ p₂ q₁
-  
-  arr : obj ⇒ Y 
-  arr = p₂ ∘ r₁ 
-    
-record Triback {X Y Z trg} 
-  (f : X ⇒ trg) 
-  (g : Y ⇒ trg) 
-  (h : Z ⇒ trg) : Set (o ⊔ ℓ ⊔ e) where
-  field 
-    {obj P12 P23} : Obj
-    p₁ : P12 ⇒ X
-    p₂ : P12 ⇒ Y
-    q₁ : P23 ⇒ Y
-    q₂ : P23 ⇒ Z
-    r₁ : obj ⇒ P12
-    r₂ : obj ⇒ P23
-    isTriback : IsTriback f g h p₁ p₂ q₁ q₂ r₁ r₂
-  
-  open IsTriback isTriback public
-    
+-- -- triqualizers
+-- record IsTriqualizer {X Y obj E12 E23} (f g h : X ⇒ Y)
+--   (e12 : E12 ⇒ X)
+--   (e23 : E23 ⇒ X)
+--   (p1 : obj ⇒ E12)
+--   (p2 : obj ⇒ E23) : Set (o ⊔ ℓ ⊔ e) where
+--   field
+--     isEq-fg : IsEqualizer e12 f g
+--     isEq-gh : IsEqualizer e23 g h
+--     isPb    : IsPullback p1 p2 e12 e23
+
+--   arr : obj ⇒ X
+--   arr = e12 ∘ p1
+
+-- record Triqualizer {X Y}  (f g h : X ⇒ Y) : Set (o ⊔ ℓ ⊔ e) where
+--   field
+--     {obj E12 E23} : Obj
+--     e12 : E12 ⇒ X
+--     e23 : E23 ⇒ X
+--     p1 : obj ⇒ E12
+--     p2 : obj ⇒ E23
+--     isTriqualizer : IsTriqualizer f g h e12 e23 p1 p2
+
+--   open IsTriqualizer isTriqualizer public
+
+-- record IsTriback {X Y Z trg obj P12 P23}
+--   (f : X ⇒ trg)
+--   (g : Y ⇒ trg)
+--   (h : Z ⇒ trg)
+--   (p₁ : P12 ⇒ X) (p₂ : P12 ⇒ Y)
+--   (q₁ : P23 ⇒ Y) (q₂ : P23 ⇒ Z)
+--   (r₁ : obj ⇒ P12) (r₂ : obj ⇒ P23) : Set (o ⊔ ℓ ⊔ e) where
+--   field
+--     pb1 : IsPullback p₁ p₂ f g
+--     pb2 : IsPullback q₁ q₂ g h
+--     tripb : IsPullback r₁ r₂ p₂ q₁
+
+--   arr : obj ⇒ Y
+--   arr = p₂ ∘ r₁
+
+-- record Triback {X Y Z trg}
+--   (f : X ⇒ trg)
+--   (g : Y ⇒ trg)
+--   (h : Z ⇒ trg) : Set (o ⊔ ℓ ⊔ e) where
+--   field
+--     {obj P12 P23} : Obj
+--     p₁ : P12 ⇒ X
+--     p₂ : P12 ⇒ Y
+--     q₁ : P23 ⇒ Y
+--     q₂ : P23 ⇒ Z
+--     r₁ : obj ⇒ P12
+--     r₂ : obj ⇒ P23
+--     isTriback : IsTriback f g h p₁ p₂ q₁ q₂ r₁ r₂
+
+--   open IsTriback isTriback public
+
 aNets : Category _ _ _
 aNets = record
   { Obj = ANetObj
@@ -175,6 +199,34 @@ Graphs = record
     (begin (fV ∘ gV) ∘ t A ≈⟨ pullʳ eqt' ⟩
             fV ∘ t B ∘ gE  ≈⟨ pullˡ eqt ○ assoc ⟩
             t C ∘ fE ∘ gE  ∎)
+
+RGraphs : Category _ _ _
+RGraphs = record
+  { Obj = RGraphObj
+  ; _⇒_ = λ G H → RGraphMor G H
+  ; _≈_ = λ u v → (fE u ≈ fE v) × (fV u ≈ fV v)
+  ; id = rgraphmor id id id-comm-sym id-comm-sym
+  ; _∘_ = comp
+  ; assoc = assoc , assoc
+  ; sym-assoc = sym-assoc , sym-assoc
+  ; identityˡ = identityˡ , identityˡ
+  ; identityʳ = identityʳ , identityʳ
+  ; identity² = identity² , identity²
+  ; equiv = record
+    { refl = refl , refl
+    ; sym = λ x → (sym (proj₁ x)) , (sym (proj₂ x))
+    ; trans = λ p q → (trans (proj₁ p) (proj₁ q)) , (trans (proj₂ p) (proj₂ q))
+    }
+  ; ∘-resp-≈ = λ p q → (∘-resp-≈ (proj₁ p) (proj₁ q)) , (∘-resp-≈ (proj₂ p) (proj₂ q))
+  } where
+      comp : {A B C : RGraphObj} → RGraphMor B C → RGraphMor A B → RGraphMor A C
+      comp {A} {B} {C} (rgraphmor fE fV eqs eqt) (rgraphmor gE gV eqs' eqt') = rgraphmor (fE ∘ gE) (fV ∘ gV)
+        (begin (fV ∘ gV) ∘ s A ≈⟨ pullʳ eqs' ⟩
+                fV ∘ s B ∘ gE  ≈⟨ pullˡ eqs ○ assoc ⟩
+                s C ∘ fE ∘ gE  ∎)
+        (begin (fV ∘ gV) ∘ t A ≈⟨ pullʳ eqt' ⟩
+                fV ∘ t B ∘ gE  ≈⟨ pullˡ eqt ○ assoc ⟩
+                t C ∘ fE ∘ gE  ∎)
 
 -- a "tautological" functor aNets -> Graphs
 q* : Functor aNets Graphs
@@ -238,19 +290,34 @@ D coc = record
   } where open Cocartesian coc
           open Functor
 
--- the almighty adjoint to D
-R : {fc : FinitelyComplete} → Functor aNets Graphs 
-R {fc} = record
-  { F₀ = λ {(anetobj {X} s t) → graphobj {obj {!   !}} {{!   !}} {!   !} {!   !}}
-  ; F₁ = {!   !}
-  ; identity = {!   !}
-  ; homomorphism = {!   !}
-  ; F-resp-≈ = {!   !}
-  } where open FinitelyComplete fc
-          open Triqualizer
-          open Triback
-
-
+W : Cartesian ℂ → Functor Graphs aNets
+W c = record
+  { F₀ = λ {(graphobj {E} {V} s t) → anetobj {A×B} ⟨ π₁ , s ∘ π₁ ⟩ ⟨ π₁ , t ∘ π₁ ⟩}
+  ; F₁ = λ { {graphobj s t} {graphobj s' t'} (graphmor fE fV s-eqv t-eqv) → anetmor (fE ⁂ fV)
+      (begin ⟨ fE ∘ π₁ , fV ∘ π₂ ⟩ ∘ ⟨ π₁ , s ∘ π₁ ⟩                       ≈⟨ ⟨⟩∘ ⟩
+             ⟨ (fE ∘ π₁) ∘ ⟨ π₁ , s ∘ π₁ ⟩ , (fV ∘ π₂) ∘ ⟨ π₁ , s ∘ π₁ ⟩ ⟩ ≈⟨ ⟨⟩-cong₂ (assoc ○ refl⟩∘⟨ project₁) (assoc ○ refl⟩∘⟨ project₂) ⟩
+             ⟨ fE ∘ π₁ , fV ∘ s ∘ π₁ ⟩                                     ≈⟨ ⟨⟩-congˡ (sym assoc ○ (s-eqv ⟩∘⟨refl) ○ assoc) ⟩
+             ⟨ fE ∘ π₁ , s' ∘ fE ∘ π₁ ⟩                                    ≈⟨ ⟨⟩-congʳ (introˡ refl) ⟩
+             ⟨ id ∘ fE ∘ π₁ , s' ∘ fE ∘ π₁ ⟩                               ≈⟨ sym ⟨⟩∘ ⟩
+             ⟨ id , s' ⟩ ∘ fE ∘ π₁                                         ≈⟨ refl⟩∘⟨ sym project₁ ⟩
+             ⟨ id , s' ⟩ ∘ π₁ ∘ ⟨ fE ∘ π₁ , fV ∘ π₂ ⟩                      ≈⟨ sym assoc ⟩
+             (⟨ id , s' ⟩ ∘ π₁) ∘ ⟨ fE ∘ π₁ , fV ∘ π₂ ⟩                    ≈⟨ (⟨⟩∘ ○ ⟨⟩-congʳ identityˡ) ⟩∘⟨refl ⟩
+             ⟨ π₁ , s' ∘ π₁ ⟩ ∘ ⟨ fE ∘ π₁ , fV ∘ π₂ ⟩                      ∎)
+      (begin ⟨ fE ∘ π₁ , fV ∘ π₂ ⟩ ∘ ⟨ π₁ , t ∘ π₁ ⟩                       ≈⟨ ⟨⟩∘ ⟩
+             ⟨ (fE ∘ π₁) ∘ ⟨ π₁ , t ∘ π₁ ⟩ , (fV ∘ π₂) ∘ ⟨ π₁ , t ∘ π₁ ⟩ ⟩ ≈⟨ ⟨⟩-cong₂ (assoc ○ refl⟩∘⟨ project₁) (assoc ○ refl⟩∘⟨ project₂) ⟩
+             ⟨ fE ∘ π₁ , fV ∘ t ∘ π₁ ⟩                                     ≈⟨ ⟨⟩-congˡ (sym assoc ○ (t-eqv ⟩∘⟨refl) ○ assoc) ⟩
+             ⟨ fE ∘ π₁ , t' ∘ fE ∘ π₁ ⟩                                    ≈⟨ ⟨⟩-congʳ (introˡ refl) ⟩
+             ⟨ id ∘ fE ∘ π₁ , t' ∘ fE ∘ π₁ ⟩                               ≈⟨ sym ⟨⟩∘ ⟩
+             ⟨ id , t' ⟩ ∘ fE ∘ π₁                                         ≈⟨ refl⟩∘⟨ sym project₁ ⟩
+             ⟨ id , t' ⟩ ∘ π₁ ∘ ⟨ fE ∘ π₁ , fV ∘ π₂ ⟩                      ≈⟨ sym assoc ⟩
+             (⟨ id , t' ⟩ ∘ π₁) ∘ ⟨ fE ∘ π₁ , fV ∘ π₂ ⟩                    ≈⟨ (⟨⟩∘ ○ ⟨⟩-congʳ identityˡ) ⟩∘⟨refl ⟩
+             ⟨ π₁ , t' ∘ π₁ ⟩ ∘ ⟨ fE ∘ π₁ , fV ∘ π₂ ⟩                      ∎) }
+  ; identity = identity -×-
+  ; homomorphism = homomorphism -×-
+  ; F-resp-≈ = λ { (fst , snd) → (F-resp-≈ -×-) (fst , snd) }
+  } where open Cartesian c
+          open BinaryProducts products
+          open Functor
 
 -- gives the object of vertices
 forget : Functor aNets ℂ
@@ -340,6 +407,42 @@ codisc c = record
               where open module M {f} {g} = Coequalizer (coequalizer f g)
           open Coequalizer
 
+j : Functor RGraphs Graphs
+j = record
+  { F₀ = λ {(rgraphobj s t i eq-s eq-t) → graphobj s t}
+  ; F₁ = λ {(rgraphmor fE fV s-eqv t-eqv) → graphmor fE fV s-eqv t-eqv}
+  ; identity = refl , refl
+  ; homomorphism = refl , refl
+  ; F-resp-≈ = λ (fst , snd) → fst , snd
+  }
+
+
+R : {coc : Cocartesian ℂ} → Functor Graphs RGraphs
+R {coc} = record
+  { F₀ = λ {(graphobj {E} {V} s t) → rgraphobj {V + E} {V} [ id , s ] [ id , t ] i₁ inject₁ inject₁}
+  ; F₁ = λ { {graphobj s t} {graphobj s' t'} (graphmor fE fV s-eqv t-eqv) → rgraphmor (fV +₁ fE) fV
+          (begin fV ∘ [ id , s ] ≈⟨ ∘-distribˡ-[] ⟩
+                 [ fV ∘ id , fV ∘ s ] ≈⟨ []-cong₂ id-comm s-eqv ⟩
+                 [ id  ∘ fV , s' ∘ fE ] ≈⟨ []-cong₂ (pushˡ (sym inject₁)) (pushˡ (sym inject₂)) ⟩
+                 [ [ id , s' ] ∘ i₁  ∘ fV , [ id , s' ] ∘ i₂  ∘ fE ] ≈⟨ sym ∘-distribˡ-[] ⟩
+                 [ id , s' ] ∘ [ i₁  ∘ fV , i₂  ∘ fE ]
+          ∎)
+         (begin fV ∘ [ id , t ] ≈⟨ ∘-distribˡ-[] ⟩
+                 [ fV ∘ id , fV ∘ t ] ≈⟨ []-cong₂ id-comm t-eqv ⟩
+                 [ id  ∘ fV , t' ∘ fE ] ≈⟨ []-cong₂ (pushˡ (sym inject₁)) (pushˡ (sym inject₂)) ⟩
+                 [ [ id , t' ] ∘ i₁  ∘ fV , [ id , t' ] ∘ i₂  ∘ fE ] ≈⟨ sym ∘-distribˡ-[] ⟩
+                 [ id , t' ] ∘ [ i₁  ∘ fV , i₂  ∘ fE ]
+          ∎)}
+  ; identity = ([]-cong₂ identityʳ identityʳ ○ +-η) , refl
+  ; homomorphism = λ {
+    {_} {_} {_} {graphmor fE fV _ _} {graphmor fE' fV' _ _} →
+      sym (begin [ i₁ ∘ fV' , i₂ ∘ fE' ] ∘ [ i₁ ∘ fV , i₂ ∘ fE ] ≈⟨ ∘-distribˡ-[] ⟩
+                 [ [ i₁ ∘ fV' , i₂ ∘ fE' ] ∘ i₁ ∘ fV , [ i₁ ∘ fV' , i₂ ∘ fE' ] ∘ i₂ ∘ fE ] ≈⟨ []-cong₂ (pullˡ inject₁ ○ assoc) (pullˡ inject₂ ○ assoc) ⟩
+                 [ i₁ ∘ fV' ∘ fV , i₂ ∘ fE' ∘ fE ] ∎)
+      , refl}
+  ; F-resp-≈ = λ {(fst , snd) → ([]-cong₂ (refl⟩∘⟨ snd) (refl⟩∘⟨ fst)) , snd}
+  } where open Cocartesian coc
+
 -- various adjunctions
 disc⊣forget : {coc : Cocartesian ℂ} → disc coc ⊣ forget'
 disc⊣forget {coc} = record
@@ -393,3 +496,7 @@ forget⊣codisc {c} = record
   } where open Cartesian c
           open Functor
           open BinaryProducts products
+
+
+j⊣R : j ⊣ R
+j⊣R = {!   !}
