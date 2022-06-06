@@ -416,29 +416,26 @@ j = record
   ; F-resp-≈ = λ (fst , snd) → fst , snd
   }
 
-
 R : {coc : Cocartesian ℂ} → Functor Graphs RGraphs
 R {coc} = record
   { F₀ = λ {(graphobj {E} {V} s t) → rgraphobj {V + E} {V} [ id , s ] [ id , t ] i₁ inject₁ inject₁}
   ; F₁ = λ { {graphobj s t} {graphobj s' t'} (graphmor fE fV s-eqv t-eqv) → rgraphmor (fV +₁ fE) fV
-          (begin fV ∘ [ id , s ] ≈⟨ ∘-distribˡ-[] ⟩
-                 [ fV ∘ id , fV ∘ s ] ≈⟨ []-cong₂ id-comm s-eqv ⟩
-                 [ id  ∘ fV , s' ∘ fE ] ≈⟨ []-cong₂ (pushˡ (sym inject₁)) (pushˡ (sym inject₂)) ⟩
+          (begin fV ∘ [ id , s ]                                     ≈⟨ ∘-distribˡ-[] ⟩
+                 [ fV ∘ id , fV ∘ s ]                                ≈⟨ []-cong₂ id-comm s-eqv ⟩
+                 [ id  ∘ fV , s' ∘ fE ]                              ≈⟨ []-cong₂ (pushˡ (sym inject₁)) (pushˡ (sym inject₂)) ⟩
                  [ [ id , s' ] ∘ i₁  ∘ fV , [ id , s' ] ∘ i₂  ∘ fE ] ≈⟨ sym ∘-distribˡ-[] ⟩
-                 [ id , s' ] ∘ [ i₁  ∘ fV , i₂  ∘ fE ]
-          ∎)
+                 [ id , s' ] ∘ [ i₁  ∘ fV , i₂  ∘ fE ]               ∎)
          (begin fV ∘ [ id , t ] ≈⟨ ∘-distribˡ-[] ⟩
-                 [ fV ∘ id , fV ∘ t ] ≈⟨ []-cong₂ id-comm t-eqv ⟩
-                 [ id  ∘ fV , t' ∘ fE ] ≈⟨ []-cong₂ (pushˡ (sym inject₁)) (pushˡ (sym inject₂)) ⟩
+                 [ fV ∘ id , fV ∘ t ]                                ≈⟨ []-cong₂ id-comm t-eqv ⟩
+                 [ id  ∘ fV , t' ∘ fE ]                              ≈⟨ []-cong₂ (pushˡ (sym inject₁)) (pushˡ (sym inject₂)) ⟩
                  [ [ id , t' ] ∘ i₁  ∘ fV , [ id , t' ] ∘ i₂  ∘ fE ] ≈⟨ sym ∘-distribˡ-[] ⟩
-                 [ id , t' ] ∘ [ i₁  ∘ fV , i₂  ∘ fE ]
-          ∎)}
+                 [ id , t' ] ∘ [ i₁  ∘ fV , i₂  ∘ fE ]               ∎)}
   ; identity = ([]-cong₂ identityʳ identityʳ ○ +-η) , refl
   ; homomorphism = λ {
     {_} {_} {_} {graphmor fE fV _ _} {graphmor fE' fV' _ _} →
-      sym (begin [ i₁ ∘ fV' , i₂ ∘ fE' ] ∘ [ i₁ ∘ fV , i₂ ∘ fE ] ≈⟨ ∘-distribˡ-[] ⟩
+      sym (begin [ i₁ ∘ fV' , i₂ ∘ fE' ] ∘ [ i₁ ∘ fV , i₂ ∘ fE ]                           ≈⟨ ∘-distribˡ-[] ⟩
                  [ [ i₁ ∘ fV' , i₂ ∘ fE' ] ∘ i₁ ∘ fV , [ i₁ ∘ fV' , i₂ ∘ fE' ] ∘ i₂ ∘ fE ] ≈⟨ []-cong₂ (pullˡ inject₁ ○ assoc) (pullˡ inject₂ ○ assoc) ⟩
-                 [ i₁ ∘ fV' ∘ fV , i₂ ∘ fE' ∘ fE ] ∎)
+                 [ i₁ ∘ fV' ∘ fV , i₂ ∘ fE' ∘ fE ]                                         ∎)
       , refl}
   ; F-resp-≈ = λ {(fst , snd) → ([]-cong₂ (refl⟩∘⟨ snd) (refl⟩∘⟨ fst)) , snd}
   } where open Cocartesian coc
@@ -498,5 +495,18 @@ forget⊣codisc {c} = record
           open BinaryProducts products
 
 
-j⊣R : j ⊣ R
-j⊣R = {!   !}
+j⊣R : {coc : Cocartesian ℂ} → j ⊣ R {coc}
+j⊣R {coc} = record
+  { unit = record
+    { η = λ _ → rgraphmor i₂ id (trans identityˡ (sym inject₂)) (trans identityˡ (sym inject₂))
+    ; commute = λ _ → sym inject₂ , sym id-comm
+    ; sym-commute = λ _ → inject₂ , id-comm
+    }
+  ; counit = record
+    { η = {!   !} -- wtf λ {(graphobj {E} {V} s t) → graphmor [ i (Functor.F₀ R (graphobj s t)) , id ] id {!   !} {!   !}}
+    ; commute = {!   !}
+    ; sym-commute = {!   !}
+    }
+  ; zig = {!   !}
+  ; zag = {!   !}
+  } where open Cocartesian coc
