@@ -435,7 +435,7 @@ R {coc} = record
     {_} {_} {_} {graphmor fE fV _ _} {graphmor fE' fV' _ _} →
       sym (begin [ i₁ ∘ fV' , i₂ ∘ fE' ] ∘ [ i₁ ∘ fV , i₂ ∘ fE ]                           ≈⟨ ∘-distribˡ-[] ⟩
                  [ [ i₁ ∘ fV' , i₂ ∘ fE' ] ∘ i₁ ∘ fV , [ i₁ ∘ fV' , i₂ ∘ fE' ] ∘ i₂ ∘ fE ] ≈⟨ []-cong₂ (pullˡ inject₁ ○ assoc) (pullˡ inject₂ ○ assoc) ⟩
-                 [ i₁ ∘ fV' ∘ fV , i₂ ∘ fE' ∘ fE ]                                         ∎)
+                 [ i₁ ∘ fV' ∘ fV , i₂ ∘ fE' ∘ fE ]                                          ∎)
       , refl}
   ; F-resp-≈ = λ {(fst , snd) → ([]-cong₂ (refl⟩∘⟨ snd) (refl⟩∘⟨ fst)) , snd}
   } where open Cocartesian coc
