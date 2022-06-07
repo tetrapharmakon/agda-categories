@@ -8,7 +8,7 @@ make: *** No rule to make target 'all'.  Stop.
 # This is free software: you are free to change and redistribute it.
 # There is NO WARRANTY, to the extent permitted by law.
 
-# Make data base, printed on Thu Jun  2 13:08:27 2022
+# Make data base, printed on Tue Jun  7 10:38:22 2022
 
 # Variables
 
@@ -23,7 +23,7 @@ NO_AT_BRIDGE = 1
 # environment
 I3SOCK = /run/user/1000/i3/ipc-socket.586460
 # environment
-VSCODE_IPC_HOOK_EXTHOST = /run/user/1000/vscode-ipc-31674faf-20f2-487a-b8ca-0b27d4c1f2ba.sock
+VSCODE_IPC_HOOK_EXTHOST = /run/user/1000/vscode-ipc-b0ea26c3-344c-4e59-856d-df74d33763fe.sock
 # environment
 VSCODE_CWD = /home/fouche
 # environment
@@ -91,7 +91,7 @@ LC_COLLATE = C
 # environment
 VSCODE_VERBOSE_LOGGING = true
 # environment
-VSCODE_PID = 1072634
+VSCODE_PID = 1429136
 # environment
 XDG_SESSION_TYPE = x11
 # automatic
@@ -281,7 +281,6 @@ test: Everything.agda
 #  File has not been updated.
 
 # files hash-table stats:
- 
 # Load=10/1024=1%, Rehash=0, Collisions=0/29=0%
 # VPATH Search Paths
 
@@ -295,6 +294,6 @@ test: Everything.agda
 # strcache performance: lookups = 44 / hit rate = 38%
 # hash-table stats:
 # Load=27/8192=0%, Rehash=0, Collisions=0/44=0%
-# Finished Make data base on Thu Jun  2 13:08:27 2022
+# Finished Make data base on Tue Jun  7 10:38:22 2022
 
  

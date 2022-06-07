@@ -12,7 +12,7 @@ open import Level
 
 open import Categories.Morphism.Reasoning ℂ
 open import Categories.Functor.Core
-open import Categories.Functor.Bifunctor using (Bifunctor)
+-- open import Categories.Functor.Bifunctor using (Bifunctor)
 open import Categories.Category.Cartesian as c
 open import Categories.Category.BinaryProducts
 open import Categories.Category.Cocartesian as cc
@@ -87,6 +87,7 @@ record RGraphMor (G H : RGraphObj) : Set (ℓ ⊔ e) where
     fV : G.V ⇒ H.V
     s-eqv : fV ∘ G.s ≈ H.s ∘ fE
     t-eqv : fV ∘ G.t ≈ H.t ∘ fE
+    i-eqv : H.i ∘ fV ≈ fE ∘ G.i
 
 open RGraphMor
 
@@ -205,7 +206,7 @@ RGraphs = record
   { Obj = RGraphObj
   ; _⇒_ = λ G H → RGraphMor G H
   ; _≈_ = λ u v → (fE u ≈ fE v) × (fV u ≈ fV v)
-  ; id = rgraphmor id id id-comm-sym id-comm-sym
+  ; id = rgraphmor id id id-comm-sym id-comm-sym id-comm
   ; _∘_ = comp
   ; assoc = assoc , assoc
   ; sym-assoc = sym-assoc , sym-assoc
@@ -220,13 +221,19 @@ RGraphs = record
   ; ∘-resp-≈ = λ p q → (∘-resp-≈ (proj₁ p) (proj₁ q)) , (∘-resp-≈ (proj₂ p) (proj₂ q))
   } where
       comp : {A B C : RGraphObj} → RGraphMor B C → RGraphMor A B → RGraphMor A C
-      comp {A} {B} {C} (rgraphmor fE fV eqs eqt) (rgraphmor gE gV eqs' eqt') = rgraphmor (fE ∘ gE) (fV ∘ gV)
+      comp {A} {B} {C} (rgraphmor fE fV eqs eqt eqi) (rgraphmor gE gV eqs' eqt' eqi') = rgraphmor (fE ∘ gE) (fV ∘ gV)
         (begin (fV ∘ gV) ∘ s A ≈⟨ pullʳ eqs' ⟩
                 fV ∘ s B ∘ gE  ≈⟨ pullˡ eqs ○ assoc ⟩
                 s C ∘ fE ∘ gE  ∎)
         (begin (fV ∘ gV) ∘ t A ≈⟨ pullʳ eqt' ⟩
                 fV ∘ t B ∘ gE  ≈⟨ pullˡ eqt ○ assoc ⟩
                 t C ∘ fE ∘ gE  ∎)
+        (begin i C ∘ fV ∘ gV   ≈⟨ sym assoc ⟩
+               (i C ∘ fV) ∘ gV   ≈⟨ eqi ⟩∘⟨refl ⟩
+               (fE ∘ i B) ∘ gV   ≈⟨ assoc ⟩
+               fE ∘ i B ∘ gV   ≈⟨ refl⟩∘⟨ eqi' ⟩
+               fE ∘ gE ∘ i A   ≈⟨ sym assoc ⟩
+               (fE ∘ gE) ∘ i A ∎)
 
 -- a "tautological" functor aNets -> Graphs
 q* : Functor aNets Graphs
@@ -410,7 +417,7 @@ codisc c = record
 j : Functor RGraphs Graphs
 j = record
   { F₀ = λ {(rgraphobj s t i eq-s eq-t) → graphobj s t}
-  ; F₁ = λ {(rgraphmor fE fV s-eqv t-eqv) → graphmor fE fV s-eqv t-eqv}
+  ; F₁ = λ {(rgraphmor fE fV s-eqv t-eqv i-eqv) → graphmor fE fV s-eqv t-eqv}
   ; identity = refl , refl
   ; homomorphism = refl , refl
   ; F-resp-≈ = λ (fst , snd) → fst , snd
@@ -429,7 +436,8 @@ R {coc} = record
                  [ fV ∘ id , fV ∘ t ]                                ≈⟨ []-cong₂ id-comm t-eqv ⟩
                  [ id  ∘ fV , t' ∘ fE ]                              ≈⟨ []-cong₂ (pushˡ (sym inject₁)) (pushˡ (sym inject₂)) ⟩
                  [ [ id , t' ] ∘ i₁  ∘ fV , [ id , t' ] ∘ i₂  ∘ fE ] ≈⟨ sym ∘-distribˡ-[] ⟩
-                 [ id , t' ] ∘ [ i₁  ∘ fV , i₂  ∘ fE ]               ∎)}
+                 [ id , t' ] ∘ [ i₁  ∘ fV , i₂  ∘ fE ]               ∎)
+          (sym inject₁)}
   ; identity = ([]-cong₂ identityʳ identityʳ ○ +-η) , refl
   ; homomorphism = λ {
     {_} {_} {_} {graphmor fE fV _ _} {graphmor fE' fV' _ _} →
@@ -494,19 +502,46 @@ forget⊣codisc {c} = record
           open Functor
           open BinaryProducts products
 
-
-j⊣R : {coc : Cocartesian ℂ} → j ⊣ R {coc}
-j⊣R {coc} = record
+R⊣j : {coc : Cocartesian ℂ} → R {coc} ⊣ j
+R⊣j {coc} = record
   { unit = record
-    { η = λ _ → rgraphmor i₂ id (trans identityˡ (sym inject₂)) (trans identityˡ (sym inject₂))
-    ; commute = λ _ → sym inject₂ , sym id-comm
-    ; sym-commute = λ _ → inject₂ , id-comm
+    { η = λ {_ → graphmor i₂ id (sym (inject₂ ○ introˡ refl)) (sym (inject₂ ○ introˡ refl))}
+    ; commute = λ {_ → sym inject₂ , id-comm-sym}
+    ; sym-commute = λ {_ → inject₂ , id-comm}
     }
   ; counit = record
-    { η = {!   !} -- wtf λ {(graphobj {E} {V} s t) → graphmor [ i (Functor.F₀ R (graphobj s t)) , id ] id {!   !} {!   !}}
-    ; commute = {!   !}
-    ; sym-commute = {!   !}
+    { η = λ {(rgraphobj {E} {V} s t i eq-s eq-t) → rgraphmor [ i , id ] id
+        (begin id ∘ [ id , s ]    ≈⟨ identityˡ ⟩
+               [ id , s ]         ≈⟨ []-cong₂ (sym eq-s) (sym identityʳ) ⟩
+               [ s ∘ i , s ∘ id ] ≈⟨  sym ∘-distribˡ-[] ⟩
+               s ∘ [ i , id ]     ∎)
+        (begin id ∘ [ id , t ]    ≈⟨ identityˡ ⟩
+               [ id , t ]         ≈⟨ []-cong₂ (sym eq-t) (sym identityʳ) ⟩
+               [ t ∘ i , t ∘ id ] ≈⟨ sym ∘-distribˡ-[] ⟩
+               t ∘ [ i , id ]     ∎)
+        (identityʳ ○ sym inject₁)}
+    ; commute = λ { {rgraphobj _ _ i _ _} {rgraphobj _ _ i' _ _} (rgraphmor fE fV _ _ i-eqv) →
+      (begin [ i' , id ] ∘ [ i₁ ∘ fV , i₂ ∘ fE ]                  ≈⟨ ∘-distribˡ-[] ⟩
+           [ [ i' , id ] ∘  i₁ ∘ fV , [ i' , id ] ∘ i₂ ∘ fE ]     ≈⟨ []-cong₂ (sym assoc) (sym assoc) ⟩
+           [ ([ i' , id ] ∘  i₁) ∘ fV , ([ i' , id ] ∘ i₂) ∘ fE ] ≈⟨ []-cong₂ (inject₁ ⟩∘⟨refl) (inject₂ ⟩∘⟨refl) ⟩
+           [ i' ∘ fV , id ∘ fE ]                                  ≈⟨ []-cong₂ i-eqv id-comm-sym ⟩
+           [ fE ∘ i , fE ∘ id ]                                   ≈⟨ sym ∘-distribˡ-[] ⟩
+           fE ∘ [ i , id ]                                        ∎)
+    , id-comm-sym}
+    ; sym-commute = λ { {rgraphobj _ _ i _ _} {rgraphobj _ _ i' _ _} (rgraphmor fE fV _ _ i-eqv) →
+      (sym (begin [ i' , id ] ∘ [ i₁ ∘ fV , i₂ ∘ fE ]             ≈⟨ ∘-distribˡ-[] ⟩
+           [ [ i' , id ] ∘  i₁ ∘ fV , [ i' , id ] ∘ i₂ ∘ fE ]     ≈⟨ []-cong₂ (sym assoc) (sym assoc) ⟩
+           [ ([ i' , id ] ∘  i₁) ∘ fV , ([ i' , id ] ∘ i₂) ∘ fE ] ≈⟨ []-cong₂ (inject₁ ⟩∘⟨refl) (inject₂ ⟩∘⟨refl) ⟩
+           [ i' ∘ fV , id ∘ fE ]                                  ≈⟨ []-cong₂ i-eqv id-comm-sym ⟩
+           [ fE ∘ i , fE ∘ id ]                                   ≈⟨ sym ∘-distribˡ-[] ⟩
+           fE ∘ [ i , id ]                                        ∎)) , id-comm}
     }
-  ; zig = {!   !}
-  ; zag = {!   !}
+  ; zig = (begin [ i₁ , id ] ∘ [ i₁ ∘ id , i₂ ∘ i₂ ] ≈⟨ ∘-distribˡ-[] ⟩
+                 [ [ i₁ , id ] ∘ i₁ ∘ id , [ i₁ , id ] ∘ i₂ ∘ i₂ ] ≈⟨ []-cong₂ (sym assoc) (sym assoc) ⟩
+                 [ ([ i₁ , id ] ∘ i₁) ∘ id , ([ i₁ , id ] ∘ i₂) ∘ i₂ ] ≈⟨ []-cong₂ (inject₁ ⟩∘⟨refl) (inject₂ ⟩∘⟨refl) ⟩
+                 [ i₁ ∘ id , id ∘ i₂ ] ≈⟨ []-cong₂ identityʳ identityˡ ⟩
+                 [ i₁ , i₂ ] ≈⟨ +-η ⟩
+                 id ∎)
+          , identity²
+  ; zag = inject₂ , identity²
   } where open Cocartesian coc
