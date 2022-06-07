@@ -91,62 +91,6 @@ record RGraphMor (G H : RGraphObj) : Set (ℓ ⊔ e) where
 
 open RGraphMor
 
--- -- triqualizers
--- record IsTriqualizer {X Y obj E12 E23} (f g h : X ⇒ Y)
---   (e12 : E12 ⇒ X)
---   (e23 : E23 ⇒ X)
---   (p1 : obj ⇒ E12)
---   (p2 : obj ⇒ E23) : Set (o ⊔ ℓ ⊔ e) where
---   field
---     isEq-fg : IsEqualizer e12 f g
---     isEq-gh : IsEqualizer e23 g h
---     isPb    : IsPullback p1 p2 e12 e23
-
---   arr : obj ⇒ X
---   arr = e12 ∘ p1
-
--- record Triqualizer {X Y}  (f g h : X ⇒ Y) : Set (o ⊔ ℓ ⊔ e) where
---   field
---     {obj E12 E23} : Obj
---     e12 : E12 ⇒ X
---     e23 : E23 ⇒ X
---     p1 : obj ⇒ E12
---     p2 : obj ⇒ E23
---     isTriqualizer : IsTriqualizer f g h e12 e23 p1 p2
-
---   open IsTriqualizer isTriqualizer public
-
--- record IsTriback {X Y Z trg obj P12 P23}
---   (f : X ⇒ trg)
---   (g : Y ⇒ trg)
---   (h : Z ⇒ trg)
---   (p₁ : P12 ⇒ X) (p₂ : P12 ⇒ Y)
---   (q₁ : P23 ⇒ Y) (q₂ : P23 ⇒ Z)
---   (r₁ : obj ⇒ P12) (r₂ : obj ⇒ P23) : Set (o ⊔ ℓ ⊔ e) where
---   field
---     pb1 : IsPullback p₁ p₂ f g
---     pb2 : IsPullback q₁ q₂ g h
---     tripb : IsPullback r₁ r₂ p₂ q₁
-
---   arr : obj ⇒ Y
---   arr = p₂ ∘ r₁
-
--- record Triback {X Y Z trg}
---   (f : X ⇒ trg)
---   (g : Y ⇒ trg)
---   (h : Z ⇒ trg) : Set (o ⊔ ℓ ⊔ e) where
---   field
---     {obj P12 P23} : Obj
---     p₁ : P12 ⇒ X
---     p₂ : P12 ⇒ Y
---     q₁ : P23 ⇒ Y
---     q₂ : P23 ⇒ Z
---     r₁ : obj ⇒ P12
---     r₂ : obj ⇒ P23
---     isTriback : IsTriback f g h p₁ p₂ q₁ q₂ r₁ r₂
-
---   open IsTriback isTriback public
-
 aNets : Category _ _ _
 aNets = record
   { Obj = ANetObj
@@ -471,18 +415,16 @@ forget⊣codisc {c} = record
   { unit = record
     { η = λ { (graphobj s t) → graphmor ⟨ s , t ⟩ id (sym (project₁ ○ sym identityˡ)) (sym (project₂ ○ sym identityˡ)) }
     ; commute = λ { {graphobj s t} {graphobj s' t'} (graphmor fE fV s-eqv t-eqv) →
-      (begin
-        ⟨ s' , t' ⟩ ∘ fE                  ≈⟨ ⟨⟩∘ ⟩
-        ⟨ s' ∘ fE , t' ∘ fE  ⟩            ≈⟨ sym (⟨⟩-cong₂ s-eqv t-eqv) ⟩
-        ⟨ fV ∘ s , fV ∘ t ⟩               ≈⟨ sym ⁂∘⟨⟩ ⟩
-        ⟨ fV ∘ π₁ , fV ∘ π₂ ⟩ ∘ ⟨ s , t ⟩ ∎)
-      , id-comm-sym }
-    ; sym-commute = λ { {graphobj s t} {graphobj s' t'} (graphmor fE fV s-eqv t-eqv) →
-      sym (begin
-             ⟨ s' , t' ⟩ ∘ fE                  ≈⟨ ⟨⟩∘ ⟩
+      (begin ⟨ s' , t' ⟩ ∘ fE                  ≈⟨ ⟨⟩∘ ⟩
              ⟨ s' ∘ fE , t' ∘ fE  ⟩            ≈⟨ sym (⟨⟩-cong₂ s-eqv t-eqv) ⟩
              ⟨ fV ∘ s , fV ∘ t ⟩               ≈⟨ sym ⁂∘⟨⟩ ⟩
              ⟨ fV ∘ π₁ , fV ∘ π₂ ⟩ ∘ ⟨ s , t ⟩ ∎)
+      , id-comm-sym }
+    ; sym-commute = λ { {graphobj s t} {graphobj s' t'} (graphmor fE fV s-eqv t-eqv) →
+      sym (begin ⟨ s' , t' ⟩ ∘ fE                  ≈⟨ ⟨⟩∘ ⟩
+                 ⟨ s' ∘ fE , t' ∘ fE  ⟩            ≈⟨ sym (⟨⟩-cong₂ s-eqv t-eqv) ⟩
+                 ⟨ fV ∘ s , fV ∘ t ⟩               ≈⟨ sym ⁂∘⟨⟩ ⟩
+                 ⟨ fV ∘ π₁ , fV ∘ π₂ ⟩ ∘ ⟨ s , t ⟩ ∎)
       , id-comm }
     }
   ; counit = record
@@ -491,12 +433,10 @@ forget⊣codisc {c} = record
     ; sym-commute = λ _ → id-comm
     }
   ; zig = identity²
-  ; zag =
-    (begin
-      ⟨ id ∘ π₁ , id ∘ π₂ ⟩ ∘ ⟨ π₁ , π₂ ⟩ ≈⟨ refl⟩∘⟨ η ⟩
-      ⟨ id ∘ π₁ , id ∘ π₂ ⟩ ∘ id          ≈⟨ ⟨⟩-cong₂ identityˡ identityˡ ⟩∘⟨refl ⟩
-      ⟨ π₁ , π₂ ⟩ ∘ id                    ≈⟨ η ⟩∘⟨refl ○ identity² ⟩
-      id                                  ∎)
+  ; zag = (begin ⟨ id ∘ π₁ , id ∘ π₂ ⟩ ∘ ⟨ π₁ , π₂ ⟩ ≈⟨ refl⟩∘⟨ η ⟩
+                 ⟨ id ∘ π₁ , id ∘ π₂ ⟩ ∘ id          ≈⟨ ⟨⟩-cong₂ identityˡ identityˡ ⟩∘⟨refl ⟩
+                 ⟨ π₁ , π₂ ⟩ ∘ id                    ≈⟨ η ⟩∘⟨refl ○ identity² ⟩
+                 id                                  ∎)
     , identity²
   } where open Cartesian c
           open Functor
@@ -510,7 +450,7 @@ R⊣j {coc} = record
     ; sym-commute = λ {_ → inject₂ , id-comm}
     }
   ; counit = record
-    { η = λ {(rgraphobj {E} {V} s t i eq-s eq-t) → rgraphmor [ i , id ] id
+    { η = λ {(rgraphobj s t i eq-s eq-t) → rgraphmor [ i , id ] id
         (begin id ∘ [ id , s ]    ≈⟨ identityˡ ⟩
                [ id , s ]         ≈⟨ []-cong₂ (sym eq-s) (sym identityʳ) ⟩
                [ s ∘ i , s ∘ id ] ≈⟨  sym ∘-distribˡ-[] ⟩
@@ -521,20 +461,20 @@ R⊣j {coc} = record
                t ∘ [ i , id ]     ∎)
         (identityʳ ○ sym inject₁)}
     ; commute = λ { {rgraphobj _ _ i _ _} {rgraphobj _ _ i' _ _} (rgraphmor fE fV _ _ i-eqv) →
-      (begin [ i' , id ] ∘ [ i₁ ∘ fV , i₂ ∘ fE ]                  ≈⟨ ∘-distribˡ-[] ⟩
-           [ [ i' , id ] ∘  i₁ ∘ fV , [ i' , id ] ∘ i₂ ∘ fE ]     ≈⟨ []-cong₂ (sym assoc) (sym assoc) ⟩
-           [ ([ i' , id ] ∘  i₁) ∘ fV , ([ i' , id ] ∘ i₂) ∘ fE ] ≈⟨ []-cong₂ (inject₁ ⟩∘⟨refl) (inject₂ ⟩∘⟨refl) ⟩
-           [ i' ∘ fV , id ∘ fE ]                                  ≈⟨ []-cong₂ i-eqv id-comm-sym ⟩
-           [ fE ∘ i , fE ∘ id ]                                   ≈⟨ sym ∘-distribˡ-[] ⟩
-           fE ∘ [ i , id ]                                        ∎)
+      (begin [ i' , id ] ∘ [ i₁ ∘ fV , i₂ ∘ fE ]                    ≈⟨ ∘-distribˡ-[] ⟩
+             [ [ i' , id ] ∘  i₁ ∘ fV , [ i' , id ] ∘ i₂ ∘ fE ]     ≈⟨ []-cong₂ (sym assoc) (sym assoc) ⟩
+             [ ([ i' , id ] ∘  i₁) ∘ fV , ([ i' , id ] ∘ i₂) ∘ fE ] ≈⟨ []-cong₂ (inject₁ ⟩∘⟨refl) (inject₂ ⟩∘⟨refl) ⟩
+             [ i' ∘ fV , id ∘ fE ]                                  ≈⟨ []-cong₂ i-eqv id-comm-sym ⟩
+             [ fE ∘ i , fE ∘ id ]                                   ≈⟨ sym ∘-distribˡ-[] ⟩
+             fE ∘ [ i , id ]                                        ∎)
     , id-comm-sym}
     ; sym-commute = λ { {rgraphobj _ _ i _ _} {rgraphobj _ _ i' _ _} (rgraphmor fE fV _ _ i-eqv) →
-      (sym (begin [ i' , id ] ∘ [ i₁ ∘ fV , i₂ ∘ fE ]             ≈⟨ ∘-distribˡ-[] ⟩
-           [ [ i' , id ] ∘  i₁ ∘ fV , [ i' , id ] ∘ i₂ ∘ fE ]     ≈⟨ []-cong₂ (sym assoc) (sym assoc) ⟩
-           [ ([ i' , id ] ∘  i₁) ∘ fV , ([ i' , id ] ∘ i₂) ∘ fE ] ≈⟨ []-cong₂ (inject₁ ⟩∘⟨refl) (inject₂ ⟩∘⟨refl) ⟩
-           [ i' ∘ fV , id ∘ fE ]                                  ≈⟨ []-cong₂ i-eqv id-comm-sym ⟩
-           [ fE ∘ i , fE ∘ id ]                                   ≈⟨ sym ∘-distribˡ-[] ⟩
-           fE ∘ [ i , id ]                                        ∎)) , id-comm}
+      (sym (begin [ i' , id ] ∘ [ i₁ ∘ fV , i₂ ∘ fE ]                    ≈⟨ ∘-distribˡ-[] ⟩
+                  [ [ i' , id ] ∘  i₁ ∘ fV , [ i' , id ] ∘ i₂ ∘ fE ]     ≈⟨ []-cong₂ (sym assoc) (sym assoc) ⟩
+                  [ ([ i' , id ] ∘  i₁) ∘ fV , ([ i' , id ] ∘ i₂) ∘ fE ] ≈⟨ []-cong₂ (inject₁ ⟩∘⟨refl) (inject₂ ⟩∘⟨refl) ⟩
+                  [ i' ∘ fV , id ∘ fE ]                                  ≈⟨ []-cong₂ i-eqv id-comm-sym ⟩
+                  [ fE ∘ i , fE ∘ id ]                                   ≈⟨ sym ∘-distribˡ-[] ⟩
+                  fE ∘ [ i , id ]                                        ∎)) , id-comm}
     }
   ; zig = (begin [ i₁ , id ] ∘ [ i₁ ∘ id , i₂ ∘ i₂ ] ≈⟨ ∘-distribˡ-[] ⟩
                  [ [ i₁ , id ] ∘ i₁ ∘ id , [ i₁ , id ] ∘ i₂ ∘ i₂ ] ≈⟨ []-cong₂ (sym assoc) (sym assoc) ⟩
