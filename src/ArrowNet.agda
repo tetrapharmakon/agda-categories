@@ -10,21 +10,25 @@ open Equiv
 
 open import Level
 
-open import Categories.Morphism.Reasoning ℂ
-open import Categories.Functor.Core
--- open import Categories.Functor.Bifunctor using (Bifunctor)
-open import Categories.Category.Cartesian as c
-open import Categories.Category.BinaryProducts
-open import Categories.Category.Cocartesian as cc
-open import Categories.Object.Coproduct
 open import Categories.Adjoint
-open import Categories.Functor.Limits
-open import Categories.Diagram.Equalizer ℂ
-open import Categories.Diagram.Coequalizer ℂ
-open import Categories.Diagram.Pullback ℂ
-open import Categories.Category.Complete.Finitely ℂ
+open import Categories.Category.BinaryProducts
+open import Categories.Category.Cartesian as c
+open import Categories.Category.Cocartesian as cc
 open import Categories.Category.Cocomplete.Finitely ℂ
+open import Categories.Diagram.Coequalizer ℂ
+open import Categories.Functor.Core
+open import Categories.Morphism.Reasoning ℂ
+open import Categories.Object.Coproduct
 
+
+{-
+CATEGORIES
+===
+arrow network; an arrow network is a set equipped with an action
+of the free monoid on two generators, called s,t to make evident
+that an arrow network is also a special kind of graph (where the
+object of vertices and of edges coincide).
+-}
 record ANetObj : Set (o ⊔ ℓ) where
   constructor anetobj
   field
@@ -61,6 +65,7 @@ record GraphMor (G H : GraphObj) : Set (ℓ ⊔ e) where
   field
     fE : G.E ⇒ H.E
     fV : G.V ⇒ H.V
+    --
     s-eqv : fV ∘ G.s ≈ H.s ∘ fE
     t-eqv : fV ∘ G.t ≈ H.t ∘ fE
 
@@ -72,6 +77,7 @@ record RGraphObj : Set (o ⊔ ℓ ⊔ e) where
     {E V} : Obj
     s t : E ⇒ V
     i : V ⇒ E
+    --
     eq-s : s ∘ i ≈ id
     eq-t : t ∘ i ≈ id
 
@@ -85,11 +91,42 @@ record RGraphMor (G H : RGraphObj) : Set (ℓ ⊔ e) where
   field
     fE : G.E ⇒ H.E
     fV : G.V ⇒ H.V
+    --
     s-eqv : fV ∘ G.s ≈ H.s ∘ fE
     t-eqv : fV ∘ G.t ≈ H.t ∘ fE
     i-eqv : H.i ∘ fV ≈ fE ∘ G.i
 
 open RGraphMor
+
+-- undirected graphs
+record UGraphObj : Set (o ⊔ ℓ ⊔ e) where
+  constructor ugraphobj
+  field
+    {E V} : Obj
+    s t : E ⇒ V
+    σ : E ⇒ E
+    --
+    σs=t : s ∘ σ ≈ t
+    σt=s : t ∘ σ ≈ s
+    σ-idem : σ ∘ σ ≈ id
+
+open UGraphObj
+
+record UGraphMor (G H : UGraphObj) : Set (ℓ ⊔ e) where
+  constructor ugraphmor
+  private
+    module G = UGraphObj G
+    module H = UGraphObj H
+  field
+    fE : G.E ⇒ H.E
+    fV : G.V ⇒ H.V
+    s-eqv : fV ∘ G.s ≈ H.s ∘ fE
+    t-eqv : fV ∘ G.t ≈ H.t ∘ fE
+    σ-eqv : fE ∘ G.σ ≈ H.σ ∘ fE
+
+open UGraphMor
+
+
 
 aNets : Category _ _ _
 aNets = record
@@ -179,7 +216,47 @@ RGraphs = record
                fE ∘ gE ∘ i A   ≈⟨ sym assoc ⟩
                (fE ∘ gE) ∘ i A ∎)
 
--- a "tautological" functor aNets -> Graphs
+UGraphs : Category _ _ _
+UGraphs = record
+  { Obj = UGraphObj
+  ; _⇒_ = λ G H → UGraphMor G H
+  ; _≈_ = λ u v → (fE u ≈ fE v) × (fV u ≈ fV v)
+  ; id = ugraphmor id id id-comm-sym id-comm-sym id-comm-sym
+  ; _∘_ = comp
+  ; assoc = assoc , assoc
+  ; sym-assoc = sym-assoc , sym-assoc
+  ; identityˡ = identityˡ , identityˡ
+  ; identityʳ = identityʳ , identityʳ
+  ; identity² = identity² , identity²
+  ; equiv = record
+    { refl = refl , refl
+    ; sym = λ x → (sym (proj₁ x)) , (sym (proj₂ x))
+    ; trans = λ p q → (trans (proj₁ p) (proj₁ q)) , (trans (proj₂ p) (proj₂ q))
+    }
+  ; ∘-resp-≈ = λ p q → (∘-resp-≈ (proj₁ p) (proj₁ q)) , (∘-resp-≈ (proj₂ p) (proj₂ q))
+  } where
+      comp : {A B C : UGraphObj} → UGraphMor B C → UGraphMor A B → UGraphMor A C
+      comp {A} {B} {C} (ugraphmor fE fV eqs eqt eqσ) (ugraphmor gE gV eqs' eqt' eqσ') = ugraphmor (fE ∘ gE) (fV ∘ gV)
+        (begin (fV ∘ gV) ∘ s A ≈⟨ pullʳ eqs' ⟩
+                fV ∘ s B ∘ gE  ≈⟨ pullˡ eqs ○ assoc ⟩
+                s C ∘ fE ∘ gE  ∎)
+        (begin (fV ∘ gV) ∘ t A ≈⟨ pullʳ eqt' ⟩
+                fV ∘ t B ∘ gE  ≈⟨ pullˡ eqt ○ assoc ⟩
+                t C ∘ fE ∘ gE  ∎)
+        (begin (fE ∘ gE) ∘ σ A ≈⟨ pullʳ eqσ' ⟩
+               fE ∘ σ B ∘ gE   ≈⟨ pullˡ eqσ ○ assoc ⟩
+               σ C ∘ fE ∘ gE   ∎)
+
+
+-- TODO:
+-- define G(2), M(2) and others from Guitart
+-- http://rene.guitart.pagesperso-orange.fr/textespublications/Guitart118.pdf
+{-
+FUNCTORS
+===
+
+-}
+-- a few "tautological" functors aNets -> Graphs
 q* : Functor aNets Graphs
 q* = record
   { F₀ = λ { (anetobj {X} s t) → graphobj s t}
