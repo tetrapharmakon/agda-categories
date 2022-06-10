@@ -178,21 +178,21 @@ record Triqualizer {X Y}  (f g h : X ⇒ Y) : Set (o ⊔ ℓ ⊔ e) where
 
   open IsTriqualizer isTriqualizer public
 
-R : {fc : FinitelyComplete} → Functor aNets Graphs
-R {fc} = record
-  { F₀ = λ {(anetobj {X} s t) → graphobj {FinitelyComplete.pullback.obj {!   !} {!   !}} {{!   !}} {!   !} {!   !}}
-  ; F₁ = {!   !}
-  ; identity = {!   !}
-  ; homomorphism = {!   !}
-  ; F-resp-≈ = {!   !}
-  } where open FinitelyComplete fc
-          -- open Triqualizer
-          -- open module P = Pullback (pullback (s BinaryProducts.⁂ t) s)
+-- R : {fc : FinitelyComplete} → Functor aNets Graphs
+-- R {fc} = record
+--   { F₀ = λ {(anetobj {X} s t) → graphobj {FinitelyComplete.pullback.obj {!   !} {!   !}} {{!   !}} {!   !} {!   !}}
+--   ; F₁ = {!   !}
+--   ; identity = {!   !}
+--   ; homomorphism = {!   !}
+--   ; F-resp-≈ = {!   !}
+--   } where open FinitelyComplete fc
+--           -- open Triqualizer
+--           -- open module P = Pullback (pullback (s BinaryProducts.⁂ t) s)
 
-D⊣R : {coc : Cocartesian ℂ} → D coc ⊣ R
-D⊣R {coc} = record
-  { unit = {!   !}
-  ; counit = {!   !}
-  ; zig = {!   !}
-  ; zag = {!   !}
-  } where open Cocartesian coc
+-- D⊣R : {coc : Cocartesian ℂ} → D coc ⊣ R
+-- D⊣R {coc} = record
+--   { unit = {!   !}
+--   ; counit = {!   !}
+--   ; zig = {!   !}
+--   ; zag = {!   !}
+--   } where open Cocartesian coc

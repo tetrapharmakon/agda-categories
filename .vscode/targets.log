@@ -1,6 +1,4 @@
 make all --print-data-base --no-builtin-variables --no-builtin-rules --question
-make: *** No rule to make target 'all'.  Stop.
-
 # GNU Make 4.3
 # Built for x86_64-pc-linux-gnu
 # Copyright (C) 1988-2020 Free Software Foundation, Inc.
@@ -8,7 +6,7 @@ make: *** No rule to make target 'all'.  Stop.
 # This is free software: you are free to change and redistribute it.
 # There is NO WARRANTY, to the extent permitted by law.
 
-# Make data base, printed on Thu Jun  9 11:25:58 2022
+# Make data base, printed on Thu Jun  9 19:59:45 2022
 
 # Variables
 
@@ -23,7 +21,7 @@ NO_AT_BRIDGE = 1
 # environment
 I3SOCK = /run/user/1000/i3/ipc-socket.586460
 # environment
-VSCODE_IPC_HOOK_EXTHOST = /run/user/1000/vscode-ipc-05fee5ea-59f8-42f2-9463-3403e6680659.sock
+VSCODE_IPC_HOOK_EXTHOST = /run/user/1000/vscode-ipc-ec668e6e-33e5-4109-9bbd-5c3ebc845b8f.sock
 # environment
 VSCODE_CWD = /home/fouche
 # environment
@@ -281,7 +279,6 @@ test: Everything.agda
 #  File has not been updated.
 
 # files hash-table stats:
- 
 # Load=10/1024=1%, Rehash=0, Collisions=0/29=0%
 # VPATH Search Paths
 
@@ -294,7 +291,10 @@ test: Everything.agda
 
 # strcache performance: lookups = 44 / hit rate = 38%
 # hash-table stats:
+ 
+make: *** No rule to make target 'all'.  Stop.
+
 # Load=27/8192=0%, Rehash=0, Collisions=0/44=0%
-# Finished Make data base on Thu Jun  9 11:25:58 2022
+# Finished Make data base on Thu Jun  9 19:59:45 2022
 
  
