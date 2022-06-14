@@ -41,9 +41,9 @@ record IndexedCoproductOf {i} {I : Set i} (P : I → Obj) : Set (i ⊔ o ⊔ e �
 record IndexedCoproduct {i} (I : Set i) : Set (i ⊔ o ⊔ e ⊔ ℓ) where
   field
     P         : I → Obj
-    productOf : IndexedCoproductOf P
+    coproductOf : IndexedCoproductOf P
 
-  open IndexedCoproductOf productOf public
+  open IndexedCoproductOf coproductOf public
 
 AllCoproducts : ∀ i → Set (o ⊔ ℓ ⊔ e ⊔ suc i)
 AllCoproducts i = (I : Set i) → IndexedCoproduct I
