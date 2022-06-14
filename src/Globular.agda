@@ -15,14 +15,19 @@ open import Categories.Category.BinaryProducts
 open import Categories.Category.Cartesian as c
 open import Categories.Category.Cocartesian as cc
 open import Categories.Category.Cocomplete.Finitely ℂ
+open import Categories.Category.Cocomplete
 open import Categories.Category.Complete.Finitely ℂ
 open import Categories.Diagram.Coequalizer ℂ
+open import Categories.Category.Lift
 open import Categories.Diagram.Equalizer ℂ
 open import Categories.Diagram.Pullback ℂ
 open import Categories.Functor.Core
 open import Categories.Morphism.Reasoning ℂ
 open import Categories.Object.Coproduct
 open import ArrowNet
+
+open import Categories.Object.Coproduct.Indexed ℂ
+open import Categories.Object.Coproduct.Indexed.Properties ℂ
 
 
 {-
@@ -50,14 +55,15 @@ record GlobMor (G H : GlobObj) : Set (o ⊔ ℓ ⊔ e) where
     module H = GlobObj H
   field
     f : ∀ (n : Nat) → G.E n ⇒ H.E n
-    eq : ∀ {n : Nat} → f n ∘ G.s n ≈ H.s n ∘ f (n + 1)
+    eq-s : ∀ {n : Nat} → f n ∘ G.s n ≈ H.s n ∘ f (n + 1)
+    eq-t : ∀ {n : Nat} → f n ∘ G.t n ≈ H.t n ∘ f (n + 1)
 
 Globs : Category _ _ _
 Globs = record
   { Obj = GlobObj
   ; _⇒_ = λ G H → GlobMor G H
-  ; _≈_ = λ {(glmor f eq) (glmor g eq') → ∀ {n : Nat} → f n ≈ g n}
-  ; id = glmor (λ _ → id) id-comm-sym
+  ; _≈_ = λ {(glmor f eq-s eq-t) (glmor g eq-s' eq-t') → ∀ {n : Nat} → f n ≈ g n}
+  ; id = glmor (λ _ → id) id-comm-sym id-comm-sym
   ; _∘_ = comp
   ; assoc = assoc
   ; sym-assoc = sym-assoc
@@ -71,13 +77,27 @@ Globs = record
     }
   ; ∘-resp-≈ = λ p q → ∘-resp-≈ p q
   } where comp : {A B C : GlobObj} → GlobMor B C → GlobMor A B → GlobMor A C
-          comp {globj A s t s-gi t-gi} {globj B s' t' s-gi' t-gi'} {globj C s'' t'' s-gi'' t-gi''} (glmor f eq) (glmor g eq') = glmor (λ n → f n ∘ g n)
+          comp {globj A s t s-gi t-gi} {globj B s' t' s-gi' t-gi'} {globj C s'' t'' s-gi'' t-gi''} (glmor f eq-s eq-t) (glmor g eq-s' eq-t') = glmor (λ n → f n ∘ g n)
             (λ {n} → begin (f n ∘ g n) ∘ s n ≈⟨ assoc ⟩
-                           f n ∘ g n ∘ s n ≈⟨ refl⟩∘⟨ eq' ⟩
+                           f n ∘ g n ∘ s n ≈⟨ refl⟩∘⟨ eq-s' ⟩
                            f n ∘ s' n ∘ g (n + 1) ≈⟨ sym assoc ⟩
-                           (f n ∘ s' n) ∘ g (n + 1) ≈⟨ eq ⟩∘⟨refl ⟩
+                           (f n ∘ s' n) ∘ g (n + 1) ≈⟨ eq-s ⟩∘⟨refl ⟩
                            (s'' n ∘ f (n + 1)) ∘ g (n + 1) ≈⟨ assoc ⟩
                            s'' n ∘ f (n + 1) ∘ g (n + 1) ∎)
+            (λ {n} → begin (f n ∘ g n) ∘ t n ≈⟨ assoc ⟩
+                           f n ∘ g n ∘ t n ≈⟨ refl⟩∘⟨ eq-t' ⟩
+                           f n ∘ t' n ∘ g (n + 1) ≈⟨ sym assoc ⟩
+                           (f n ∘ t' n) ∘ g (n + 1) ≈⟨ eq-t ⟩∘⟨refl ⟩
+                           (t'' n ∘ f (n + 1)) ∘ g (n + 1) ≈⟨ assoc ⟩
+                           t'' n ∘ f (n + 1) ∘ g (n + 1) ∎)
 
-C : Functor Globs aNets
-C = ?
+
+
+Γ : {ac : AllCoproductsOf (o ⊔ ℓ ⊔ e)} → Functor Globs (aNets ℂ)
+Γ {ac} = record
+  { F₀ = {!   !}
+  ; F₁ = {!   !}
+  ; identity = {!   !}
+  ; homomorphism = {!   !}
+  ; F-resp-≈ = {!   !}
+  } where open IndexedCoproductOf
