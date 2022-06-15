@@ -104,7 +104,7 @@ Globs = record
                     ι i ∘ id                      ≈⟨ id-comm ⟩
                      id ∘ ι i                     ∎)}
   ; homomorphism = λ {X} {Y} {Z} {f} {g} → sabbia {X} {Y} {Z} {f} {g}
-  ; F-resp-≈ = {!   !} -- λ { {globj E s t gi-s gi-t} {globj E₁ s₁ t₁ gi-s₁ gi-t₁} {glmor f eq-s eq-t} {glmor f₁ eq-s₁ eq-t₁} x → {!   !}}
+  ; F-resp-≈ = λ { {X} {Y} {f} {g} x → koala {X} {Y} {f} {g} x}
   } where
       σ : (O : GlobObj) → (i : ℕ) → (GlobObj.E O) i ⇒ _
       σ (globj E s t gi-s gi-t) zero = ι 0
@@ -125,7 +125,13 @@ Globs = record
                 where module A = IndexedCoproductOf (ac A)
                       module B = IndexedCoproductOf (ac B)
                       module C = IndexedCoproductOf (ac C)
-
+      koala : {X Y : GlobObj} {f g : GlobMor X Y} (f=g : ∀ {i : ℕ} → GlobMor.f f i ≈ GlobMor.f g i) → _
+      koala {globj A s t gi-s gi-t}
+            {globj B sB tB gi-sB gi-tB}
+            {glmor f eq-sf eq-tf}
+            {glmor g eq-sg eq-tg} f≈g = A.⟨⟩-cong {B.X} (λ i → B.ι i ∘ f i) (λ i → B.ι i ∘ g i) λ i → refl⟩∘⟨ f≈g
+              where module A = IndexedCoproductOf (ac A)
+                    module B = IndexedCoproductOf (ac B)
       τ : (O : GlobObj) → (i : ℕ) → (GlobObj.E O) i ⇒ _
       τ (globj E s t gi-s gi-t) zero = ι 0
         where open IndexedCoproductOf (ac E)
