@@ -139,12 +139,12 @@ Globs = record
         where open IndexedCoproductOf (ac E)
 
       Γ0 : ∀ (G : GlobObj) → ANetObj
-      Γ0 O@(globj E s t gi-s gi-t) = anetobj {X} ⟨ σ O ⟩ ⟨ τ O ⟩
+      Γ0 G@(globj E s t gi-s gi-t) = anetobj {X} ⟨ σ G ⟩ ⟨ τ G ⟩
         where open IndexedCoproductOf (ac E)
 
       Γ1 : ∀ {A B} → GlobMor A B → _
       Γ1 A@{globj E s t gi-s gi-t}
-         B@{globj E₁ s₁ t₁ gi-s₁ gi-t₁}
+         B@{globj F s₁ t₁ gi-s₁ gi-t₁}
          (glmor f eq-s eq-t) =
            anetmor A.⟨ help ⟩
            (begin A.⟨ (λ i → B.ι i ∘ f i) ⟩ ∘ A.⟨ σ A ⟩              ≈⟨ A.⟨⟩∘ _ _ ⟩
@@ -156,19 +156,19 @@ Globs = record
                   A.⟨ (λ i → B.⟨ τ B ⟩ ∘ B.ι i ∘ f i) ⟩              ≈⟨ sym (A.⟨⟩∘ _ _) ⟩
                   B.⟨ τ B ⟩ ∘ A.⟨ (λ i → B.ι i ∘ f i) ⟩              ∎)
         where module A = IndexedCoproductOf (ac E)
-              module B = IndexedCoproductOf (ac E₁)
+              module B = IndexedCoproductOf (ac F)
               help : (i : ℕ) → E i ⇒ B.X
               help i = B.ι i ∘ f i
 
-              prop : (i : ℕ) → A.⟨ (λ i₁ → B.ι i₁ ∘ f i₁) ⟩ ∘ σ A i ≈ B.⟨ σ B ⟩ ∘ B.ι i ∘ f i
+              prop : (i : ℕ) → A.⟨ (λ j → B.ι j ∘ f j) ⟩ ∘ σ A i ≈ B.⟨ σ B ⟩ ∘ B.ι i ∘ f i
               prop ℕ.zero =
-                begin A.⟨ (λ i₁ → B.ι i₁ ∘ f i₁) ⟩ ∘ A.ι 0 ≈⟨ A.commute (λ i₁ → B.ι i₁ ∘ f i₁) ℕ.zero ⟩
+                begin A.⟨ (λ j → B.ι j ∘ f j) ⟩ ∘ A.ι 0 ≈⟨ A.commute _ ℕ.zero ⟩
                       B.ι 0 ∘ f 0                          ≈⟨ sym (B.commute (σ B) 0) ⟩∘⟨refl ⟩
                       (B.⟨ σ B ⟩ ∘ B.ι 0) ∘ f 0            ≈⟨ assoc ⟩
                       B.⟨ σ B ⟩ ∘ B.ι 0 ∘ f 0              ∎
               prop (ℕ.suc i) =
-                begin A.⟨ (λ i₁ → B.ι i₁ ∘ f i₁) ⟩ ∘ A.ι i ∘ s i    ≈⟨ sym-assoc ⟩
-                      (A.⟨ (λ i₁ → B.ι i₁ ∘ f i₁) ⟩ ∘ A.ι i) ∘ s i  ≈⟨ A.commute (λ i₁ → B.ι i₁ ∘ f i₁) i ⟩∘⟨refl ⟩
+                begin A.⟨ (λ j → B.ι j ∘ f j) ⟩ ∘ A.ι i ∘ s i    ≈⟨ sym-assoc ⟩
+                      (A.⟨ (λ j → B.ι j ∘ f j) ⟩ ∘ A.ι i) ∘ s i  ≈⟨ A.commute _ i ⟩∘⟨refl ⟩
                       (B.ι i ∘ f i) ∘ s i                           ≈⟨ assoc ⟩
                       B.ι i ∘ f i ∘ s i                             ≈⟨ refl⟩∘⟨ eq-s ⟩
                       B.ι i ∘ s₁ i ∘ f (ℕ.suc i)                    ≈⟨ sym-assoc ⟩
@@ -176,15 +176,15 @@ Globs = record
                       (B.⟨ σ B ⟩ ∘ B.ι (ℕ.suc i)) ∘ f (ℕ.suc i)     ≈⟨ assoc ⟩
                       B.⟨ σ B ⟩ ∘ B.ι (ℕ.suc i) ∘ f (ℕ.suc i)       ∎
               -- same as prop, but for t
-              prop2 : (i : ℕ) → A.⟨ (λ i₁ → B.ι i₁ ∘ f i₁) ⟩ ∘ τ A i ≈ B.⟨ τ B ⟩ ∘ B.ι i ∘ f i
+              prop2 : (i : ℕ) → A.⟨ (λ j → B.ι j ∘ f j) ⟩ ∘ τ A i ≈ B.⟨ τ B ⟩ ∘ B.ι i ∘ f i
               prop2 ℕ.zero =
-                begin A.⟨ (λ i₁ → B.ι i₁ ∘ f i₁) ⟩ ∘ A.ι 0  ≈⟨ A.commute (λ i₁ → B.ι i₁ ∘ f i₁) ℕ.zero ⟩
+                begin A.⟨ (λ j → B.ι j ∘ f j) ⟩ ∘ A.ι 0  ≈⟨ A.commute (λ j → B.ι j ∘ f j) ℕ.zero ⟩
                       B.ι 0 ∘ f 0                           ≈⟨ sym (B.commute (τ B) 0) ⟩∘⟨refl ⟩
                       (B.⟨ τ B ⟩ ∘ B.ι 0) ∘ f 0             ≈⟨ assoc ⟩
                       B.⟨ τ B ⟩ ∘ B.ι 0 ∘ f 0               ∎
               prop2 (ℕ.suc i) =
-                begin A.⟨ (λ i₁ → B.ι i₁ ∘ f i₁) ⟩ ∘ A.ι i ∘ t i    ≈⟨ sym-assoc ⟩
-                      (A.⟨ (λ i₁ → B.ι i₁ ∘ f i₁) ⟩ ∘ A.ι i) ∘ t i  ≈⟨ A.commute (λ i₁ → B.ι i₁ ∘ f i₁) i ⟩∘⟨refl ⟩
+                begin A.⟨ (λ j → B.ι j ∘ f j) ⟩ ∘ A.ι i ∘ t i    ≈⟨ sym-assoc ⟩
+                      (A.⟨ (λ j → B.ι j ∘ f j) ⟩ ∘ A.ι i) ∘ t i  ≈⟨ A.commute _ i ⟩∘⟨refl ⟩
                       (B.ι i ∘ f i) ∘ t i                           ≈⟨ assoc ⟩
                       B.ι i ∘ f i ∘ t i                             ≈⟨ refl⟩∘⟨ eq-t ⟩
                       B.ι i ∘ t₁ i ∘ f (ℕ.suc i)                    ≈⟨ sym-assoc ⟩
