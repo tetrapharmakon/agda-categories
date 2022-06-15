@@ -103,8 +103,8 @@ Globs = record
         (λ i → begin ⟨ (λ i₁ → ι i₁ ∘ id) ⟩ ∘ ι i ≈⟨ commute _ i ⟩
                     ι i ∘ id                      ≈⟨ id-comm ⟩
                      id ∘ ι i                     ∎)}
-  ; homomorphism = λ {X} {Y} {Z} {f} {g} → sabbia {X} {Y} {Z} {f} {g}
-  ; F-resp-≈ = λ { {X} {Y} {f} {g} x → koala {X} {Y} {f} {g} x}
+  ; homomorphism = λ {X} {Y} {Z} {f} {g} → Γhom {X} {Y} {Z} {f} {g}
+  ; F-resp-≈ = λ { {X} {Y} {f} {g} x → Γresp {X} {Y} {f} {g} x}
   } where
       σ : (O : GlobObj) → (i : ℕ) → (GlobObj.E O) i ⇒ _
       σ (globj E s t gi-s gi-t) zero = ι 0
@@ -112,21 +112,21 @@ Globs = record
       σ (globj E s t gi-s gi-t) (suc i) = ι i ∘ s i
         where open IndexedCoproductOf (ac E)
 
-      sabbia : {X Y Z : GlobObj} {f : GlobMor X Y} {g : GlobMor Y Z} → _
-      sabbia {globj A sA tA gi-sA gi-tA}
-             {globj B sB tB gi-sB gi-tB}
-             {globj C sC tC gi-sC gi-tC}
-             {glmor f eq-s eq-t}
-             {glmor g eq-s' eq-t'} =
-                begin A.⟨ (λ i → C.ι i ∘ g i ∘ f i) ⟩ ≈⟨ A.⟨⟩-cong _ _ (λ i → sym-assoc) ⟩
-                     A.⟨ (λ i → (C.ι i ∘ g i) ∘ f i) ⟩ ≈⟨ A.⟨⟩-cong _ _ (λ i → pushˡ (sym (B.commute _ _))) ⟩
-                     A.⟨ (λ i → B.⟨ (λ j → C.ι j ∘ g j) ⟩ ∘ B.ι i ∘ f i) ⟩ ≈⟨ sym (A.⟨⟩∘ _ _) ⟩
-                     B.⟨ (λ i → C.ι i ∘ g i) ⟩ ∘ A.⟨ (λ i → B.ι i ∘ f i) ⟩ ∎
-                where module A = IndexedCoproductOf (ac A)
-                      module B = IndexedCoproductOf (ac B)
-                      module C = IndexedCoproductOf (ac C)
-      koala : {X Y : GlobObj} {f g : GlobMor X Y} (f=g : ∀ {i : ℕ} → GlobMor.f f i ≈ GlobMor.f g i) → _
-      koala {globj A s t gi-s gi-t}
+      Γhom : {X Y Z : GlobObj} {f : GlobMor X Y} {g : GlobMor Y Z} → _
+      Γhom {globj A sA tA gi-sA gi-tA}
+           {globj B sB tB gi-sB gi-tB}
+           {globj C sC tC gi-sC gi-tC}
+           {glmor f eq-s eq-t}
+           {glmor g eq-s' eq-t'} =
+              begin A.⟨ (λ i → C.ι i ∘ g i ∘ f i) ⟩ ≈⟨ A.⟨⟩-cong _ _ (λ i → sym-assoc) ⟩
+                   A.⟨ (λ i → (C.ι i ∘ g i) ∘ f i) ⟩ ≈⟨ A.⟨⟩-cong _ _ (λ i → pushˡ (sym (B.commute _ _))) ⟩
+                   A.⟨ (λ i → B.⟨ (λ j → C.ι j ∘ g j) ⟩ ∘ B.ι i ∘ f i) ⟩ ≈⟨ sym (A.⟨⟩∘ _ _) ⟩
+                   B.⟨ (λ i → C.ι i ∘ g i) ⟩ ∘ A.⟨ (λ i → B.ι i ∘ f i) ⟩ ∎
+              where module A = IndexedCoproductOf (ac A)
+                    module B = IndexedCoproductOf (ac B)
+                    module C = IndexedCoproductOf (ac C)
+      Γresp : {X Y : GlobObj} {f g : GlobMor X Y} (f=g : ∀ {i : ℕ} → GlobMor.f f i ≈ GlobMor.f g i) → _
+      Γresp {globj A s t gi-s gi-t}
             {globj B sB tB gi-sB gi-tB}
             {glmor f eq-sf eq-tf}
             {glmor g eq-sg eq-tg} f≈g = A.⟨⟩-cong {B.X} (λ i → B.ι i ∘ f i) (λ i → B.ι i ∘ g i) λ i → refl⟩∘⟨ f≈g
@@ -143,15 +143,18 @@ Globs = record
         where open IndexedCoproductOf (ac E)
 
       Γ1 : ∀ {A B} → GlobMor A B → _
-      Γ1 A@{globj E s t gi-s gi-t} B@{globj E₁ s₁ t₁ gi-s₁ gi-t₁} (glmor f eq-s eq-t) = anetmor A.⟨ help ⟩
-                      (begin A.⟨ (λ i → B.ι i ∘ f i) ⟩ ∘ A.⟨ σ A ⟩              ≈⟨ A.⟨⟩∘ _ _ ⟩
-                             A.⟨ (λ i → A.⟨ (λ i₁ → B.ι i₁ ∘ f i₁) ⟩ ∘ σ A i) ⟩ ≈⟨ A.⟨⟩-cong _ _ prop ⟩
-                             A.⟨ (λ i → B.⟨ σ B ⟩ ∘ B.ι i ∘ f i) ⟩              ≈⟨ sym (A.⟨⟩∘ _ _) ⟩
-                             B.⟨ σ B ⟩ ∘ A.⟨ (λ i → B.ι i ∘ f i) ⟩              ∎)
-                      (begin A.⟨ (λ i → B.ι i ∘ f i) ⟩ ∘ A.⟨ τ A ⟩              ≈⟨ A.⟨⟩∘ _ _ ⟩
-                             A.⟨ (λ i → A.⟨ (λ i₁ → B.ι i₁ ∘ f i₁) ⟩ ∘ τ A i) ⟩ ≈⟨ A.⟨⟩-cong _ _ prop2 ⟩
-                             A.⟨ (λ i → B.⟨ τ B ⟩ ∘ B.ι i ∘ f i) ⟩              ≈⟨ sym (A.⟨⟩∘ _ _) ⟩
-                             B.⟨ τ B ⟩ ∘ A.⟨ (λ i → B.ι i ∘ f i) ⟩              ∎)
+      Γ1 A@{globj E s t gi-s gi-t}
+         B@{globj E₁ s₁ t₁ gi-s₁ gi-t₁}
+         (glmor f eq-s eq-t) =
+           anetmor A.⟨ help ⟩
+           (begin A.⟨ (λ i → B.ι i ∘ f i) ⟩ ∘ A.⟨ σ A ⟩              ≈⟨ A.⟨⟩∘ _ _ ⟩
+                  A.⟨ (λ i → A.⟨ (λ i₁ → B.ι i₁ ∘ f i₁) ⟩ ∘ σ A i) ⟩ ≈⟨ A.⟨⟩-cong _ _ prop ⟩
+                  A.⟨ (λ i → B.⟨ σ B ⟩ ∘ B.ι i ∘ f i) ⟩              ≈⟨ sym (A.⟨⟩∘ _ _) ⟩
+                  B.⟨ σ B ⟩ ∘ A.⟨ (λ i → B.ι i ∘ f i) ⟩              ∎)
+           (begin A.⟨ (λ i → B.ι i ∘ f i) ⟩ ∘ A.⟨ τ A ⟩              ≈⟨ A.⟨⟩∘ _ _ ⟩
+                  A.⟨ (λ i → A.⟨ (λ i₁ → B.ι i₁ ∘ f i₁) ⟩ ∘ τ A i) ⟩ ≈⟨ A.⟨⟩-cong _ _ prop2 ⟩
+                  A.⟨ (λ i → B.⟨ τ B ⟩ ∘ B.ι i ∘ f i) ⟩              ≈⟨ sym (A.⟨⟩∘ _ _) ⟩
+                  B.⟨ τ B ⟩ ∘ A.⟨ (λ i → B.ι i ∘ f i) ⟩              ∎)
         where module A = IndexedCoproductOf (ac E)
               module B = IndexedCoproductOf (ac E₁)
               help : (i : ℕ) → E i ⇒ B.X
