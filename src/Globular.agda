@@ -174,18 +174,20 @@ Globs = record
                       B.ι i ∘ s₁ i ∘ f (ℕ.suc i)                    ≈⟨ sym-assoc ⟩
                       (B.ι i ∘ s₁ i) ∘ f (ℕ.suc i)                  ≈⟨ sym (B.commute (σ B) (1 + i)) ⟩∘⟨refl ⟩
                       (B.⟨ σ B ⟩ ∘ B.ι (ℕ.suc i)) ∘ f (ℕ.suc i)     ≈⟨ assoc ⟩
-                      B.⟨ σ B ⟩ ∘ B.ι (ℕ.suc i) ∘ f (ℕ.suc i)   ∎
+                      B.⟨ σ B ⟩ ∘ B.ι (ℕ.suc i) ∘ f (ℕ.suc i)       ∎
               -- same as prop, but for t
               prop2 : (i : ℕ) → A.⟨ (λ i₁ → B.ι i₁ ∘ f i₁) ⟩ ∘ τ A i ≈ B.⟨ τ B ⟩ ∘ B.ι i ∘ f i
-              prop2 ℕ.zero = begin A.⟨ (λ i₁ → B.ι i₁ ∘ f i₁) ⟩ ∘ A.ι 0 ≈⟨ A.commute (λ i₁ → B.ι i₁ ∘ f i₁) ℕ.zero ⟩
-                                  B.ι 0 ∘ f 0                           ≈⟨ sym (B.commute (τ B) 0) ⟩∘⟨refl ⟩
-                                  (B.⟨ τ B ⟩ ∘ B.ι 0) ∘ f 0             ≈⟨ assoc ⟩
-                                  B.⟨ τ B ⟩ ∘ B.ι 0 ∘ f 0               ∎
-              prop2 (ℕ.suc i) = begin A.⟨ (λ i₁ → B.ι i₁ ∘ f i₁) ⟩ ∘ A.ι i ∘ t i   ≈⟨ sym-assoc ⟩
-                                     (A.⟨ (λ i₁ → B.ι i₁ ∘ f i₁) ⟩ ∘ A.ι i) ∘ t i  ≈⟨ A.commute (λ i₁ → B.ι i₁ ∘ f i₁) i ⟩∘⟨refl ⟩
-                                     (B.ι i ∘ f i) ∘ t i                           ≈⟨ assoc ⟩
-                                     B.ι i ∘ f i ∘ t i                             ≈⟨ refl⟩∘⟨ eq-t ⟩
-                                     B.ι i ∘ t₁ i ∘ f (ℕ.suc i)                    ≈⟨ sym-assoc ⟩
-                                     (B.ι i ∘ t₁ i) ∘ f (ℕ.suc i)                  ≈⟨ sym (B.commute (τ B) (1 + i)) ⟩∘⟨refl ⟩
-                                     (B.⟨ τ B ⟩ ∘ B.ι (ℕ.suc i)) ∘ f (ℕ.suc i)     ≈⟨ assoc ⟩
-                                     B.⟨ τ B ⟩ ∘ B.ι (ℕ.suc i) ∘ f (ℕ.suc i)       ∎
+              prop2 ℕ.zero =
+                begin A.⟨ (λ i₁ → B.ι i₁ ∘ f i₁) ⟩ ∘ A.ι 0  ≈⟨ A.commute (λ i₁ → B.ι i₁ ∘ f i₁) ℕ.zero ⟩
+                      B.ι 0 ∘ f 0                           ≈⟨ sym (B.commute (τ B) 0) ⟩∘⟨refl ⟩
+                      (B.⟨ τ B ⟩ ∘ B.ι 0) ∘ f 0             ≈⟨ assoc ⟩
+                      B.⟨ τ B ⟩ ∘ B.ι 0 ∘ f 0               ∎
+              prop2 (ℕ.suc i) =
+                begin A.⟨ (λ i₁ → B.ι i₁ ∘ f i₁) ⟩ ∘ A.ι i ∘ t i    ≈⟨ sym-assoc ⟩
+                      (A.⟨ (λ i₁ → B.ι i₁ ∘ f i₁) ⟩ ∘ A.ι i) ∘ t i  ≈⟨ A.commute (λ i₁ → B.ι i₁ ∘ f i₁) i ⟩∘⟨refl ⟩
+                      (B.ι i ∘ f i) ∘ t i                           ≈⟨ assoc ⟩
+                      B.ι i ∘ f i ∘ t i                             ≈⟨ refl⟩∘⟨ eq-t ⟩
+                      B.ι i ∘ t₁ i ∘ f (ℕ.suc i)                    ≈⟨ sym-assoc ⟩
+                      (B.ι i ∘ t₁ i) ∘ f (ℕ.suc i)                  ≈⟨ sym (B.commute (τ B) (1 + i)) ⟩∘⟨refl ⟩
+                      (B.⟨ τ B ⟩ ∘ B.ι (ℕ.suc i)) ∘ f (ℕ.suc i)     ≈⟨ assoc ⟩
+                      B.⟨ τ B ⟩ ∘ B.ι (ℕ.suc i) ∘ f (ℕ.suc i)       ∎
