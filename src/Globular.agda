@@ -31,12 +31,7 @@ open import Categories.Object.Coproduct.Indexed.Properties ℂ
 
 
 {-
-CATEGORIES
-===
-arrow network; an arrow network is a set equipped with an action
-of the free monoid on two generators, called s,t to make evident
-that an arrow network is also a special kind of graph (where the
-object of vertices and of edges coincide).
+The category of globular sets
 -}
 record GlobObj : Set (o ⊔ ℓ ⊔ e) where
   constructor globj
@@ -76,112 +71,112 @@ Globs = record
     ; trans = λ p q → trans p q
     }
   ; ∘-resp-≈ = λ p q → ∘-resp-≈ p q
-  } where comp : {A B C : GlobObj} → GlobMor B C → GlobMor A B → GlobMor A C
-          comp {globj A s t s-gi t-gi} {globj B s' t' s-gi' t-gi'} {globj C s'' t'' s-gi'' t-gi''} (glmor f eq-s eq-t) (glmor g eq-s' eq-t') = glmor (λ n → f n ∘ g n)
-            (λ {n} → begin (f n ∘ g n) ∘ s n ≈⟨ assoc ⟩
-                           f n ∘ g n ∘ s n ≈⟨ refl⟩∘⟨ eq-s' ⟩
-                           f n ∘ s' n ∘ g (1 + n) ≈⟨ sym assoc ⟩
-                           (f n ∘ s' n) ∘ g (1 + n) ≈⟨ eq-s ⟩∘⟨refl ⟩
-                           (s'' n ∘ f (1 + n)) ∘ g (1 + n) ≈⟨ assoc ⟩
-                           s'' n ∘ f (1 + n) ∘ g (1 + n) ∎)
-            (λ {n} → begin (f n ∘ g n) ∘ t n ≈⟨ assoc ⟩
-                           f n ∘ g n ∘ t n ≈⟨ refl⟩∘⟨ eq-t' ⟩
-                           f n ∘ t' n ∘ g (1 + n) ≈⟨ sym assoc ⟩
-                           (f n ∘ t' n) ∘ g (1 + n) ≈⟨ eq-t ⟩∘⟨refl ⟩
-                           (t'' n ∘ f (1 + n)) ∘ g (1 + n) ≈⟨ assoc ⟩
-                           t'' n ∘ f (1 + n) ∘ g (1 + n) ∎)
-
-
+  } where
+      comp : {A B C : GlobObj} → GlobMor B C → GlobMor A B → GlobMor A C
+      comp {globj A s t s-gi t-gi}
+           {globj B s' t' s-gi' t-gi'}
+           {globj C s'' t'' s-gi'' t-gi''}
+           (glmor f eq-s eq-t)
+           (glmor g eq-s' eq-t') = glmor (λ n → f n ∘ g n)
+            (λ {n} →
+              begin (f n ∘ g n) ∘ s n               ≈⟨ assoc ⟩
+                    f n ∘ g n ∘ s n                 ≈⟨ refl⟩∘⟨ eq-s' ⟩
+                    f n ∘ s' n ∘ g (1 + n)          ≈⟨ sym assoc ⟩
+                    (f n ∘ s' n) ∘ g (1 + n)        ≈⟨ eq-s ⟩∘⟨refl ⟩
+                    (s'' n ∘ f (1 + n)) ∘ g (1 + n) ≈⟨ assoc ⟩
+                    s'' n ∘ f (1 + n) ∘ g (1 + n)   ∎)
+            (λ {n} →
+              begin (f n ∘ g n) ∘ t n               ≈⟨ assoc ⟩
+                    f n ∘ g n ∘ t n                 ≈⟨ refl⟩∘⟨ eq-t' ⟩
+                    f n ∘ t' n ∘ g (1 + n)          ≈⟨ sym assoc ⟩
+                    (f n ∘ t' n) ∘ g (1 + n)        ≈⟨ eq-t ⟩∘⟨refl ⟩
+                    (t'' n ∘ f (1 + n)) ∘ g (1 + n) ≈⟨ assoc ⟩
+                    t'' n ∘ f (1 + n) ∘ g (1 + n)   ∎)
 
 Γ : {ac : AllCoproductsOf Level.zero} → Functor Globs aNets
 Γ {ac} = record
-  { F₀ = gioco
-  ; F₁ = giocoM
-  ; identity = {!   !}
-  ; homomorphism = {!   !}
-  ; F-resp-≈ = {!   !}
+  { F₀ = Γ0
+  ; F₁ = Γ1
+  ; identity = λ { {globj E s t gi-s gi-t} → let
+      open IndexedCoproductOf (ac E) in
+      unique′ _ _
+        (λ i → begin ⟨ (λ i₁ → ι i₁ ∘ id) ⟩ ∘ ι i ≈⟨ commute _ i ⟩
+                    ι i ∘ id                      ≈⟨ id-comm ⟩
+                     id ∘ ι i                     ∎)}
+  ; homomorphism = λ {X} {Y} {Z} {f} {g} → sabbia {X} {Y} {Z} {f} {g}
+  ; F-resp-≈ = {!   !} -- λ { {globj E s t gi-s gi-t} {globj E₁ s₁ t₁ gi-s₁ gi-t₁} {glmor f eq-s eq-t} {glmor f₁ eq-s₁ eq-t₁} x → {!   !}}
   } where
-      sigma : (O : GlobObj) → (i : ℕ) → (GlobObj.E O) i ⇒ _
-      sigma (globj E s t gi-s gi-t) zero = ι 0
+      σ : (O : GlobObj) → (i : ℕ) → (GlobObj.E O) i ⇒ _
+      σ (globj E s t gi-s gi-t) zero = ι 0
         where open IndexedCoproductOf (ac E)
-      sigma (globj E s t gi-s gi-t) (suc i) = ι i ∘ s i
-        where open IndexedCoproductOf (ac E)
-
-
-      tau : (O : GlobObj) → (i : ℕ) → (GlobObj.E O) i ⇒ _
-      tau (globj E s t gi-s gi-t) zero = ι 0
-        where open IndexedCoproductOf (ac E)
-      tau (globj E s t gi-s gi-t) (suc i) = ι i ∘ t i
+      σ (globj E s t gi-s gi-t) (suc i) = ι i ∘ s i
         where open IndexedCoproductOf (ac E)
 
-      gioco : ∀ (G : GlobObj) → ANetObj
-      gioco O@(globj E s t gi-s gi-t) = anetobj {X} ⟨ sigma O ⟩ ⟨ tau O ⟩
+      sabbia : {X Y Z : GlobObj} {f : GlobMor X Y} {g : GlobMor Y Z} → _
+      sabbia {globj A sA tA gi-sA gi-tA}
+             {globj B sB tB gi-sB gi-tB}
+             {globj C sC tC gi-sC gi-tC}
+             {glmor f eq-s eq-t}
+             {glmor g eq-s' eq-t'} =
+                begin A.⟨ (λ i → C.ι i ∘ g i ∘ f i) ⟩ ≈⟨ A.⟨⟩-cong _ _ (λ i → sym-assoc) ⟩
+                     A.⟨ (λ i → (C.ι i ∘ g i) ∘ f i) ⟩ ≈⟨ A.⟨⟩-cong _ _ (λ i → pushˡ (sym (B.commute _ _))) ⟩
+                     A.⟨ (λ i → B.⟨ (λ j → C.ι j ∘ g j) ⟩ ∘ B.ι i ∘ f i) ⟩ ≈⟨ sym (A.⟨⟩∘ _ _) ⟩
+                     B.⟨ (λ i → C.ι i ∘ g i) ⟩ ∘ A.⟨ (λ i → B.ι i ∘ f i) ⟩ ∎
+                where module A = IndexedCoproductOf (ac A)
+                      module B = IndexedCoproductOf (ac B)
+                      module C = IndexedCoproductOf (ac C)
+
+      τ : (O : GlobObj) → (i : ℕ) → (GlobObj.E O) i ⇒ _
+      τ (globj E s t gi-s gi-t) zero = ι 0
+        where open IndexedCoproductOf (ac E)
+      τ (globj E s t gi-s gi-t) (suc i) = ι i ∘ t i
         where open IndexedCoproductOf (ac E)
 
+      Γ0 : ∀ (G : GlobObj) → ANetObj
+      Γ0 O@(globj E s t gi-s gi-t) = anetobj {X} ⟨ σ O ⟩ ⟨ τ O ⟩
+        where open IndexedCoproductOf (ac E)
 
-      giocoM : ∀ {A B} → GlobMor A B → _
-      giocoM A@{globj E s t gi-s gi-t} B@{globj E₁ s₁ t₁ gi-s₁ gi-t₁} (glmor f eq-s eq-t) = anetmor A.⟨ pollo ⟩
-                      (begin A.⟨ (λ i → B.ι i ∘ f i) ⟩ ∘ A.⟨ sigma A ⟩              ≈⟨ A.⟨⟩∘ _ _ ⟩
-                             A.⟨ (λ i → A.⟨ (λ i₁ → B.ι i₁ ∘ f i₁) ⟩ ∘ sigma A i) ⟩ ≈⟨ A.⟨⟩-cong _ _ prop ⟩
-                             A.⟨ (λ i → B.⟨ sigma B ⟩ ∘ B.ι i ∘ f i) ⟩              ≈⟨ sym (A.⟨⟩∘ _ _) ⟩
-                             B.⟨ sigma B ⟩ ∘ A.⟨ (λ i → B.ι i ∘ f i) ⟩              ∎)
-                      (begin A.⟨ (λ i → B.ι i ∘ f i) ⟩ ∘ A.⟨ tau A ⟩              ≈⟨ A.⟨⟩∘ _ _ ⟩
-                             A.⟨ (λ i → A.⟨ (λ i₁ → B.ι i₁ ∘ f i₁) ⟩ ∘ tau A i) ⟩ ≈⟨ A.⟨⟩-cong _ _ prop2 ⟩
-                             A.⟨ (λ i → B.⟨ tau B ⟩ ∘ B.ι i ∘ f i) ⟩              ≈⟨ sym (A.⟨⟩∘ _ _) ⟩
-                             B.⟨ tau B ⟩ ∘ A.⟨ (λ i → B.ι i ∘ f i) ⟩              ∎)
+      Γ1 : ∀ {A B} → GlobMor A B → _
+      Γ1 A@{globj E s t gi-s gi-t} B@{globj E₁ s₁ t₁ gi-s₁ gi-t₁} (glmor f eq-s eq-t) = anetmor A.⟨ help ⟩
+                      (begin A.⟨ (λ i → B.ι i ∘ f i) ⟩ ∘ A.⟨ σ A ⟩              ≈⟨ A.⟨⟩∘ _ _ ⟩
+                             A.⟨ (λ i → A.⟨ (λ i₁ → B.ι i₁ ∘ f i₁) ⟩ ∘ σ A i) ⟩ ≈⟨ A.⟨⟩-cong _ _ prop ⟩
+                             A.⟨ (λ i → B.⟨ σ B ⟩ ∘ B.ι i ∘ f i) ⟩              ≈⟨ sym (A.⟨⟩∘ _ _) ⟩
+                             B.⟨ σ B ⟩ ∘ A.⟨ (λ i → B.ι i ∘ f i) ⟩              ∎)
+                      (begin A.⟨ (λ i → B.ι i ∘ f i) ⟩ ∘ A.⟨ τ A ⟩              ≈⟨ A.⟨⟩∘ _ _ ⟩
+                             A.⟨ (λ i → A.⟨ (λ i₁ → B.ι i₁ ∘ f i₁) ⟩ ∘ τ A i) ⟩ ≈⟨ A.⟨⟩-cong _ _ prop2 ⟩
+                             A.⟨ (λ i → B.⟨ τ B ⟩ ∘ B.ι i ∘ f i) ⟩              ≈⟨ sym (A.⟨⟩∘ _ _) ⟩
+                             B.⟨ τ B ⟩ ∘ A.⟨ (λ i → B.ι i ∘ f i) ⟩              ∎)
         where module A = IndexedCoproductOf (ac E)
               module B = IndexedCoproductOf (ac E₁)
-              pollo : (i : ℕ) → E i ⇒ B.X
-              pollo i = B.ι i ∘ f i
+              help : (i : ℕ) → E i ⇒ B.X
+              help i = B.ι i ∘ f i
 
-              prop : (i : ℕ) → A.⟨ (λ i₁ → B.ι i₁ ∘ f i₁) ⟩ ∘ sigma A i
-                             ≈ B.⟨ sigma B ⟩ ∘ B.ι i ∘ f i
-              prop ℕ.zero = begin A.⟨ (λ i₁ → B.ι i₁ ∘ f i₁) ⟩ ∘ A.ι 0 ≈⟨ A.commute (λ i₁ → B.ι i₁ ∘ f i₁) ℕ.zero ⟩
-                                  B.ι 0 ∘ f 0                          ≈⟨ sym (B.commute (sigma B) 0) ⟩∘⟨refl ⟩
-                                  (B.⟨ sigma B ⟩ ∘ B.ι 0) ∘ f 0        ≈⟨ assoc ⟩
-                                  B.⟨ sigma B ⟩ ∘ B.ι 0 ∘ f 0          ∎
-              prop (ℕ.suc i) = begin A.⟨ (λ i₁ → B.ι i₁ ∘ f i₁) ⟩ ∘ A.ι i ∘ s i    ≈⟨ sym-assoc ⟩
-                                     (A.⟨ (λ i₁ → B.ι i₁ ∘ f i₁) ⟩ ∘ A.ι i) ∘ s i  ≈⟨ A.commute (λ i₁ → B.ι i₁ ∘ f i₁) i ⟩∘⟨refl ⟩
-                                     (B.ι i ∘ f i) ∘ s i                           ≈⟨ assoc ⟩
-                                     B.ι i ∘ f i ∘ s i                             ≈⟨ refl⟩∘⟨ eq-s ⟩
-                                     B.ι i ∘ s₁ i ∘ f (ℕ.suc i)                    ≈⟨ sym-assoc ⟩
-                                     (B.ι i ∘ s₁ i) ∘ f (ℕ.suc i)                  ≈⟨ sym (B.commute (sigma B) (1 + i)) ⟩∘⟨refl ⟩
-                                     (B.⟨ sigma B ⟩ ∘ B.ι (ℕ.suc i)) ∘ f (ℕ.suc i) ≈⟨ assoc ⟩
-                                     B.⟨ sigma B ⟩ ∘ B.ι (ℕ.suc i) ∘ f (ℕ.suc i)   ∎
-
-              prop2 : (i : ℕ) → A.⟨ (λ i₁ → B.ι i₁ ∘ f i₁) ⟩ ∘ tau A i
-                             ≈ B.⟨ tau B ⟩ ∘ B.ι i ∘ f i
+              prop : (i : ℕ) → A.⟨ (λ i₁ → B.ι i₁ ∘ f i₁) ⟩ ∘ σ A i ≈ B.⟨ σ B ⟩ ∘ B.ι i ∘ f i
+              prop ℕ.zero =
+                begin A.⟨ (λ i₁ → B.ι i₁ ∘ f i₁) ⟩ ∘ A.ι 0 ≈⟨ A.commute (λ i₁ → B.ι i₁ ∘ f i₁) ℕ.zero ⟩
+                      B.ι 0 ∘ f 0                          ≈⟨ sym (B.commute (σ B) 0) ⟩∘⟨refl ⟩
+                      (B.⟨ σ B ⟩ ∘ B.ι 0) ∘ f 0            ≈⟨ assoc ⟩
+                      B.⟨ σ B ⟩ ∘ B.ι 0 ∘ f 0              ∎
+              prop (ℕ.suc i) =
+                begin A.⟨ (λ i₁ → B.ι i₁ ∘ f i₁) ⟩ ∘ A.ι i ∘ s i    ≈⟨ sym-assoc ⟩
+                      (A.⟨ (λ i₁ → B.ι i₁ ∘ f i₁) ⟩ ∘ A.ι i) ∘ s i  ≈⟨ A.commute (λ i₁ → B.ι i₁ ∘ f i₁) i ⟩∘⟨refl ⟩
+                      (B.ι i ∘ f i) ∘ s i                           ≈⟨ assoc ⟩
+                      B.ι i ∘ f i ∘ s i                             ≈⟨ refl⟩∘⟨ eq-s ⟩
+                      B.ι i ∘ s₁ i ∘ f (ℕ.suc i)                    ≈⟨ sym-assoc ⟩
+                      (B.ι i ∘ s₁ i) ∘ f (ℕ.suc i)                  ≈⟨ sym (B.commute (σ B) (1 + i)) ⟩∘⟨refl ⟩
+                      (B.⟨ σ B ⟩ ∘ B.ι (ℕ.suc i)) ∘ f (ℕ.suc i)     ≈⟨ assoc ⟩
+                      B.⟨ σ B ⟩ ∘ B.ι (ℕ.suc i) ∘ f (ℕ.suc i)   ∎
+              -- same as prop, but for t
+              prop2 : (i : ℕ) → A.⟨ (λ i₁ → B.ι i₁ ∘ f i₁) ⟩ ∘ τ A i ≈ B.⟨ τ B ⟩ ∘ B.ι i ∘ f i
               prop2 ℕ.zero = begin A.⟨ (λ i₁ → B.ι i₁ ∘ f i₁) ⟩ ∘ A.ι 0 ≈⟨ A.commute (λ i₁ → B.ι i₁ ∘ f i₁) ℕ.zero ⟩
-                                  B.ι 0 ∘ f 0                        ≈⟨ sym (B.commute (tau B) 0) ⟩∘⟨refl ⟩
-                                  (B.⟨ tau B ⟩ ∘ B.ι 0) ∘ f 0        ≈⟨ assoc ⟩
-                                  B.⟨ tau B ⟩ ∘ B.ι 0 ∘ f 0          ∎
+                                  B.ι 0 ∘ f 0                           ≈⟨ sym (B.commute (τ B) 0) ⟩∘⟨refl ⟩
+                                  (B.⟨ τ B ⟩ ∘ B.ι 0) ∘ f 0             ≈⟨ assoc ⟩
+                                  B.⟨ τ B ⟩ ∘ B.ι 0 ∘ f 0               ∎
               prop2 (ℕ.suc i) = begin A.⟨ (λ i₁ → B.ι i₁ ∘ f i₁) ⟩ ∘ A.ι i ∘ t i   ≈⟨ sym-assoc ⟩
                                      (A.⟨ (λ i₁ → B.ι i₁ ∘ f i₁) ⟩ ∘ A.ι i) ∘ t i  ≈⟨ A.commute (λ i₁ → B.ι i₁ ∘ f i₁) i ⟩∘⟨refl ⟩
                                      (B.ι i ∘ f i) ∘ t i                           ≈⟨ assoc ⟩
                                      B.ι i ∘ f i ∘ t i                             ≈⟨ refl⟩∘⟨ eq-t ⟩
                                      B.ι i ∘ t₁ i ∘ f (ℕ.suc i)                    ≈⟨ sym-assoc ⟩
-                                     (B.ι i ∘ t₁ i) ∘ f (ℕ.suc i)                  ≈⟨ sym (B.commute (tau B) (1 + i)) ⟩∘⟨refl ⟩
-                                     (B.⟨ tau B ⟩ ∘ B.ι (ℕ.suc i)) ∘ f (ℕ.suc i)   ≈⟨ assoc ⟩
-                                     B.⟨ tau B ⟩ ∘ B.ι (ℕ.suc i) ∘ f (ℕ.suc i)     ∎
-
-        --where pollo :
-
-
-
-      --anetmor {! ⟨ pollo ⟩  !} {!   !} {!   !}
-        --where pollo :
-
-
-{-
-
-λ { (globj E s t gi-s gi-t) →
-              let open IndexedCoproductOf (ac E)
-                  pippo : (i : ℕ) → E i ⇒ X
-                  pippo i = {! i !}
-                  sigma : X ⇒ X
-                  sigma = ⟨ pippo ⟩
-                  tau : X ⇒ X
-                  tau = {!   !}
-               in anetobj {X} sigma tau }
-
-               -}
+                                     (B.ι i ∘ t₁ i) ∘ f (ℕ.suc i)                  ≈⟨ sym (B.commute (τ B) (1 + i)) ⟩∘⟨refl ⟩
+                                     (B.⟨ τ B ⟩ ∘ B.ι (ℕ.suc i)) ∘ f (ℕ.suc i)     ≈⟨ assoc ⟩
+                                     B.⟨ τ B ⟩ ∘ B.ι (ℕ.suc i) ∘ f (ℕ.suc i)       ∎

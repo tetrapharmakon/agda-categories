@@ -1,6 +1,4 @@
 make all --print-data-base --no-builtin-variables --no-builtin-rules --question
-make: *** No rule to make target 'all'.  Stop.
-
 # GNU Make 4.3
 # Built for x86_64-pc-linux-gnu
 # Copyright (C) 1988-2020 Free Software Foundation, Inc.
@@ -8,7 +6,7 @@ make: *** No rule to make target 'all'.  Stop.
 # This is free software: you are free to change and redistribute it.
 # There is NO WARRANTY, to the extent permitted by law.
 
-# Make data base, printed on Sat Jun 11 00:27:40 2022
+# Make data base, printed on Tue Jun 14 22:26:35 2022
 
 # Variables
 
@@ -23,7 +21,7 @@ NO_AT_BRIDGE = 1
 # environment
 I3SOCK = /run/user/1000/i3/ipc-socket.586460
 # environment
-VSCODE_IPC_HOOK_EXTHOST = /run/user/1000/vscode-ipc-c2eb949e-e8a6-426c-8a93-9c4e2a4106cc.sock
+VSCODE_IPC_HOOK_EXTHOST = /run/user/1000/vscode-ipc-ce704763-0dce-47f8-9339-ce927e0a5e82.sock
 # environment
 VSCODE_CWD = /home/fouche
 # environment
@@ -55,7 +53,7 @@ VSCODE_LOG_STACK = false
 # automatic
 %F = $(notdir $%)
 # environment
-VSCODE_CODE_CACHE_PATH = /home/fouche/.config/Code/CachedData/c3511e6c69bb39013c4a4b7b9566ec1ca73fc4d5
+VSCODE_CODE_CACHE_PATH = /home/fouche/.config/Code/CachedData/4af164ea3a06f701fe3e89a2bcbb421d2026b68f
 # environment
 LANG = C
 # environment
@@ -91,7 +89,7 @@ LC_COLLATE = C
 # environment
 VSCODE_VERBOSE_LOGGING = true
 # environment
-VSCODE_PID = 1573597
+VSCODE_PID = 2400331
 # environment
 XDG_SESSION_TYPE = x11
 # automatic
@@ -179,7 +177,7 @@ HOME = /home/fouche
 # environment
 ELECTRON_RUN_AS_NODE = 1
 # environment
-VSCODE_IPC_HOOK = /run/user/1000/vscode-822160a4-1.67.2-main.sock
+VSCODE_IPC_HOOK = /run/user/1000/vscode-822160a4-1.68.0-main.sock
 # environment
 MATHEMATICA_HOME = /usr/local/Wolfram/Mathematica/11.3
 # environment
@@ -279,7 +277,6 @@ test: Everything.agda
 #  Implicit rule search has not been done.
 #  Modification time never checked.
 #  File has not been updated.
- 
 
 # files hash-table stats:
 # Load=10/1024=1%, Rehash=0, Collisions=0/29=0%
@@ -294,7 +291,10 @@ test: Everything.agda
 
 # strcache performance: lookups = 44 / hit rate = 38%
 # hash-table stats:
+ 
+make: *** No rule to make target 'all'.  Stop.
+
 # Load=27/8192=0%, Rehash=0, Collisions=0/44=0%
-# Finished Make data base on Sat Jun 11 00:27:40 2022
+# Finished Make data base on Tue Jun 14 22:26:35 2022
 
  
