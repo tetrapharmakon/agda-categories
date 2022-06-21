@@ -20,6 +20,7 @@ open import Categories.Category.Complete.Finitely ℂ
 open import Categories.Diagram.Coequalizer ℂ
 open import Categories.Category.Lift
 open import Categories.Diagram.Equalizer ℂ
+open import Categories.Diagram.Equalizer.Indexed ℂ
 open import Categories.Diagram.Pullback ℂ
 open import Categories.Functor.Core
 open import Categories.Morphism.Reasoning ℂ
@@ -191,3 +192,21 @@ Globs = record
                       (B.ι i ∘ t₁ i) ∘ f (ℕ.suc i)                  ≈⟨ sym (B.commute (τ B) (1 + i)) ⟩∘⟨refl ⟩
                       (B.⟨ τ B ⟩ ∘ B.ι (ℕ.suc i)) ∘ f (ℕ.suc i)     ≈⟨ assoc ⟩
                       B.⟨ τ B ⟩ ∘ B.ι (ℕ.suc i) ∘ f (ℕ.suc i)       ∎
+
+record Triq {fc : FinitelyComplete} (A : ANetObj) : Set (o ⊔ ℓ ⊔ e) where
+  module A = ANetObj A
+  module fc = FinitelyComplete fc
+  field
+    pb : Pullback (FinitelyComplete.equalizer.arr fc A.s (id {A.X}))
+                  (FinitelyComplete.equalizer.arr fc A.t (id {A.X}))
+
+open Triq
+
+R : {fc : FinitelyComplete} → Functor aNets Graphs
+R {fc} = record
+  { F₀ = {!   !}
+  ; F₁ = {!   !}
+  ; identity = {!   !}
+  ; homomorphism = {!   !}
+  ; F-resp-≈ = {!   !}
+  } where open FinitelyComplete fc
