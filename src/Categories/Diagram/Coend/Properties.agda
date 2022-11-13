@@ -162,26 +162,30 @@ module _ {o ℓ e o′ ℓ′ e′} {C : Category o ℓ e} {D : Category o′ �
 --           F'' : D.op x D -> Functors (C.op x C) E
 -- let's write the helpers using `curry₀`:
 
-_ᵒᵖ×self : Category o ℓ e → Category o ℓ e
-X ᵒᵖ×self = Product (Category.op X) X
+_ᵒᵒ : Category o ℓ e → Category o ℓ e
+X ᵒᵒ = Product (Category.op X) X
 
-_′ : (F : Bifunctor (Category.op (Product C D)) (Product C D) E) → Functor (C ᵒᵖ×self) (Functors (D ᵒᵖ×self) E)
+_′ : (F : Bifunctor (Category.op (Product C D)) (Product C D) E) → Functor (C ᵒᵒ) (Functors (D ᵒᵒ) E)
 F ′ = record
   { F₀ = λ {(c , c') →
     record
       { F₀ = λ {(d , d') → Functor.F₀ F (((c , d) , (c' , d')))}
-      ; F₁ = λ { {a , a'} {b , b'} (f , f') → Functor.F₁ F (({!   !} , f) , (Category.id C , {!   !}))}
-      ; identity = {!   !}
-      ; homomorphism = {!   !}
-      ; F-resp-≈ = {!   !}
+      ; F₁ = λ { {a , a'} {b , b'} (f , f') → Functor.F₁ F ((_ , f) , (_ , f'))}
+      ; identity = λ {A} → Functor.identity F
+      ; homomorphism = λ {X} {Y} {Z} {f} {g} → {!   !}
+      ; F-resp-≈ = λ x → {!   !}
       }}
-  ; F₁ = {!   !}
+  ; F₁ = λ { {a , a'} {b , b'} (f , f') →
+    record { η = λ X → {!   !}
+           ; commute = {!   !}
+           ; sym-commute = {!   !}
+           }}
   ; identity = {!   !}
   ; homomorphism = {!   !}
   ; F-resp-≈ = {!   !}
   }
 
-_′′ : (F : Bifunctor (Category.op (Product C D)) (Product C D) E) → Functor (D ᵒᵖ×self) (Functors (C ᵒᵖ×self) E)
+_′′ : (F : Bifunctor (Category.op (Product C D)) (Product C D) E) → Functor (D ᵒᵒ) (Functors (C ᵒᵒ) E)
 F ′′ = {!   !}
 
 Fubini : (F : Bifunctor (Category.op (Product C D)) (Product C D) E) → Coend F
