@@ -160,6 +160,29 @@ module _ {o ℓ e o′ ℓ′ e′} {C : Category o ℓ e} {D : Category o′ �
 -- "transposes" of a F : (C x D).op x (C x D) -> E:
 -- F induces F' : C.op x C -> Functors (D.op x D) E
 --           F'' : D.op x D -> Functors (C.op x C) E
+-- let's write the helpers using `curry₀`:
+
+_ᵒᵖ×self : Category o ℓ e → Category o ℓ e
+X ᵒᵖ×self = Product (Category.op X) X
+
+_′ : (F : Bifunctor (Category.op (Product C D)) (Product C D) E) → Functor (C ᵒᵖ×self) (Functors (D ᵒᵖ×self) E)
+F ′ = record
+  { F₀ = λ {(c , c') →
+    record
+      { F₀ = λ {(d , d') → Functor.F₀ F (((c , d) , (c' , d')))}
+      ; F₁ = λ { {a , a'} {b , b'} (f , f') → Functor.F₁ F (({!   !} , f) , (Category.id C , {!   !}))}
+      ; identity = {!   !}
+      ; homomorphism = {!   !}
+      ; F-resp-≈ = {!   !}
+      }}
+  ; F₁ = {!   !}
+  ; identity = {!   !}
+  ; homomorphism = {!   !}
+  ; F-resp-≈ = {!   !}
+  }
+
+_′′ : (F : Bifunctor (Category.op (Product C D)) (Product C D) E) → Functor (D ᵒᵖ×self) (Functors (C ᵒᵖ×self) E)
+F ′′ = {!   !}
 
 Fubini : (F : Bifunctor (Category.op (Product C D)) (Product C D) E) → Coend F
 Fubini = {!   !}
