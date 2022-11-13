@@ -156,3 +156,10 @@ module _ {o ℓ e o′ ℓ′ e′} {C : Category o ℓ e} {D : Category o′ �
     where
       X≅Y = Coend-as-Colimit coend cl
       open Category D
+
+-- "transposes" of a F : (C x D).op x (C x D) -> E:
+-- F induces F' : C.op x C -> Functors (D.op x D) E
+--           F'' : D.op x D -> Functors (C.op x C) E
+
+Fubini : (F : Bifunctor (Category.op (Product C D)) (Product C D) E) → Coend F
+Fubini = {!   !}
