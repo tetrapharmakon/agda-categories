@@ -1,4 +1,4 @@
-{-# OPTIONS --without-K --safe #-}
+{-# OPTIONS --without-K #-}
 
 --------------------------------------------------------------------------------
 -- A simple reflection based solver for categories.
@@ -20,7 +20,7 @@ open import Data.List    as List    using (List; _∷_; [])
 open import Categories.Category.BinaryProducts using (BinaryProducts)
 open import Categories.Category.Cartesian
 open import Categories.Category.Cartesian.Monoidal
-open import Categories.Category.Instance.One renaming (One to ⊤; One-op to ⊤-op)
+open import Categories.Category.Instance.One renaming (One to ⊤)
 open import Categories.Category.Monoidal.Instance.Cats
 open import Categories.Category.Instance.Cats
 open import Categories.Category.Monoidal
@@ -35,12 +35,20 @@ module _ {o ℓ e} where
 
   private
     variable
-      A B C : Category o ℓ e
+      A B C D : Category o ℓ e
 
   open Monoidal (Product.Cats-Monoidal {o} {ℓ} {e})
   open BinaryProducts (Product.Cats-has-all {o} {ℓ} {e})
   open import Categories.Morphism (Cats o ℓ e)
   open import Relation.Binary.Reasoning.Setoid ≅-setoid
+
+
+  postulate
+    ×-cong : A ≅ B → C ≅ D → A × C ≅ B × D --(X × Y) × Z
+  --×-cong = Associative product product product product
+
+  postulate
+    ⊤-op : Category.op ⊤ ≅ ⊤
 
   --------------------------------------------------------------------------------
   -- An 'Expr' reifies the parentheses/identity morphisms of some series of
@@ -221,5 +229,12 @@ module _ {o ℓ e} where
     solve = solve-macro
 
   base : ∀ {a b c : Category o ℓ e}
-       → Category.op a × ⊤ × Category.op (Category.op b) ≅ Category.op ((⊤ × a) × Category.op b)
+       → Category.op a × ⊤ × Category.op (Category.op b)
+       × Category.op a × ⊤ × Category.op (Category.op b)
+       × Category.op a × ⊤ × Category.op (Category.op b)
+       × Category.op a × ⊤ × Category.op (Category.op b)
+       ≅ Category.op a × (⊤ × b)
+       × Category.op a × (⊤ × b)
+       × Category.op a × (⊤ × b)
+       × Category.op a × (⊤ × b)
   base = solve
