@@ -12,7 +12,7 @@ open import Categories.Diagram.Coend
 open import Categories.Diagram.Colimit
 open import Categories.Diagram.Cowedge
 open import Categories.Diagram.Cowedge.Properties
-open import Categories.Functor using (Functor; _∘F_)
+open import Categories.Functor using (Functor)
 open import Categories.Functor.Bifunctor using (Bifunctor)
 open import Categories.Functor.Instance.Twisted
 import Categories.Morphism as M
@@ -127,7 +127,10 @@ module _ {P Q : Functor (Product (Category.op C) C) D} (P⇒Q : NaturalTransform
     open Cowedge
     open MR D
 
-module _ {o ℓ e o′ ℓ′ e′} {C : Category o ℓ e} {D : Category o′ ℓ′ e′}
+module _ {o ℓ e o′ ℓ′ e′ o″ ℓ″ e″}
+         {C : Category o ℓ e}
+         {D : Category o′ ℓ′ e′}
+         {E : Category o″ ℓ″ e″}
   (F : Bifunctor (Category.op C) C D) where
   private
     Eq = CoconesTwist≅Cowedges F
@@ -157,38 +160,56 @@ module _ {o ℓ e o′ ℓ′ e′} {C : Category o ℓ e} {D : Category o′ �
       X≅Y = Coend-as-Colimit coend cl
       open Category D
 
--- "transposes" of a F : (C x D).op x (C x D) -> E:
--- F induces F' : C.op x C -> Functors (D.op x D) E
---           F'' : D.op x D -> Functors (C.op x C) E
--- let's write the helpers using curry₀:
+  -- "transposes" of a F : (C x D).op x (C x D) -> E:
+  -- F induces F' : C.op x C -> Functors (D.op x D) E
+  --           F'' : D.op x D -> Functors (C.op x C) E
+  -- let's write the helpers using `curry₀`:
 
-_ᵒᵒ : Category o ℓ e → Category o ℓ e
-X ᵒᵒ = Product (Category.op X) X
+  _ᵒᵒ : ∀ {o ℓ e} → Category o ℓ e → Category o ℓ e
+  X ᵒᵒ = Product (Category.op X) X
 
-_′ : (F : Bifunctor (Category.op (Product C D)) (Product C D) E) → Bifunctor (Category.op C) C (Functors (D ᵒᵒ) E)
-F ′ = curry.F₀ (F ∘F {!   !})
-  where R : Functor (Product (Product (Category.op C) C) (D ᵒᵒ)) (Product (Category.op (Product C D)) (Product C D))
-        R = {!   !}
-  -- { F₀ = λ {(c , c') →
-  --   record
-  --     { F₀ = λ {(d , d') → Functor.F₀ F (((c , d) , (c' , d')))}
-  --     ; F₁ = λ { {a , a'} {b , b'} (f , f') → Functor.F₁ F ((_ , f) , (_ , f'))}
-  --     ; identity = λ {A} → Functor.identity F
-  --     ; homomorphism = λ {X} {Y} {Z} {f} {g} → {!   !}
-  --     ; F-resp-≈ = λ x → {!   !}
-  --     }}
-  -- ; F₁ = λ { {a , a'} {b , b'} (f , f') →
-  --   record { η = λ X → {!   !}
-  --          ; commute = {!   !}
-  --          ; sym-commute = {!   !}
-  --          }}
-  -- ; identity = {!   !}
-  -- ; homomorphism = {!   !}
-  -- ; F-resp-≈ = {!   !}
-  -- }
+  _′ : (F : Bifunctor (Category.op (Product C D)) (Product C D) E) → Functor (C ᵒᵒ) (Functors (D ᵒᵒ) E)
+  F ′ = record
+    { F₀ = λ {(c , c') →
+      record
+        { F₀ = λ {(d , d') → Functor.F₀ F (((c , d) , (c' , d')))}
+        ; F₁ = λ { {a , a'} {b , b'} (f , f') → Functor.F₁ F ((_ , f) , (_ , f'))}
+        ; identity = λ {A} → Functor.identity F
+        ; homomorphism = λ {X} {Y} {Z} {f} {g} → {!   !}
+        ; F-resp-≈ = λ x → {!   !}
+        }}
+    ; F₁ = λ { {a , a'} {b , b'} (f , f') →
+      record { η = λ X → {!   !}
+            ; commute = {!   !}
+            ; sym-commute = {!   !}
+            }}
+    ; identity = {!   !}
+    ; homomorphism = {!   !}
+    ; F-resp-≈ = {!   !}
+    }
 
-_′′ : (F : Bifunctor (Category.op (Product C D)) (Product C D) E) → Bifunctor (Category.op D) D (Functors (C ᵒᵒ) E)
-F ′′ = {!   !}
+  _′′ : (F : Bifunctor (Category.op (Product C D)) (Product C D) E) → Functor (D ᵒᵒ) (Functors (C ᵒᵒ) E)
+  F ′′ = {!   !}
 
--- Fubini : (F : Bifunctor (Category.op (Product C D)) (Product C D) E) → Coend (CoendF (F ′′) (λ {(d , d') → {!  !}}))
--- Fubini = {!   !}
+
+  Fubini : (F : Bifunctor (Category.op (Product C D)) (Product C D) E)
+        → (allCoends : ∀ X → Coend (Functor.F₀ (F ′) X))
+        → Coend (CoendF ( F ′) allCoends)
+        → Coend F
+  Fubini F AllCoends ∫∀ = record
+    { cowedge = record
+      { E = ∫∀.E
+      ; dinatural = record
+        { α = λ (c , d) → ∫∀.dinatural.α c ∘ ∫∀s.dinatural.α (c , c) d
+        ; commute = λ (f , f') → begin _ ≈⟨ {!  ∫∀.dinatural.commute f !}  ⟩
+                                {! _  !} ≈⟨ {!   !} ⟩
+                                _ ∎
+        ; op-commute = {!   !}
+        }
+      }
+    ; factor = {!   !}
+    ; universal = {!   !} ; unique = {!   !} }
+    where module ∫∀ = Coend ∫∀
+          module ∫∀s X = Coend (AllCoends X)
+          open Category E
+          open HomReasoning
