@@ -1,5 +1,5 @@
 {-# OPTIONS --without-K --safe #-}
-module Categories.Monad where
+module Categories.Monad {o ℓ e} where
 
 open import Level
 
@@ -10,7 +10,7 @@ open import Categories.NaturalTransformation.NaturalIsomorphism hiding (_≃_)
 open import Categories.NaturalTransformation.Equivalence
 open NaturalIsomorphism
 
-record Monad {o ℓ e} (C : Category o ℓ e) : Set (o ⊔ ℓ ⊔ e) where
+record Monad (C : Category o ℓ e) : Set (o ⊔ ℓ ⊔ e) where
   field
     F : Endofunctor C
     η : NaturalTransformation idF F
@@ -29,7 +29,7 @@ record Monad {o ℓ e} (C : Category o ℓ e) : Set (o ⊔ ℓ ⊔ e) where
     identityˡ : ∀ {X : Obj} → μ.η X ∘ F₁ (η.η X) ≈ id
     identityʳ : ∀ {X : Obj} → μ.η X ∘ η.η (F₀ X) ≈ id
 
-module _ {o ℓ e} (C : Category o ℓ e) where
+module _ (C : Category o ℓ e) where
   open Monad
   open Category C hiding (id)
   id : Monad C
@@ -40,3 +40,44 @@ module _ {o ℓ e} (C : Category o ℓ e) where
   id .sym-assoc = Equiv.refl
   id .identityˡ = identity²
   id .identityʳ = identity²
+
+
+record monadMap {C : Category o ℓ e} (S : Monad C) (T : Monad C) : Set (o ⊔ ℓ ⊔ e) where 
+  field
+    α : NaturalTransformation (Monad.F S) (Monad.F T)
+  
+  module α = NaturalTransformation α
+  module S = Monad.F S
+  module T = Monad.F T
+  
+  open Category C
+  open S 
+  open T
+  open α 
+
+  field
+    resp-id : ∀ {X : Obj} → Monad.η.η T X ≈ α.η X ∘ Monad.η.η S X
+    resp-mu : ∀ {X : Obj} → α.η X ∘ Monad.μ.η S X ≈ (Monad.μ.η T X ∘ NaturalTransformation.η (α ∘ₕ α) X)
+
+-- the category of monads 
+
+Monads : (C : Category o ℓ e) → Category _ _ _ 
+Monads C = record
+  { Obj = Monad C
+  ; _⇒_ = λ S T → monadMap S T
+  ; _≈_ = λ α β → ∀ {X : Obj} → monadMap.α.η α X ≈ monadMap.α.η β X
+  ; id = {!   !}
+  ; _∘_ = λ α β → record 
+    { α = monadMap.α α ∘ᵥ monadMap.α β 
+    ; resp-id = {!   !} 
+    ; resp-mu = {!   !} 
+    }
+  ; assoc = {!   !}
+  ; sym-assoc = {!   !}
+  ; identityˡ = {!   !}
+  ; identityʳ = {!   !}
+  ; identity² = {!   !}
+  ; equiv = {!   !}
+  ; ∘-resp-≈ = {!   !}
+  } where
+    open Category C
