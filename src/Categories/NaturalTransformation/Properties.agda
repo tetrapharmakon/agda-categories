@@ -75,6 +75,24 @@ module _ {F G : Functor C D} where
     where open NaturalIsomorphism G≃G′
           open NaturalTransformation α  
 
+module _ (F : Functor C D) (H : Functor D E) where 
+  open import Categories.NaturalTransformation.Equivalence renaming (_≃_ to _≃ⁿ_)
+
+  private
+    module C = Category C
+    module D = Category D
+    module E = Category E 
+    open E
+    open MR E
+    open NaturalTransformation
+  
+  id∘ₕid≡id : ∀ X → η (idN {F = H} ∘ₕ idN {F = F}) X ≈ η (idN {F = H ∘F F}) X
+  id∘ₕid≡id = λ X → let open HomReasoning in 
+    begin (Functor.F₁ H D.id ∘ E.id) ≈⟨  MR.elimʳ E Equiv.refl ⟩ 
+          Functor.F₁ H D.id ≈⟨  Functor.identity H ⟩ 
+          E.id ∎
+  infixr 7 _∙_
+  _∙_ = Equiv.trans
 module _ (F : Bifunctor C D E) where
 
   -- there is natural transformation between two partially applied bifunctors.
