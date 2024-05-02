@@ -93,6 +93,25 @@ module _ (F : Functor C D) (H : Functor D E) where
           E.id ∎
   infixr 7 _∙_
   _∙_ = Equiv.trans
+  
+  interchange : {G K : Functor C D} {I J : Functor D E} → (α : NaturalTransformation F G) 
+      (β : NaturalTransformation G K)
+      (γ : NaturalTransformation H I)
+      (δ : NaturalTransformation I J) → 
+      (δ ∘ᵥ γ) ∘ₕ (β ∘ᵥ α) ≃ⁿ (δ ∘ₕ β) ∘ᵥ (γ ∘ₕ α)
+  interchange {G} {K} {I} {J} = λ { α β γ δ {X} → let open HomReasoning in 
+    let module J = Functor J in
+    let module G = Functor G in
+    let module I = Functor I in
+    let module F = Functor F in
+    begin _ ≈⟨ ∘-resp-≈ J.homomorphism E.Equiv.refl ⟩ 
+          _ ≈˘⟨ E.sym-assoc ⟩ 
+          _ ≈˘⟨ assoc ∙ ∘-resp-≈ʳ assoc ⟩ 
+          _ ≈˘⟨ (MR.pullʳ E (commute δ (η α X)) ⟩∘⟨refl) ⟩ 
+          _  ≈⟨ E.assoc ⟩ 
+          _ ≈˘⟨ ∘-resp-≈ E.Equiv.refl E.Equiv.refl ⟩ 
+          _ ∎}
+
 module _ (F : Bifunctor C D E) where
 
   -- there is natural transformation between two partially applied bifunctors.
