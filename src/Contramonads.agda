@@ -63,9 +63,18 @@ record Contramonad : Set (o ⊔ l ⊔ e) where
  ̂μ {X} = F.F₁ (ι.α X) ∘ F.F₁ (δ.α X) ∘ δ.α (F.F₀ X)
 
  C5 : ∀ {A B : Obj} (f : A ⇒ B) → F.F₁ (δ.α A) ∘ F.F₁ (F².F₁ f) ≈ F.F₁ (δ.α A) ∘ F.F₁ (F².F₁ f) ∘ F².F₁ (ι.α B) ∘ F.F₁ (δ.α B)
- C5 f = {!    !} 
+ C5 f = begin
+     {!   !}
+   ≈˘⟨ homomorphism F ⟩
+        {!   !}
+   ≈⟨ F-resp-≈ F C2 ⟩
+        {!   !}
+   ≈⟨ {!   !} ⟩
+     {!   !}
+   ∎ 
    where open 𝓒.HomReasoning
          open MR 𝓒
+         open Functor
 
  C6 : ∀ {X : Obj} → F.F₁ (ι.α X) ∘ δ.α X ≈ id
  C6 {X} = {!   !}
