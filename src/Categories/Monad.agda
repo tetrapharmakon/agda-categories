@@ -58,26 +58,3 @@ record monadMap {C : Category o ℓ e} (S : Monad C) (T : Monad C) : Set (o ⊔ 
   field
     resp-id : ∀ {X : Obj} → Monad.η.η T X ≈ α.η X ∘ Monad.η.η S X
     resp-mu : ∀ {X : Obj} → α.η X ∘ Monad.μ.η S X ≈ (Monad.μ.η T X ∘ NaturalTransformation.η (α ∘ₕ α) X)
-
--- the category of monads 
-
-Monads : (C : Category o ℓ e) → Category _ _ _ 
-Monads C = record
-  { Obj = Monad C
-  ; _⇒_ = λ S T → monadMap S T
-  ; _≈_ = λ α β → ∀ {X : Obj} → monadMap.α.η α X ≈ monadMap.α.η β X
-  ; id = {!   !}
-  ; _∘_ = λ α β → record 
-    { α = monadMap.α α ∘ᵥ monadMap.α β 
-    ; resp-id = {!   !} 
-    ; resp-mu = {!   !} 
-    }
-  ; assoc = {!   !}
-  ; sym-assoc = {!   !}
-  ; identityˡ = {!   !}
-  ; identityʳ = {!   !}
-  ; identity² = {!   !}
-  ; equiv = {!   !}
-  ; ∘-resp-≈ = {!   !}
-  } where
-    open Category C
