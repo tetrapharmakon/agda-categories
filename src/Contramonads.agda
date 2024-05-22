@@ -48,10 +48,14 @@ record Contramonad : Set (o ⊔ l ⊔ e) where
  module F² = Functor F²
  
  field
-  C1 : ∀ {A B : Obj} {f : A ⇒ B} → (δ.α B ∘ ι.α B) ∘ f ≈ F².F₁ f ∘ δ.α A ∘ ι.α A
-  C2 : ∀ {A B : Obj} {f : A ⇒ B} → F².F₁ f ∘ δ.α A ≈ δ.α B ∘ F.F₁ (ι.α B) ∘ F².F₁ f ∘ δ.α A
-  C3 : ∀ {A : Obj} → id ≈ F.F₁ (ι.α A) ∘ F.F₁ (δ.α A) ∘ δ.α (F.F₀ A) ∘ ι.α (F.F₀ A)
-  C4 : ∀ {A : Obj} → F.F₁ (δ.α A) ∘ δ.α (F.F₀ A) ≈ δ.α A ∘ F.F₁ (ι.α A) ∘ F.F₁ (δ.α A) ∘ δ.α (F.F₀ A)
+  C1 : ∀ {A B : Obj} {f : A ⇒ B} → 
+   (δ.α B ∘ ι.α B) ∘ f ≈ F².F₁ f ∘ δ.α A ∘ ι.α A
+  C2 : ∀ {A B : Obj} {f : A ⇒ B} → 
+   F².F₁ f ∘ δ.α A ≈ δ.α B ∘ F.F₁ (ι.α B) ∘ F².F₁ f ∘ δ.α A
+  C3 : ∀ {A : Obj} → 
+   id ≈ F.F₁ (ι.α A) ∘ F.F₁ (δ.α A) ∘ δ.α (F.F₀ A) ∘ ι.α (F.F₀ A)
+  C4 : ∀ {A : Obj} → 
+   F.F₁ (δ.α A) ∘ δ.α (F.F₀ A) ≈ δ.α A ∘ F.F₁ (ι.α A) ∘ F.F₁ (δ.α A) ∘ δ.α (F.F₀ A)
  
  ̂η : ∀ (X : Obj) → X ⇒ F².F₀ X  
  ̂η X = δ.α X ∘ ι.α X
@@ -67,72 +71,94 @@ record Contramonad : Set (o ⊔ l ⊔ e) where
   open MR 𝓒
   open Functor
 
-  C5 : ∀ {A B : Obj} (f : A ⇒ B) → F.F₁ (δ.α A) ∘ F.F₁ (F².F₁ f) ≈ F.F₁ (δ.α A) ∘ F.F₁ (F².F₁ f) ∘ F².F₁ (ι.α B) ∘ F.F₁ (δ.α B)
-  C5 f = begin _ ≈˘⟨ homomorphism F ⟩
-               _ ≈⟨ F-resp-≈ F C2 ⟩
-               _ ≈⟨ (homomorphism F ○ ((homomorphism F ⟩∘⟨refl) ○ (((homomorphism F ⟩∘⟨refl) ⟩∘⟨refl) ○ {! some-assoc...  !}))) ⟩
-               _ ∎ 
+  C5 : ∀ {A B : Obj} (f : A ⇒ B) → 
+   F.F₁ (δ.α A) ∘ F.F₁ (F².F₁ f) ≈ F.F₁ (δ.α A) ∘ F.F₁ (F².F₁ f) ∘ F².F₁ (ι.α B) ∘ F.F₁ (δ.α B)
+  C5 f = begin 
+   _ ≈˘⟨ homomorphism F ⟩
+   _ ≈⟨ F-resp-≈ F C2 ⟩
+   _ ≈⟨ (homomorphism F ○ ((homomorphism F ⟩∘⟨refl) ○ (((homomorphism F ⟩∘⟨refl) ⟩∘⟨refl) ○ {! some-assoc...  !}))) ⟩
+   _ ∎ 
 
   𝐏-unit-lemma : ∀ {A : Obj} → δ.α A ≈ F.F₁ (δ.α A) ∘ δ.α (F.F₀ A) ∘ ι.α (F.F₀ A)
-  𝐏-unit-lemma = begin _ ≈˘⟨ identityʳ ⟩
-                       _ ≈⟨ (refl⟩∘⟨ C3) ⟩
-                       _ ≈˘⟨ assoc ○ assoc ○ assoc ⟩
-                       _ ≈⟨ ((assoc ○ assoc ○ Equiv.sym C4 ) ⟩∘⟨refl) ⟩
-                       _ ≈⟨ assoc ⟩
-                       _ ∎ -- TODO: refactor
+  𝐏-unit-lemma = begin 
+   _ ≈˘⟨ identityʳ ⟩
+   _ ≈⟨ (refl⟩∘⟨ C3) ⟩
+   _ ≈˘⟨ assoc ○ assoc ○ assoc ⟩
+   _ ≈⟨ ((assoc ○ assoc ○ Equiv.sym C4 ) ⟩∘⟨refl) ⟩
+   _ ≈⟨ assoc ⟩
+   _ ∎ -- TODO: refactor
   
-  C6 : ∀ {X : Obj} → F.F₁ (ι.α X) ∘ δ.α X ≈ id
+  C6 : ∀ {X : Obj} → 
+   F.F₁ (ι.α X) ∘ δ.α X ≈ id
   C6 {X} = (refl⟩∘⟨ 𝐏-unit-lemma) ○ Equiv.sym C3
 
-  C7 : ∀ {X : Obj} → F.F₁ (δ.α X) ∘ ̂η (F.F₀ X) ≈ δ.α X
-  C7 {X} = 
-    begin _ ≈⟨ pullˡ C4 ⟩ 
-          _ ≈⟨ assoc ○ refl⟩∘⟨ assoc ○ (refl⟩∘⟨ (refl⟩∘⟨ assoc)) ⟩ -- TODO: refactor ugly assoc.
-          _ ≈⟨ elimʳ (Equiv.sym C3) ⟩ 
-          _ ∎ 
+  C7 : ∀ {X : Obj} → 
+   F.F₁ (δ.α X) ∘ ̂η (F.F₀ X) ≈ δ.α X
+  C7 {X} = begin 
+   _ ≈⟨ pullˡ C4 ⟩ 
+   _ ≈⟨ assoc ○ refl⟩∘⟨ assoc ○ (refl⟩∘⟨ (refl⟩∘⟨ assoc)) ⟩ -- TODO: refactor ugly assoc.
+   _ ≈⟨ elimʳ (Equiv.sym C3) ⟩ 
+   _ ∎ 
   
-  C8 : ∀ {X : Obj} → F.F₁ (δ.α X) ≈ F.F₁ (̂η (F.F₀ X)) ∘ F².F₁ (δ.α X)
+  C8 : ∀ {X : Obj} → 
+   F.F₁ (δ.α X) ≈ F.F₁ (̂η (F.F₀ X)) ∘ F².F₁ (δ.α X)
   C8 {X} = F-resp-≈ F (Equiv.sym C7) ○ homomorphism F
 
+  𝐏Functor : Endofunctor 𝓒
+  𝐏Functor = record
+   { F₀ = λ X → F₀ F X
+   ; F₁ = λ f → 𝐏 f
+   ; identity = λ { {A} → MR.elim-center 𝓒 (identity F²) ○ C6 }
+   ; homomorphism = λ { {X} {Y} {Z} {f} {g} → {!   !}}
+   ; F-resp-≈ = λ f≈g → refl⟩∘⟨ (F-resp-≈ F² f≈g ⟩∘⟨refl)
+   } where open Functor
+           open 𝓒.HomReasoning
+           open MR 𝓒
 
-open Contramonad
 
-F²Monad : (R : Contramonad) → Monad 𝓒 
-F²Monad R = record
-  { F = F² R
-  ; η = ntHelper (record 
-    { η = λ X → ̂η R X 
-    ; commute = λ _ → C1 R
-    })
-  ; μ = ntHelper (record 
-    { η = λ X → F₁ (F R) (δ.α R (F₀ (F R) X) ∘ ι.α R (F₀ (F R) X)) 
-    ; commute = {!   !} 
-    })
-  ; assoc = {!   !}
-  ; sym-assoc = {!   !}
-  ; identityˡ = {!   !}
-  ; identityʳ = {!   !}
-  } where module R = Contramonad R
-          open Functor
-          open 𝓒.HomReasoning
-          open MR 𝓒
+module _ {R : Contramonad} where
+  
+ open Contramonad R
+  
+ F²Monad : Monad 𝓒 
+ F²Monad = record
+   { F = F²
+   ; η = ntHelper (record 
+     { η = λ X → ̂η X 
+     ; commute = λ _ → C1
+     })
+   ; μ = ntHelper (record 
+     { η = λ X → F₁ F (δ.α (F₀ F X) ∘ ι.α (F₀ F X)) 
+     ; commute = λ f → begin 
+       {!   !} ≈⟨ {!   !} ⟩ 
+       {!   !} ≈⟨ {!   !} ⟩ 
+       {!   !} ≈⟨ {!   !} ⟩ 
+       {!   !} ∎ 
+     })
+   ; assoc = {!   !}
+   ; sym-assoc = {!   !}
+   ; identityˡ = {!   !}
+   ; identityʳ = {!   !}
+   } where open Functor
+           open 𝓒.HomReasoning
+           open MR 𝓒
 
-𝐏Monad : (R : Contramonad) → Monad 𝓒 
-𝐏Monad R = record
-  { F = record
-    { F₀ = λ X → F₀ R.F X
-    ; F₁ = λ f → R.𝐏 f
-    ; identity = λ { {A} → elim-center (identity (F² R)) ○ C6 R }
-    ; homomorphism = λ { {X} {Y} {Z} {f} {g} → {!   !}}
-    ; F-resp-≈ = λ f≈g → refl⟩∘⟨ (F-resp-≈ R.F² f≈g ⟩∘⟨refl)
-    }
-  ; η = ntHelper (record { η = λ X → R.ι.α X ; commute = {!   !} })
-  ; μ = ntHelper (record { η = λ X → ̂μ R {X} ; commute = {!   !} })
-  ; assoc = {!   !}
-  ; sym-assoc = {!   !}
-  ; identityˡ = {!   !}
-  ; identityʳ = {!   !}
-  } where module R = Contramonad R
-          open Functor
-          open 𝓒.HomReasoning
-          open MR 𝓒 
+ 𝐏Monad : Monad 𝓒 
+ 𝐏Monad = record
+   { F = 𝐏Functor
+   ; η = ntHelper (record { η = λ X → ι.α X ; commute = {!   !} })
+   ; μ = ntHelper (record { η = λ X → ̂μ {X} ; commute = {!   !} })
+   ; assoc = {!   !}
+   ; sym-assoc = {!   !}
+   ; identityˡ = {!   !}
+   ; identityʳ = {!   !}
+   } where open Functor
+           open 𝓒.HomReasoning
+           open MR 𝓒 
+
+ ζ : monadMap 𝐏Monad F²Monad
+ ζ = record 
+   { α = ntHelper (record { η = δ.α ; commute = {!   !} }) 
+   ; resp-id = Equiv.refl 
+   ; resp-mu = {!   !} 
+   }
