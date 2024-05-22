@@ -130,9 +130,9 @@ module _ {R : Contramonad} where
    ; μ = ntHelper (record 
      { η = λ X → F₁ F (δ.α (F₀ F X) ∘ ι.α (F₀ F X)) 
      ; commute = λ f → begin 
+       {!   !} ≈⟨ (homomorphism F ⟩∘⟨refl) ⟩ 
        {!   !} ≈⟨ {!   !} ⟩ 
-       {!   !} ≈⟨ {!   !} ⟩ 
-       {!   !} ≈⟨ {!   !} ⟩ 
+       {!   !} ≈⟨ {! refl⟩∘⟨ ?  !} ⟩ 
        {!   !} ∎ 
      })
    ; assoc = {!   !}
