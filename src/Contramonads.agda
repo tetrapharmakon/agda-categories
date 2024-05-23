@@ -9,7 +9,7 @@ module Contramonads {o l e} {𝓒 : Category o l e} where
 open import Level
 
 open import Categories.Monad hiding (id)
-open import Categories.NaturalTransformation.Dinatural
+open import Categories.NaturalTransformation.Dinatural renaming (DinaturalTransformation to Dinat)
 open import Categories.Category.Product
 open import Categories.NaturalTransformation.Core renaming (id to idN)
 open import Categories.NaturalTransformation.NaturalIsomorphism hiding (refl)
@@ -17,6 +17,7 @@ import Categories.Morphism.Reasoning as MR
 
 module 𝓒 = Category 𝓒
 open 𝓒
+
 
 private
  variable
@@ -32,19 +33,35 @@ liftF⁻ F = F ∘F πʳ
 liftF⁺ : Functor (Category.op 𝓒) 𝓓 → Functor (𝓒 ᵒ× 𝓒) 𝓓 
 liftF⁺ F = F ∘F πˡ
 
+open Dinat
+
+antiCommute⁻⁺ : {H : Functor 𝓒 𝓒} {G : Functor (Category.op 𝓒) 𝓒} (θ : Dinat (liftF⁻ H) (liftF⁺ G)) → 
+ ∀ {A B} {f : A ⇒ B} → Functor.F₁ G f ∘ α θ B ∘ Functor.F₁ H f ≈ α θ A
+antiCommute⁻⁺ {H} {G} θ {A} {B} {f} = Equiv.sym (commute θ f) ○ elimˡ (identity G) ○ elimʳ (identity H)
+  where open 𝓒.HomReasoning
+        open MR 𝓒
+        open Functor
+
+antiCommute⁺⁻ : {G : Functor 𝓒 𝓒} {H : Functor (Category.op 𝓒) 𝓒} (θ : Dinat (liftF⁺ H) (liftF⁻ G)) → 
+ ∀ {A B} {f : A ⇒ B} → Functor.F₁ G f ∘ α θ A ∘ Functor.F₁ H f ≈ α θ B
+antiCommute⁺⁻ {G} {H} θ {A} {B} {f} = commute θ f ○ (elimˡ (identity G) ○ elimʳ (identity H))
+  where open 𝓒.HomReasoning
+        open MR 𝓒
+        open Functor
+
 record Contramonad : Set (o ⊔ l ⊔ e) where
  field
   F : Functor (Category.op 𝓒) 𝓒
-  ι : DinaturalTransformation (liftF⁻ idF) (liftF⁺ F)
+  ι : Dinat (liftF⁻ idF) (liftF⁺ F)
  
  F² = F ∘F Functor.op F
 
  field
-  δ : DinaturalTransformation (liftF⁺ F) (liftF⁻ F²)
+  δ : Dinat (liftF⁺ F) (liftF⁻ F²)
 
  module F = Functor F
- module ι = DinaturalTransformation ι
- module δ = DinaturalTransformation δ
+ module ι = Dinat ι
+ module δ = Dinat δ
  module F² = Functor F²
  
  field
@@ -130,10 +147,14 @@ module _ {R : Contramonad} where
    ; μ = ntHelper (record 
      { η = λ X → F₁ F (δ.α (F₀ F X) ∘ ι.α (F₀ F X)) 
      ; commute = λ f → begin 
-       {!   !} ≈⟨ (homomorphism F ⟩∘⟨refl) ⟩ 
-       {!   !} ≈⟨ {!   !} ⟩ 
-       {!   !} ≈⟨ {! refl⟩∘⟨ ?  !} ⟩ 
-       {!   !} ∎ 
+       _ ≈˘⟨ homomorphism F ⟩ 
+       _ ≈⟨ F-resp-≈ F (refl⟩∘⟨ (refl⟩∘⟨ Equiv.sym (antiCommute⁻⁺ ι {f = F.F₁ f}))) ⟩ 
+       _ ≈⟨ F-resp-≈ F (sym-assoc ○ sym-assoc ○ sym-assoc) ⟩ 
+       _ ≈⟨ F-resp-≈ F (assoc ○ assoc ⟩∘⟨refl) ⟩ 
+       _ ≈⟨ F-resp-≈ F sym-assoc ⟩ 
+       _ ≈⟨ F-resp-≈ F ((antiCommute⁺⁻ δ {f = F.F₁ f} ⟩∘⟨refl) ⟩∘⟨refl) ⟩ 
+       _ ≈⟨ homomorphism F ⟩ 
+       _ ∎ 
      })
    ; assoc = {!   !}
    ; sym-assoc = {!   !}
@@ -146,8 +167,14 @@ module _ {R : Contramonad} where
  𝐏Monad : Monad 𝓒 
  𝐏Monad = record
    { F = 𝐏Functor
-   ; η = ntHelper (record { η = λ X → ι.α X ; commute = {!   !} })
-   ; μ = ntHelper (record { η = λ X → ̂μ {X} ; commute = {!   !} })
+   ; η = ntHelper (record 
+     { η = λ X → ι.α X 
+     ; commute = {!   !} 
+     })
+   ; μ = ntHelper (record 
+     { η = λ X → ̂μ {X} 
+     ; commute = {!   !} 
+     })
    ; assoc = {!   !}
    ; sym-assoc = {!   !}
    ; identityˡ = {!   !}
