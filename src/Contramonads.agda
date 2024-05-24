@@ -120,7 +120,11 @@ record Contramonad : Set (o ⊔ l ⊔ e) where
    { F₀ = λ X → F₀ F X
    ; F₁ = λ f → 𝐏 f
    ; identity = λ { {A} → MR.elim-center 𝓒 (identity F²) ○ C6 }
-   ; homomorphism = λ { {X} {Y} {Z} {f} {g} → {!   !}}
+   ; homomorphism = λ { {X} {Y} {Z} {f} {g} → Equiv.sym (
+     assoc ∙ (refl⟩∘⟨ assoc) ∙ 
+     (refl⟩∘⟨ refl⟩∘⟨ Equiv.sym C2) ∙ 
+     MR.pull-center 𝓒 (Equiv.sym (homomorphism F²))
+     )}
    ; F-resp-≈ = λ f≈g → refl⟩∘⟨ (F-resp-≈ F² f≈g ⟩∘⟨refl)
    } where open Functor
 
@@ -179,8 +183,9 @@ module _ {R : Contramonad} where
    ; μ = ntHelper (record
      { η = λ X → ̂μ {X}
      ; commute = λ { {X} {Y} f → {!   !}}
+     -- one of the most difficult proofs...
      })
-   ; assoc = {!   !}
+   ; assoc = λ { {X} → {!   !} }
    ; sym-assoc = {!   !}
    ; identityˡ = λ { {X} → 
      assoc ∙ 
@@ -199,5 +204,5 @@ module _ {R : Contramonad} where
      ; commute = λ { {X} {Y} f → Equiv.sym C2 }
      })
    ; resp-id = Equiv.refl
-   ; resp-mu = {!   !}
+   ; resp-mu = λ { {X} → Equiv.sym C4 ∙ (C8 ⟩∘⟨refl) ∙ assoc}
    }
