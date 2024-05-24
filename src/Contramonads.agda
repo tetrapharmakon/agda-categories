@@ -146,8 +146,16 @@ module _ {R : Contramonad} where
      })
    ; assoc = {!   !}
    ; sym-assoc = {!   !}
-   ; identityˡ = λ { {X} → {!!} }
-   ; identityʳ = {!   !}
+   ; identityˡ = λ { {X} → 
+     Equiv.sym (homomorphism F) ∙
+     F-resp-≈ F (homomorphism F ⟩∘⟨refl) ∙
+     F-resp-≈ F assoc ∙
+     F-resp-≈ F (Equiv.sym C3) ∙
+     identity F }
+   ; identityʳ = λ {X} → 
+     (homomorphism F ⟩∘⟨refl) ∙ 
+     assoc ∙ 
+     Equiv.sym C3
    } where open Functor
 
  𝐏Monad : Monad 𝓒
@@ -155,7 +163,10 @@ module _ {R : Contramonad} where
    { F = 𝐏Functor
    ; η = ntHelper (record
      { η = λ X → ι.α X
-     ; commute = {!   !}
+     ; commute = λ { {X} {Y} f → 
+       Equiv.sym (MR.pullʳ 𝓒 (assoc ∙ Equiv.sym C1) ∙ 
+       MR.assoc²δγ 𝓒 ∙ 
+       MR.elimˡ 𝓒 C6)}
      })
    ; μ = ntHelper (record
      { η = λ X → ̂μ {X}
