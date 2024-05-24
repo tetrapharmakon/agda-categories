@@ -83,10 +83,10 @@ record Contramonad : Set (o ⊔ l ⊔ e) where
 
   C5 : ∀ {A B : Obj} (f : A ⇒ B) →
    F.F₁ (δ.α A) ∘ F.F₁ (F².F₁ f) ≈ F.F₁ (δ.α A) ∘ F.F₁ (F².F₁ f) ∘ F².F₁ (ι.α B) ∘ F.F₁ (δ.α B)
-  C5 f = 
-    Equiv.sym (homomorphism F) ∙ 
-    F.F-resp-≈ C2 ∙ 
-    F.F-resp-≈ (sym-assoc ∙ sym-assoc) ∙ 
+  C5 f =
+    Equiv.sym (homomorphism F) ∙
+    F.F-resp-≈ C2 ∙
+    F.F-resp-≈ (sym-assoc ∙ sym-assoc) ∙
     homomorphism₄ F
 
   𝐏-unit-lemma : ∀ {A : Obj} → δ.α A ≈ F.F₁ (δ.α A) ∘ δ.α (F.F₀ A) ∘ ι.α (F.F₀ A)
@@ -149,20 +149,25 @@ module _ {R : Contramonad} where
        _ ∎
      })
    ; assoc = λ { {X} → 
-   begin {!   !} ≈⟨ refl⟩∘⟨ homomorphism (F² ∘F F) ⟩
-         {!   !} ≈⟨ {! refl⟩∘⟨ (F-resp-≈ F ?) !} ⟩ 
-         {!   !} ≈⟨ {!   !} ⟩ 
-         {!   !} ∎ }
+   begin {!   !} ≈˘⟨ homomorphism F ⟩ -- refl⟩∘⟨ homomorphism (F² ∘F F) ⟩
+        --  {!   !} ≈⟨ F-resp-≈ F (homomorphism F² ⟩∘⟨refl) ⟩ -- refl⟩∘⟨ {!   !} ⟩
+        --  {!   !} ≈⟨ (F-resp-≈ F {! C1  !}) ∙ {!   !} ⟩
+         {!   !} ≈⟨  F-resp-≈ F {!   !} ⟩
+         {!   !} ≈⟨  F-resp-≈ F {!   !} ⟩
+         {!   !} ≈⟨  F-resp-≈ F assoc ⟩
+         {!   !} ≈⟨ homomorphism F ⟩
+         {!   !} ∎ 
+         }
    ; sym-assoc = {!   !}
-   ; identityˡ = λ { {X} → 
+   ; identityˡ = λ { {X} →
      Equiv.sym (homomorphism F) ∙
      F-resp-≈ F (homomorphism F ⟩∘⟨refl) ∙
      F-resp-≈ F assoc ∙
      F-resp-≈ F (Equiv.sym C3) ∙
      identity F }
-   ; identityʳ = λ {X} → 
-     (homomorphism F ⟩∘⟨refl) ∙ 
-     assoc ∙ 
+   ; identityʳ = λ {X} →
+     (homomorphism F ⟩∘⟨refl) ∙
+     assoc ∙
      Equiv.sym C3
    } where open Functor
 
@@ -171,9 +176,9 @@ module _ {R : Contramonad} where
    { F = 𝐏Functor
    ; η = ntHelper (record
      { η = λ X → ι.α X
-     ; commute = λ { {X} {Y} f → 
-       Equiv.sym (MR.pullʳ 𝓒 (assoc ∙ Equiv.sym C1) ∙ 
-       MR.assoc²δγ 𝓒 ∙ 
+     ; commute = λ { {X} {Y} f →
+       Equiv.sym (MR.pullʳ 𝓒 (assoc ∙ Equiv.sym C1) ∙
+       MR.assoc²δγ 𝓒 ∙
        MR.elimˡ 𝓒 C6)}
      })
    ; μ = ntHelper (record
@@ -182,20 +187,20 @@ module _ {R : Contramonad} where
      })
    ; assoc = {!   !}
    ; sym-assoc = {!   !}
-   ; identityˡ = λ { {X} → 
-     assoc ∙ 
-     (refl⟩∘⟨ assoc) ∙ 
-     (skip-2 (Equiv.sym C2)) ∙ 
-     (refl⟩∘⟨ sym-assoc) ∙ 
-     (MR.elim-center 𝓒 (Equiv.sym (homomorphism F) ∙ (F-resp-≈ F C6) ∙ identity F)) ∙ 
+   ; identityˡ = λ { {X} →
+     assoc ∙
+     (refl⟩∘⟨ assoc) ∙
+     (skip-2 (Equiv.sym C2)) ∙
+     (refl⟩∘⟨ sym-assoc) ∙
+     (MR.elim-center 𝓒 (Equiv.sym (homomorphism F) ∙ (F-resp-≈ F C6) ∙ identity F)) ∙
      C6}
    ; identityʳ = λ { {X} → MR.assoc²βε 𝓒 ∙ Equiv.sym C3}
    } where open Functor
 
  ζ : monadMap 𝐏Monad F²Monad
  ζ = record
-   { α = ntHelper (record 
-     { η = δ.α 
+   { α = ntHelper (record
+     { η = δ.α
      ; commute = λ { {X} {Y} f → Equiv.sym C2 }
      })
    ; resp-id = Equiv.refl
