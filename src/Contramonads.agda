@@ -2,6 +2,7 @@
 
 open import Categories.Category
 open import Categories.Functor renaming (id to idF)
+open import Categories.Functor.Properties
 open import Categories.Category.Core
 
 module Contramonads {o l e} {𝓒 : Category o l e} where
@@ -192,7 +193,7 @@ module _ {R : Contramonad} where
      (refl⟩∘⟨ assoc) ∙ 
      (skip-2 (Equiv.sym C2)) ∙ 
      (refl⟩∘⟨ sym-assoc) ∙ 
-     (MR.elim-center 𝓒 (Equiv.sym (homomorphism F) ∙ (F-resp-≈ F C6) ∙ identity F)) ∙ 
+     (MR.elim-center 𝓒 (Equiv.sym (homomorphism F) ∙ [ F ][≈id]≈id C6)) ∙ 
      C6}
    ; identityʳ = λ { {X} → MR.assoc²βε 𝓒 ∙ Equiv.sym C3}
    } where open Functor
