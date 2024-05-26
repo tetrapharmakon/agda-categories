@@ -121,13 +121,6 @@ module _ {o ℓ e}
         ≈ F.₁ f′ ∘ F.₁ g′ ∘ F.₁ h′
   [_]-3 eq = Equiv.sym homomorphism₃ ∙ F.F-resp-≈ eq ∙ homomorphism₃
 
-  [_]-2-4 : ∀ {A B C D}
-            {f f′ : B Z.⇒ A} {g g′ : C Z.⇒ B} {h h′ : D Z.⇒ C}
-        → f Z.∘ g Z.∘ h Z.≈ f′ Z.∘ g′ Z.∘ h′
-        → F.₁ f ∘ F.₁ g ∘ F.₁ h
-        ≈ F.₁ f′ ∘ F.₁ g′ ∘ F.₁ h′
-  [_]-2-4 eq = Equiv.sym homomorphism₃ ∙ F.F-resp-≈ eq ∙ homomorphism₃
-
   [_]-3-1 : ∀ {A B C D}
             {f : B Z.⇒ A} {g : C Z.⇒ B} {h : D Z.⇒ C}
             {fgh : D Z.⇒ A}
