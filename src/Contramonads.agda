@@ -154,14 +154,10 @@ module _ {R : Contramonad} where
        _ ∎
      })
    ; assoc = λ { {X} → 
-   begin {!   !} ≈˘⟨ homomorphism F ⟩ -- refl⟩∘⟨ homomorphism (F² ∘F F) ⟩
-        --  {!   !} ≈⟨ F-resp-≈ F (homomorphism F² ⟩∘⟨refl) ⟩ -- refl⟩∘⟨ {!   !} ⟩
-        --  {!   !} ≈⟨ (F-resp-≈ F {! C1  !}) ∙ {!   !} ⟩
-         {!   !} ≈⟨  F-resp-≈ F {!   !} ⟩
-         {!   !} ≈⟨  F-resp-≈ F {!   !} ⟩
-         {!   !} ≈⟨  F-resp-≈ F assoc ⟩
-         {!   !} ≈⟨ homomorphism F ⟩
-         {!   !} ∎ 
+   begin _ ≈˘⟨ homomorphism F ⟩
+         _ ≈˘⟨ F-resp-≈ F C1 ⟩
+         _ ≈⟨ homomorphism F ⟩
+         _ ∎ 
          }
    ; sym-assoc = {!   !}
    ; identityˡ = λ { {X} →
@@ -191,15 +187,16 @@ module _ {R : Contramonad} where
      ; commute = λ { {X} {Y} f → {!   !}}
      -- one of the most difficult proofs...
      })
-   ; assoc = λ { {X} → skip-2 (homomorphism F² ⟩∘⟨refl) ∙ {!   !} }
-   ; sym-assoc = {!   !}
+   ; assoc = λ { {X} → {!   !} }
+   ; sym-assoc = λ { {X} →  {!   !} }
    ; identityˡ = λ { {X} → 
      assoc ∙ 
      (refl⟩∘⟨ assoc) ∙ 
      (skip-2 (Equiv.sym C2)) ∙ 
      (refl⟩∘⟨ sym-assoc) ∙ 
      (MR.elim-center 𝓒 (Equiv.sym (homomorphism F) ∙ [ F ]-elim C6)) ∙ 
-     C6}
+     C6
+     }
    ; identityʳ = λ { {X} → MR.assoc²βε 𝓒 ∙ Equiv.sym C3}
    } where open Functor
 
