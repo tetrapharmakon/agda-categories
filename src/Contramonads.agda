@@ -1,4 +1,4 @@
-{-# OPTIONS --without-K --safe #-}
+{-# OPTIONS --without-K --allow-unsolved-metas #-}
 
 open import Categories.Category
 open import Categories.Functor renaming (id to idF)
@@ -186,14 +186,14 @@ module _ {R : Contramonad} where
      ; commute = λ { {X} {Y} f → {!   !}}
      -- one of the most difficult proofs...
      })
-   ; assoc = λ { {X} → {!   !} }
+   ; assoc = λ { {X} → skip-2 (homomorphism F² ⟩∘⟨refl) ∙ {!   !} }
    ; sym-assoc = {!   !}
    ; identityˡ = λ { {X} → 
      assoc ∙ 
      (refl⟩∘⟨ assoc) ∙ 
      (skip-2 (Equiv.sym C2)) ∙ 
      (refl⟩∘⟨ sym-assoc) ∙ 
-     (MR.elim-center 𝓒 (Equiv.sym (homomorphism F) ∙ [ F ][≈id]≈id C6)) ∙ 
+     (MR.elim-center 𝓒 (Equiv.sym (homomorphism F) ∙ [ F ]-elim C6)) ∙ 
      C6}
    ; identityʳ = λ { {X} → MR.assoc²βε 𝓒 ∙ Equiv.sym C3}
    } where open Functor
