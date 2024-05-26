@@ -1,7 +1,8 @@
-{-# OPTIONS --without-K --safe #-}
+{-# OPTIONS --without-K --allow-unsolved-metas #-}
 
 open import Categories.Category
 open import Categories.Functor renaming (id to idF)
+open import Categories.Functor.Properties
 open import Categories.Category.Core
 
 module Contramonads {o l e} {𝓒 : Category o l e} where
@@ -120,7 +121,11 @@ record Contramonad : Set (o ⊔ l ⊔ e) where
    { F₀ = λ X → F₀ F X
    ; F₁ = λ f → 𝐏 f
    ; identity = λ { {A} → MR.elim-center 𝓒 (identity F²) ○ C6 }
-   ; homomorphism = λ { {X} {Y} {Z} {f} {g} → {!   !}}
+   ; homomorphism = λ { {X} {Y} {Z} {f} {g} → Equiv.sym (
+     assoc ∙ (refl⟩∘⟨ assoc) ∙ 
+     (refl⟩∘⟨ refl⟩∘⟨ Equiv.sym C2) ∙ 
+     MR.pull-center 𝓒 (Equiv.sym (homomorphism F²))
+     )}
    ; F-resp-≈ = λ f≈g → refl⟩∘⟨ (F-resp-≈ F² f≈g ⟩∘⟨refl)
    } where open Functor
 
@@ -184,15 +189,16 @@ module _ {R : Contramonad} where
    ; μ = ntHelper (record
      { η = λ X → ̂μ {X}
      ; commute = λ { {X} {Y} f → {!   !}}
+     -- one of the most difficult proofs...
      })
-   ; assoc = {!   !}
+   ; assoc = λ { {X} → skip-2 (homomorphism F² ⟩∘⟨refl) ∙ {!   !} }
    ; sym-assoc = {!   !}
-   ; identityˡ = λ { {X} →
-     assoc ∙
-     (refl⟩∘⟨ assoc) ∙
-     (skip-2 (Equiv.sym C2)) ∙
-     (refl⟩∘⟨ sym-assoc) ∙
-     (MR.elim-center 𝓒 (Equiv.sym (homomorphism F) ∙ (F-resp-≈ F C6) ∙ identity F)) ∙
+   ; identityˡ = λ { {X} → 
+     assoc ∙ 
+     (refl⟩∘⟨ assoc) ∙ 
+     (skip-2 (Equiv.sym C2)) ∙ 
+     (refl⟩∘⟨ sym-assoc) ∙ 
+     (MR.elim-center 𝓒 (Equiv.sym (homomorphism F) ∙ [ F ]-elim C6)) ∙ 
      C6}
    ; identityʳ = λ { {X} → MR.assoc²βε 𝓒 ∙ Equiv.sym C3}
    } where open Functor
@@ -204,5 +210,5 @@ module _ {R : Contramonad} where
      ; commute = λ { {X} {Y} f → Equiv.sym C2 }
      })
    ; resp-id = Equiv.refl
-   ; resp-mu = {!   !}
+   ; resp-mu = λ { {X} → Equiv.sym C4 ∙ (C8 ⟩∘⟨refl) ∙ assoc}
    }

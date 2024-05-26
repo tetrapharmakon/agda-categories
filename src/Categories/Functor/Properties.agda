@@ -75,6 +75,13 @@ module _ (F : Functor C D) where
     F₁ h             ∎
     where open D.HomReasoning
 
+  [_]-elim : {f : A ⇒ A} → C [ f ≈ id ] → D [ F₁ f ≈ D.id ]
+  [_]-elim {f = f} eq = begin
+    F₁ f  ≈⟨ F-resp-≈ eq ⟩
+    F₁ id ≈⟨ identity ⟩
+    D.id  ∎
+    where open D.HomReasoning
+
   [_]-resp-square : Definitions.CommutativeSquare C f g h i →
                     Definitions.CommutativeSquare D (F₁ f) (F₁ g) (F₁ h) (F₁ i)
   [_]-resp-square {f = f} {g = g} {h = h} {i = i} sq = begin
