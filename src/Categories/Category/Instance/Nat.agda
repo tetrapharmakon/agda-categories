@@ -5,23 +5,26 @@ module Categories.Category.Instance.Nat where
 
 open import Level
 
-open import Data.Fin.Base using (Fin; inject+; raise; splitAt; join)
-open import Data.Fin.Properties
-open import Data.Nat.Base using (ℕ; _+_)
+open import Data.Fin.Base using (Fin; _↑ˡ_; _↑ʳ_; splitAt; join; remQuot; combine)
+open import Data.Fin.Properties using (join-splitAt; splitAt-↑ˡ; splitAt-↑ʳ; combine-remQuot;
+  remQuot-combine)
+open import Data.Nat.Base using (ℕ; _+_; _*_)
+open import Data.Product using (proj₁; proj₂; uncurry; <_,_>)
 open import Data.Sum using (inj₁; inj₂; [_,_]′)
-open import Data.Sum.Properties
+open import Data.Sum.Properties using ([,]-∘; [,]-cong)
 open import Relation.Binary.PropositionalEquality
-  using (_≗_; _≡_; refl; sym; trans; cong; module ≡-Reasoning; inspect; [_])
-open import Function using (id; _∘′_)
+  using (_≗_; _≡_; refl; sym; trans; cong; cong₂; module ≡-Reasoning)
+open import Function using (id; _∘′_; case_returning_of_)
 
+open import Categories.Category.Cartesian using (Cartesian)
 open import Categories.Category.Cartesian.Bundle using (CartesianCategory)
 open import Categories.Category.Cocartesian using (Cocartesian)
 open import Categories.Category.Cocartesian.Bundle using (CocartesianCategory)
 open import Categories.Category.Core using (Category)
-open import Categories.Category.Duality using (Cocartesian⇒coCartesian)
-open import Categories.Object.Coproduct
-open import Categories.Object.Duality using (Coproduct⇒coProduct)
-open import Categories.Object.Product
+open import Categories.Category.Duality using (Cocartesian⇒coCartesian; coCartesian⇒Cocartesian)
+open import Categories.Object.Coproduct using (Coproduct)
+open import Categories.Object.Duality using (Coproduct⇒coProduct; coProduct⇒Coproduct)
+open import Categories.Object.Product using (Product)
 
 Nat : Category 0ℓ 0ℓ 0ℓ
 Nat = record
@@ -48,22 +51,22 @@ Nat = record
 Coprod : (m n : ℕ) → Coproduct Nat m n
 Coprod m n = record
   { A+B = m + n
-  ; i₁ = inject+ n
-  ; i₂ = raise m
+  ; i₁ = _↑ˡ n
+  ; i₂ = m ↑ʳ_
   ; [_,_] = λ l r z → [ l , r ]′ (splitAt m z)
-  ; inject₁ = λ {_ f g} x → cong [ f , g ]′ (splitAt-inject+ m n x)
-  ; inject₂ = λ {_ f g} x → cong [ f , g ]′ (splitAt-raise m n x)
+  ; inject₁ = λ {_ f g} x → cong [ f , g ]′ (splitAt-↑ˡ m x n)
+  ; inject₂ = λ {_ f g} x → cong [ f , g ]′ (splitAt-↑ʳ m n x)
   ; unique = uniq
   }
   where
     open ≡-Reasoning
     uniq : {o : ℕ} {h : Fin (m + n) → Fin o} {f : Fin m → Fin o} {g : Fin n → Fin o} →
-      h ∘′ inject+ n ≗ f → h ∘′ raise m ≗ g → (λ z → [ f , g ]′ (splitAt m z)) ≗ h
+      h ∘′ (_↑ˡ n) ≗ f → h ∘′ (m ↑ʳ_) ≗ g → (λ z → [ f , g ]′ (splitAt m z)) ≗ h
     uniq {_} {h} {f} {g} h≗f h≗g w = begin
-      [ f , g ]′ (splitAt m w)                         ≡⟨ [,]-cong (λ x → sym (h≗f x)) (λ x → sym (h≗g x)) (splitAt m w) ⟩
-      [ h ∘′ inject+ n , h ∘′ raise m ]′ (splitAt m w) ≡˘⟨ [,]-∘-distr h (splitAt m w) ⟩
-      h ([ inject+ n , raise m ]′ (splitAt m w))       ≡⟨ cong h (join-splitAt m n w) ⟩
-      h w                                              ∎
+      [ f , g ]′ (splitAt m w)                       ≡˘⟨ [,]-cong h≗f h≗g (splitAt m w) ⟩
+      [ h ∘′ (_↑ˡ n) , h ∘′ (m ↑ʳ_) ]′ (splitAt m w) ≡˘⟨ [,]-∘ h (splitAt m w) ⟩
+      h ([ _↑ˡ n , m ↑ʳ_ ]′ (splitAt m w))           ≡⟨ cong h (join-splitAt m n w) ⟩
+      h w                                            ∎
 
 Nat-Cocartesian : Cocartesian Nat
 Nat-Cocartesian = record
@@ -77,6 +80,36 @@ Nat-Cocartesian = record
   ; coproducts = record { coproduct = λ {m} {n} → Coprod m n }
   }
 
+Prod : (m n : ℕ) → Product Nat m n
+Prod m n = record
+  { A×B = m * n
+  ; π₁ = proj₁ ∘′ remQuot n
+  ; π₂ = proj₂ ∘′ remQuot {m} n
+  ; ⟨_,_⟩ = λ l r z → uncurry combine (< l , r > z)
+  ; project₁ = λ {_ f g} z → cong proj₁ (remQuot-combine (f z) (g z))
+  ; project₂ = λ {_ f g} z → cong proj₂ (remQuot-combine (f z) (g z))
+  ; unique = uniq
+  }
+  where
+    open ≡-Reasoning
+    uniq : {o : ℕ} {h : Fin o → Fin (m * n)} {f : Fin o → Fin m} {g : Fin o → Fin n} →
+      proj₁ ∘′ remQuot n ∘′ h ≗ f →  proj₂ ∘′ remQuot {m} n ∘′ h ≗ g → uncurry combine ∘′ < f , g > ≗ h
+    uniq {_} {h} {f} {g} h≗f h≗g w = begin
+      combine (f w) (g w)                                                 ≡˘⟨ cong₂ combine (h≗f w) (h≗g w) ⟩
+      combine (proj₁ (remQuot {m} n (h w))) (proj₂ (remQuot {m} n (h w))) ≡⟨ combine-remQuot {m} n (h w) ⟩
+      h w                                                                 ∎
+
+Nat-Cartesian : Cartesian Nat
+Nat-Cartesian = record
+  { terminal = record
+    { ⊤ = 1
+    ; ⊤-is-terminal = record
+      { !-unique = λ f x → case f x returning (Fin.zero ≡_) of λ { Fin.zero → refl }
+      }
+    }
+  ; products = record {product = λ {m} {n} → Prod m n }
+  }
+
 -- And Natop is what is used a lot, so record some things here too
 Natop : Category 0ℓ 0ℓ 0ℓ
 Natop = Category.op Nat
@@ -88,4 +121,13 @@ Natop-Cartesian : CartesianCategory 0ℓ 0ℓ 0ℓ
 Natop-Cartesian = record
   { U = Natop
   ; cartesian = Cocartesian⇒coCartesian Nat Nat-Cocartesian
+  }
+
+Natop-Coprod : (m n : ℕ) → Coproduct Natop m n
+Natop-Coprod m n = coProduct⇒Coproduct Natop (Prod m n)
+
+Natop-Cocartesian : CocartesianCategory 0ℓ 0ℓ 0ℓ
+Natop-Cocartesian = record
+  { U = Natop
+  ; cocartesian = coCartesian⇒Cocartesian Natop Nat-Cartesian
   }
