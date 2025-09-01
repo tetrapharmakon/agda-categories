@@ -37,12 +37,18 @@ open Dinat
 
 antiCommute⁻⁺ : {H : Functor 𝓒 𝓒} {G : Functor (Category.op 𝓒) 𝓒} (θ : Dinat (liftF⁻ H) (liftF⁺ G)) →
  ∀ {A B} {f : A ⇒ B} → Functor.F₁ G f ∘ α θ B ∘ Functor.F₁ H f ≈ α θ A
-antiCommute⁻⁺ {H} {G} θ {A} {B} {f} = Equiv.sym (commute θ f) ∙ MR.elimˡ 𝓒 (identity G) ∙ MR.elimʳ 𝓒 (identity H)
+antiCommute⁻⁺ {H} {G} θ {A} {B} {f} = 
+  Equiv.sym (commute θ f) ∙ 
+  MR.elimˡ 𝓒 (identity G) ∙ 
+  MR.elimʳ 𝓒 (identity H)
   where open Functor
 
 antiCommute⁺⁻ : {G : Functor 𝓒 𝓒} {H : Functor (Category.op 𝓒) 𝓒} (θ : Dinat (liftF⁺ H) (liftF⁻ G)) →
  ∀ {A B} {f : A ⇒ B} → Functor.F₁ G f ∘ α θ A ∘ Functor.F₁ H f ≈ α θ B
-antiCommute⁺⁻ {G} {H} θ {A} {B} {f} = commute θ f ∙ (MR.elimˡ 𝓒 (identity G) ∙ MR.elimʳ 𝓒 (identity H))
+antiCommute⁺⁻ {G} {H} θ {A} {B} {f} = 
+  commute θ f ∙ 
+  (MR.elimˡ 𝓒 (identity G) ∙ 
+  MR.elimʳ 𝓒 (identity H))
   where open Functor
 
 record Contramonad : Set (o ⊔ l ⊔ e) where
@@ -157,9 +163,13 @@ module _ {R : Contramonad} where
    begin _ ≈˘⟨ homomorphism F ⟩
          _ ≈˘⟨ F-resp-≈ F C1 ⟩
          _ ≈⟨ homomorphism F ⟩
-         _ ∎ 
-         }
-   ; sym-assoc = {!   !}
+         _ ∎ }
+   ; sym-assoc = 
+      begin 
+         _ ≈⟨ {! homomorphism F  !} ⟩
+         _ ≈⟨ {!   !} ⟩
+         _ ≈⟨ {!   !} ⟩
+         _ ∎
    ; identityˡ = λ { {X} →
      Equiv.sym (homomorphism F) ∙
      F-resp-≈ F (homomorphism F ⟩∘⟨refl) ∙
