@@ -16,10 +16,12 @@ open import Categories.Object.Zero C using (Zero)
 open import Categories.Functor.Construction.Constant using (const; constˡ)
 open import Categories.NaturalTransformation using (NaturalTransformation; ntHelper; _∘ᵥ_)
 open import Categories.NaturalTransformation.NaturalIsomorphism using (NaturalIsomorphism; _≃_)
-open import Categories.Category.Product using (Product; _※_; πʳ)
+open import Categories.Category.Product using (Product; _※_; πˡ; πʳ; Swap)
 open import Categories.Category.Equivalence using (StrongEquivalence; WeakInverse)
 open import Categories.Adjoint.Monadic using (IsMonadicAdjunction)
 open import Categories.Adjoint.Compose using (_∘⊣_)
+open import Categories.Monad using (Monad)
+open import Categories.Category.Construction.EilenbergMoore using (EilenbergMoore)
 
 open Category C
 open HomReasoning
@@ -105,6 +107,7 @@ record SDirCleft {a b : Level} (I : Set a) (J : Set b) : Set (suc (o ⊔ ℓ ⊔
     KL        : Functor P C
     KL⊣K      : KL ⊣ K
     K-monadic : IsMonadicAdjunction KL⊣K
+    fibred    : NaturalIsomorphism (πʳ {C = FS𝓣} {D = FS𝓕} ∘F (K ∘F KL)) (πʳ {C = FS𝓣} {D = FS𝓕})
 
 
 FoA : ∀ {a b : Level} (I : Set a) (J : Set b) → Set (suc (o ⊔ ℓ ⊔ e ⊔ a ⊔ b))
@@ -211,6 +214,37 @@ module _ {a b : Level} {I : Set a} {J : Set b} (sdir : SDirCleft I J)
     ; qL = qL
     ; qL⊣q = qL⊣q
     }
+
+-- Parameterized monad from a semidirect cleft: for each A ∈ FS𝓕, the composite
+--   πˡ ∘ (K ∘ KL) ∘ ⟨id, const A⟩  is a monad on FS𝓣.
+module _ {a b : Level} {I : Set a} {J : Set b} (sdir : SDirCleft I J) where
+  private
+    cleft = SDirCleft.cleft sdir
+    FS𝓣   = FullSubCategory (Cleft.𝓣 cleft)
+    FS𝓕   = FullSubCategory (Cleft.𝓕 cleft)
+    P     = Product FS𝓣 FS𝓕
+    K     = Cleft.K cleft
+    KL    = SDirCleft.KL sdir
+
+    M : Functor P P
+    M = K ∘F KL
+
+  PM : Functor (Product FS𝓕 FS𝓣) FS𝓣
+  PM = πˡ {C = FS𝓣} {D = FS𝓕} ∘F M ∘F Swap {C = FS𝓕} {D = FS𝓣}
+
+  PMon : Category.Obj FS𝓕 → Monad FS𝓣
+  PMon A = record
+    { F           = πˡ {C = FS𝓣} {D = FS𝓕} ∘F M ∘F (idF ※ const A)
+    ; η           = {!   !}
+    ; μ           = {!   !}
+    ; assoc       = {!   !}
+    ; sym-assoc   = {!   !}
+    ; identityˡ   = {!   !}
+    ; identityʳ   = {!   !}
+    }
+
+  PAlg : Category.Obj FS𝓕 → Category _ _ _
+  PAlg A = EilenbergMoore (PMon A)
 
 -- a zero cleft: a cleft where the composite adjunction q∘i ⊣ iR∘qR is the null adjunction,
 -- i.e., the subcategories have zero objects and the composites are constant at zero.
