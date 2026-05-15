@@ -250,7 +250,8 @@ module _ {a b : Level} {I : Set a} {J : Set b} (sdir : SDirCleft I J) where
       open 𝓣.Equiv
 
       P-cat   = Product FS𝓣 FS𝓕
-      open Category P-cat using (_∘_; _≈_; assoc; sym-assoc; ∘-resp-≈)
+      _∘P_ = Category._∘_ P-cat
+      open Category P-cat using (_≈_; assoc; sym-assoc; ∘-resp-≈)
         renaming (id to P-id)
 
       πˡ-f = πˡ {C = FS𝓣} {D = FS𝓕}
@@ -270,22 +271,19 @@ module _ {a b : Level} {I : Set a} {J : Set b} (sdir : SDirCleft I J) where
       η-A : NaturalTransformation idF (πˡ-f ∘F M-f ∘F (idF ※ const A))
       η-A = ntHelper record
         { η       = λ X → πˡ-f.F₁ (Tη.η (X , A))
-        ; commute = λ {X Y} f → begin
-            πˡ-f.F₁ (Tη.η (Y , A)) ∘ f
-              ≈˘⟨ πˡ-f.homomorphism (Tη.η (Y , A)) (f , 𝓕.id) ⟩
-            πˡ-f.F₁ (Tη.η (Y , A) ∘ (f , 𝓕.id))
-              ≈⟨ πˡ-f.F-resp-≈ (Tη.commute (f , 𝓕.id)) ⟩
-            πˡ-f.F₁ (M-f.F₁ (f , 𝓕.id) ∘ Tη.η (X , A))
-              ≈⟨ πˡ-f.homomorphism (M-f.F₁ (f , 𝓕.id)) (Tη.η (X , A)) ⟩
-            πˡ-f.F₁ (M-f.F₁ (f , 𝓕.id)) ∘ πˡ-f.F₁ (Tη.η (X , A))
-            ∎
+        ; commute = λ {X Y} f →
+            𝓣.Equiv.trans (𝓣.Equiv.sym (πˡ-f.homomorphism {f = (f , 𝓕.id)} {g = Tη.η (Y , A)}))
+              (𝓣.Equiv.trans (πˡ-f.F-resp-≈ (Tη.commute (f , 𝓕.id)))
+                (πˡ-f.homomorphism {f = Tη.η (X , A)} {g = M-f.F₁ (f , 𝓕.id)}))
         }
+
+      F = πˡ-f ∘F M-f ∘F (idF ※ const A)
 
       ψ : ∀ X → P-cat [ (πˡ-f.F₀ (M-f.F₀ (X , A)) , A) , M-f.F₀ (X , A) ]
       ψ X = 𝓣.id , F⇐G.η (X , A)
 
       ψ-natural : ∀ {X Y} (f : FS𝓣 [ X , Y ]) →
-        P-cat [ ψ Y ∘ (πˡ-f.F₁ (M-f.F₁ (f , 𝓕.id)) , 𝓕.id) ≈ M-f.F₁ (f , 𝓕.id) ∘ ψ X ]
+        P-cat [ ψ Y ∘P (πˡ-f.F₁ (M-f.F₁ (f , 𝓕.id)) , 𝓕.id) ≈ M-f.F₁ (f , 𝓕.id) ∘P ψ X ]
       ψ-natural {X} {Y} f =
           𝓣.Equiv.trans 𝓣.identityˡ (𝓣.Equiv.sym 𝓣.identityʳ)
         , F⇐G.commute (f , 𝓕.id)
@@ -294,35 +292,30 @@ module _ {a b : Level} {I : Set a} {J : Set b} (sdir : SDirCleft I J) where
       μ-A = ntHelper record
         { η       = λ X → πˡ-f.F₁ (Tμ.η (X , A)) ∘ πˡ-f.F₁ (M-f.F₁ (ψ X))
         ; commute = λ {X Y} f →
-            let μY = Tμ.η (Y , A)
-                μX = Tμ.η (X , A)
-                a  = M-f.F₁ (ψ Y)
-                b  = M-f.F₁ (πˡ-f.F₁ (M-f.F₁ (f , 𝓕.id)) , 𝓕.id)
-                c  = M-f.F₁ (ψ Y ∘ (πˡ-f.F₁ (M-f.F₁ (f , 𝓕.id)) , 𝓕.id))
-                d  = M-f.F₁ (M-f.F₁ (f , 𝓕.id) ∘ ψ X)
-                e  = M-f.F₁ (M-f.F₁ (f , 𝓕.id))
-                p  = M-f.F₁ (ψ X)
-            in πˡ-f.F-resp-≈
-              (let open Category P-cat
-                   open HomReasoning
-               in begin
-                 (μY ∘ a) ∘ b
-                   ≈⟨ sym assoc ⟩
-                 μY ∘ (a ∘ b)
-                   ≈⟨ ∘-resp-≈ (sym (M-f.homomorphism (πˡ-f.F₁ (M-f.F₁ (f , 𝓕.id)) , 𝓕.id) (ψ Y)))
-                               Equiv.refl ⟩
-                 μY ∘ c
-                   ≈⟨ ∘-resp-≈ (M-f.F-resp-≈ (ψ-natural f)) Equiv.refl ⟩
-                 μY ∘ d
-                   ≈⟨ ∘-resp-≈ (M-f.homomorphism ψ X (M-f.F₁ (f , 𝓕.id))) Equiv.refl ⟩
-                 μY ∘ (e ∘ p)
-                   ≈⟨ sym assoc ⟩
-                 (μY ∘ e) ∘ p
-                   ≈⟨ ∘-resp-≈ Equiv.refl (Tμ.commute (f , 𝓕.id)) ⟩
-                  (M-f.F₁ (f , 𝓕.id) ∘ μX) ∘ p
-                   ∎
-                 )
-        }
+            let μX = Tμ.η (X , A)
+                P-eq : P-cat [ (Tμ.η (Y , A) ∘P M-f.F₁ (ψ Y)) ∘P M-f.F₁ (πˡ-f.F₁ (M-f.F₁ (f , 𝓕.id)) , 𝓕.id) ≈ (M-f.F₁ (f , 𝓕.id) ∘P μX) ∘P M-f.F₁ (ψ X) ]
+                P-eq = let open Category P-cat
+                           open module PK = Category P-cat using ()
+                       in PK.Equiv.trans PK.assoc
+                          (PK.Equiv.trans (PK.∘-resp-≈ PK.Equiv.refl
+                                          (PK.Equiv.sym
+                                            (M-f.homomorphism {f = (πˡ-f.F₁ (M-f.F₁ (f , 𝓕.id)) , 𝓕.id)} {g = ψ Y})))
+                            (PK.Equiv.trans (PK.∘-resp-≈ PK.Equiv.refl
+                                            (M-f.F-resp-≈ (ψ-natural f)))
+                              (PK.Equiv.trans (PK.∘-resp-≈ PK.Equiv.refl
+                                              (M-f.homomorphism {f = ψ X} {g = M-f.F₁ (f , 𝓕.id)}))
+                                (PK.Equiv.trans PK.sym-assoc
+                                  (PK.∘-resp-≈ (Tμ.commute (f , 𝓕.id)) PK.Equiv.refl)))))
+            in 𝓣.Equiv.trans
+                 (𝓣.Equiv.sym
+                   (𝓣.Equiv.trans (πˡ-f.homomorphism {f = M-f.F₁ (πˡ-f.F₁ (M-f.F₁ (f , 𝓕.id)) , 𝓕.id)} {g = Tμ.η (Y , A) ∘P M-f.F₁ (ψ Y)})
+                     (𝓣.∘-resp-≈ (πˡ-f.homomorphism {f = M-f.F₁ (ψ Y)} {g = Tμ.η (Y , A)}) 𝓣.Equiv.refl)))
+                 (𝓣.Equiv.trans (πˡ-f.F-resp-≈ P-eq)
+                   (𝓣.Equiv.trans
+                     (𝓣.Equiv.trans (πˡ-f.homomorphism {f = M-f.F₁ (ψ X)} {g = M-f.F₁ (f , 𝓕.id) ∘P μX})
+                       (𝓣.∘-resp-≈ (πˡ-f.homomorphism {f = μX} {g = M-f.F₁ (f , 𝓕.id)}) 𝓣.Equiv.refl))
+                     𝓣.assoc))
+         }
 
 
 
