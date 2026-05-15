@@ -1,6 +1,6 @@
 {-# OPTIONS --safe --without-K #-}
 
-open import Categories.Category using (Category)
+open import Categories.Category using (Category; _[_,_]; _[_≈_])
 module Torsion {o ℓ e} {C : Category o ℓ e} where
 
 open import Data.Product using (_,_; _×_)
@@ -18,6 +18,7 @@ open import Categories.NaturalTransformation using (NaturalTransformation; ntHel
 open import Categories.NaturalTransformation.NaturalIsomorphism using (NaturalIsomorphism; _≃_)
 open import Categories.Category.Product using (Product; _※_; πˡ; πʳ; Swap)
 open import Categories.Category.Equivalence using (StrongEquivalence; WeakInverse)
+open import Categories.Adjoint.Properties using (adjoint⇒monad)
 open import Categories.Adjoint.Monadic using (IsMonadicAdjunction)
 open import Categories.Adjoint.Compose using (_∘⊣_)
 open import Categories.Monad using (Monad)
@@ -235,13 +236,95 @@ module _ {a b : Level} {I : Set a} {J : Set b} (sdir : SDirCleft I J) where
   PMon : Category.Obj FS𝓕 → Monad FS𝓣
   PMon A = record
     { F           = πˡ {C = FS𝓣} {D = FS𝓕} ∘F M ∘F (idF ※ const A)
-    ; η           = {!   !}
-    ; μ           = {!   !}
+    ; η           = η-A
+    ; μ           = μ-A
     ; assoc       = {!   !}
     ; sym-assoc   = {!   !}
     ; identityˡ   = {!   !}
     ; identityʳ   = {!   !}
     }
+    where
+      module 𝓣 = Category FS𝓣
+      module 𝓕 = Category FS𝓕
+      open 𝓣.HomReasoning
+      open 𝓣.Equiv
+
+      P-cat   = Product FS𝓣 FS𝓕
+      open Category P-cat using (_∘_; _≈_; assoc; sym-assoc; ∘-resp-≈)
+        renaming (id to P-id)
+
+      πˡ-f = πˡ {C = FS𝓣} {D = FS𝓕}
+      module πˡ-f = Functor πˡ-f
+
+      M-f = M
+      module M-f = Functor M-f
+
+      open Adj (SDirCleft.KL⊣K sdir) renaming (unit to adj-unit)
+      open NaturalIsomorphism (SDirCleft.fibred sdir) using (F⇒G; F⇐G)
+      module F⇐G = NaturalTransformation F⇐G
+
+      T = adjoint⇒monad (SDirCleft.KL⊣K sdir)
+      module Tη = NaturalTransformation (Monad.η T)
+      module Tμ = NaturalTransformation (Monad.μ T)
+
+      η-A : NaturalTransformation idF (πˡ-f ∘F M-f ∘F (idF ※ const A))
+      η-A = ntHelper record
+        { η       = λ X → πˡ-f.F₁ (Tη.η (X , A))
+        ; commute = λ {X Y} f → begin
+            πˡ-f.F₁ (Tη.η (Y , A)) ∘ f
+              ≈˘⟨ πˡ-f.homomorphism (Tη.η (Y , A)) (f , 𝓕.id) ⟩
+            πˡ-f.F₁ (Tη.η (Y , A) ∘ (f , 𝓕.id))
+              ≈⟨ πˡ-f.F-resp-≈ (Tη.commute (f , 𝓕.id)) ⟩
+            πˡ-f.F₁ (M-f.F₁ (f , 𝓕.id) ∘ Tη.η (X , A))
+              ≈⟨ πˡ-f.homomorphism (M-f.F₁ (f , 𝓕.id)) (Tη.η (X , A)) ⟩
+            πˡ-f.F₁ (M-f.F₁ (f , 𝓕.id)) ∘ πˡ-f.F₁ (Tη.η (X , A))
+            ∎
+        }
+
+      ψ : ∀ X → P-cat [ (πˡ-f.F₀ (M-f.F₀ (X , A)) , A) , M-f.F₀ (X , A) ]
+      ψ X = 𝓣.id , F⇐G.η (X , A)
+
+      ψ-natural : ∀ {X Y} (f : FS𝓣 [ X , Y ]) →
+        P-cat [ ψ Y ∘ (πˡ-f.F₁ (M-f.F₁ (f , 𝓕.id)) , 𝓕.id) ≈ M-f.F₁ (f , 𝓕.id) ∘ ψ X ]
+      ψ-natural {X} {Y} f =
+          𝓣.Equiv.trans 𝓣.identityˡ (𝓣.Equiv.sym 𝓣.identityʳ)
+        , F⇐G.commute (f , 𝓕.id)
+
+      μ-A : NaturalTransformation (F ∘F F) F
+      μ-A = ntHelper record
+        { η       = λ X → πˡ-f.F₁ (Tμ.η (X , A)) ∘ πˡ-f.F₁ (M-f.F₁ (ψ X))
+        ; commute = λ {X Y} f →
+            let μY = Tμ.η (Y , A)
+                μX = Tμ.η (X , A)
+                a  = M-f.F₁ (ψ Y)
+                b  = M-f.F₁ (πˡ-f.F₁ (M-f.F₁ (f , 𝓕.id)) , 𝓕.id)
+                c  = M-f.F₁ (ψ Y ∘ (πˡ-f.F₁ (M-f.F₁ (f , 𝓕.id)) , 𝓕.id))
+                d  = M-f.F₁ (M-f.F₁ (f , 𝓕.id) ∘ ψ X)
+                e  = M-f.F₁ (M-f.F₁ (f , 𝓕.id))
+                p  = M-f.F₁ (ψ X)
+            in πˡ-f.F-resp-≈
+              (let open Category P-cat
+                   open HomReasoning
+               in begin
+                 (μY ∘ a) ∘ b
+                   ≈⟨ sym assoc ⟩
+                 μY ∘ (a ∘ b)
+                   ≈⟨ ∘-resp-≈ (sym (M-f.homomorphism (πˡ-f.F₁ (M-f.F₁ (f , 𝓕.id)) , 𝓕.id) (ψ Y)))
+                               Equiv.refl ⟩
+                 μY ∘ c
+                   ≈⟨ ∘-resp-≈ (M-f.F-resp-≈ (ψ-natural f)) Equiv.refl ⟩
+                 μY ∘ d
+                   ≈⟨ ∘-resp-≈ (M-f.homomorphism ψ X (M-f.F₁ (f , 𝓕.id))) Equiv.refl ⟩
+                 μY ∘ (e ∘ p)
+                   ≈⟨ sym assoc ⟩
+                 (μY ∘ e) ∘ p
+                   ≈⟨ ∘-resp-≈ Equiv.refl (Tμ.commute (f , 𝓕.id)) ⟩
+                  (M-f.F₁ (f , 𝓕.id) ∘ μX) ∘ p
+                   ∎
+                 )
+        }
+
+
 
   PAlg : Category.Obj FS𝓕 → Category _ _ _
   PAlg A = EilenbergMoore (PMon A)
