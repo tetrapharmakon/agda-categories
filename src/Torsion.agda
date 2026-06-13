@@ -1,6 +1,6 @@
 {-# OPTIONS --safe --without-K #-}
 
-open import Categories.Category using (Category)
+open import Categories.Category using (Category; _[_,_]; _[_≈_])
 module Torsion {o ℓ e} {C : Category o ℓ e} where
 
 open import Data.Product using (_,_; _×_)
@@ -16,10 +16,13 @@ open import Categories.Object.Zero C using (Zero)
 open import Categories.Functor.Construction.Constant using (const; constˡ)
 open import Categories.NaturalTransformation using (NaturalTransformation; ntHelper; _∘ᵥ_)
 open import Categories.NaturalTransformation.NaturalIsomorphism using (NaturalIsomorphism; _≃_)
-open import Categories.Category.Product using (Product; _※_; πʳ)
+open import Categories.Category.Product using (Product; _※_; πˡ; πʳ; Swap)
 open import Categories.Category.Equivalence using (StrongEquivalence; WeakInverse)
+open import Categories.Adjoint.Properties using (adjoint⇒monad)
 open import Categories.Adjoint.Monadic using (IsMonadicAdjunction)
 open import Categories.Adjoint.Compose using (_∘⊣_)
+open import Categories.Monad using (Monad)
+open import Categories.Category.Construction.EilenbergMoore using (EilenbergMoore)
 
 open Category C
 open HomReasoning
@@ -105,6 +108,7 @@ record SDirCleft {a b : Level} (I : Set a) (J : Set b) : Set (suc (o ⊔ ℓ ⊔
     KL        : Functor P C
     KL⊣K      : KL ⊣ K
     K-monadic : IsMonadicAdjunction KL⊣K
+    fibred    : NaturalIsomorphism (πʳ {C = FS𝓣} {D = FS𝓕} ∘F (K ∘F KL)) (πʳ {C = FS𝓣} {D = FS𝓕})
 
 
 FoA : ∀ {a b : Level} (I : Set a) (J : Set b) → Set (suc (o ⊔ ℓ ⊔ e ⊔ a ⊔ b))
@@ -211,6 +215,112 @@ module _ {a b : Level} {I : Set a} {J : Set b} (sdir : SDirCleft I J)
     ; qL = qL
     ; qL⊣q = qL⊣q
     }
+
+-- Parameterized monad from a semidirect cleft: for each A ∈ FS𝓕, the composite
+--   πˡ ∘ (K ∘ KL) ∘ ⟨id, const A⟩  is a monad on FS𝓣.
+module _ {a b : Level} {I : Set a} {J : Set b} (sdir : SDirCleft I J) where
+  private
+    cleft = SDirCleft.cleft sdir
+    FS𝓣   = FullSubCategory (Cleft.𝓣 cleft)
+    FS𝓕   = FullSubCategory (Cleft.𝓕 cleft)
+    P     = Product FS𝓣 FS𝓕
+    K     = Cleft.K cleft
+    KL    = SDirCleft.KL sdir
+
+    M : Functor P P
+    M = K ∘F KL
+
+  PM : Functor (Product FS𝓕 FS𝓣) FS𝓣
+  PM = πˡ {C = FS𝓣} {D = FS𝓕} ∘F M ∘F Swap {C = FS𝓕} {D = FS𝓣}
+
+  PMon : Category.Obj FS𝓕 → Monad FS𝓣
+  PMon A = record
+    { F           = πˡ {C = FS𝓣} {D = FS𝓕} ∘F M ∘F (idF ※ const A)
+    ; η           = η-A
+    ; μ           = μ-A
+    ; assoc       = {!   !}
+    ; sym-assoc   = {!   !}
+    ; identityˡ   = {!   !}
+    ; identityʳ   = {!   !}
+    }
+    where
+      module 𝓣 = Category FS𝓣
+      module 𝓕 = Category FS𝓕
+      open 𝓣.HomReasoning
+      open 𝓣.Equiv
+
+      P-cat   = Product FS𝓣 FS𝓕
+      _∘P_ = Category._∘_ P-cat
+      open Category P-cat using (_≈_; assoc; sym-assoc; ∘-resp-≈)
+        renaming (id to P-id)
+
+      πˡ-f = πˡ {C = FS𝓣} {D = FS𝓕}
+      module πˡ-f = Functor πˡ-f
+
+      M-f = M
+      module M-f = Functor M-f
+
+      open Adj (SDirCleft.KL⊣K sdir) renaming (unit to adj-unit)
+      open NaturalIsomorphism (SDirCleft.fibred sdir) using (F⇒G; F⇐G)
+      module F⇐G = NaturalTransformation F⇐G
+
+      T = adjoint⇒monad (SDirCleft.KL⊣K sdir)
+      module Tη = NaturalTransformation (Monad.η T)
+      module Tμ = NaturalTransformation (Monad.μ T)
+
+      η-A : NaturalTransformation idF (πˡ-f ∘F M-f ∘F (idF ※ const A))
+      η-A = ntHelper record
+        { η       = λ X → πˡ-f.F₁ (Tη.η (X , A))
+        ; commute = λ {X Y} f →
+            𝓣.Equiv.trans (𝓣.Equiv.sym (πˡ-f.homomorphism {f = (f , 𝓕.id)} {g = Tη.η (Y , A)}))
+              (𝓣.Equiv.trans (πˡ-f.F-resp-≈ (Tη.commute (f , 𝓕.id)))
+                (πˡ-f.homomorphism {f = Tη.η (X , A)} {g = M-f.F₁ (f , 𝓕.id)}))
+        }
+
+      F = πˡ-f ∘F M-f ∘F (idF ※ const A)
+
+      ψ : ∀ X → P-cat [ (πˡ-f.F₀ (M-f.F₀ (X , A)) , A) , M-f.F₀ (X , A) ]
+      ψ X = 𝓣.id , F⇐G.η (X , A)
+
+      ψ-natural : ∀ {X Y} (f : FS𝓣 [ X , Y ]) →
+        P-cat [ ψ Y ∘P (πˡ-f.F₁ (M-f.F₁ (f , 𝓕.id)) , 𝓕.id) ≈ M-f.F₁ (f , 𝓕.id) ∘P ψ X ]
+      ψ-natural {X} {Y} f =
+          𝓣.Equiv.trans 𝓣.identityˡ (𝓣.Equiv.sym 𝓣.identityʳ)
+        , F⇐G.commute (f , 𝓕.id)
+
+      μ-A : NaturalTransformation (F ∘F F) F
+      μ-A = ntHelper record
+        { η       = λ X → πˡ-f.F₁ (Tμ.η (X , A)) ∘ πˡ-f.F₁ (M-f.F₁ (ψ X))
+        ; commute = λ {X Y} f →
+            let μX = Tμ.η (X , A)
+                P-eq : P-cat [ (Tμ.η (Y , A) ∘P M-f.F₁ (ψ Y)) ∘P M-f.F₁ (πˡ-f.F₁ (M-f.F₁ (f , 𝓕.id)) , 𝓕.id) ≈ (M-f.F₁ (f , 𝓕.id) ∘P μX) ∘P M-f.F₁ (ψ X) ]
+                P-eq = let open Category P-cat
+                           open module PK = Category P-cat using ()
+                       in PK.Equiv.trans PK.assoc
+                          (PK.Equiv.trans (PK.∘-resp-≈ PK.Equiv.refl
+                                          (PK.Equiv.sym
+                                            (M-f.homomorphism {f = (πˡ-f.F₁ (M-f.F₁ (f , 𝓕.id)) , 𝓕.id)} {g = ψ Y})))
+                            (PK.Equiv.trans (PK.∘-resp-≈ PK.Equiv.refl
+                                            (M-f.F-resp-≈ (ψ-natural f)))
+                              (PK.Equiv.trans (PK.∘-resp-≈ PK.Equiv.refl
+                                              (M-f.homomorphism {f = ψ X} {g = M-f.F₁ (f , 𝓕.id)}))
+                                (PK.Equiv.trans PK.sym-assoc
+                                  (PK.∘-resp-≈ (Tμ.commute (f , 𝓕.id)) PK.Equiv.refl)))))
+            in 𝓣.Equiv.trans
+                 (𝓣.Equiv.sym
+                   (𝓣.Equiv.trans (πˡ-f.homomorphism {f = M-f.F₁ (πˡ-f.F₁ (M-f.F₁ (f , 𝓕.id)) , 𝓕.id)} {g = Tμ.η (Y , A) ∘P M-f.F₁ (ψ Y)})
+                     (𝓣.∘-resp-≈ (πˡ-f.homomorphism {f = M-f.F₁ (ψ Y)} {g = Tμ.η (Y , A)}) 𝓣.Equiv.refl)))
+                 (𝓣.Equiv.trans (πˡ-f.F-resp-≈ P-eq)
+                   (𝓣.Equiv.trans
+                     (𝓣.Equiv.trans (πˡ-f.homomorphism {f = M-f.F₁ (ψ X)} {g = M-f.F₁ (f , 𝓕.id) ∘P μX})
+                       (𝓣.∘-resp-≈ (πˡ-f.homomorphism {f = μX} {g = M-f.F₁ (f , 𝓕.id)}) 𝓣.Equiv.refl))
+                     𝓣.assoc))
+         }
+
+
+
+  PAlg : Category.Obj FS𝓕 → Category _ _ _
+  PAlg A = EilenbergMoore (PMon A)
 
 -- a zero cleft: a cleft where the composite adjunction q∘i ⊣ iR∘qR is the null adjunction,
 -- i.e., the subcategories have zero objects and the composites are constant at zero.
