@@ -45,10 +45,10 @@ record MR2 (A B : Obj) : Set (o ⊔ ℓ ⊔ e) where
     f : A ⇒ B
     ϕ : NaturalTransformation Cod (([_,-] A) ∘F Cod)
 
-MR2-Setoid : Obj → Obj → Setoid (o ⊔ ℓ ⊔ e) e
+MR2-Setoid : Obj → Obj → Setoid (o ⊔ ℓ ⊔ e) (o ⊔ ℓ ⊔ e)
 MR2-Setoid A B = record
   { Carrier = MR2 A B
-  ; _≈_ = λ p q → (MR2.f p ≈ MR2.f q) × (MR2.ϕ p ≃ MR2.ϕ q)
+  ; _≈_ = λ (⟪ f , ϕ ⟫) (⟪ g , ϕ' ⟫) → (f ≈ g) × (ϕ ≃ ϕ')
   ; isEquivalence = record
     { refl  = Equiv.refl , IsEquivalence.refl  ≃-isEquivalence
     ; sym   = λ (pf , pϕ) → Equiv.sym pf , IsEquivalence.sym ≃-isEquivalence pϕ
@@ -73,7 +73,7 @@ open HomReasoning
 MRS-Profunctor : Bifunctor (Category.op C) C (Setoids (o ⊔ ℓ ⊔ e) _)
 MRS-Profunctor = record
   { F₀ = λ { (A , B) → MR2-Setoid A B }
-  ; F₁ = λ { {(A , B)} {(A' , B')} (u , v) → record 
+  ; F₁ = λ { {(A , B)} {(A' , B')} (u , v) → record
     { _⟨$⟩_ = λ {⟪ f , ϕ ⟫ → ⟪ v ∘ f ∘ u , (nHom u ∘ʳ Cod) ∘ᵥ ϕ ⟫ }
     ; cong = λ { {⟪ f , ϕ ⟫} {⟪ g , ϕ' ⟫} (f≈g , ϕ≈ϕ') →
         (∘-resp-≈ Equiv.refl (∘-resp-≈ f≈g Equiv.refl))
@@ -96,7 +96,8 @@ MRS-Profunctor = record
           NaturalTransformation.η ϕ x
         ∎)
     }
-  ; homomorphism = λ { {(A , B)} {(A' , B')} {(A'' , B'')} {f = (u₁ , v₁)} {g = (u₂ , v₂)} {⟪ f , ϕ ⟫} →
+  ; homomorphism = λ { {(A , B)} {(A' , B')} {(A'' , B'')}
+                       {f = (u₁ , v₁)} {g = (u₂ , v₂)} {⟪ f , ϕ ⟫} →
       let module Hom = Functor [-,-] in
       (begin
         (v₂ ∘ v₁) ∘ f ∘ (u₁ ∘ u₂)
@@ -122,7 +123,8 @@ MRS-Profunctor = record
           [ u₂ , id ]₁ ∘ ([ u₁ , id ]₁ ∘ NaturalTransformation.η ϕ x)
           ∎)
     }
-  ; F-resp-≈ = λ { {(A , B)} {(A' , B')} {f = (u , v)} {g = (u' , v')} (u≈u' , v≈v') {⟪ f , ϕ ⟫} →
+  ; F-resp-≈ = λ { {(A , B)} {(A' , B')}
+                   {f = (u , v)} {g = (u' , v')} (u≈u' , v≈v') {⟪ f , ϕ ⟫} →
       let module Hom = Functor [-,-] in
       (∘-resp-≈ v≈v' (∘-resp-≈ Equiv.refl u≈u'))
     , (λ {x} →
