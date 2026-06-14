@@ -60,8 +60,8 @@ MR2-Setoid A B = record
 nHom : ∀ {A B} → A ⇒ B → NaturalTransformation ([_,-] B) ([_,-] A)
 nHom {A} {B} f = record 
   { η = λ X → [ f , id ]₁ 
-  ; commute = λ h → Equiv.sym ([ [-,-] ]-commute {f = f} {g = h})
-  ; sym-commute = λ h → [ [-,-] ]-commute {f = f} {g = h}
+  ; commute = λ h → Equiv.sym [ [-,-] ]-commute
+  ; sym-commute = λ h → [ [-,-] ]-commute
   }
 
 
@@ -70,64 +70,45 @@ import Categories.Morphism.Reasoning as MR
 
 open HomReasoning 
 -- Type of the desired profunctor C.op × C → Sets sending (A , B) ↦ MR2 A B.
-MRS-Profunctor : Bifunctor (Category.op C) C (Setoids (o ⊔ ℓ ⊔ e) _)
+MRS-Profunctor : Bifunctor (Category.op C) C (Setoids (o ⊔ ℓ ⊔ e) (o ⊔ ℓ ⊔ e))
 MRS-Profunctor = record
   { F₀ = λ { (A , B) → MR2-Setoid A B }
-  ; F₁ = λ { {(A , B)} {(A' , B')} (u , v) → record
+  ; F₁ = λ { {(A , B)} {(A' , B')} (u , v) → record 
     { _⟨$⟩_ = λ {⟪ f , ϕ ⟫ → ⟪ v ∘ f ∘ u , (nHom u ∘ʳ Cod) ∘ᵥ ϕ ⟫ }
     ; cong = λ { {⟪ f , ϕ ⟫} {⟪ g , ϕ' ⟫} (f≈g , ϕ≈ϕ') →
         (∘-resp-≈ Equiv.refl (∘-resp-≈ f≈g Equiv.refl))
       , (λ {x} → ∘-resp-≈ʳ (ϕ≈ϕ' {x}))
       }
     }}
-  ; identity = λ { {(A , B)} {⟪ f , ϕ ⟫} →
+  ; identity = λ { {(A , B)} {⟪ f , ϕ ⟫} {⟪ g , ϕ' ⟫} →
       let module Hom = Functor [-,-] in
       let module CodF = Functor Cod in
-      (begin
-        id ∘ f ∘ id ≈⟨ ∘-resp-≈ Equiv.refl identityʳ ⟩
-        id ∘ f      ≈⟨ identityˡ ⟩
-        f           ∎)
-    , (λ {x} →
-        begin
-          [ id , id ]₁ ∘ NaturalTransformation.η ϕ x
-            ≈⟨ ∘-resp-≈ˡ (Hom.identity {A = (A , CodF.F₀ x)}) ⟩
-          id ∘ NaturalTransformation.η ϕ x
-            ≈⟨ identityˡ ⟩
-          NaturalTransformation.η ϕ x
-        ∎)
+        ( λ (f≈g , ϕ≈ϕ') → (begin id ∘ f ∘ id ≈⟨ identityˡ ⟩ 
+                                  f ∘ id      ≈⟨ identityʳ ⟩ 
+                                  f           ≈⟨ f≈g ⟩ 
+                                  g           ∎) 
+        , λ { {h} → {!  !} })
     }
-  ; homomorphism = λ { {(A , B)} {(A' , B')} {(A'' , B'')}
-                       {f = (u₁ , v₁)} {g = (u₂ , v₂)} {⟪ f , ϕ ⟫} →
+  ; homomorphism = λ { {(A , B)} {(A' , B')} {(A'' , B'')} {f = (u₁ , v₁)} {g = (u₂ , v₂)} {⟪ f , ϕ ⟫} {⟪ g , ϕ' ⟫} →
       let module Hom = Functor [-,-] in
-      (begin
-        (v₂ ∘ v₁) ∘ f ∘ (u₁ ∘ u₂)
-          ≈⟨ sym-assoc ⟩
-        ((v₂ ∘ v₁) ∘ f) ∘ (u₁ ∘ u₂)
-          ≈⟨ ∘-resp-≈ assoc Equiv.refl ⟩
-        (v₂ ∘ (v₁ ∘ f)) ∘ (u₁ ∘ u₂)
-          ≈⟨ assoc ⟩
-        v₂ ∘ ((v₁ ∘ f) ∘ (u₁ ∘ u₂))
-          ≈⟨ ∘-resp-≈ Equiv.refl sym-assoc ⟩
-        v₂ ∘ (((v₁ ∘ f) ∘ u₁) ∘ u₂)
-          ≈⟨ ∘-resp-≈ Equiv.refl (∘-resp-≈ assoc Equiv.refl) ⟩
-        v₂ ∘ ((v₁ ∘ f ∘ u₁) ∘ u₂)
-          ≈⟨ assoc ⟩
-        v₂ ∘ (v₁ ∘ f ∘ u₁) ∘ u₂
-        ∎)
-    , (λ {x} →
-        begin
-          [ u₁ ∘ u₂ , id ]₁ ∘ NaturalTransformation.η ϕ x
-            ≈⟨ ∘-resp-≈ˡ Hom.homomorphism ⟩
-          ([ u₂ , id ]₁ ∘ [ u₁ , id ]₁) ∘ NaturalTransformation.η ϕ x
-            ≈⟨ assoc ⟩
-          [ u₂ , id ]₁ ∘ ([ u₁ , id ]₁ ∘ NaturalTransformation.η ϕ x)
-          ∎)
+        ( λ { (f≈g , ϕ≈ϕ') → 
+            (begin (v₂ ∘ v₁) ∘ f ∘ u₁ ∘ u₂     ≈⟨ sym-assoc ⟩ 
+                   ((v₂ ∘ v₁) ∘ f) ∘ u₁ ∘ u₂   ≈⟨ Equiv.sym assoc ⟩ 
+                   (((v₂ ∘ v₁) ∘ f) ∘ u₁) ∘ u₂ ≈⟨ (refl⟩∘⟨ f≈g) ⟩∘⟨refl ⟩∘⟨refl ⟩ 
+                   (((v₂ ∘ v₁) ∘ g) ∘ u₁) ∘ u₂ ≈⟨ assoc ⟩∘⟨refl ⟩
+                   ((v₂ ∘ v₁) ∘ g ∘ u₁) ∘ u₂   ≈⟨ assoc ⟩∘⟨refl ⟩ 
+                   (v₂ ∘ (v₁ ∘ (g ∘ u₁))) ∘ u₂ ≈⟨ assoc ⟩ 
+                   v₂ ∘ (v₁ ∘ g ∘ u₁) ∘ u₂     ≈⟨ sym-assoc ⟩ 
+                   (v₂ ∘ v₁ ∘ g ∘ u₁) ∘ u₂     ≈⟨ assoc ⟩ 
+                   v₂ ∘ (v₁ ∘ g ∘ u₁) ∘ u₂     ∎)
+        ,   {!  !} })
     }
-  ; F-resp-≈ = λ { {(A , B)} {(A' , B')}
-                   {f = (u , v)} {g = (u' , v')} (u≈u' , v≈v') {⟪ f , ϕ ⟫} →
-      let module Hom = Functor [-,-] in
-      (∘-resp-≈ v≈v' (∘-resp-≈ Equiv.refl u≈u'))
-    , (λ {x} →
-        ∘-resp-≈ˡ (Hom.F-resp-≈ (u≈u' , Equiv.refl)))
+  ; F-resp-≈ = λ { {(A , B)} {(A' , B')} {f = (u , v)} {g = (u' , v')} (u≈u' , v≈v') {⟪ f , ϕ ⟫} {⟪ g , ϕ' ⟫} →
+      let module Hom = Functor [-,-] in 
+        ( λ { (f≈g , ϕ≈ϕ') → 
+          (begin v ∘ f ∘ u   ≈⟨ ∘-resp-≈ v≈v' (∘-resp-≈ʳ u≈u') ⟩ 
+                 v' ∘ f ∘ u' ≈⟨ refl⟩∘⟨ f≈g ⟩∘⟨refl ⟩
+                 v' ∘ g ∘ u' ∎) 
+        , λ {h} → {!  !} })
     }
   }
