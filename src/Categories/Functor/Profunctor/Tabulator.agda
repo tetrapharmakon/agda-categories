@@ -11,8 +11,8 @@ open import Categories.Functor.Profunctor using (Profunctor)
 open import Categories.Functor.Bifunctor.Properties
 open import Categories.Category.Instance.Setoids
 open import Relation.Binary.Bundles 
-open import Relation.Binary.Reasoning.Setoid as SetoidR
-open import Function.Equality using (Π; _⟶_; _⟨$⟩_; cong)
+import Relation.Binary.Reasoning.Setoid as SetoidR
+open import Function.Equality using (Π; _⟶_; _⟨$⟩_; cong) renaming (_∘_ to _∗_)
 
 private
   module 𝒞 = Category C
@@ -62,20 +62,25 @@ Tabulator p = record
         open SetoidR PAC
         in record 
           { arr = t.arr ∘ s.arr 
-          ; eq = {!  !}
-            --  SetoidR.begin
-            --   p.F₁ (id , t.arr ∘ s.arr) ⟨$⟩ A.ξ
-            --     SetoidR.≈⟨ p.homomorphism {f = (id , s.arr)} {g = (id , t.arr)} (Setoid.refl PAA) ⟩
-            --   (p.F₁ (id , t.arr) ∘ p.F₁ (id , s.arr)) ⟨$⟩ A.ξ
-            --     SetoidR.≈⟨ cong (p.F₁ (id , t.arr)) s.eq ⟩
-            --   p.F₁ (id , t.arr) ⟨$⟩ (p.F₁ (s.arr , id) ⟨$⟩ B.ξ)
-            --     SetoidR.≈⟨ ? ⟩ -- p-props.[_]-commute {f = s.arr} {g = t.arr} (Setoid.refl PBB) ⟩
-            --   p.F₁ (s.arr , id) ⟨$⟩ (p.F₁ (id , t.arr) ⟨$⟩ B.ξ)
-            --     SetoidR.≈⟨ cong (p.F₁ (s.arr , id)) t.eq ⟩
-            --   p.F₁ (s.arr , id) ⟨$⟩ (p.F₁ (t.arr , id) ⟨$⟩ C.ξ)
-            --     SetoidR.≈˘⟨ p.homomorphism {f = (t.arr , id)} {g = (s.arr , id)} (Setoid.refl PCC) ⟩
-            --   p.F₁ (t.arr ∘ s.arr , id) ⟨$⟩ C.ξ
-            --   SetoidR.∎
+          ; eq = begin
+              p.F₁ (id , t.arr ∘ s.arr) ⟨$⟩ A.ξ
+                ≈⟨ {! Functor.homomorphism p !} ⟩
+              (p.F₁ (id , t.arr) ∗ p.F₁ (id , s.arr)) ⟨$⟩ A.ξ
+                ≈⟨ {!  !} ⟩
+              p.F₁ (id , t.arr) ⟨$⟩ (p.F₁ (id , s.arr) ⟨$⟩ A.ξ)
+                ≈⟨ cong (p.F₁ (id , t.arr)) s.eq ⟩
+              p.F₁ (id , t.arr) ⟨$⟩ (p.F₁ (s.arr , id) ⟨$⟩ B.ξ)
+                ≈⟨ {!  !} ⟩
+              p.F₁ (s.arr , t.arr) ⟨$⟩ B.ξ
+                ≈⟨ {!  !} ⟩
+              p.F₁ (s.arr , id) ⟨$⟩ (p.F₁ (id , t.arr) ⟨$⟩ B.ξ)
+                ≈⟨ cong (p.F₁ (s.arr , id)) t.eq ⟩
+              p.F₁ (s.arr , id) ⟨$⟩ (p.F₁ (t.arr , id) ⟨$⟩ C.ξ)
+                ≈⟨ {!  !} ⟩
+              (p.F₁ (s.arr , id) ∗ p.F₁ (t.arr , id)) ⟨$⟩ C.ξ
+                ≈⟨ {! Equiv.sym (Functor.homomorphism p) !} ⟩
+              p.F₁ (t.arr ∘ s.arr , id) ⟨$⟩ C.ξ
+              ∎
           } }
   ; assoc = assoc
   ; sym-assoc = sym-assoc
