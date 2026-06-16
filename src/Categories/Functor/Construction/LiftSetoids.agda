@@ -4,7 +4,7 @@ module Categories.Functor.Construction.LiftSetoids where
 
 open import Level
 open import Relation.Binary
-open import Function.Equality
+open import Function.Function.Bundles using (_⟶_; _⟨$⟩_; cong)
 open import Function using (_$_) renaming (id to idf)
 
 open import Categories.Category

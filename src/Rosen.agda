@@ -112,3 +112,8 @@ MRS-Profunctor = record
         , λ {h} → {!  !} })
     }
   }
+
+open import Categories.Functor.Profunctor.Tabulator
+
+projection : Functor (Tabulator MRS-Profunctor) C 
+projection = {!  !}

@@ -8,6 +8,7 @@ module Categories.Functor.Profunctor.Tabulator {o ℓ e} {C : Category o ℓ e} 
 open import Data.Product  
 open import Categories.Functor renaming (id to idF)
 open import Categories.Functor.Profunctor using (Profunctor)
+open import Categories.Functor.Bifunctor using (Bifunctor; appˡ; appʳ)
 open import Categories.Functor.Bifunctor.Properties
 open import Categories.Category.Instance.Setoids
 open import Relation.Binary.Bundles 
@@ -123,13 +124,37 @@ module _ {p : Profunctor C C} where
     { η = λ {(X , Y) → let module X = tab₀ X 
                            module Y = tab₀ Y 
                            module p = Functor p in record 
-      { _⟨$⟩_ = λ {u → lift (p.F₁ (id , tab⇒.arr u) ⟨$⟩ X.ξ) }
-      ; cong = λ { i≈j → lift (cong {!  !} i≈j) }
-      } }
+       { _⟨$⟩_ = λ {u → lift (p.F₁ (id , tab⇒.arr u) ⟨$⟩ X.ξ) }
+       ; cong = λ { i≈j →
+           lift (p.F-resp-≈ (Equiv.refl , i≈j) (Setoid.refl (p.F₀ (X.B , X.B))))
+         }
+       } }
     ; commute = λ { {(x , x')} {(y , y')} f {t} {t'} h → 
         let module x = tab₀ x 
             module y = tab₀ y 
             module x' = tab₀ x'
             module y' = tab₀ y'
-            module p = Functor p in {!  !} }
+            module p = Functor p
+            module pL {A} = Functor (appˡ p A)
+            module pR {A} = Functor (appʳ p A)
+            module t = tab⇒ t
+            module t' = tab⇒ t'
+            module f₁ = tab⇒ (proj₁ f)
+            module f₂ = tab⇒ (proj₂ f)
+            Pyy  = p.F₀ (y.B , y.B)
+            Pxx  = p.F₀ (x.B , x.B)
+            Pxx' = p.F₀ (x.B , x'.B)
+            Pyy' = p.F₀ (y.B , y'.B)
+            pf₁f₁ = p.F₀ (f₁.x.B , f₁.x.B)
+            open SetoidR Pyy'
+            in lift (begin
+              p.F₁ (id , f₂.arr ∘ t.arr ∘ f₁.arr) ⟨$⟩ y.ξ                                  ≈⟨ p.F-resp-≈ (Equiv.refl , ∘-resp-≈ʳ (∘-resp-≈ˡ h)) (Setoid.refl Pyy) ⟩
+              p.F₁ (id , f₂.arr ∘ t'.arr ∘ f₁.arr) ⟨$⟩ y.ξ                                 ≈⟨ p.F-resp-≈ (Equiv.sym identity² , Equiv.refl) (Setoid.refl pf₁f₁) ⟩
+              p.F₁ (id ∘ id , f₂.arr ∘ t'.arr ∘ f₁.arr) ⟨$⟩ y.ξ                            ≈⟨ p.homomorphism (Setoid.refl pf₁f₁) ⟩
+              p.F₁ (id , f₂.arr) ⟨$⟩ (p.F₁ (id , t'.arr ∘ f₁.arr) ⟨$⟩ y.ξ)                 ≈⟨ cong (p.F₁ (id , f₂.arr)) (pL.homomorphism (Setoid.refl pf₁f₁)) ⟩
+              p.F₁ (id , f₂.arr) ⟨$⟩ (p.F₁ (id , t'.arr) ⟨$⟩ (p.F₁ (id , f₁.arr) ⟨$⟩ y.ξ)) ≈⟨ cong (p.F₁ (id , f₂.arr)) (cong (p.F₁ (id , t'.arr)) f₁.eq) ⟩
+              p.F₁ (id , f₂.arr) ⟨$⟩ (p.F₁ (id , t'.arr) ⟨$⟩ (p.F₁ (f₁.arr , id) ⟨$⟩ x.ξ)) ≈⟨ cong (p.F₁ (id , f₂.arr)) ([ p ]-commute (Setoid.refl Pxx)) ⟩
+              p.F₁ (id , f₂.arr) ⟨$⟩ (p.F₁ (f₁.arr , id) ⟨$⟩ (p.F₁ (id , t'.arr) ⟨$⟩ x.ξ)) ≈˘⟨ [ p ]-decompose₂ (Setoid.refl Pxx') ⟩
+              p.F₁ (f₁.arr , f₂.arr) ⟨$⟩ (p.F₁ (id , t'.arr) ⟨$⟩ x.ξ)
+              ∎) }
     })
