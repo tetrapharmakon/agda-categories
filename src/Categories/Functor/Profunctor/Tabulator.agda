@@ -1,6 +1,6 @@
 {-# OPTIONS --without-K --safe #-}
 
-open import Level using (_⊔_)
+open import Level using (_⊔_;lift;zero;suc)
 
 open import Categories.Category using (Category)
 
@@ -90,3 +90,46 @@ Tabulator p = record
     }
   ; ∘-resp-≈ = ∘-resp-≈
   }
+
+
+module _ {p : Profunctor C C} where
+  
+  projection : Functor (Tabulator p) C
+  projection = record
+    { F₀ = λ {x → let module x = tab₀ x in x.B }
+    ; F₁ = λ {f → let module f = tab⇒ f in f.arr }
+    ; identity = λ {A} → Equiv.refl
+    ; homomorphism = Equiv.refl
+    ; F-resp-≈ = λ x → x
+    }
+  
+  projection' : Functor (Tabulator p) C
+  projection' = record
+    { F₀ = λ {x → let module x = tab₀ x in x.B }
+    ; F₁ = λ {f → let module f = tab⇒ f in f.arr }
+    ; identity = λ {A} → Equiv.refl
+    ; homomorphism = Equiv.refl
+    ; F-resp-≈ = λ x → x
+    }
+  
+  open import Categories.Functor.Hom using (Hom[_][-,-])
+  open import Categories.NaturalTransformation renaming (id to idN)
+  open import Categories.Category.Product using (_⁂_)
+  open import Categories.Functor.Construction.LiftSetoids using (LiftSetoids)
+
+  
+  cell : NaturalTransformation Hom[ Tabulator p ][-,-] ((LiftSetoids (o ⊔ e) zero ∘F p) ∘F (Functor.op projection' ⁂ projection))
+  cell = ntHelper (record 
+    { η = λ {(X , Y) → let module X = tab₀ X 
+                           module Y = tab₀ Y 
+                           module p = Functor p in record 
+      { _⟨$⟩_ = λ {u → lift (p.F₁ (id , tab⇒.arr u) ⟨$⟩ X.ξ) }
+      ; cong = λ { i≈j → lift (cong {!  !} i≈j) }
+      } }
+    ; commute = λ { {(x , x')} {(y , y')} f {t} {t'} h → 
+        let module x = tab₀ x 
+            module y = tab₀ y 
+            module x' = tab₀ x'
+            module y' = tab₀ y'
+            module p = Functor p in {!  !} }
+    })
