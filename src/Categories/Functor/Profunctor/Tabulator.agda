@@ -54,7 +54,8 @@ Tabulator p = record
         module A = tab₀ A
         module B = tab₀ B
         module C = tab₀ C
-        module p = Functor p
+        p₀ = p
+        module p = Functor p₀
         PAA = p.F₀ (A.B , A.B)
         PBB = p.F₀ (B.B , B.B)
         PCC = p.F₀ (C.B , C.B)
@@ -63,24 +64,19 @@ Tabulator p = record
         in record 
           { arr = t.arr ∘ s.arr 
           ; eq = begin
-              p.F₁ (id , t.arr ∘ s.arr) ⟨$⟩ A.ξ
-                ≈⟨ {! Functor.homomorphism p !} ⟩
-              (p.F₁ (id , t.arr) ∗ p.F₁ (id , s.arr)) ⟨$⟩ A.ξ
-                ≈⟨ {!  !} ⟩
-              p.F₁ (id , t.arr) ⟨$⟩ (p.F₁ (id , s.arr) ⟨$⟩ A.ξ)
-                ≈⟨ cong (p.F₁ (id , t.arr)) s.eq ⟩
-              p.F₁ (id , t.arr) ⟨$⟩ (p.F₁ (s.arr , id) ⟨$⟩ B.ξ)
-                ≈⟨ {!  !} ⟩
-              p.F₁ (s.arr , t.arr) ⟨$⟩ B.ξ
-                ≈⟨ {!  !} ⟩
-              p.F₁ (s.arr , id) ⟨$⟩ (p.F₁ (id , t.arr) ⟨$⟩ B.ξ)
-                ≈⟨ cong (p.F₁ (s.arr , id)) t.eq ⟩
-              p.F₁ (s.arr , id) ⟨$⟩ (p.F₁ (t.arr , id) ⟨$⟩ C.ξ)
-                ≈⟨ {!  !} ⟩
-              (p.F₁ (s.arr , id) ∗ p.F₁ (t.arr , id)) ⟨$⟩ C.ξ
-                ≈⟨ {! Equiv.sym (Functor.homomorphism p) !} ⟩
-              p.F₁ (t.arr ∘ s.arr , id) ⟨$⟩ C.ξ
-              ∎
+              p.F₁ (id , t.arr ∘ s.arr) ⟨$⟩ A.ξ                  ≈⟨ Setoid.sym PAC (p.F-resp-≈ (identity² , Equiv.refl) (Setoid.refl PAA)) ⟩
+              p.F₁ (id ∘ id , t.arr ∘ s.arr) ⟨$⟩ A.ξ             ≈⟨ p.homomorphism (Setoid.refl PAA) ⟩
+              p.F₁ (id , t.arr) ⟨$⟩ (p.F₁ (id , s.arr) ⟨$⟩ A.ξ)  ≈⟨ cong (p.F₁ (id , t.arr)) s.eq ⟩
+              p.F₁ (id , t.arr) ⟨$⟩ (p.F₁ (s.arr , id) ⟨$⟩ B.ξ)  ≈⟨ Setoid.sym PAC (p.homomorphism (Setoid.refl PBB)) ⟩
+              p.F₁ (s.arr ∘ id , t.arr ∘ id) ⟨$⟩ B.ξ             ≈⟨ p.F-resp-≈ (identityʳ , identityʳ) (Setoid.refl PBB) ⟩
+              p.F₁ (s.arr , t.arr) ⟨$⟩ B.ξ                       ≈⟨ Setoid.sym PAC (p.F-resp-≈ (identityʳ , identityʳ) (Setoid.refl PBB)) ⟩
+              p.F₁ (s.arr ∘ id , t.arr ∘ id) ⟨$⟩ B.ξ             ≈⟨ p.homomorphism {f = (s.arr , id)} {g = (id , t.arr)} (Setoid.refl PBB) ⟩
+              (p.F₁ (id , t.arr) ∗ p.F₁ (s.arr , id)) ⟨$⟩ B.ξ    ≈⟨ [ p₀ ]-commute (Setoid.refl PBB) ⟩
+              (p.F₁ (s.arr , id) ∗ p.F₁ (id , t.arr)) ⟨$⟩ B.ξ    ≈⟨ Setoid.refl PAC ⟩
+              p.F₁ (s.arr , id) ⟨$⟩ (p.F₁ (id , t.arr) ⟨$⟩ B.ξ)  ≈⟨ cong (p.F₁ (s.arr , id)) t.eq ⟩
+              p.F₁ (s.arr , id) ⟨$⟩ (p.F₁ (t.arr , id) ⟨$⟩ C.ξ)  ≈⟨ Setoid.sym PAC (p.homomorphism (Setoid.refl PCC)) ⟩
+              p.F₁ (t.arr ∘ s.arr , id ∘ id) ⟨$⟩ C.ξ             ≈⟨ p.F-resp-≈ (Equiv.refl , identity²) (Setoid.refl PCC) ⟩
+              p.F₁ (t.arr ∘ s.arr , id) ⟨$⟩ C.ξ                  ∎
           } }
   ; assoc = assoc
   ; sym-assoc = sym-assoc
