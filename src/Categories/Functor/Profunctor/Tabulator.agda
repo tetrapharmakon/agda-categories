@@ -1,14 +1,14 @@
 {-# OPTIONS --without-K --safe #-}
 
-open import Level using (_⊔_;lift;zero;suc)
+open import Level using (_⊔_;lift;lower;zero;suc)
 
 open import Categories.Category using (Category)
 
 module Categories.Functor.Profunctor.Tabulator {o ℓ e} {C : Category o ℓ e} where
 open import Data.Product  
 open import Categories.Functor renaming (id to idF)
-open import Categories.Functor.Profunctor using (Profunctor)
 open import Categories.Functor.Bifunctor using (Bifunctor; appˡ; appʳ)
+open import Categories.Functor.Profunctor using (Profunctor)
 open import Categories.Functor.Bifunctor.Properties
 open import Categories.Category.Instance.Setoids
 open import Relation.Binary.Bundles renaming (Setoid to S)
@@ -20,13 +20,13 @@ private
 
 open 𝒞
 
-record tab₀ (p : Profunctor C C) : Set (o ⊔ ℓ)
+record tab₀ (p : Bifunctor (Category.op C) C (Setoids (o ⊔ ℓ ⊔ e) (o ⊔ ℓ ⊔ e))) : Set (o ⊔ ℓ ⊔ e)
   where
     field
       B : Obj
       ξ : S.Carrier (Functor.F₀ p (B , B))
 
-record tab⇒ (p : Profunctor C C) (x y : tab₀ p) : Set (o ⊔ ℓ ⊔ e) where
+record tab⇒ (p : Bifunctor (Category.op C) C (Setoids (o ⊔ ℓ ⊔ e) (o ⊔ ℓ ⊔ e))) (x y : tab₀ p) : Set (o ⊔ ℓ ⊔ e) where
   module x = tab₀ x
   module y = tab₀ y
   field
@@ -35,7 +35,8 @@ record tab⇒ (p : Profunctor C C) (x y : tab₀ p) : Set (o ⊔ ℓ ⊔ e) wher
            (Functor.F₁ p (id , arr) ⟨$⟩ x.ξ)
            (Functor.F₁ p (arr , id) ⟨$⟩ y.ξ)
 
-Tabulator : (p : Profunctor C C) → Category (o ⊔ ℓ) (o ⊔ ℓ ⊔ e) e 
+Tabulator : ∀ (p : Bifunctor (Category.op C) C (Setoids (o ⊔ ℓ ⊔ e) (o ⊔ ℓ ⊔ e)))
+          → Category (o ⊔ ℓ ⊔ e) (o ⊔ ℓ ⊔ e) e
 Tabulator p = record
   { Obj = tab₀ p
   ; _⇒_ = λ { s t → tab⇒ p s t }
@@ -93,7 +94,7 @@ Tabulator p = record
   }
 
 
-module _ {p : Profunctor C C} where
+module _ {p : Bifunctor (Category.op C) C (Setoids (o ⊔ ℓ ⊔ e) (o ⊔ ℓ ⊔ e))} where
   
   projection : Functor (Tabulator p) C
   projection = record
@@ -119,42 +120,43 @@ module _ {p : Profunctor C C} where
   open import Categories.Functor.Construction.LiftSetoids using (LiftSetoids)
 
   
-  cell : NaturalTransformation Hom[ Tabulator p ][-,-] ((LiftSetoids (o ⊔ e) zero ∘F p) ∘F (Functor.op projection' ⁂ projection))
-  cell = ntHelper (record 
-    { η = λ {(X , Y) → let module X = tab₀ X 
-                           module Y = tab₀ Y 
-                           module p = Functor p in record 
-       { _⟨$⟩_ = λ {u → lift (p.F₁ (id , tab⇒.arr u) ⟨$⟩ X.ξ) }
-       ; cong = λ { i≈j →
-           lift (p.F-resp-≈ (Equiv.refl , i≈j) (S.refl (p.F₀ (X.B , X.B))))
-         }
-       } }
-    ; commute = λ { {(x , x')} {(y , y')} f {t} {t'} h → 
-        let module x = tab₀ x 
-            module y = tab₀ y 
-            module x' = tab₀ x'
-            module y' = tab₀ y'
-            module p = Functor p
-            module pL {A} = Functor (appˡ p A)
-            module pR {A} = Functor (appʳ p A)
-            module t = tab⇒ t
-            module t' = tab⇒ t'
-            module f₁ = tab⇒ (proj₁ f)
-            module f₂ = tab⇒ (proj₂ f)
-            Pyy  = p.F₀ (y.B , y.B)
-            Pxx  = p.F₀ (x.B , x.B)
-            Pxx' = p.F₀ (x.B , x'.B)
-            Pyy' = p.F₀ (y.B , y'.B)
-            pf₁f₁ = p.F₀ (f₁.x.B , f₁.x.B)
-            open SetoidR Pyy'
-            in lift (begin
-              p.F₁ (id , f₂.arr ∘ t.arr ∘ f₁.arr) ⟨$⟩ y.ξ                                  ≈⟨ p.F-resp-≈ (Equiv.refl , ∘-resp-≈ʳ (∘-resp-≈ˡ h)) (S.refl Pyy) ⟩
-              p.F₁ (id , f₂.arr ∘ t'.arr ∘ f₁.arr) ⟨$⟩ y.ξ                                 ≈⟨ p.F-resp-≈ (Equiv.sym identity² , Equiv.refl) (S.refl pf₁f₁) ⟩
-              p.F₁ (id ∘ id , f₂.arr ∘ t'.arr ∘ f₁.arr) ⟨$⟩ y.ξ                            ≈⟨ p.homomorphism (S.refl pf₁f₁) ⟩
-              p.F₁ (id , f₂.arr) ⟨$⟩ (p.F₁ (id , t'.arr ∘ f₁.arr) ⟨$⟩ y.ξ)                 ≈⟨ cong (p.F₁ (id , f₂.arr)) (pL.homomorphism (S.refl pf₁f₁)) ⟩
-              p.F₁ (id , f₂.arr) ⟨$⟩ (p.F₁ (id , t'.arr) ⟨$⟩ (p.F₁ (id , f₁.arr) ⟨$⟩ y.ξ)) ≈⟨ cong (p.F₁ (id , f₂.arr)) (cong (p.F₁ (id , t'.arr)) f₁.eq) ⟩
-              p.F₁ (id , f₂.arr) ⟨$⟩ (p.F₁ (id , t'.arr) ⟨$⟩ (p.F₁ (f₁.arr , id) ⟨$⟩ x.ξ)) ≈⟨ cong (p.F₁ (id , f₂.arr)) ([ p ]-commute (S.refl Pxx)) ⟩
-              p.F₁ (id , f₂.arr) ⟨$⟩ (p.F₁ (f₁.arr , id) ⟨$⟩ (p.F₁ (id , t'.arr) ⟨$⟩ x.ξ)) ≈˘⟨ [ p ]-decompose₂ (S.refl Pxx') ⟩
-              p.F₁ (f₁.arr , f₂.arr) ⟨$⟩ (p.F₁ (id , t'.arr) ⟨$⟩ x.ξ)
-              ∎) }
-    })
+  cell : NaturalTransformation (LiftSetoids zero (o ⊔ ℓ) ∘F Hom[ Tabulator p ][-,-]) (p ∘F (Functor.op projection' ⁂ projection))
+  cell = 
+    ntHelper (record 
+      { η = λ {(X , Y) → let module X = tab₀ X 
+                             module Y = tab₀ Y 
+                             module p = Functor p in record 
+         { _⟨$⟩_ = λ {u → p.F₁ (id , tab⇒.arr (lower u)) ⟨$⟩ X.ξ }
+         ; cong = λ { i≈j →
+             p.F-resp-≈ (Equiv.refl , lower i≈j) (S.refl (p.F₀ (X.B , X.B)))
+           }
+         } }
+      ; commute = λ { {(x , x')} {(y , y')} f {t} {t'} h → 
+          let module x = tab₀ x 
+              module y = tab₀ y 
+              module x' = tab₀ x'
+              module y' = tab₀ y'
+              module p = Functor p
+              module pL {A} = Functor (appˡ p A)
+              module pR {A} = Functor (appʳ p A)
+              module t = tab⇒ (lower t)
+              module t' = tab⇒ (lower t')
+              module f₁ = tab⇒ (proj₁ f)
+              module f₂ = tab⇒ (proj₂ f)
+              Pyy  = p.F₀ (y.B , y.B)
+              Pxx  = p.F₀ (x.B , x.B)
+              Pxx' = p.F₀ (x.B , x'.B)
+              Pyy' = p.F₀ (y.B , y'.B)
+              pf₁f₁ = p.F₀ (f₁.x.B , f₁.x.B)
+              open SetoidR Pyy'
+              in begin
+                p.F₁ (id , f₂.arr ∘ t.arr ∘ f₁.arr) ⟨$⟩ y.ξ                                  ≈⟨ p.F-resp-≈ (Equiv.refl , ∘-resp-≈ʳ (∘-resp-≈ˡ (lower h))) (S.refl Pyy) ⟩
+                p.F₁ (id , f₂.arr ∘ t'.arr ∘ f₁.arr) ⟨$⟩ y.ξ                                 ≈⟨ p.F-resp-≈ (Equiv.sym identity² , Equiv.refl) (S.refl pf₁f₁) ⟩
+                p.F₁ (id ∘ id , f₂.arr ∘ t'.arr ∘ f₁.arr) ⟨$⟩ y.ξ                            ≈⟨ p.homomorphism (S.refl pf₁f₁) ⟩
+                p.F₁ (id , f₂.arr) ⟨$⟩ (p.F₁ (id , t'.arr ∘ f₁.arr) ⟨$⟩ y.ξ)                 ≈⟨ cong (p.F₁ (id , f₂.arr)) (pL.homomorphism (S.refl pf₁f₁)) ⟩
+                p.F₁ (id , f₂.arr) ⟨$⟩ (p.F₁ (id , t'.arr) ⟨$⟩ (p.F₁ (id , f₁.arr) ⟨$⟩ y.ξ)) ≈⟨ cong (p.F₁ (id , f₂.arr)) (cong (p.F₁ (id , t'.arr)) f₁.eq) ⟩
+                p.F₁ (id , f₂.arr) ⟨$⟩ (p.F₁ (id , t'.arr) ⟨$⟩ (p.F₁ (f₁.arr , id) ⟨$⟩ x.ξ)) ≈⟨ cong (p.F₁ (id , f₂.arr)) ([ p ]-commute (S.refl Pxx)) ⟩
+                p.F₁ (id , f₂.arr) ⟨$⟩ (p.F₁ (f₁.arr , id) ⟨$⟩ (p.F₁ (id , t'.arr) ⟨$⟩ x.ξ)) ≈˘⟨ [ p ]-decompose₂ (S.refl Pxx') ⟩
+                p.F₁ (f₁.arr , f₂.arr) ⟨$⟩ (p.F₁ (id , t'.arr) ⟨$⟩ x.ξ)
+                ∎ }
+      })
