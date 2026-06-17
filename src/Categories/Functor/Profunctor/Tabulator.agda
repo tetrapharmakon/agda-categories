@@ -14,6 +14,7 @@ open import Categories.Category.Instance.Setoids
 open import Relation.Binary.Bundles renaming (Setoid to S)
 import Relation.Binary.Reasoning.Setoid as SetoidR
 open import Function.Equality using (Π; _⟶_; _⟨$⟩_; cong) renaming (_∘_ to _∗_)
+open import Categories.Category.Product using (Product;_⁂_)
 
 private
   module 𝒞 = Category C
@@ -116,7 +117,7 @@ module _ {p : Bifunctor (Category.op C) C (Setoids (o ⊔ ℓ ⊔ e) (o ⊔ ℓ 
   
   open import Categories.Functor.Hom using (Hom[_][-,-])
   open import Categories.NaturalTransformation renaming (id to idN)
-  open import Categories.Category.Product using (_⁂_)
+  
   open import Categories.Functor.Construction.LiftSetoids using (LiftSetoids)
 
   
@@ -191,17 +192,46 @@ module _ {p q : Bifunctor (Category.op C) C (Setoids (o ⊔ ℓ ⊔ e) (o ⊔ �
       }}
     ; identity = λ { {A} → 
         let module A = tab₀ A 
-            open SetoidR (q.F₀ (A.B , A.B)) in {!  !} }
+            open SetoidR (q.F₀ (A.B , A.B)) in Equiv.refl }
     ; homomorphism = λ { {X} {Y} {Z} {f} {g} → 
         let module X = tab₀ X 
             module Y = tab₀ Y 
             module Z = tab₀ Z 
             module f = tab⇒ f 
             module g = tab⇒ g 
-            open SetoidR (q.F₀ (f.x.B , g.x.B)) in {!  !} }
+            open SetoidR (q.F₀ (f.x.B , g.x.B)) in Equiv.refl }
     ; F-resp-≈ = λ { {X} {Y} {f} {g} f≈g →   
         let module X = tab₀ X 
             module Y = tab₀ Y 
             module f = tab⇒ f 
-            module g = tab⇒ g in {!  !} }
+            module g = tab⇒ g in f≈g }
     } 
+
+open import Categories.Category.Construction.Functors using (Functors)
+open import Categories.Category.Instance.Cats using (Cats)
+open import Categories.NaturalTransformation.NaturalIsomorphism
+  using (_≃_; niHelper)
+  
+𝕋ab : Functor (Functors (Product (Category.op C) C) (Setoids (o ⊔ ℓ ⊔ e) (o ⊔ ℓ ⊔ e))) (Cats (o ⊔ ℓ ⊔ e) (o ⊔ ℓ ⊔ e) e)
+𝕋ab = record
+  { F₀ = λ x → Tabulator x
+  ; F₁ = λ α → h α
+  ; identity = niHelper (record 
+     { η = λ X → record { arr = id ; eq = {!  !} } 
+     ; η⁻¹ = {!  !} 
+     ; commute = {!  !} 
+     ; iso = {!  !} 
+     })
+  ; homomorphism = niHelper (record 
+     { η = {!  !} 
+     ; η⁻¹ = {!  !} 
+     ; commute = {!  !} 
+     ; iso = {!  !} 
+     })
+  ; F-resp-≈ = λ x → niHelper (record 
+     { η = {!  !} 
+     ; η⁻¹ = {!  !} 
+     ; commute = {!  !} 
+     ; iso = {!  !} 
+     })
+  }
