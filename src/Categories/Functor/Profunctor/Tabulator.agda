@@ -29,6 +29,7 @@ record tab₀ (p : Bifunctor (Category.op C) C (Setoids (o ⊔ ℓ ⊔ e) (o ⊔
       ξ : S.Carrier (Functor.F₀ p (B , B))
 
 record tab⇒ (p : Bifunctor (Category.op C) C (Setoids (o ⊔ ℓ ⊔ e) (o ⊔ ℓ ⊔ e))) (x y : tab₀ p) : Set (o ⊔ ℓ ⊔ e) where
+  constructor _∥_
   module x = tab₀ x
   module y = tab₀ y
   field
@@ -225,25 +226,32 @@ open import Categories.NaturalTransformation.NaturalIsomorphism
                module R = SetoidR pXX
                open R
            in record { arr = id 
-                     ; eq = begin {!  !} ≈⟨ Pp.identity (S.refl pXX) ⟩ 
-                                  {!  !} ≈⟨ S.refl pXX ⟩ 
-                                  {!  !} ≈⟨ S.sym pXX (Pp.identity (S.refl pXX)) ⟩ 
-                                  {!  !} ∎ } } 
-       ; η⁻¹ = {!  !} 
-       ; commute = {!  !} 
-       ; iso = {!  !} 
+                     ; eq = begin _ ≈⟨ Pp.identity (S.refl pXX) ⟩ 
+                                  _ ≈⟨ S.refl pXX ⟩ 
+                                  _ ≈⟨ S.sym pXX (Pp.identity (S.refl pXX)) ⟩ 
+                                  _ ∎ } } 
+       ; η⁻¹ = λ { (X ∣ ξ) → 
+           let module Pp = Functor p
+               module Tp = Category (Tabulator p)
+               pXX = Pp.F₀ (X , X)
+               module R = SetoidR pXX
+               open R
+           in record { arr = id 
+                     ; eq = begin _ ≈⟨ Pp.identity (S.refl pXX) ⟩ 
+                                  _ ≈⟨ S.refl pXX ⟩ 
+                                  _ ≈⟨ S.sym pXX (Pp.identity (S.refl pXX)) ⟩ 
+                                  _ ∎ } } 
+       ; commute = λ { {X ∣ ξ} {Y ∣ η} (arr ∥ eq) → 
+           let module Pp = Functor p
+               module Tp = Category (Tabulator p)
+               open Tp using (Obj; _⇒_; _≈_; id; _∘_; module Equiv; module HomReasoning)
+               open Tp.HomReasoning
+               pXY = Pp.F₀ (X , Y)
+           in begin _ ≈⟨ identityˡ ⟩ 
+                    _ ≈⟨ Tp.Equiv.sym identityʳ ⟩ 
+                    _ ∎ }
+       ; iso = λ X → record { isoˡ = identityˡ ; isoʳ = identity² } 
        } ) }
-    -- λ { {p} → niHelper (record 
-    --  { η = λ { X →
-    --      let module Pp = Functor p
-    --          module Tp = Category (Tabulator p)
-    --          open Tp using (Obj; _⇒_; _≈_; id; _∘_; module Equiv; module HomReasoning)
-    --          open Tp.HomReasoning
-    --      in record { arr = id ; eq = {!  !} } }
-    --  ; η⁻¹ = {!  !} 
-    --  ; commute = {!  !} 
-    --  ; iso = {!  !} 
-    --  }}) }
   ; homomorphism = niHelper (record 
      { η = {!  !} 
      ; η⁻¹ = {!  !} 
