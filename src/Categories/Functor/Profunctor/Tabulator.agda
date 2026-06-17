@@ -1,4 +1,4 @@
-{-# OPTIONS --without-K --safe #-}
+{-# OPTIONS --without-K --allow-unsolved-metas #-}
 
 open import Level using (_⊔_;lift;lower;zero;suc)
 
@@ -160,3 +160,48 @@ module _ {p : Bifunctor (Category.op C) C (Setoids (o ⊔ ℓ ⊔ e) (o ⊔ ℓ 
                 p.F₁ (f₁.arr , f₂.arr) ⟨$⟩ (p.F₁ (id , t'.arr) ⟨$⟩ x.ξ)
                 ∎ }
       })
+
+module _ {p q : Bifunctor (Category.op C) C (Setoids (o ⊔ ℓ ⊔ e) (o ⊔ ℓ ⊔ e))} where
+
+
+  open import Categories.NaturalTransformation renaming (id to idN)
+
+  h : (α : NaturalTransformation p q) → Functor (Tabulator p) (Tabulator q)
+  h α = let module p = Functor p 
+            module q = Functor q in 
+            record
+    { F₀ = λ {x → let module x = tab₀ x 
+                      module α = NaturalTransformation α in 
+                        record { B = x.B 
+                               ; ξ = α.η (x.B , x.B) ⟨$⟩ x.ξ 
+                               }}
+    ; F₁ = λ { {X} {Y} f → let module X = tab₀ X
+                               module Y = tab₀ Y
+                               module f = tab⇒ f
+                               module α = NaturalTransformation α
+                               pXX = p.F₀ (X.B , X.B)
+                               pYY = p.F₀ (Y.B , Y.B)
+                               qXY = q.F₀ (X.B , Y.B)
+                               open SetoidR qXY in record 
+      { arr = f.arr 
+      ; eq = begin q.F₁ (id , f.arr) ⟨$⟩ (α.η (f.x.B , f.x.B) ⟨$⟩ f.x.ξ) ≈⟨ S.sym qXY (α.commute (id , f.arr) (S.refl pXX)) ⟩ 
+                   α.η (f.x.B , f.y.B) ⟨$⟩ (p.F₁ (id , f.arr) ⟨$⟩ f.x.ξ) ≈⟨ cong (α.η (f.x.B , f.y.B)) f.eq ⟩ 
+                   α.η (f.x.B , f.y.B) ⟨$⟩ (p.F₁ (f.arr , id) ⟨$⟩ f.y.ξ) ≈⟨ α.commute (f.arr , id) (S.refl pYY) ⟩ 
+                   q.F₁ (f.arr , id) ⟨$⟩ (α.η (f.y.B , f.y.B) ⟨$⟩ f.y.ξ) ∎
+      }}
+    ; identity = λ { {A} → 
+        let module A = tab₀ A 
+            open SetoidR (q.F₀ (A.B , A.B)) in {!  !} }
+    ; homomorphism = λ { {X} {Y} {Z} {f} {g} → 
+        let module X = tab₀ X 
+            module Y = tab₀ Y 
+            module Z = tab₀ Z 
+            module f = tab⇒ f 
+            module g = tab⇒ g 
+            open SetoidR (q.F₀ (f.x.B , g.x.B)) in {!  !} }
+    ; F-resp-≈ = λ { {X} {Y} {f} {g} f≈g →   
+        let module X = tab₀ X 
+            module Y = tab₀ Y 
+            module f = tab⇒ f 
+            module g = tab⇒ g in {!  !} }
+    } 

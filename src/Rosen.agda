@@ -1,6 +1,6 @@
-{-# OPTIONS --without-K --safe #-}
+{-# OPTIONS --without-K --allow-unsolved-metas #-}
 
-open import Level using (_⊔_)
+open import Level using (_⊔_;lift;lower;zero;suc)
 
 open import Data.Product using (_,_; proj₂; _×_)
 open import Relation.Binary using (IsEquivalence)
@@ -113,10 +113,36 @@ MRS-Profunctor = record
     }
   }
 
+open import Categories.Functor.Hom using (Hom[_][-,-])
+open import Categories.NaturalTransformation renaming (id to idN)
 open import Categories.Functor.Profunctor.Tabulator
+open import Categories.Functor.Construction.LiftSetoids using (LiftSetoids)
 
 𝕋MRS = Tabulator MRS-Profunctor
 
-π = projection {p = MRS-Profunctor}
-
+π  = projection {p = MRS-Profunctor}
 π' = projection' {p = MRS-Profunctor}
+þ  = cell {p = MRS-Profunctor}
+
+-- gives f
+∫_ : Functor 𝕋MRS Arr.Arrow
+∫_ = record
+  { F₀ = {!  !}
+  ; F₁ = {!  !}
+  ; identity = {!  !}
+  ; homomorphism = {!  !}
+  ; F-resp-≈ = {!  !}
+  }
+
+-- gives ϕ
+∇_ : Functor 𝕋MRS Arr.Arrow
+∇_ = record
+  { F₀ = {!  !}
+  ; F₁ = {!  !}
+  ; identity = {!  !}
+  ; homomorphism = {!  !}
+  ; F-resp-≈ = {!  !}
+  }
+
+ϵ  : NaturalTransformation MRS-Profunctor (LiftSetoids (o ⊔ e) (o ⊔ ℓ) ∘F Hom[ C ][-,-])
+ϵ = ntHelper record { η = {!  !} ; commute = {!  !} }
