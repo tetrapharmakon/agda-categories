@@ -115,5 +115,6 @@ MRS-Profunctor = record
 
 open import Categories.Functor.Profunctor.Tabulator
 
-projection : Functor (Tabulator MRS-Profunctor) C 
-projection = {!  !}
+π = projection {p = MRS-Profunctor}
+
+π' = projection' {p = {!  !}}

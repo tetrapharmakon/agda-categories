@@ -11,7 +11,7 @@ open import Categories.Functor.Profunctor using (Profunctor)
 open import Categories.Functor.Bifunctor using (Bifunctor; appˡ; appʳ)
 open import Categories.Functor.Bifunctor.Properties
 open import Categories.Category.Instance.Setoids
-open import Relation.Binary.Bundles 
+open import Relation.Binary.Bundles renaming (Setoid to S)
 import Relation.Binary.Reasoning.Setoid as SetoidR
 open import Function.Equality using (Π; _⟶_; _⟨$⟩_; cong) renaming (_∘_ to _∗_)
 
@@ -24,14 +24,14 @@ record tab₀ (p : Profunctor C C) : Set (o ⊔ ℓ)
   where
     field
       B : Obj
-      ξ : Setoid.Carrier (Functor.F₀ p (B , B))
+      ξ : S.Carrier (Functor.F₀ p (B , B))
 
 record tab⇒ (p : Profunctor C C) (x y : tab₀ p) : Set (o ⊔ ℓ ⊔ e) where
   module x = tab₀ x
   module y = tab₀ y
   field
     arr : x.B ⇒ y.B
-    eq : Setoid._≈_ (Functor.F₀ p (x.B , y.B))
+    eq : S._≈_ (Functor.F₀ p (x.B , y.B))
            (Functor.F₁ p (id , arr) ⟨$⟩ x.ξ)
            (Functor.F₁ p (arr , id) ⟨$⟩ y.ξ)
 
@@ -47,7 +47,7 @@ Tabulator p = record
       let pAA = Functor.F₀ p (tab₀.B A , tab₀.B A) 
       in record 
         { arr = id 
-        ; eq = Setoid.refl pAA
+        ; eq = S.refl pAA
         }}
   ; _∘_ = λ { {A} {B} {C} t s → 
     let module t = tab⇒ t
@@ -65,18 +65,18 @@ Tabulator p = record
         in record 
           { arr = t.arr ∘ s.arr 
           ; eq = begin
-              p.F₁ (id , t.arr ∘ s.arr) ⟨$⟩ A.ξ                  ≈⟨ Setoid.sym PAC (p.F-resp-≈ (identity² , Equiv.refl) (Setoid.refl PAA)) ⟩
-              p.F₁ (id ∘ id , t.arr ∘ s.arr) ⟨$⟩ A.ξ             ≈⟨ p.homomorphism (Setoid.refl PAA) ⟩
+              p.F₁ (id , t.arr ∘ s.arr) ⟨$⟩ A.ξ                  ≈⟨ S.sym PAC (p.F-resp-≈ (identity² , Equiv.refl) (S.refl PAA)) ⟩
+              p.F₁ (id ∘ id , t.arr ∘ s.arr) ⟨$⟩ A.ξ             ≈⟨ p.homomorphism (S.refl PAA) ⟩
               p.F₁ (id , t.arr) ⟨$⟩ (p.F₁ (id , s.arr) ⟨$⟩ A.ξ)  ≈⟨ cong (p.F₁ (id , t.arr)) s.eq ⟩
-              p.F₁ (id , t.arr) ⟨$⟩ (p.F₁ (s.arr , id) ⟨$⟩ B.ξ)  ≈⟨ Setoid.sym PAC (p.homomorphism (Setoid.refl PBB)) ⟩
-              p.F₁ (s.arr ∘ id , t.arr ∘ id) ⟨$⟩ B.ξ             ≈⟨ p.F-resp-≈ (identityʳ , identityʳ) (Setoid.refl PBB) ⟩
-              p.F₁ (s.arr , t.arr) ⟨$⟩ B.ξ                       ≈⟨ Setoid.sym PAC (p.F-resp-≈ (identityʳ , identityʳ) (Setoid.refl PBB)) ⟩
-              p.F₁ (s.arr ∘ id , t.arr ∘ id) ⟨$⟩ B.ξ             ≈⟨ p.homomorphism {f = (s.arr , id)} {g = (id , t.arr)} (Setoid.refl PBB) ⟩
-              (p.F₁ (id , t.arr) ∗ p.F₁ (s.arr , id)) ⟨$⟩ B.ξ    ≈⟨ [ p₀ ]-commute (Setoid.refl PBB) ⟩
-              (p.F₁ (s.arr , id) ∗ p.F₁ (id , t.arr)) ⟨$⟩ B.ξ    ≈⟨ Setoid.refl PAC ⟩
+              p.F₁ (id , t.arr) ⟨$⟩ (p.F₁ (s.arr , id) ⟨$⟩ B.ξ)  ≈⟨ S.sym PAC (p.homomorphism (S.refl PBB)) ⟩
+              p.F₁ (s.arr ∘ id , t.arr ∘ id) ⟨$⟩ B.ξ             ≈⟨ p.F-resp-≈ (identityʳ , identityʳ) (S.refl PBB) ⟩
+              p.F₁ (s.arr , t.arr) ⟨$⟩ B.ξ                       ≈⟨ S.sym PAC (p.F-resp-≈ (identityʳ , identityʳ) (S.refl PBB)) ⟩
+              p.F₁ (s.arr ∘ id , t.arr ∘ id) ⟨$⟩ B.ξ             ≈⟨ p.homomorphism {f = (s.arr , id)} {g = (id , t.arr)} (S.refl PBB) ⟩
+              (p.F₁ (id , t.arr) ∗ p.F₁ (s.arr , id)) ⟨$⟩ B.ξ    ≈⟨ [ p₀ ]-commute (S.refl PBB) ⟩
+              (p.F₁ (s.arr , id) ∗ p.F₁ (id , t.arr)) ⟨$⟩ B.ξ    ≈⟨ S.refl PAC ⟩
               p.F₁ (s.arr , id) ⟨$⟩ (p.F₁ (id , t.arr) ⟨$⟩ B.ξ)  ≈⟨ cong (p.F₁ (s.arr , id)) t.eq ⟩
-              p.F₁ (s.arr , id) ⟨$⟩ (p.F₁ (t.arr , id) ⟨$⟩ C.ξ)  ≈⟨ Setoid.sym PAC (p.homomorphism (Setoid.refl PCC)) ⟩
-              p.F₁ (t.arr ∘ s.arr , id ∘ id) ⟨$⟩ C.ξ             ≈⟨ p.F-resp-≈ (Equiv.refl , identity²) (Setoid.refl PCC) ⟩
+              p.F₁ (s.arr , id) ⟨$⟩ (p.F₁ (t.arr , id) ⟨$⟩ C.ξ)  ≈⟨ S.sym PAC (p.homomorphism (S.refl PCC)) ⟩
+              p.F₁ (t.arr ∘ s.arr , id ∘ id) ⟨$⟩ C.ξ             ≈⟨ p.F-resp-≈ (Equiv.refl , identity²) (S.refl PCC) ⟩
               p.F₁ (t.arr ∘ s.arr , id) ⟨$⟩ C.ξ                  ∎
           } }
   ; assoc = assoc
@@ -126,7 +126,7 @@ module _ {p : Profunctor C C} where
                            module p = Functor p in record 
        { _⟨$⟩_ = λ {u → lift (p.F₁ (id , tab⇒.arr u) ⟨$⟩ X.ξ) }
        ; cong = λ { i≈j →
-           lift (p.F-resp-≈ (Equiv.refl , i≈j) (Setoid.refl (p.F₀ (X.B , X.B))))
+           lift (p.F-resp-≈ (Equiv.refl , i≈j) (S.refl (p.F₀ (X.B , X.B))))
          }
        } }
     ; commute = λ { {(x , x')} {(y , y')} f {t} {t'} h → 
@@ -148,13 +148,13 @@ module _ {p : Profunctor C C} where
             pf₁f₁ = p.F₀ (f₁.x.B , f₁.x.B)
             open SetoidR Pyy'
             in lift (begin
-              p.F₁ (id , f₂.arr ∘ t.arr ∘ f₁.arr) ⟨$⟩ y.ξ                                  ≈⟨ p.F-resp-≈ (Equiv.refl , ∘-resp-≈ʳ (∘-resp-≈ˡ h)) (Setoid.refl Pyy) ⟩
-              p.F₁ (id , f₂.arr ∘ t'.arr ∘ f₁.arr) ⟨$⟩ y.ξ                                 ≈⟨ p.F-resp-≈ (Equiv.sym identity² , Equiv.refl) (Setoid.refl pf₁f₁) ⟩
-              p.F₁ (id ∘ id , f₂.arr ∘ t'.arr ∘ f₁.arr) ⟨$⟩ y.ξ                            ≈⟨ p.homomorphism (Setoid.refl pf₁f₁) ⟩
-              p.F₁ (id , f₂.arr) ⟨$⟩ (p.F₁ (id , t'.arr ∘ f₁.arr) ⟨$⟩ y.ξ)                 ≈⟨ cong (p.F₁ (id , f₂.arr)) (pL.homomorphism (Setoid.refl pf₁f₁)) ⟩
+              p.F₁ (id , f₂.arr ∘ t.arr ∘ f₁.arr) ⟨$⟩ y.ξ                                  ≈⟨ p.F-resp-≈ (Equiv.refl , ∘-resp-≈ʳ (∘-resp-≈ˡ h)) (S.refl Pyy) ⟩
+              p.F₁ (id , f₂.arr ∘ t'.arr ∘ f₁.arr) ⟨$⟩ y.ξ                                 ≈⟨ p.F-resp-≈ (Equiv.sym identity² , Equiv.refl) (S.refl pf₁f₁) ⟩
+              p.F₁ (id ∘ id , f₂.arr ∘ t'.arr ∘ f₁.arr) ⟨$⟩ y.ξ                            ≈⟨ p.homomorphism (S.refl pf₁f₁) ⟩
+              p.F₁ (id , f₂.arr) ⟨$⟩ (p.F₁ (id , t'.arr ∘ f₁.arr) ⟨$⟩ y.ξ)                 ≈⟨ cong (p.F₁ (id , f₂.arr)) (pL.homomorphism (S.refl pf₁f₁)) ⟩
               p.F₁ (id , f₂.arr) ⟨$⟩ (p.F₁ (id , t'.arr) ⟨$⟩ (p.F₁ (id , f₁.arr) ⟨$⟩ y.ξ)) ≈⟨ cong (p.F₁ (id , f₂.arr)) (cong (p.F₁ (id , t'.arr)) f₁.eq) ⟩
-              p.F₁ (id , f₂.arr) ⟨$⟩ (p.F₁ (id , t'.arr) ⟨$⟩ (p.F₁ (f₁.arr , id) ⟨$⟩ x.ξ)) ≈⟨ cong (p.F₁ (id , f₂.arr)) ([ p ]-commute (Setoid.refl Pxx)) ⟩
-              p.F₁ (id , f₂.arr) ⟨$⟩ (p.F₁ (f₁.arr , id) ⟨$⟩ (p.F₁ (id , t'.arr) ⟨$⟩ x.ξ)) ≈˘⟨ [ p ]-decompose₂ (Setoid.refl Pxx') ⟩
+              p.F₁ (id , f₂.arr) ⟨$⟩ (p.F₁ (id , t'.arr) ⟨$⟩ (p.F₁ (f₁.arr , id) ⟨$⟩ x.ξ)) ≈⟨ cong (p.F₁ (id , f₂.arr)) ([ p ]-commute (S.refl Pxx)) ⟩
+              p.F₁ (id , f₂.arr) ⟨$⟩ (p.F₁ (f₁.arr , id) ⟨$⟩ (p.F₁ (id , t'.arr) ⟨$⟩ x.ξ)) ≈˘⟨ [ p ]-decompose₂ (S.refl Pxx') ⟩
               p.F₁ (f₁.arr , f₂.arr) ⟨$⟩ (p.F₁ (id , t'.arr) ⟨$⟩ x.ξ)
               ∎) }
     })
