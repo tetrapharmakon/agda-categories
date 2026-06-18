@@ -43,10 +43,9 @@ record tab⇒ (p : Bifunctor (Category.op C) C (Setoids (o ⊔ ℓ ⊔ e) (o ⊔
     r : x.R ⇒ y.R
     eq : S._≈_ (p.F₀ (x.L , y.R)) (p.F₁ (id , r) ⟨$⟩ x.ξ) (p.F₁ (l , id) ⟨$⟩ y.ξ)
 
-{-
-Diagonizie : ∀ (p : Bifunctor (Category.op C) C (Setoids (o ⊔ ℓ ⊔ e) (o ⊔ ℓ ⊔ e)))
+Tabulator : ∀ (p : Bifunctor (Category.op C) C (Setoids (o ⊔ ℓ ⊔ e) (o ⊔ ℓ ⊔ e)))
           → Category (o ⊔ ℓ ⊔ e) (o ⊔ ℓ ⊔ e) e
-Diagonizie p = record
+Tabulator p = record
   { Obj = tab₀ p
   ; _⇒_ = λ { s t → tab⇒ p s t }
   ; _≈_ = λ h k → tab⇒.arr h ≈ tab⇒.arr k
@@ -99,9 +98,10 @@ Diagonizie p = record
   ; ∘-resp-≈ = ∘-resp-≈
   }
 
+{-
 module _ {p : Bifunctor (Category.op C) C (Setoids (o ⊔ ℓ ⊔ e) (o ⊔ ℓ ⊔ e))} where
   
-  projection : Functor (Diagonizie p) C
+  projection : Functor (Tabulator p) C
   projection = record
     { F₀ = λ {x → tab₀.B x}
     ; F₁ = λ {f → tab⇒.arr f}
@@ -114,7 +114,7 @@ module _ {p : Bifunctor (Category.op C) C (Setoids (o ⊔ ℓ ⊔ e) (o ⊔ ℓ 
   
   open import Categories.Functor.Construction.LiftSetoids using (LiftSetoids)
 
-  cell : NaturalTransformation (LiftSetoids zero (o ⊔ ℓ) ∘F Hom[ Diagonizie p ][-,-]) (p ∘F (Functor.op projection ⁂ projection))
+  cell : NaturalTransformation (LiftSetoids zero (o ⊔ ℓ) ∘F Hom[ Tabulator p ][-,-]) (p ∘F (Functor.op projection ⁂ projection))
   cell = 
     ntHelper (record 
       { η = λ {(X , Y) → let module X = tab₀ X 
@@ -156,7 +156,7 @@ module _ {p : Bifunctor (Category.op C) C (Setoids (o ⊔ ℓ ⊔ e) (o ⊔ ℓ 
 
 module _ {p q : Bifunctor (Category.op C) C (Setoids (o ⊔ ℓ ⊔ e) (o ⊔ ℓ ⊔ e))} where
 
-  h : (α : NaturalTransformation p q) → Functor (Diagonizie p) (Diagonizie q)
+  h : (α : NaturalTransformation p q) → Functor (Tabulator p) (Tabulator q)
   h α = let module p = Functor p 
             module q = Functor q 
             module α = NaturalTransformation α in 
@@ -189,7 +189,7 @@ open import Categories.NaturalTransformation.NaturalIsomorphism
   
 𝕋ab : Functor (Functors (Product (Category.op C) C) (Setoids (o ⊔ ℓ ⊔ e) (o ⊔ ℓ ⊔ e))) (Cats (o ⊔ ℓ ⊔ e) (o ⊔ ℓ ⊔ e) e)
 𝕋ab = record
-  { F₀ = λ x → Diagonizie x
+  { F₀ = λ x → Tabulator x
   ; F₁ = λ α → h α
   ; identity = λ { {p} → niHelper (record 
         { η = λ { (X ∣ ξ) → 

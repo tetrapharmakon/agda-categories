@@ -25,19 +25,21 @@ open 𝒞
 record tab₀ (p : Bifunctor (Category.op C) C (Setoids (o ⊔ ℓ ⊔ e) (o ⊔ ℓ ⊔ e))) : Set (o ⊔ ℓ ⊔ e)
   where
     constructor _∣_
+    module p = Functor p
     field
       B : Obj
-      ξ : S.Carrier (Functor.F₀ p (B , B))
+      ξ : S.Carrier (p.F₀ (B , B))
 
 record tab⇒ (p : Bifunctor (Category.op C) C (Setoids (o ⊔ ℓ ⊔ e) (o ⊔ ℓ ⊔ e))) (x y : tab₀ p) : Set (o ⊔ ℓ ⊔ e) where
   constructor _∥_
   module x = tab₀ x
   module y = tab₀ y
+  module p = Functor p
   field
     arr : x.B ⇒ y.B
-    eq : S._≈_ (Functor.F₀ p (x.B , y.B))
-           (Functor.F₁ p (id , arr) ⟨$⟩ x.ξ)
-           (Functor.F₁ p (arr , id) ⟨$⟩ y.ξ)
+    eq : S._≈_ (p.F₀ (x.B , y.B))
+           (p.F₁ (id , arr) ⟨$⟩ x.ξ)
+           (p.F₁ (arr , id) ⟨$⟩ y.ξ)
 
 Diagonizie : ∀ (p : Bifunctor (Category.op C) C (Setoids (o ⊔ ℓ ⊔ e) (o ⊔ ℓ ⊔ e)))
           → Category (o ⊔ ℓ ⊔ e) (o ⊔ ℓ ⊔ e) e
