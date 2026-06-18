@@ -1,6 +1,6 @@
-{-# OPTIONS --without-K --allow-unsolved-metas --warning=noUserWarning #-}
+{-# OPTIONS --without-K --safe --warning=noUserWarning #-}
 
-open import Level using (_⊔_;lift;lower;zero;suc)
+open import Level using (_⊔_; lift; lower; zero)
 
 open import Categories.Category using (Category)
 
@@ -8,7 +8,6 @@ module Categories.Functor.Profunctor.Tabulator {o ℓ e} {C : Category o ℓ e} 
 open import Data.Product  
 open import Categories.Functor renaming (id to idF)
 open import Categories.Functor.Bifunctor using (Bifunctor; appˡ; appʳ)
-open import Categories.Functor.Profunctor using (Profunctor)
 open import Categories.Functor.Bifunctor.Properties
 open import Categories.Category.Instance.Setoids
 open import Relation.Binary.Bundles renaming (Setoid to S)
@@ -16,7 +15,7 @@ import Relation.Binary.Reasoning.Setoid as SetoidR
 open import Function.Equality using (Π; _⟶_; _⟨$⟩_; cong) renaming (_∘_ to _∗_)
 open import Categories.Category.Product using (Product;_⁂_)
 open import Categories.NaturalTransformation renaming (id to idN)
-open import Categories.Morphism.Reasoning.Core using (id-comm-sym)
+open import Categories.Morphism.Reasoning.Core C using (id-comm-sym)
 
 private
   module 𝒞 = Category C
@@ -45,10 +44,7 @@ Tabulator : ∀ (p : Bifunctor (Category.op C) C (Setoids (o ⊔ ℓ ⊔ e) (o �
 Tabulator p = record
   { Obj = tab₀ p
   ; _⇒_ = λ { s t → tab⇒ p s t }
-  ; _≈_ = λ h k → 
-    let module h = tab⇒ h
-        module k = tab⇒ k
-        in h.arr ≈ k.arr
+  ; _≈_ = λ h k → tab⇒.arr h ≈ tab⇒.arr k
   ; id = λ { {A} → 
       let pAA = Functor.F₀ p (tab₀.B A , tab₀.B A) 
       in record 
@@ -92,40 +88,28 @@ Tabulator p = record
   ; identity² = λ { {A} → identity² }
   ; equiv = record 
     { refl = λ {x} → Equiv.refl 
-    ; sym = λ x → Equiv.sym x 
-    ; trans = λ x y → Equiv.trans x y 
+    ; sym = Equiv.sym 
+    ; trans = Equiv.trans 
     }
   ; ∘-resp-≈ = ∘-resp-≈
   }
-
 
 module _ {p : Bifunctor (Category.op C) C (Setoids (o ⊔ ℓ ⊔ e) (o ⊔ ℓ ⊔ e))} where
   
   projection : Functor (Tabulator p) C
   projection = record
-    { F₀ = λ {x → let module x = tab₀ x in x.B }
-    ; F₁ = λ {f → let module f = tab⇒ f in f.arr }
-    ; identity = λ {A} → Equiv.refl
-    ; homomorphism = Equiv.refl
-    ; F-resp-≈ = λ x → x
-    }
-  
-  projection' : Functor (Tabulator p) C
-  projection' = record
-    { F₀ = λ {x → let module x = tab₀ x in x.B }
-    ; F₁ = λ {f → let module f = tab⇒ f in f.arr }
+    { F₀ = λ {x → tab₀.B x}
+    ; F₁ = λ {f → tab⇒.arr f}
     ; identity = λ {A} → Equiv.refl
     ; homomorphism = Equiv.refl
     ; F-resp-≈ = λ x → x
     }
   
   open import Categories.Functor.Hom using (Hom[_][-,-])
-  open import Categories.NaturalTransformation renaming (id to idN)
   
   open import Categories.Functor.Construction.LiftSetoids using (LiftSetoids)
 
-  
-  cell : NaturalTransformation (LiftSetoids zero (o ⊔ ℓ) ∘F Hom[ Tabulator p ][-,-]) (p ∘F (Functor.op projection' ⁂ projection))
+  cell : NaturalTransformation (LiftSetoids zero (o ⊔ ℓ) ∘F Hom[ Tabulator p ][-,-]) (p ∘F (Functor.op projection ⁂ projection))
   cell = 
     ntHelper (record 
       { η = λ {(X , Y) → let module X = tab₀ X 
@@ -143,7 +127,6 @@ module _ {p : Bifunctor (Category.op C) C (Setoids (o ⊔ ℓ ⊔ e) (o ⊔ ℓ 
               module y' = tab₀ y'
               module p = Functor p
               module pL {A} = Functor (appˡ p A)
-              module pR {A} = Functor (appʳ p A)
               module t = tab⇒ (lower t)
               module t' = tab⇒ (lower t')
               module f₁ = tab⇒ (proj₁ f)
@@ -168,20 +151,17 @@ module _ {p : Bifunctor (Category.op C) C (Setoids (o ⊔ ℓ ⊔ e) (o ⊔ ℓ 
 
 module _ {p q : Bifunctor (Category.op C) C (Setoids (o ⊔ ℓ ⊔ e) (o ⊔ ℓ ⊔ e))} where
 
-
   h : (α : NaturalTransformation p q) → Functor (Tabulator p) (Tabulator q)
   h α = let module p = Functor p 
-            module q = Functor q in 
+            module q = Functor q 
+            module α = NaturalTransformation α in 
             record
-    { F₀ = λ {x → let module x = tab₀ x 
-                      module α = NaturalTransformation α in 
-                        record { B = x.B 
-                               ; ξ = α.η (x.B , x.B) ⟨$⟩ x.ξ 
-                               }}
+    { F₀ = λ {x → record { B = tab₀.B x 
+                          ; ξ = α.η (tab₀.B x , tab₀.B x) ⟨$⟩ tab₀.ξ x 
+                          }}
     ; F₁ = λ { {X} {Y} f → let module X = tab₀ X
                                module Y = tab₀ Y
                                module f = tab⇒ f
-                               module α = NaturalTransformation α
                                pXX = p.F₀ (X.B , X.B)
                                pYY = p.F₀ (Y.B , Y.B)
                                qXY = q.F₀ (X.B , Y.B)
@@ -192,104 +172,54 @@ module _ {p q : Bifunctor (Category.op C) C (Setoids (o ⊔ ℓ ⊔ e) (o ⊔ �
                    α.η (f.x.B , f.y.B) ⟨$⟩ (p.F₁ (f.arr , id) ⟨$⟩ f.y.ξ) ≈⟨ α.commute (f.arr , id) (S.refl pYY) ⟩ 
                    q.F₁ (f.arr , id) ⟨$⟩ (α.η (f.y.B , f.y.B) ⟨$⟩ f.y.ξ) ∎
       }}
-    ; identity = λ { {A} → 
-        let module A = tab₀ A 
-            open SetoidR (q.F₀ (A.B , A.B)) in Equiv.refl }
-    ; homomorphism = λ { {X} {Y} {Z} {f} {g} → 
-        let module X = tab₀ X 
-            module Y = tab₀ Y 
-            module Z = tab₀ Z 
-            module f = tab⇒ f 
-            module g = tab⇒ g 
-            open SetoidR (q.F₀ (f.x.B , g.x.B)) in Equiv.refl }
-    ; F-resp-≈ = λ { {X} {Y} {f} {g} f≈g →   
-        let module X = tab₀ X 
-            module Y = tab₀ Y 
-            module f = tab⇒ f 
-            module g = tab⇒ g in f≈g }
+    ; identity = λ { {A} → Equiv.refl }
+    ; homomorphism = λ { {X} {Y} {Z} {f} {g} → Equiv.refl }
+    ; F-resp-≈ = λ { {X} {Y} {f} {g} f≈g → f≈g }
     } 
 
 open import Categories.Category.Construction.Functors using (Functors)
 open import Categories.Category.Instance.Cats using (Cats)
 open import Categories.NaturalTransformation.NaturalIsomorphism
-  using (_≃_; niHelper)
+  using (niHelper)
   
 𝕋ab : Functor (Functors (Product (Category.op C) C) (Setoids (o ⊔ ℓ ⊔ e) (o ⊔ ℓ ⊔ e))) (Cats (o ⊔ ℓ ⊔ e) (o ⊔ ℓ ⊔ e) e)
 𝕋ab = record
   { F₀ = λ x → Tabulator x
   ; F₁ = λ α → h α
   ; identity = λ { {p} → niHelper (record 
-       { η = λ { (X ∣ ξ) → 
-           let module Pp = Functor p
-               module Tp = Category (Tabulator p)
-               pXX = Pp.F₀ (X , X)
-               module R = SetoidR pXX
-               open R
-           in record { arr = id 
-                     ; eq = begin _ ≈⟨ Pp.identity (S.refl pXX) ⟩ 
-                                  _ ≈⟨ S.refl pXX ⟩ 
-                                  _ ≈⟨ S.sym pXX (Pp.identity (S.refl pXX)) ⟩ 
-                                  _ ∎ } } 
-       ; η⁻¹ = λ { (X ∣ ξ) → 
-           let module Pp = Functor p
-               module Tp = Category (Tabulator p)
-               pXX = Pp.F₀ (X , X)
-               module R = SetoidR pXX
-               open R
-           in record { arr = id 
-                     ; eq = begin _ ≈⟨ Pp.identity (S.refl pXX) ⟩ 
-                                  _ ≈⟨ S.refl pXX ⟩ 
-                                  _ ≈⟨ S.sym pXX (Pp.identity (S.refl pXX)) ⟩ 
-                                  _ ∎ } } 
-       ; commute = λ { {X ∣ ξ} {Y ∣ η} (arr ∥ eq) → 
-           let module Pp = Functor p
-               module Tp = Category (Tabulator p)
-               open Tp using (Obj; _⇒_; _≈_; id; _∘_; module Equiv; module HomReasoning)
-               open Tp.HomReasoning
-               pXY = Pp.F₀ (X , Y)
-           in begin {!   !} ≈⟨ identityˡ {X} ⟩ 
-                    {!   !} ≈⟨ Tp.Equiv.sym identityʳ ⟩ 
-                    {!   !} ∎ }
+        { η = λ { (X ∣ ξ) → 
+            let module Pp = Functor p
+                pXX = Pp.F₀ (X , X)
+            in record { arr = id 
+                      ; eq = S.refl pXX } } 
+        ; η⁻¹ = λ { (X ∣ ξ) → 
+            let module Pp = Functor p
+                pXX = Pp.F₀ (X , X)
+            in record { arr = id 
+                      ; eq = S.refl pXX } } 
+        ; commute = λ { {X ∣ ξ} {Y ∣ η} (arr ∥ eq) → id-comm-sym {f = arr} }
        ; iso = λ X → record { isoˡ = identityˡ ; isoʳ = identity² } 
        } ) }
   ; homomorphism = λ { {p} {q} {r} {α} {β} → 
-    let module Pp = Functor p 
-        module Pq = Functor q 
-        module Pr = Functor r 
-        module α = NaturalTransformation α 
-        module β = NaturalTransformation β
-        module Hα = Functor (h α)
-        module Hβ = Functor (h β)
-        module Tp = Category (Tabulator p)
-        module Tq = Category (Tabulator q)
-        module Tr = Category (Tabulator r) in
+    let module Pr = Functor r in
     niHelper (record 
-     { η = λ { (X ∣ ξ) → let open SetoidR (Pr.F₀ (X , X)) 
-       in id ∥ cong (Pr.F₁ (id , id)) (S.refl ((Pr.F₀ (X , X)))) }
-     ; η⁻¹ = λ { (X ∣ ξ) → let open SetoidR (Pr.F₀ (X , X)) 
-       in id ∥ cong (Pr.F₁ (id , id)) (S.refl ((Pr.F₀ (X , X)))) }
-     ; commute = λ { {X ∣ ξ} {Y ∣ η} (arr ∥ eq) → 
-       let open Tr 
-           open Tr.HomReasoning in id-comm-sym C {X} }
+     { η = λ { (X ∣ ξ) → 
+       id ∥ cong (Pr.F₁ (id , id)) (S.refl (Pr.F₀ (X , X))) }
+     ; η⁻¹ = λ { (X ∣ ξ) → 
+       id ∥ cong (Pr.F₁ (id , id)) (S.refl (Pr.F₀ (X , X))) }
+      ; commute = λ { {X ∣ ξ} {Y ∣ η} (arr ∥ eq) → id-comm-sym {f = arr} }
      ; iso = λ X → record { isoˡ = identityˡ ; isoʳ = identity² } 
      }) }
   ; F-resp-≈ = λ { {p} {q} {α} {β} f≈g → 
     let module Pp = Functor p 
-        module Pq = Functor q 
-        module Tp = Category (Tabulator p)
-        module Tq = Category (Tabulator q)
-        module α = NaturalTransformation α 
-        module H = Functor (h α)
-        module β = NaturalTransformation β in niHelper (record 
+        module Pq = Functor q in niHelper (record 
      { η = λ { (X ∣ ξ) → 
-       let open SetoidR (Pq.F₀ (X , X)) 
-       in id ∥ cong (Pq.F₁ (id , id)) (f≈g (S.refl (Pp.F₀ (X , X)))) 
+       id ∥ cong (Pq.F₁ (id , id)) (f≈g (S.refl (Pp.F₀ (X , X)))) 
        }
      ; η⁻¹ =  λ { (X ∣ _) → 
-       let open SetoidR (Pq.F₀ (X , X)) 
-       in id ∥ cong (Pq.F₁ (id , id)) (S.sym (Pq.F₀ (X , X)) (f≈g (S.refl (Pp.F₀ (X , X))))) 
+       id ∥ cong (Pq.F₁ (id , id)) (S.sym (Pq.F₀ (X , X)) (f≈g (S.refl (Pp.F₀ (X , X))))) 
        }
-     ; commute = λ { _ → 𝒞.Equiv.trans 𝒞.identityˡ (𝒞.Equiv.sym 𝒞.identityʳ) }
+      ; commute = λ { {X ∣ ξ} {Y ∣ η} (arr ∥ eq) → id-comm-sym {f = arr} }
      ; iso = λ X → record { isoˡ = identityˡ ; isoʳ = identity² } 
      })}
   }
