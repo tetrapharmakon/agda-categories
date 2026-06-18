@@ -4,7 +4,7 @@ open import Level using (_⊔_; lift; lower; zero)
 
 open import Categories.Category using (Category)
 
-module Categories.Functor.Profunctor.Tabulator {o ℓ e} {C : Category o ℓ e} where
+module Categories.Functor.Profunctor.Diagonizie {o ℓ e} {C : Category o ℓ e} where
 open import Data.Product
 open import Categories.Functor renaming (id to idF)
 open import Categories.Functor.Bifunctor using (Bifunctor; appˡ; appʳ)
@@ -26,24 +26,19 @@ record tab₀ (p : Bifunctor (Category.op C) C (Setoids (o ⊔ ℓ ⊔ e) (o ⊔
   where
     constructor _∣_
     field
-      Car : Obj × Obj
-    L = proj₁ Car 
-    R = proj₂ Car
-    field
-      ξ : S.Carrier (Functor.F₀ p (L , R))
-
+      B : Obj
+      ξ : S.Carrier (Functor.F₀ p (B , B))
 
 record tab⇒ (p : Bifunctor (Category.op C) C (Setoids (o ⊔ ℓ ⊔ e) (o ⊔ ℓ ⊔ e))) (x y : tab₀ p) : Set (o ⊔ ℓ ⊔ e) where
   constructor _∥_
   module x = tab₀ x
   module y = tab₀ y
-  module p = Functor p
   field
-    l : x.L ⇒ y.L
-    r : x.R ⇒ y.R
-    eq : S._≈_ (p.F₀ (x.L , y.R)) (p.F₁ (id , r) ⟨$⟩ x.ξ) (p.F₁ (l , id) ⟨$⟩ y.ξ)
+    arr : x.B ⇒ y.B
+    eq : S._≈_ (Functor.F₀ p (x.B , y.B))
+           (Functor.F₁ p (id , arr) ⟨$⟩ x.ξ)
+           (Functor.F₁ p (arr , id) ⟨$⟩ y.ξ)
 
-{-
 Diagonizie : ∀ (p : Bifunctor (Category.op C) C (Setoids (o ⊔ ℓ ⊔ e) (o ⊔ ℓ ⊔ e)))
           → Category (o ⊔ ℓ ⊔ e) (o ⊔ ℓ ⊔ e) e
 Diagonizie p = record
@@ -228,4 +223,3 @@ open import Categories.NaturalTransformation.NaturalIsomorphism
      ; iso = λ X → record { isoˡ = identityˡ ; isoʳ = identity² } 
      })}
   }
--}

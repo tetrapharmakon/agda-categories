@@ -1,4 +1,4 @@
-{-# OPTIONS --without-K --allow-unsolved-metas #-}
+{-# OPTIONS --without-K --safe --warning=noUserWarning #-}
 
 open import Level using (_⊔_;lift;lower;zero;suc)
 
@@ -121,13 +121,12 @@ open import Categories.Functor.Construction.LiftSetoids using (LiftSetoids)
 𝕋MRS = Tabulator MRS-Profunctor
 
 π  = projection {p = MRS-Profunctor}
-π' = projection' {p = MRS-Profunctor}
 þ  = cell {p = MRS-Profunctor}
 
 -- gives f
 ∫_ : Functor 𝕋MRS Arr.Arrow
 ∫_ = record
-  { F₀ = {!  !}
+  { F₀ = λ { (B ∣ ξ) → record { arr = {!  !} } }
   ; F₁ = {!  !}
   ; identity = {!  !}
   ; homomorphism = {!  !}
