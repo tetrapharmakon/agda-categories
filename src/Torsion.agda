@@ -241,7 +241,33 @@ module _ {a b : Level} {I : Set a} {J : Set b} (sdir : SDirCleft I J) where
     ; assoc       = {!   !}
     ; sym-assoc   = {!   !}
     ; identityˡ   = {!   !}
-    ; identityʳ   = {!   !}
+    ; identityʳ   = λ {X} →
+        let FX = πˡ-f.F₀ (M-f.F₀ (X , A))
+        in 𝓣.Equiv.trans
+             (𝓣.assoc {f = πˡ-f.F₁ (Tη.η (FX , A))}
+                      {g = πˡ-f.F₁ (M-f.F₁ (ψ X))}
+                      {h = πˡ-f.F₁ (Tμ.η (X , A))})
+             (𝓣.Equiv.trans
+               (𝓣.∘-resp-≈ 𝓣.Equiv.refl
+                 (𝓣.Equiv.sym (πˡ-f.homomorphism {f = M-f.F₁ (ψ X)}
+                                                  {g = Tη.η (FX , A)})))
+               (𝓣.Equiv.trans
+                 (𝓣.∘-resp-≈ 𝓣.Equiv.refl
+                   (πˡ-f.F-resp-≈ (Tη.commute (ψ X))))
+                 (𝓣.Equiv.trans
+                   (𝓣.Equiv.sym (πˡ-f.homomorphism {f = Tμ.η (X , A)}
+                                                    {g = Tη.η (M-f.F₀ (X , A)) ∘P ψ X}))
+                   (𝓣.Equiv.trans
+                     (πˡ-f.F-resp-≈ (sym-assoc {f = ψ X}
+                                               {g = Tη.η (M-f.F₀ (X , A))}
+                                               {h = Tμ.η (X , A)}))
+                     (𝓣.Equiv.trans
+                       (πˡ-f.F-resp-≈ (∘-resp-≈
+                         (Monad.identityʳ T {X = (X , A)})
+                         (Category.Equiv.refl P-cat {x = ψ X})))
+                       (𝓣.Equiv.trans
+                         (πˡ-f.F-resp-≈ (Category.identityˡ P-cat {f = ψ X}))
+                         𝓣.Equiv.refl))))))
     }
     where
       module 𝓣 = Category FS𝓣
