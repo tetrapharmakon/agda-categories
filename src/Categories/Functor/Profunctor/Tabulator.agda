@@ -16,6 +16,7 @@ import Relation.Binary.Reasoning.Setoid as SetoidR
 open import Function.Equality using (Π; _⟶_; _⟨$⟩_; cong) renaming (_∘_ to _∗_)
 open import Categories.Category.Product using (Product;_⁂_)
 open import Categories.NaturalTransformation renaming (id to idN)
+open import Categories.Morphism.Reasoning.Core using (id-comm-sym)
 
 private
   module 𝒞 = Category C
@@ -246,17 +247,32 @@ open import Categories.NaturalTransformation.NaturalIsomorphism
                open Tp using (Obj; _⇒_; _≈_; id; _∘_; module Equiv; module HomReasoning)
                open Tp.HomReasoning
                pXY = Pp.F₀ (X , Y)
-           in begin {!   !} ≈⟨ identityˡ ⟩ 
+           in begin {!   !} ≈⟨ identityˡ {X} ⟩ 
                     {!   !} ≈⟨ Tp.Equiv.sym identityʳ ⟩ 
                     {!   !} ∎ }
        ; iso = λ X → record { isoˡ = identityˡ ; isoʳ = identity² } 
        } ) }
-  ; homomorphism = niHelper (record 
-     { η = {!  !} 
-     ; η⁻¹ = {!  !} 
-     ; commute = {!  !} 
-     ; iso = {!  !} 
-     })
+  ; homomorphism = λ { {p} {q} {r} {α} {β} → 
+    let module Pp = Functor p 
+        module Pq = Functor q 
+        module Pr = Functor r 
+        module α = NaturalTransformation α 
+        module β = NaturalTransformation β
+        module Hα = Functor (h α)
+        module Hβ = Functor (h β)
+        module Tp = Category (Tabulator p)
+        module Tq = Category (Tabulator q)
+        module Tr = Category (Tabulator r) in
+    niHelper (record 
+     { η = λ { (X ∣ ξ) → let open SetoidR (Pr.F₀ (X , X)) 
+       in id ∥ cong (Pr.F₁ (id , id)) (S.refl ((Pr.F₀ (X , X)))) }
+     ; η⁻¹ = λ { (X ∣ ξ) → let open SetoidR (Pr.F₀ (X , X)) 
+       in id ∥ cong (Pr.F₁ (id , id)) (S.refl ((Pr.F₀ (X , X)))) }
+     ; commute = λ { {X ∣ ξ} {Y ∣ η} (arr ∥ eq) → 
+       let open Tr 
+           open Tr.HomReasoning in id-comm-sym C {X} }
+     ; iso = λ X → record { isoˡ = identityˡ ; isoʳ = identity² } 
+     }) }
   ; F-resp-≈ = λ { {p} {q} {α} {β} f≈g → 
     let module Pp = Functor p 
         module Pq = Functor q 
