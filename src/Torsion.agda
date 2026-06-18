@@ -369,6 +369,70 @@ record ZeroCleft {a b : Level} (I : Set a) (J : Set b) : Set (o ⊔ ℓ ⊔ e �
     q∘i-const   : Q∘I ≃ const (Initial.⊥ ⊥𝓕)
     iR∘qR-const : IR∘QR ≃ const (Terminal.⊤ ⊤𝓣)
 
+
+-- Variations of the refinements assuming a ZeroCleft instead of a Cleft.
+
+record SplitZeroCleft {a b : Level} (I : Set a) (J : Set b) : Set (suc (o ⊔ ℓ ⊔ e ⊔ a ⊔ b)) where
+  field
+    zeroCleft : ZeroCleft I J
+
+  private
+    cleft = ZeroCleft.cleft zeroCleft
+    FS𝓣 = FullSubCategory (Cleft.𝓣 cleft)
+    FS𝓕 = FullSubCategory (Cleft.𝓕 cleft)
+    K   = Cleft.K cleft
+
+  field
+    qL   : Functor FS𝓕 C
+    qL⊣q : qL ⊣ (πʳ {C = FS𝓣} {D = FS𝓕} ∘F K)
+
+
+record SDirZeroCleft {a b : Level} (I : Set a) (J : Set b) : Set (suc (o ⊔ ℓ ⊔ e ⊔ a ⊔ b)) where
+  field
+    zeroCleft : ZeroCleft I J
+
+  private
+    cleft = ZeroCleft.cleft zeroCleft
+    FS𝓣 = FullSubCategory (Cleft.𝓣 cleft)
+    FS𝓕 = FullSubCategory (Cleft.𝓕 cleft)
+    P   = Product FS𝓣 FS𝓕
+    K   = Cleft.K cleft
+
+  field
+    KL        : Functor P C
+    KL⊣K      : KL ⊣ K
+    K-monadic : IsMonadicAdjunction KL⊣K
+
+
+record RectangularZeroCleft {a b : Level} (I : Set a) (J : Set b) : Set (suc (o ⊔ ℓ ⊔ e ⊔ a ⊔ b)) where
+  field
+    zeroCleft : ZeroCleft I J
+
+  private
+    cleft = ZeroCleft.cleft zeroCleft
+    FS𝓣 = FullSubCategory (Cleft.𝓣 cleft)
+    FS𝓕 = FullSubCategory (Cleft.𝓕 cleft)
+    P   = Product FS𝓣 FS𝓕
+    K   = Cleft.K cleft
+
+  field
+    K⁻¹         : Functor P C
+    K∘K⁻¹≈id    : NaturalIsomorphism (K ∘F K⁻¹) (idF {C = P})
+    K⁻¹∘K≈id    : NaturalIsomorphism (K⁻¹ ∘F K) (idF {C = C})
+
+  K-weakInverse : WeakInverse K K⁻¹
+  K-weakInverse = record
+    { F∘G≈id = K∘K⁻¹≈id
+    ; G∘F≈id = K⁻¹∘K≈id
+    }
+
+  K-equivalence : StrongEquivalence C P
+  K-equivalence = record
+    { F = K
+    ; G = K⁻¹
+    ; weak-inverse = K-weakInverse
+    }
+
 -- null adjunction: between any two categories each with an initial and a terminal object,
 -- the constant functor at D's initial is left adjoint to the constant functor at C's terminal.
 

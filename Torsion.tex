@@ -1,0 +1,254 @@
+\documentclass[11pt]{article}
+
+\usepackage{amsmath,amssymb,amsthm}
+
+\newcommand{\Obj}{\mathrm{Obj}}
+\newcommand{\Hom}{\mathrm{Hom}}
+\newcommand{\id}{\mathrm{id}}
+\newcommand{\op}{\mathrm{op}}
+\newcommand{\Cat}{\mathbf{Cat}}
+
+\newcommand{\FS}[1]{\mathbf{FullSub}(#1)} % full subcategory
+\newcommand{\Prod}{\times}
+
+\begin{document}
+
+\title{Torsion Clefts and Variations}
+\date{}
+\maketitle
+
+\paragraph{Ambient data.}
+Fix a category $\mathcal{C}$. Write $\Obj(\mathcal{C})$ for objects and $\Hom_{\mathcal{C}}(X,Y)$ for morphisms.
+
+\paragraph{Full subcategories.}
+Given a set $I$ and a function $\mathcal{T} : I \to \Obj(\mathcal{C})$ selecting a family of objects, let
+$\FS{\mathcal{T}}$ denote the \emph{full subcategory} of $\mathcal{C}$ on the chosen objects.
+We write
+\[
+  i : \FS{\mathcal{T}} \hookrightarrow \mathcal{C}
+\]
+for its inclusion functor.
+Likewise, for $\mathcal{F} : J \to \Obj(\mathcal{C})$ we write $\FS{\mathcal{F}}$ with inclusion
+\[
+  q_R : \FS{\mathcal{F}} \hookrightarrow \mathcal{C}.
+\]
+
+\paragraph{Adjunction notation.}
+An adjunction is written $L \dashv R$.
+Its \emph{unit} is a natural transformation $\eta : \id \Rightarrow R L$ and its \emph{counit} is
+$\varepsilon : L R \Rightarrow \id$.
+
+\section*{Clefts}
+
+\paragraph{Definition (Cleft).}
+Let $I,J$ be sets.
+A \emph{cleft} on $\mathcal{C}$ indexed by $(I,J)$ is the following data:
+
+\begin{enumerate}
+\item A family $\mathcal{T} : I \to \Obj(\mathcal{C})$ and a family $\mathcal{F} : J \to \Obj(\mathcal{C})$.
+\item A functor $i_R : \mathcal{C} \to \FS{\mathcal{T}}$ right adjoint to the inclusion
+      $i : \FS{\mathcal{T}} \hookrightarrow \mathcal{C}$, i.e.
+      \[ i \dashv i_R. \]
+\item A functor $q : \mathcal{C} \to \FS{\mathcal{F}}$ left adjoint to the inclusion
+      $q_R : \FS{\mathcal{F}} \hookrightarrow \mathcal{C}$, i.e.
+      \[ q \dashv q_R. \]
+\end{enumerate}
+
+\medskip
+In other words, a cleft is a pair of full subcategories $(\FS{\mathcal{T}},\FS{\mathcal{F}})$ such that
+$\FS{\mathcal{T}}$ is \emph{reflective} in $\mathcal{C}$ and $\FS{\mathcal{F}}$ is \emph{coreflective} in $\mathcal{C}$.
+
+\paragraph{The combined functor $K$.}
+From a cleft we obtain a functor
+\[
+  K : \mathcal{C} \to \FS{\mathcal{T}} \Prod \FS{\mathcal{F}}
+\]
+defined by pairing the two components
+\[
+  K(X) = (i_R(X),\, q(X)),
+\]
+and similarly on morphisms.
+
+\paragraph{The essential sequence.}
+Define two endofunctors of $\mathcal{C}$:
+\[
+  i \circ i_R : \mathcal{C} \to \mathcal{C},
+  \qquad
+  q_R \circ q : \mathcal{C} \to \mathcal{C}.
+\]
+
+From the adjunction $i \dashv i_R$ we take the counit
+\[
+  \varepsilon^i : i \circ i_R \Rightarrow \id_{\mathcal{C}}.
+\]
+From the adjunction $q \dashv q_R$ we take the unit
+\[
+  \eta^q : \id_{\mathcal{C}} \Rightarrow q_R \circ q.
+\]
+Their vertical composite is the natural transformation
+\[
+  \mathsf{essential} \,=\, \eta^q \circ \varepsilon^i : i \circ i_R \Rightarrow q_R \circ q.
+\]
+Objectwise, for each $X \in \Obj(\mathcal{C})$, this yields the composable morphisms
+\[
+  i i_R X \xrightarrow{\ \varepsilon^i_X\ } X \xrightarrow{\ \eta^q_X\ } q_R q X.
+\]
+If $\mathcal{C}$ also has an initial object $0$ and a terminal object $1$, one may extend this to
+\[
+  0 \to i i_R X \to X \to q_R q X \to 1,
+\]
+though in what follows we only require the middle three terms.
+
+\section*{Refinements of a Cleft}
+
+The following definitions package a cleft together with additional structure.
+
+\paragraph{Split clefts.}
+A \emph{split cleft} is a cleft equipped with an additional left adjoint to the projection onto the
+$\FS{\mathcal{F}}$-component.
+Concretely, it consists of:
+
+\begin{enumerate}
+\item a cleft $\mathsf{cleft}$,
+\item a functor $q_L : \FS{\mathcal{F}} \to \mathcal{C}$,
+\item an adjunction
+  \[
+    q_L \dashv (\pi_R \circ K),
+  \]
+  where $\pi_R : \FS{\mathcal{T}}\Prod\FS{\mathcal{F}} \to \FS{\mathcal{F}}$ is the right projection.
+\end{enumerate}
+Equivalently, one may ask for $q_L \dashv q$; since $q = \pi_R \circ K$ on objects and morphisms,
+we will freely identify these formulations.
+
+\paragraph{Semidirect clefts.}
+A \emph{semidirect cleft} packages a cleft together with data showing that the comparison functor $K$
+is monadic.
+It consists of:
+
+\begin{enumerate}
+\item a cleft $\mathsf{cleft}$,
+\item a functor $K_L : \FS{\mathcal{T}}\Prod\FS{\mathcal{F}} \to \mathcal{C}$,
+\item an adjunction $K_L \dashv K$,
+\item a proof that this adjunction is monadic.
+\end{enumerate}
+
+Here ``monadic'' may be read in the following concrete way: the canonical comparison functor from
+the domain $\FS{\mathcal{T}}\Prod\FS{\mathcal{F}}$ to the Eilenberg--Moore category of the induced monad on $\mathcal{C}$
+admits a weak inverse.
+
+\paragraph{Fibrations of algebras (FoA).}
+We use the term \emph{fibration of algebras} as a synonym for \emph{semidirect cleft}.
+
+\paragraph{Rectangular clefts.}
+A \emph{rectangular cleft} is a cleft whose $K$ is an equivalence of categories.
+The record stores an explicit inverse functor and the witnessing natural isomorphisms:
+
+\begin{enumerate}
+\item a cleft $\mathsf{cleft}$,
+\item a functor $K^{-1} : \FS{\mathcal{T}}\Prod\FS{\mathcal{F}} \to \mathcal{C}$,
+\item natural isomorphisms
+  \[
+    K \circ K^{-1} \cong \id_{\FS{\mathcal{T}}\Prod\FS{\mathcal{F}}},
+    \qquad
+    K^{-1} \circ K \cong \id_{\mathcal{C}}.
+  \]
+\end{enumerate}
+
+From this data one obtains an equivalence
+$\mathcal{C} \simeq \FS{\mathcal{T}}\Prod\FS{\mathcal{F}}$.
+
+\paragraph{Torsion theories (stub).}
+A \emph{torsion theory} is a cleft on a category $\mathcal{C}$ equipped with a zero object,
+together with an assertion that the essential sequence is exact.
+Formally it consists of:
+
+\begin{enumerate}
+\item a cleft $\mathsf{cleft}$,
+\item a zero object structure on $\mathcal{C}$,
+\item a field \texttt{essential-exact} (left unspecified here: the intended exactness predicate is to be supplied).
+\end{enumerate}
+
+\section*{Semidirect Implies Split (under an initial object)}
+
+Assume in addition that the torsion subcategory $\FS{\mathcal{T}}$ has an initial object $\bot_{\mathcal{T}}$.
+
+\paragraph{Construction.}
+Let $\mathsf{sdir}$ be a semidirect cleft, so that we have $K_L \dashv K$.
+Consider the functor
+\[
+  L = \mathrm{const}^\ell(\bot_{\mathcal{T}}) : \FS{\mathcal{F}} \to \FS{\mathcal{T}}\Prod\FS{\mathcal{F}},
+\]
+which sends $X$ to $(\bot_{\mathcal{T}},X)$.
+There is a canonical adjunction
+\[
+  \mathrm{const}^\ell(\bot_{\mathcal{T}}) \dashv \pi_R,
+\]
+because morphisms out of the initial object are unique.
+
+Define
+\[
+  q_L := K_L \circ \mathrm{const}^\ell(\bot_{\mathcal{T}}) : \FS{\mathcal{F}} \to \mathcal{C}.
+\]
+Then by composition of adjunctions one gets
+\[
+  q_L \dashv (\pi_R \circ K).
+\]
+This provides the data required for a split cleft.
+
+\section*{Zero Clefts}
+
+\paragraph{Definition (ZeroCleft).}
+A \emph{zero cleft} consists of:
+
+\begin{enumerate}
+\item a cleft $\mathsf{cleft}$,
+\item initial and terminal objects in each full subcategory $\FS{\mathcal{T}}$ and $\FS{\mathcal{F}}$,
+\item proofs that the composites $q \circ i$ and $i_R \circ q_R$ are (naturally isomorphic to) constant functors,
+      namely
+  \[
+    q \circ i \cong \mathrm{const}(\bot_{\FS{\mathcal{F}}}),
+    \qquad
+    i_R \circ q_R \cong \mathrm{const}(\top_{\FS{\mathcal{T}}}).
+  \]
+\end{enumerate}
+
+This expresses that the ``cross terms'' vanish in the strongest possible way (by being constant at the relevant
+zero-like objects of the full subcategories).
+
+\paragraph{Refinements based on a ZeroCleft.}
+One can repeat the previous refinement notions with a \emph{zero cleft} as the base datum:
+
+\begin{itemize}
+\item \texttt{SplitZeroCleft}.
+\item \texttt{SDirZeroCleft}.
+\item \texttt{RectangularZeroCleft}.
+\end{itemize}
+
+No other changes are made: each refinement is obtained by forgetting down to the underlying cleft and reusing the same additional fields.
+
+\section*{Null Adjunction}
+
+We conclude with a standard ``null'' adjunction built from initial and terminal objects.
+
+\paragraph{Assumptions.}
+Let $\mathcal{C}$ and $\mathcal{D}$ be categories.
+Assume $\mathcal{C}$ has an initial object $\bot_{\mathcal{C}}$ and a terminal object $\top_{\mathcal{C}}$,
+and similarly $\mathcal{D}$ has $\bot_{\mathcal{D}}$ and $\top_{\mathcal{D}}$.
+
+\paragraph{Definition.}
+Define constant functors
+\[
+  L : \mathcal{C} \to \mathcal{D}, \qquad L = \mathrm{const}(\bot_{\mathcal{D}}),
+\]
+\[
+  R : \mathcal{D} \to \mathcal{C}, \qquad R = \mathrm{const}(\top_{\mathcal{C}}).
+\]
+
+The unit $\eta : \id \Rightarrow RL$ is the unique arrow to the terminal object of $\mathcal{C}$,
+and the counit $\varepsilon : LR \Rightarrow \id$ is the unique arrow from the initial object of $\mathcal{D}$.
+The triangle identities hold by uniqueness of morphisms from an initial object and to a terminal object.
+
+\paragraph{Result.}
+These data define an adjunction $L \dashv R$.
+
+\end{document}
