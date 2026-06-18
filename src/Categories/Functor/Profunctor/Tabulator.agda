@@ -3,12 +3,12 @@
 open import Level using (_⊔_; lift; lower; zero)
 
 open import Categories.Category using (Category)
+open import Categories.Functor.Bifunctor using (Bifunctor; appˡ; appʳ)
+open import Categories.Functor.Bifunctor.Properties
 
 module Categories.Functor.Profunctor.Tabulator {o ℓ e} {C : Category o ℓ e} where
 open import Data.Product
 open import Categories.Functor renaming (id to idF)
-open import Categories.Functor.Bifunctor using (Bifunctor; appˡ; appʳ)
-open import Categories.Functor.Bifunctor.Properties
 open import Categories.Category.Instance.Setoids
 open import Relation.Binary.Bundles renaming (Setoid to S)
 import Relation.Binary.Reasoning.Setoid as SetoidR
@@ -34,7 +34,7 @@ record tab₀ (p : Bifunctor (Category.op C) C (Setoids (o ⊔ ℓ ⊔ e) (o ⊔
 
 
 record tab⇒ (p : Bifunctor (Category.op C) C (Setoids (o ⊔ ℓ ⊔ e) (o ⊔ ℓ ⊔ e))) (x y : tab₀ p) : Set (o ⊔ ℓ ⊔ e) where
-  constructor _∥_
+  constructor _,_∥_
   module x = tab₀ x
   module y = tab₀ y
   module p = Functor p
@@ -48,13 +48,11 @@ Tabulator : ∀ (p : Bifunctor (Category.op C) C (Setoids (o ⊔ ℓ ⊔ e) (o �
 Tabulator p = record
   { Obj = tab₀ p
   ; _⇒_ = λ { s t → tab⇒ p s t }
-  ; _≈_ = λ h k → tab⇒.arr h ≈ tab⇒.arr k
+  ; _≈_ = λ h k → tab⇒.l h ≈ tab⇒.l k × tab⇒.r h ≈ tab⇒.r k
   ; id = λ { {A} → 
-      let pAA = Functor.F₀ p (tab₀.B A , tab₀.B A) 
-      in record 
-        { arr = id 
-        ; eq = S.refl pAA
-        }}
+    let module p = Functor p 
+        module A = tab₀ A
+        pLR = p.F₀ (A.L , A.R) in id , id ∥ S.refl pLR }
   ; _∘_ = λ { {A} {B} {C} t s → 
     let module t = tab⇒ t
         module s = tab⇒ s
@@ -63,39 +61,31 @@ Tabulator p = record
         module C = tab₀ C
         p₀ = p
         module p = Functor p₀
-        PAA = p.F₀ (A.B , A.B)
-        PBB = p.F₀ (B.B , B.B)
-        PCC = p.F₀ (C.B , C.B)
-        PAC = p.F₀ (A.B , C.B)
-        open SetoidR PAC
-        in record 
-          { arr = t.arr ∘ s.arr 
-          ; eq = begin
-              p.F₁ (id , t.arr ∘ s.arr) ⟨$⟩ A.ξ                  ≈⟨ S.sym PAC (p.F-resp-≈ (identity² , Equiv.refl) (S.refl PAA)) ⟩
-              p.F₁ (id ∘ id , t.arr ∘ s.arr) ⟨$⟩ A.ξ             ≈⟨ p.homomorphism (S.refl PAA) ⟩
-              p.F₁ (id , t.arr) ⟨$⟩ (p.F₁ (id , s.arr) ⟨$⟩ A.ξ)  ≈⟨ cong (p.F₁ (id , t.arr)) s.eq ⟩
-              p.F₁ (id , t.arr) ⟨$⟩ (p.F₁ (s.arr , id) ⟨$⟩ B.ξ)  ≈⟨ S.sym PAC (p.homomorphism (S.refl PBB)) ⟩
-              p.F₁ (s.arr ∘ id , t.arr ∘ id) ⟨$⟩ B.ξ             ≈⟨ p.F-resp-≈ (identityʳ , identityʳ) (S.refl PBB) ⟩
-              p.F₁ (s.arr , t.arr) ⟨$⟩ B.ξ                       ≈⟨ S.sym PAC (p.F-resp-≈ (identityʳ , identityʳ) (S.refl PBB)) ⟩
-              p.F₁ (s.arr ∘ id , t.arr ∘ id) ⟨$⟩ B.ξ             ≈⟨ p.homomorphism {f = (s.arr , id)} {g = (id , t.arr)} (S.refl PBB) ⟩
-              (p.F₁ (id , t.arr) ∗ p.F₁ (s.arr , id)) ⟨$⟩ B.ξ    ≈⟨ [ p₀ ]-commute (S.refl PBB) ⟩
-              (p.F₁ (s.arr , id) ∗ p.F₁ (id , t.arr)) ⟨$⟩ B.ξ    ≈⟨ S.refl PAC ⟩
-              p.F₁ (s.arr , id) ⟨$⟩ (p.F₁ (id , t.arr) ⟨$⟩ B.ξ)  ≈⟨ cong (p.F₁ (s.arr , id)) t.eq ⟩
-              p.F₁ (s.arr , id) ⟨$⟩ (p.F₁ (t.arr , id) ⟨$⟩ C.ξ)  ≈⟨ S.sym PAC (p.homomorphism (S.refl PCC)) ⟩
-              p.F₁ (t.arr ∘ s.arr , id ∘ id) ⟨$⟩ C.ξ             ≈⟨ p.F-resp-≈ (Equiv.refl , identity²) (S.refl PCC) ⟩
-              p.F₁ (t.arr ∘ s.arr , id) ⟨$⟩ C.ξ                  ∎
-          } }
-  ; assoc = assoc
-  ; sym-assoc = sym-assoc
-  ; identityˡ = λ { {A} {B} {f} → identityˡ }
-  ; identityʳ = λ { {A} {B} {f} → identityʳ }
-  ; identity² = λ { {A} → identity² }
+        pAA = p.F₀ (A.L , A.R)
+        pBB = p.F₀ (B.L , B.R)
+        pCC = p.F₀ (C.L , C.R)
+        pLR = p.F₀ (A.L , C.R)
+        module pL {A} = Functor (appˡ p A)
+        module pR {A} = Functor (appʳ p A)
+        open SetoidR pLR
+    in (t.l ∘ s.l) , (t.r ∘ s.r) ∥ 
+       (begin p.F₁ (id , t.r ∘ s.r) ⟨$⟩ A.ξ                 ≈⟨ pL.homomorphism (S.refl pAA) ⟩ -- 
+              p.F₁ (id , t.r) ⟨$⟩ (p.F₁ (id , s.r) ⟨$⟩ A.ξ) ≈⟨ cong (p.F₁ (id , t.r)) s.eq ⟩ 
+              p.F₁ (id , t.r) ⟨$⟩ (p.F₁ (s.l , id) ⟨$⟩ B.ξ) ≈⟨ [ p ]-commute (S.refl pBB) ⟩ 
+              p.F₁ (s.l , id) ⟨$⟩ (p.F₁ (id , t.r) ⟨$⟩ B.ξ) ≈⟨ cong (p.F₁ (s.l , id)) t.eq ⟩ 
+              p.F₁ (s.l , id) ⟨$⟩ (p.F₁ (t.l , id) ⟨$⟩ C.ξ) ≈⟨ S.sym pLR (pR.homomorphism (S.refl pCC)) ⟩
+              p.F₁ (t.l ∘ s.l , id) ⟨$⟩ C.ξ                 ∎) }
+  ; assoc = assoc , assoc
+  ; sym-assoc = sym-assoc , sym-assoc
+  ; identityˡ = λ { {A} {B} {f} → identityˡ , identityˡ }
+  ; identityʳ = λ { {A} {B} {f} → identityʳ , identityʳ }
+  ; identity² = λ { {A} → identity² , identity² }
   ; equiv = record 
-    { refl = λ {x} → Equiv.refl 
-    ; sym = Equiv.sym 
-    ; trans = Equiv.trans 
+    { refl = Equiv.refl , Equiv.refl 
+    ; sym = λ {(leq , req) → (Equiv.sym leq) , (Equiv.sym req) }
+    ; trans = λ {(leq , req) (leq' , req') → (Equiv.trans leq leq') , (Equiv.trans req req') }
     }
-  ; ∘-resp-≈ = ∘-resp-≈
+  ; ∘-resp-≈ = λ { (pl , pr) (ql , qr) → (∘-resp-≈ pl ql) , (∘-resp-≈ pr qr) }
   }
 
 {-
