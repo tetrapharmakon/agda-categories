@@ -1,4 +1,4 @@
-{-# OPTIONS --without-K --allow-unsolved-metas #-}
+{-# OPTIONS --without-K --allow-unsolved-metas --warning=noUserWarning #-}
 
 open import Level using (_⊔_;lift;lower;zero;suc)
 
@@ -15,6 +15,7 @@ open import Relation.Binary.Bundles renaming (Setoid to S)
 import Relation.Binary.Reasoning.Setoid as SetoidR
 open import Function.Equality using (Π; _⟶_; _⟨$⟩_; cong) renaming (_∘_ to _∗_)
 open import Categories.Category.Product using (Product;_⁂_)
+open import Categories.NaturalTransformation renaming (id to idN)
 
 private
   module 𝒞 = Category C
@@ -167,8 +168,6 @@ module _ {p : Bifunctor (Category.op C) C (Setoids (o ⊔ ℓ ⊔ e) (o ⊔ ℓ 
 module _ {p q : Bifunctor (Category.op C) C (Setoids (o ⊔ ℓ ⊔ e) (o ⊔ ℓ ⊔ e))} where
 
 
-  open import Categories.NaturalTransformation renaming (id to idN)
-
   h : (α : NaturalTransformation p q) → Functor (Tabulator p) (Tabulator q)
   h α = let module p = Functor p 
             module q = Functor q in 
@@ -247,9 +246,9 @@ open import Categories.NaturalTransformation.NaturalIsomorphism
                open Tp using (Obj; _⇒_; _≈_; id; _∘_; module Equiv; module HomReasoning)
                open Tp.HomReasoning
                pXY = Pp.F₀ (X , Y)
-           in begin _ ≈⟨ identityˡ ⟩ 
-                    _ ≈⟨ Tp.Equiv.sym identityʳ ⟩ 
-                    _ ∎ }
+           in begin {!   !} ≈⟨ identityˡ ⟩ 
+                    {!   !} ≈⟨ Tp.Equiv.sym identityʳ ⟩ 
+                    {!   !} ∎ }
        ; iso = λ X → record { isoˡ = identityˡ ; isoʳ = identity² } 
        } ) }
   ; homomorphism = niHelper (record 
@@ -258,10 +257,23 @@ open import Categories.NaturalTransformation.NaturalIsomorphism
      ; commute = {!  !} 
      ; iso = {!  !} 
      })
-  ; F-resp-≈ = λ x → niHelper (record 
-     { η = {!  !} 
-     ; η⁻¹ = {!  !} 
-     ; commute = {!  !} 
-     ; iso = {!  !} 
-     })
+  ; F-resp-≈ = λ { {p} {q} {α} {β} f≈g → 
+    let module Pp = Functor p 
+        module Pq = Functor q 
+        module Tp = Category (Tabulator p)
+        module Tq = Category (Tabulator q)
+        module α = NaturalTransformation α 
+        module H = Functor (h α)
+        module β = NaturalTransformation β in niHelper (record 
+     { η = λ { (X ∣ ξ) → 
+       let open SetoidR (Pq.F₀ (X , X)) 
+       in id ∥ cong (Pq.F₁ (id , id)) (f≈g (S.refl (Pp.F₀ (X , X)))) 
+       }
+     ; η⁻¹ =  λ { (X ∣ _) → 
+       let open SetoidR (Pq.F₀ (X , X)) 
+       in id ∥ cong (Pq.F₁ (id , id)) (S.sym (Pq.F₀ (X , X)) (f≈g (S.refl (Pp.F₀ (X , X))))) 
+       }
+     ; commute = λ { _ → 𝒞.Equiv.trans 𝒞.identityˡ (𝒞.Equiv.sym 𝒞.identityʳ) }
+     ; iso = λ X → record { isoˡ = identityˡ ; isoʳ = identity² } 
+     })}
   }
