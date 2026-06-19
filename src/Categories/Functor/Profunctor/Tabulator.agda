@@ -224,7 +224,7 @@ open import Categories.NaturalTransformation.NaturalIsomorphism
         { η = λ { (X ∣ _) → let pLR = Pp.F₀ X in
               id , id ∥ cong (Pq.F₁ (id , id)) (f≈g (S.refl pLR)) }
         ; η⁻¹ = λ { (X ∣ _) → let pLR = Pp.F₀ X in
-              id , id ∥ cong (Pq.F₁ (id , id)) (S.sym (Pq.F₀ X) (f≈g (S.refl pLR))) }
+                id , id ∥ cong (Pq.F₁ (id , id)) (S.sym (Pq.F₀ X) (f≈g (S.refl pLR))) }
         ; commute = λ { {X ∣ ξ} {Y ∣ η} (l , r ∥ eq) → id-comm-sym , id-comm-sym  }
         ; iso = λ X → record { isoˡ = identityˡ , identityˡ ; isoʳ = identity² , identity² } 
         }) }

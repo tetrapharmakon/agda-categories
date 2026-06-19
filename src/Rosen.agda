@@ -49,11 +49,15 @@ MR2-Setoid : Obj → Obj → Setoid (o ⊔ ℓ ⊔ e) (o ⊔ ℓ ⊔ e)
 MR2-Setoid A B = record
   { Carrier = MR2 A B
   ; _≈_ = λ (⟪ f , ϕ ⟫) (⟪ g , ϕ' ⟫) → (f ≈ g) × (ϕ ≃ ϕ')
-  ; isEquivalence = record
-    { refl  = Equiv.refl , IsEquivalence.refl  ≃-isEquivalence
-    ; sym   = λ (pf , pϕ) → Equiv.sym pf , IsEquivalence.sym ≃-isEquivalence pϕ
-    ; trans = λ (pf₁ , pϕ₁) (pf₂ , pϕ₂) → Equiv.trans pf₁ pf₂ , IsEquivalence.trans ≃-isEquivalence pϕ₁ pϕ₂
-    }
+  ; isEquivalence = record 
+    { refl = Equiv.refl , (λ {x₁} → Equiv.refl) 
+    ; sym = λ (pf , k) → Equiv.sym pf , {!   !} 
+    ; trans = λ (pf₁ , pϕ₁) (pf₂ , pϕ₂) → Equiv.trans pf₁ pf₂ , {!   !}
+    } -- record
+    -- { refl  = Equiv.refl , IsEquivalence.refl  ≃-isEquivalence
+    -- ; sym   = λ (pf , pϕ) → Equiv.sym pf , IsEquivalence.sym ≃-isEquivalence pϕ
+    -- ; trans = λ (pf₁ , pϕ₁) (pf₂ , pϕ₂) → Equiv.trans pf₁ pf₂ , IsEquivalence.trans ≃-isEquivalence pϕ₁ pϕ₂
+    -- }
   }
 
 
