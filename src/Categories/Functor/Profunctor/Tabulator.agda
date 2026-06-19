@@ -165,10 +165,10 @@ module _ {p q : Bifunctor (Category.op C) C (Setoids (o ⊔ ℓ ⊔ e) (o ⊔ �
             pYY = p.F₀ (Y.L , Y.R)
             qXY = q.F₀ (X.L , Y.R)
             open SetoidR qXY in 
-            l , r ∥  (begin q.F₁ (id , r) ⟨$⟩ tab₀.ξ ((λ { (C ∣ ξ) → C ∣ (α.η C ⟨$⟩ ξ) }) X) ≈⟨ {!  !} ⟩
-                            {!  !} ≈⟨ {!  !} ⟩
-                            {!  !} ≈⟨ {!  !} ⟩
-                            q.F₁ (l , id) ⟨$⟩ tab₀.ξ ((λ { (C ∣ ξ) → C ∣ (α.η C ⟨$⟩ ξ) }) (D ∣ η)) ∎) }
+            l , r ∥  (begin q.F₁ (id , r) ⟨$⟩ (α.η C ⟨$⟩ ξ) ≈˘⟨ α.commute (id , r) (S.refl pXX) ⟩
+                            α.η (f.x.L , f.y.R) ⟨$⟩ (f.p.F₁ (id , r) ⟨$⟩ ξ) ≈⟨ cong (α.η (f.x.L , f.y.R)) f.eq ⟩
+                            α.η (f.x.L , f.y.R) ⟨$⟩ (f.p.F₁ (l , id) ⟨$⟩ η) ≈⟨ α.commute (l , id) (S.refl pYY) ⟩
+                            q.F₁ (l , id) ⟨$⟩ (α.η D ⟨$⟩ η) ∎) }
     ; identity = {!  !}
     ; homomorphism = {!  !}
     ; F-resp-≈ = {!  !}
