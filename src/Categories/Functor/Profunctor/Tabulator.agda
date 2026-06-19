@@ -169,34 +169,10 @@ module _ {p q : Bifunctor (Category.op C) C (Setoids (o ⊔ ℓ ⊔ e) (o ⊔ �
                             α.η (f.x.L , f.y.R) ⟨$⟩ (f.p.F₁ (id , r) ⟨$⟩ ξ) ≈⟨ cong (α.η (f.x.L , f.y.R)) f.eq ⟩
                             α.η (f.x.L , f.y.R) ⟨$⟩ (f.p.F₁ (l , id) ⟨$⟩ η) ≈⟨ α.commute (l , id) (S.refl pYY) ⟩
                             q.F₁ (l , id) ⟨$⟩ (α.η D ⟨$⟩ η) ∎) }
-    ; identity = {!  !}
-    ; homomorphism = {!  !}
-    ; F-resp-≈ = {!  !}
-    }
-        {-
-            record
-    { F₀ = λ {x → record { B = tab₀.B x 
-                          ; ξ = α.η (tab₀.B x , tab₀.B x) ⟨$⟩ tab₀.ξ x 
-                          }}
-    ; F₁ = λ { {X} {Y} f → let module X = tab₀ X
-                               module Y = tab₀ Y
-                               module f = tab⇒ f
-                               pXX = p.F₀ (X.B , X.B)
-                               pYY = p.F₀ (Y.B , Y.B)
-                               qXY = q.F₀ (X.B , Y.B)
-                               open SetoidR qXY in record 
-      { arr = f.arr 
-      ; eq = begin q.F₁ (id , f.arr) ⟨$⟩ (α.η (f.x.B , f.x.B) ⟨$⟩ f.x.ξ) ≈⟨ S.sym qXY (α.commute (id , f.arr) (S.refl pXX)) ⟩ 
-                   α.η (f.x.B , f.y.B) ⟨$⟩ (p.F₁ (id , f.arr) ⟨$⟩ f.x.ξ) ≈⟨ cong (α.η (f.x.B , f.y.B)) f.eq ⟩ 
-                   α.η (f.x.B , f.y.B) ⟨$⟩ (p.F₁ (f.arr , id) ⟨$⟩ f.y.ξ) ≈⟨ α.commute (f.arr , id) (S.refl pYY) ⟩ 
-                   q.F₁ (f.arr , id) ⟨$⟩ (α.η (f.y.B , f.y.B) ⟨$⟩ f.y.ξ) ∎
-      }}
-    ; identity = λ { {A} → Equiv.refl }
-    ; homomorphism = λ { {X} {Y} {Z} {f} {g} → Equiv.refl }
+    ; identity = λ { {A} → Equiv.refl , Equiv.refl }
+    ; homomorphism =  λ { {X} {Y} {Z} {f} {g} → Equiv.refl , Equiv.refl }
     ; F-resp-≈ = λ { {X} {Y} {f} {g} f≈g → f≈g }
-    } 
-
--}
+    }
 
 
 open import Categories.Category.Construction.Functors using (Functors)
@@ -205,7 +181,32 @@ open import Categories.NaturalTransformation.NaturalIsomorphism
   using (niHelper)
   
 𝕋ab : Functor (Functors (Product (Category.op C) C) (Setoids (o ⊔ ℓ ⊔ e) (o ⊔ ℓ ⊔ e))) (Cats (o ⊔ ℓ ⊔ e) (o ⊔ ℓ ⊔ e) e)
-𝕋ab = {!  !} -- record
+𝕋ab = record
+  { F₀ = λ x → Tabulator x
+  ; F₁ = λ α → h α
+  ; identity = λ { {p} → niHelper (record 
+    { η = {!   !} 
+    ; η⁻¹ = {!   !} 
+    ; commute = λ { {X ∣ ξ} {Y ∣ η} (l , r ∥ eq) → id-comm-sym , id-comm-sym  }
+    ; iso = λ X → record { isoˡ = identityˡ , identityˡ ; isoʳ = identity² , identity² } 
+    }) }
+  ; homomorphism = λ { {p} {q} {r} {α} {β} → 
+    let module Pr = Functor r in
+    niHelper (record 
+      { η = {!   !} 
+      ; η⁻¹ = {!   !} 
+      ; commute = {!   !} 
+      ; iso = {!   !} 
+      }) }
+  ; F-resp-≈ = λ { {p} {q} {α} {β} f≈g → 
+    let module Pp = Functor p 
+        module Pq = Functor q in niHelper (record 
+        { η = {!   !} 
+        ; η⁻¹ = {!   !} 
+        ; commute = λ { {X ∣ ξ} {Y ∣ η} (l , r ∥ eq) → id-comm-sym , id-comm-sym  }
+        ; iso = λ X → record { isoˡ = identityˡ , identityˡ ; isoʳ = identity² , identity² } 
+        }) }
+  } -- record
 {-
   { F₀ = λ x → Tabulator x
   ; F₁ = λ α → h α
