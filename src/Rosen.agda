@@ -51,13 +51,9 @@ MR2-Setoid A B = record
   ; _≈_ = λ (⟪ f , ϕ ⟫) (⟪ g , ϕ' ⟫) → (f ≈ g) × (ϕ ≃ ϕ')
   ; isEquivalence = record 
     { refl = Equiv.refl , (λ {x₁} → Equiv.refl) 
-    ; sym = λ (pf , k) → Equiv.sym pf , {!   !} 
-    ; trans = λ (pf₁ , pϕ₁) (pf₂ , pϕ₂) → Equiv.trans pf₁ pf₂ , {!   !}
-    } -- record
-    -- { refl  = Equiv.refl , IsEquivalence.refl  ≃-isEquivalence
-    -- ; sym   = λ (pf , pϕ) → Equiv.sym pf , IsEquivalence.sym ≃-isEquivalence pϕ
-    -- ; trans = λ (pf₁ , pϕ₁) (pf₂ , pϕ₂) → Equiv.trans pf₁ pf₂ , IsEquivalence.trans ≃-isEquivalence pϕ₁ pϕ₂
-    -- }
+    ; sym = λ (pf , k) → Equiv.sym pf , Equiv.sym k 
+    ; trans = λ (pf₁ , h) (pf₂ , k) → Equiv.trans pf₁ pf₂ , Equiv.trans h k
+    } 
   }
 
 
@@ -130,8 +126,8 @@ open import Categories.Functor.Construction.LiftSetoids using (LiftSetoids)
 -- gives f
 ∫_ : Functor 𝕋MRS Arr.Arrow
 ∫_ = record
-  { F₀ = λ { (B ∣ ξ) → record { arr = {!  !} } }
-  ; F₁ = {!  !}
+  { F₀ = λ { ((A , B) ∣ ξ) → record { arr = MR2.f ξ } }
+  ; F₁ = λ { {(A , B) ∣ ξ} {(A' , B') ∣ ξ'} (l , r ∥ eq) → mor⇒ {dom⇒ = l} {cod⇒ = r} {!   !}}
   ; identity = {!  !}
   ; homomorphism = {!  !}
   ; F-resp-≈ = {!  !}
@@ -140,7 +136,7 @@ open import Categories.Functor.Construction.LiftSetoids using (LiftSetoids)
 -- gives ϕ
 ∇_ : Functor 𝕋MRS Arr.Arrow
 ∇_ = record
-  { F₀ = {!  !}
+  { F₀ = λ { ((A , B) ∣ ξ) → let module phi = NaturalTransformation (MR2.ϕ ξ) in record { arr = phi.η (record { arr = MR2.f ξ }) } }
   ; F₁ = {!  !}
   ; identity = {!  !}
   ; homomorphism = {!  !}
