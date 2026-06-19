@@ -185,66 +185,47 @@ open import Categories.NaturalTransformation.NaturalIsomorphism
   { F₀ = λ x → Tabulator x
   ; F₁ = λ α → h α
   ; identity = λ { {p} → niHelper (record 
-    { η = {!   !} 
-    ; η⁻¹ = {!   !} 
+    { η = λ {
+      (X ∣ ξ) → 
+        let module Pp = Functor p
+            pLR = Pp.F₀ X
+        in id , id ∥ S.refl pLR
+      }
+    ; η⁻¹ = λ {
+      (X ∣ ξ) → 
+        let module Pp = Functor p
+            pLR = Pp.F₀ X
+        in id , id ∥ S.refl pLR
+      }
     ; commute = λ { {X ∣ ξ} {Y ∣ η} (l , r ∥ eq) → id-comm-sym , id-comm-sym  }
     ; iso = λ X → record { isoˡ = identityˡ , identityˡ ; isoʳ = identity² , identity² } 
     }) }
   ; homomorphism = λ { {p} {q} {r} {α} {β} → 
     let module Pr = Functor r in
     niHelper (record 
-      { η = {!   !} 
-      ; η⁻¹ = {!   !} 
-      ; commute = {!   !} 
-      ; iso = {!   !} 
+      { η = λ {
+      (X ∣ ξ) → 
+        let module Pp = Functor p
+            pLR = Pp.F₀ X
+            rLR = Pr.F₀ X
+        in id , id ∥ cong (Pr.F₁ (id , id)) (S.refl rLR) }
+      ; η⁻¹ = λ {
+      (X ∣ ξ) → 
+        let module Pp = Functor p
+            pLR = Pp.F₀ X
+            rLR = Pr.F₀ X
+        in id , id ∥ cong (Pr.F₁ (id , id)) (S.refl rLR) }
+      ; commute = λ { {X ∣ ξ} {Y ∣ η} (l , r ∥ eq) → id-comm-sym , id-comm-sym  }
+      ; iso = λ X → record { isoˡ = identityˡ , identityˡ ; isoʳ = identity² , identity² } 
       }) }
   ; F-resp-≈ = λ { {p} {q} {α} {β} f≈g → 
     let module Pp = Functor p 
         module Pq = Functor q in niHelper (record 
-        { η = {!   !} 
-        ; η⁻¹ = {!   !} 
+        { η = λ { (X ∣ _) → let pLR = Pp.F₀ X in
+              id , id ∥ cong (Pq.F₁ (id , id)) (f≈g (S.refl pLR)) }
+        ; η⁻¹ = λ { (X ∣ _) → let pLR = Pp.F₀ X in
+              id , id ∥ cong (Pq.F₁ (id , id)) (S.sym (Pq.F₀ X) (f≈g (S.refl pLR))) }
         ; commute = λ { {X ∣ ξ} {Y ∣ η} (l , r ∥ eq) → id-comm-sym , id-comm-sym  }
         ; iso = λ X → record { isoˡ = identityˡ , identityˡ ; isoʳ = identity² , identity² } 
         }) }
-  } -- record
-{-
-  { F₀ = λ x → Tabulator x
-  ; F₁ = λ α → h α
-  ; identity = λ { {p} → niHelper (record 
-        { η = λ { (X ∣ ξ) → 
-            let module Pp = Functor p
-                pXX = Pp.F₀ (X , X)
-            in record { arr = id 
-                      ; eq = S.refl pXX } } 
-        ; η⁻¹ = λ { (X ∣ ξ) → 
-            let module Pp = Functor p
-                pXX = Pp.F₀ (X , X)
-            in record { arr = id 
-                      ; eq = S.refl pXX } } 
-        ; commute = λ { {X ∣ ξ} {Y ∣ η} (arr ∥ eq) → id-comm-sym {f = arr} }
-       ; iso = λ X → record { isoˡ = identityˡ ; isoʳ = identity² } 
-       } ) }
-  ; homomorphism = λ { {p} {q} {r} {α} {β} → 
-    let module Pr = Functor r in
-    niHelper (record 
-     { η = λ { (X ∣ ξ) → 
-       id ∥ cong (Pr.F₁ (id , id)) (S.refl (Pr.F₀ (X , X))) }
-     ; η⁻¹ = λ { (X ∣ ξ) → 
-       id ∥ cong (Pr.F₁ (id , id)) (S.refl (Pr.F₀ (X , X))) }
-      ; commute = λ { {X ∣ ξ} {Y ∣ η} (arr ∥ eq) → id-comm-sym {f = arr} }
-     ; iso = λ X → record { isoˡ = identityˡ ; isoʳ = identity² } 
-     }) }
-  ; F-resp-≈ = λ { {p} {q} {α} {β} f≈g → 
-    let module Pp = Functor p 
-        module Pq = Functor q in niHelper (record 
-     { η = λ { (X ∣ ξ) → 
-       id ∥ cong (Pq.F₁ (id , id)) (f≈g (S.refl (Pp.F₀ (X , X)))) 
-       }
-     ; η⁻¹ =  λ { (X ∣ _) → 
-       id ∥ cong (Pq.F₁ (id , id)) (S.sym (Pq.F₀ (X , X)) (f≈g (S.refl (Pp.F₀ (X , X))))) 
-       }
-      ; commute = λ { {X ∣ ξ} {Y ∣ η} (arr ∥ eq) → id-comm-sym {f = arr} }
-     ; iso = λ X → record { isoˡ = identityˡ ; isoʳ = identity² } 
-     })}
   }
--}
