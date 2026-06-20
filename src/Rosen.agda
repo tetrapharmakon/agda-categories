@@ -26,7 +26,7 @@ private
 
 open 𝒞
 
-open Closed Cl using ([-,-]; [_,_]₀; [_,-]; [_,_]₁)
+open Closed Cl using ([-,-]; [_,_]₀; [_,-]; [_,_]₁; Hom[-⊗_,-]; Hom[-,[_,-]]; Hom-NI)
 
 module Arr = Categories.Category.Construction.Arrow C
 
@@ -49,6 +49,8 @@ record MR2 (A B : Obj) : Set (o ⊔ ℓ ⊔ e) where
 
   ϕη = NaturalTransformation.η ϕ
   ϕcommute = λ {X Y : Category.Obj Arr.Arrow} t → NaturalTransformation.commute ϕ {X} {Y} t
+  ϕf = ϕη (record { arr = f }) ∘ f
+  -- ϕ[ϕf] = {!  !}
 
 MR2-Setoid : Obj → Obj → Setoid (o ⊔ ℓ ⊔ e) (o ⊔ ℓ ⊔ e)
 MR2-Setoid A B = record
@@ -70,10 +72,33 @@ nHom {A} {B} f = record
   }
 
 
+open import Categories.NaturalTransformation renaming (id to idN)
+open import Categories.NaturalTransformation.NaturalIsomorphism
+  using (niHelper)
+  
+nHom-identity : ∀ {A} → nHom (id {A}) ≃ idN
+nHom-identity = {!  !}
+
+open import Categories.Category.Instance.Sets
+
+MRS-SetP : Bifunctor (Category.op C) C (Sets (o ⊔ ℓ ⊔ e))
+MRS-SetP = record
+  { F₀ = λ {(A , B) → MR2 A B}
+  ; F₁ = λ { {(A , B)} {(A' , B')} (u , v) ⟪ f , ϕ ⟫ → let module ϕ = NaturalTransformation ϕ in
+    ⟪ v ∘ f ∘ u , (nHom u ∘ʳ Cod) ∘ᵥ ϕ ⟫}
+  ; identity = {!  !}
+  ; homomorphism = {!  !}
+  ; F-resp-≈ = {!  !}
+  }
+
+open import Categories.Category.Construction.Elements using (Elements)
+
+𝓔MRS = Elements MRS-SetP
 
 import Categories.Morphism.Reasoning as MR
 
 open HomReasoning 
+open MR
 -- Type of the desired profunctor C.op × C → Sets sending (A , B) ↦ MR2 A B.
 MRS-Profunctor : Bifunctor (Category.op C) C (Setoids (o ⊔ ℓ ⊔ e) (o ⊔ ℓ ⊔ e))
 MRS-Profunctor = record
@@ -139,8 +164,56 @@ MRS-Profunctor = record
      }
   }
 
-open import Categories.NaturalTransformation renaming (id to idN)
+
 open import Categories.Functor.Profunctor.Tabulator
+module _ where
+  
+  record tot⇒ (x y : tab₀ MRS-Profunctor) : Set (o ⊔ ℓ ⊔ e) where
+    constructor [_,_∥_,_]
+    module x = tab₀ x
+    module y = tab₀ y
+    field
+      l : x.L ⇒ y.L 
+      r : x.R ⇒ y.R 
+    
+    f = MR2.f x.ξ
+    g = MR2.f y.ξ
+
+    module ϕ = NaturalTransformation (MR2.ϕ x.ξ)
+    module l*ψ = NaturalTransformation ((nHom l ∘ʳ Cod) ∘ᵥ MR2.ϕ y.ξ)
+    
+    field
+      eqf : r ∘ f ≈ g ∘ l
+      eqϕ : l*ψ.η (record { arr = g }) ∘ r ≈ Functor.F₁ [ x.L ,-] r ∘ ϕ.η (record { arr = f })
+
+  total : Category (o ⊔ ℓ ⊔ e) (o ⊔ ℓ ⊔ e) {!  !} 
+  total = record
+    { Obj = tab₀ MRS-Profunctor
+    ; _⇒_ = λ s t → tot⇒ s t
+    ; _≈_ = λ h k → tot⇒.l h ≈ tot⇒.l k × tot⇒.r h ≈ tot⇒.r k
+    ; id = λ { {(A , B) ∣ ⟪ f , ϕ ⟫} → 
+         [ id , id 
+         ∥ id-comm-sym C , 
+         (begin {!  !} ≈⟨ identityʳ ⟩ 
+                {!  !} ≈⟨ {!  !} ⟩ 
+                {!  !} ≈⟨ {!  !} ⟩ 
+                {!  !} ∎) 
+         ]}
+    ; _∘_ = λ {t t' → let module t = tot⇒ t
+                          module t' = tot⇒ t'
+                      in [ t.l ∘ t'.l , t.r ∘ t'.r ∥ 
+                           {!  !} 
+                         , {!  !} 
+                         ]}
+    ; assoc = assoc , {!  !}
+    ; sym-assoc = sym-assoc , {!  !}
+    ; identityˡ = identityˡ , {!  !}
+    ; identityʳ = identityʳ , {!  !}
+    ; identity² = identity² , {!  !}
+    ; equiv = {!  !}
+    ; ∘-resp-≈ = {!  !}
+    }
+
 open import Categories.Functor.Construction.LiftSetoids using (LiftSetoids)
 
 𝕋MRS = Tabulator MRS-Profunctor
@@ -149,13 +222,13 @@ open import Categories.Functor.Construction.LiftSetoids using (LiftSetoids)
 þ  = cell {p = MRS-Profunctor}
 
 -- gives f
-∫_ : Functor 𝕋MRS Arr.Arrow
-∫_ = record
+V₁ : Functor 𝕋MRS Arr.Arrow
+V₁ = record
   { F₀ = λ { ((A , B) ∣ ξ) → record { arr = MR2.f ξ } }
   ; F₁ = λ { {(A , B) ∣ ⟪ f , ϕ ⟫} {(A' , B') ∣ ⟪ g , ϕ' ⟫} (l , r ∥ eq) → mor⇒ {dom⇒ = l} {cod⇒ = r} 
-    (begin r ∘ f ≈˘⟨ refl⟩∘⟨ identityʳ ⟩ 
+    (begin r ∘ f      ≈˘⟨ refl⟩∘⟨ identityʳ ⟩ 
            r ∘ f ∘ id ≈⟨ (proj₁ eq) ○ identityˡ ⟩
-           g ∘ l ∎) }
+           g ∘ l      ∎) }
   ; identity = 
       Equiv.refl 
     , Equiv.refl
@@ -172,10 +245,23 @@ open import Categories.Functor.Construction.LiftSetoids using (LiftSetoids)
 -- (l , r ∥ eq) has l : A ⇒ A′, but functoriality would require a canonical
 -- morphism [ A , B ] ⇒ [ A′ , B′ ], and [-,-] is contravariant in its first
 -- argument (so it wants A′ ⇒ A instead).
--- ∇₀ : 𝕋MRS .Obj → Arr.Arrow .Obj
+-- ∇₀ : (𝕋MRS .Obj) → Arr.Arrow .Obj
 -- ∇₀ ((A , B) ∣ ξ) =
 --   let module phi = NaturalTransformation (MR2.ϕ ξ) in
 --   record { arr = phi.η (record { arr = MR2.f ξ }) }
+
+∇ : Functor 𝕋MRS Arr.Arrow
+∇ = record
+  { F₀ = λ ((A , B) ∣ ξ) → 
+  let module phi = NaturalTransformation (MR2.ϕ ξ) in
+  record { arr = phi.η (record { arr = MR2.f ξ }) }
+  ; F₁ = λ { {(A , B) ∣ ⟪ f , ϕ ⟫} {(A' , B') ∣ ⟪ g , ψ ⟫} (l , r ∥ eq) → mor⇒ (begin {!  !} ≈⟨ {!  !} ⟩ 
+              {!  !} ≈⟨ {!  !} ⟩ 
+              {!  !} ∎)}
+  ; identity = {!  !}
+  ; homomorphism = {!  !}
+  ; F-resp-≈ = {!  !}
+  }
 
 ϵ  : NaturalTransformation MRS-Profunctor (LiftSetoids (o ⊔ e) (o ⊔ ℓ) ∘F Hom[ C ][-,-])
 ϵ = ntHelper record 
@@ -186,3 +272,18 @@ open import Categories.Functor.Construction.LiftSetoids using (LiftSetoids)
   ; commute = λ { {(A , B)} {(A' , B')} (u , v) {⟪ f , ϕ ⟫} {⟪ g , ϕ' ⟫} eq →
       lift (∘-resp-≈ʳ (∘-resp-≈ˡ (proj₁ eq))) }
   }
+
+{-
+∇ : Functor 𝓔MRS Arr.Arrow
+∇ = record
+  { F₀ = λ {((A , B) , ξ) → record { arr = MR2.ϕf ξ }}
+  ; F₁ = λ { {(A , B) , X@(⟪ f , ϕ ⟫)} {(A' , B') , Y@(⟪ g , ψ ⟫)} ((l , r) , q) → 
+      mor⇒ (begin [ l , r ]₁ ∘ MR2.ϕf X ≈⟨  {!  !} ⟩ 
+                  {!  !} ≈⟨  {!  !} ⟩ 
+                  MR2.ϕf Y ∘ {!  !} ∎) }
+  ; identity = {!  !}
+  ; homomorphism = {!  !}
+  ; F-resp-≈ = {!  !}
+  }
+-- here be the pullback of two functors, V₁ and Cod. 
+-}
