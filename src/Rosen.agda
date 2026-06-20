@@ -192,12 +192,18 @@ module _ where
     ; _⇒_ = λ s t → tot⇒ s t
     ; _≈_ = λ h k → tot⇒.l h ≈ tot⇒.l k × tot⇒.r h ≈ tot⇒.r k
     ; id = λ { {(A , B) ∣ ⟪ f , ϕ ⟫} → 
-         [ id , id 
-         ∥ id-comm-sym C , 
-         (begin {!  !} ≈⟨ identityʳ ⟩ 
-                {!  !} ≈⟨ {!  !} ⟩ 
-                {!  !} ≈⟨ {!  !} ⟩ 
-                {!  !} ∎) 
+         let module ϕNT = NaturalTransformation ϕ
+             module l*ϕ = NaturalTransformation ((nHom id ∘ʳ Cod) ∘ᵥ ϕ)
+         in
+         [ id , id
+         ∥ id-comm-sym C
+         , (begin
+              l*ϕ.η (record { arr = f }) ∘ id
+                ≈⟨ identityʳ ⟩
+              l*ϕ.η (record { arr = f })
+                ≈⟨ Equiv.refl ⟩
+              Functor.F₁ [ A ,-] id ∘ ϕNT.η (record { arr = f })
+            ∎)
          ]}
     ; _∘_ = λ {t t' → let module t = tot⇒ t
                           module t' = tot⇒ t'
