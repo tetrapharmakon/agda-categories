@@ -77,7 +77,7 @@ open import Categories.NaturalTransformation.NaturalIsomorphism
   using (niHelper)
   
 nHom-identity : ∀ {A} → nHom (id {A}) ≃ idN
-nHom-identity = {!  !}
+nHom-identity = [-,-].identity
 
 open import Categories.Category.Instance.Sets
 
@@ -207,15 +207,34 @@ module _ where
          ]}
     ; _∘_ = λ {t t' → let module t = tot⇒ t
                           module t' = tot⇒ t'
-                      in [ t.l ∘ t'.l , t.r ∘ t'.r ∥ 
-                           (begin (t.r ∘ t'.r) ∘ t'.f ≈⟨ pullʳ C t'.eqf ⟩ 
-                                  t.r ∘ MR2.f t'.y.ξ ∘ t'.l ≈⟨ pullˡ C t.eqf ⟩ 
-                                  (MR2.f t.y.ξ ∘ t.l) ∘ t'.l ≈⟨ assoc ⟩ 
-                                  MR2.f t.y.ξ ∘ t.l ∘ t'.l ∎) 
-                         , (begin {!  !} ≈⟨ {!  !} ⟩ 
-                                  {!  !} ≈⟨ {!  !} ⟩ 
-                                  {!  !} ∎) 
-                         ]}
+                       in [ t.l ∘ t'.l , t.r ∘ t'.r ∥ 
+                            (begin (t.r ∘ t'.r) ∘ t'.f ≈⟨ pullʳ C t'.eqf ⟩ 
+                                   t.r ∘ MR2.f t'.y.ξ ∘ t'.l ≈⟨ pullˡ C t.eqf ⟩ 
+                                   (MR2.f t.y.ξ ∘ t.l) ∘ t'.l ≈⟨ assoc ⟩ 
+                                   MR2.f t.y.ξ ∘ t.l ∘ t'.l ∎) 
+                          , (let module Hx = Functor [ t'.x.L ,-]
+                                 module Hy = Functor [ t.x.L ,-]
+                                 module ψ = NaturalTransformation (MR2.ϕ t.y.ξ)
+                                 ψ₁ = ψ.η (record { arr = t.g })
+                                 ϕ₁ = t.ϕ.η (record { arr = t.f })
+                                 ϕ'₁ = t'.ϕ.η (record { arr = t'.f })
+                                 module Hom[-1] {X} = Functor (appʳ [-,-] X)
+                             in
+                             begin
+                               ([ t.l ∘ t'.l , id ]₁ ∘ ψ₁) ∘ (t.r ∘ t'.r)             ≈⟨ ∘-resp-≈ (∘-resp-≈ (Hom[-1].homomorphism {f = t.l} {g = t'.l}) Equiv.refl) Equiv.refl ⟩
+                               (([ t'.l , id ]₁ ∘ [ t.l , id ]₁) ∘ ψ₁) ∘ (t.r ∘ t'.r) ≈⟨ ∘-resp-≈ assoc Equiv.refl ⟩
+                               ([ t'.l , id ]₁ ∘ ([ t.l , id ]₁ ∘ ψ₁)) ∘ (t.r ∘ t'.r) ≈˘⟨ assoc ⟩
+                               (([ t'.l , id ]₁ ∘ ([ t.l , id ]₁ ∘ ψ₁)) ∘ t.r) ∘ t'.r ≈⟨ ∘-resp-≈ assoc Equiv.refl ⟩
+                               ([ t'.l , id ]₁ ∘ (([ t.l , id ]₁ ∘ ψ₁) ∘ t.r)) ∘ t'.r ≈⟨ ∘-resp-≈ (∘-resp-≈ Equiv.refl t.eqϕ) Equiv.refl ⟩
+                               ([ t'.l , id ]₁ ∘ (Hy.F₁ t.r ∘ ϕ₁)) ∘ t'.r             ≈⟨ ∘-resp-≈ (Equiv.sym assoc) Equiv.refl ⟩
+                               (([ t'.l , id ]₁ ∘ Hy.F₁ t.r) ∘ ϕ₁) ∘ t'.r             ≈⟨ ∘-resp-≈ (∘-resp-≈ (Equiv.sym [ [-,-] ]-commute) Equiv.refl) Equiv.refl ⟩
+                               ((Hx.F₁ t.r ∘ [ t'.l , id ]₁) ∘ ϕ₁) ∘ t'.r             ≈⟨ ∘-resp-≈ assoc Equiv.refl ⟩
+                               (Hx.F₁ t.r ∘ ([ t'.l , id ]₁ ∘ ϕ₁)) ∘ t'.r             ≈⟨ assoc ⟩
+                               Hx.F₁ t.r ∘ (([ t'.l , id ]₁ ∘ ϕ₁) ∘ t'.r)             ≈⟨ ∘-resp-≈ Equiv.refl t'.eqϕ ⟩
+                               Hx.F₁ t.r ∘ (Hx.F₁ t'.r ∘ ϕ'₁)                         ≈˘⟨ assoc ⟩
+                               (Hx.F₁ t.r ∘ Hx.F₁ t'.r) ∘ ϕ'₁                         ≈⟨ ∘-resp-≈ (Equiv.sym Hx.homomorphism) Equiv.refl ⟩
+                               Hx.F₁ (t.r ∘ t'.r) ∘ ϕ'₁                               ∎)
+                          ]}
     ; assoc = assoc , assoc
     ; sym-assoc = sym-assoc , sym-assoc
     ; identityˡ = identityˡ , identityˡ
@@ -268,14 +287,15 @@ V₁ = record
 ∇ : Functor total Arr.Arrow
 ∇ = record
   { F₀ = λ ((A , B) ∣ ξ) → 
-  let module phi = NaturalTransformation (MR2.ϕ ξ) in
-  record { arr = phi.η (record { arr = MR2.f ξ }) }
-  ; F₁ = λ { {(A , B) ∣ ⟪ f , ϕ ⟫} {(A' , B') ∣ ⟪ g , ψ ⟫} ([ l , r ∥ eqf , eqϕ ]) → mor⇒ (begin {!  !} ≈⟨ {!  !} ⟩ 
-              {!  !} ≈⟨ {!  !} ⟩ 
-              {!  !} ∎)}
-  ; identity = {!  !}
-  ; homomorphism = {!  !}
-  ; F-resp-≈ = {!  !}
+  let module phi = NaturalTransformation (MR2.ϕ ξ) 
+  in record { arr = phi.η (record { arr = MR2.f ξ }) }
+  ; F₁ = λ { {(A , B) ∣ ⟪ f , ϕ ⟫} {(A' , B') ∣ ⟪ g , ψ ⟫} ([ l , r ∥ eqf , eqϕ ]) → 
+          mor⇒ (begin {!  !} ≈⟨ {!  !} ⟩ 
+                      {!  !} ≈⟨ {!  !} ⟩ 
+                      {!  !} ∎)}
+  ; identity = Equiv.refl , {!  !}
+  ; homomorphism = Equiv.refl , {!  !}
+  ; F-resp-≈ = λ x → Equiv.refl , {!  !}
   }
 
 ϵ  : NaturalTransformation MRS-Profunctor (LiftSetoids (o ⊔ e) (o ⊔ ℓ) ∘F Hom[ C ][-,-])
