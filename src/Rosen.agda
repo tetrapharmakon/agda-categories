@@ -1,4 +1,4 @@
-{-# OPTIONS --without-K --safe --warning=noUserWarning #-}
+{-# OPTIONS --without-K --safe --warning=noUserWarning --warning=noUselessPrivate #-}
 
 open import Level using (_⊔_;lift;lower;zero;suc)
 
@@ -12,10 +12,12 @@ open import Categories.Category.Instance.Setoids
 open import Categories.Category.Monoidal using (Monoidal)
 open import Categories.Category.Monoidal.Closed using (Closed)
 open import Categories.Functor using (Functor; _∘F_)
-open import Categories.Functor.Bifunctor using (Bifunctor)
+open import Categories.Functor.Bifunctor using (Bifunctor; appˡ; appʳ)
 open import Categories.Functor.Bifunctor.Properties using ([_]-commute)
 open import Categories.NaturalTransformation using (NaturalTransformation;_∘ᵥ_; _∘ₕ_; _∘ˡ_; _∘ʳ_)
 open import Categories.NaturalTransformation.Equivalence using (_≃_; ≃-isEquivalence)
+
+open import Categories.Functor.Hom using (Hom[_][-,-]; Hom[_][_,_])
 
 module Rosen {o ℓ e} {C : Category o ℓ e} {M : Monoidal C} (Cl : Closed M) where
 
@@ -44,6 +46,9 @@ record MR2 (A B : Obj) : Set (o ⊔ ℓ ⊔ e) where
   field
     f : A ⇒ B
     ϕ : NaturalTransformation Cod (([_,-] A) ∘F Cod)
+
+  ϕη = NaturalTransformation.η ϕ
+  ϕcommute = λ {X Y : Category.Obj Arr.Arrow} t → NaturalTransformation.commute ϕ {X} {Y} t
 
 MR2-Setoid : Obj → Obj → Setoid (o ⊔ ℓ ⊔ e) (o ⊔ ℓ ⊔ e)
 MR2-Setoid A B = record
@@ -87,33 +92,53 @@ MRS-Profunctor = record
                                   f ∘ id      ≈⟨ identityʳ ⟩ 
                                   f           ≈⟨ f≈g ⟩ 
                                   g           ∎) 
-        , λ { {h} → {!  !} })
-    }
+        , λ { {h} →
+            let module ϕ = NaturalTransformation ϕ
+                module ϕ' = NaturalTransformation ϕ'
+            in
+            begin
+              [ id , id ]₁ ∘ ϕ.η h ≈⟨ ∘-resp-≈ Hom.identity Equiv.refl ⟩
+              id ∘ ϕ.η h           ≈⟨ identityˡ ⟩
+              ϕ.η h                ≈⟨ ϕ≈ϕ' {h} ⟩
+              ϕ'.η h               ∎ })
+     }
   ; homomorphism = λ { {(A , B)} {(A' , B')} {(A'' , B'')} {f = (u₁ , v₁)} {g = (u₂ , v₂)} {⟪ f , ϕ ⟫} {⟪ g , ϕ' ⟫} →
-      let module Hom = Functor [-,-] in
-        ( λ { (f≈g , ϕ≈ϕ') → 
-            (begin (v₂ ∘ v₁) ∘ f ∘ u₁ ∘ u₂     ≈⟨ sym-assoc ⟩ 
-                   ((v₂ ∘ v₁) ∘ f) ∘ u₁ ∘ u₂   ≈⟨ Equiv.sym assoc ⟩ 
-                   (((v₂ ∘ v₁) ∘ f) ∘ u₁) ∘ u₂ ≈⟨ (refl⟩∘⟨ f≈g) ⟩∘⟨refl ⟩∘⟨refl ⟩ 
-                   (((v₂ ∘ v₁) ∘ g) ∘ u₁) ∘ u₂ ≈⟨ assoc ⟩∘⟨refl ⟩
-                   ((v₂ ∘ v₁) ∘ g ∘ u₁) ∘ u₂   ≈⟨ assoc ⟩∘⟨refl ⟩ 
-                   (v₂ ∘ (v₁ ∘ (g ∘ u₁))) ∘ u₂ ≈⟨ assoc ⟩ 
-                   v₂ ∘ (v₁ ∘ g ∘ u₁) ∘ u₂     ≈⟨ sym-assoc ⟩ 
-                   (v₂ ∘ v₁ ∘ g ∘ u₁) ∘ u₂     ≈⟨ assoc ⟩ 
-                   v₂ ∘ (v₁ ∘ g ∘ u₁) ∘ u₂     ∎)
-        ,   {!  !} })
-    }
+       let module Hom = Functor [-,-] 
+           module Hom[1-] {A} = Functor (appˡ [-,-] A) 
+           module Hom[-1] {A} = Functor (appʳ [-,-] A) in
+         ( λ { (f≈g , ϕ≈ϕ') → 
+             (begin (v₂ ∘ v₁) ∘ f ∘ u₁ ∘ u₂     ≈˘⟨ assoc ○ assoc ⟩ 
+                    (((v₂ ∘ v₁) ∘ f) ∘ u₁) ∘ u₂ ≈⟨ (refl⟩∘⟨ f≈g) ⟩∘⟨refl ⟩∘⟨refl ⟩ 
+                    (((v₂ ∘ v₁) ∘ g) ∘ u₁) ∘ u₂ ≈⟨ (assoc ⟩∘⟨refl) ○ (assoc ⟩∘⟨refl) ⟩ 
+                    (v₂ ∘ (v₁ ∘ (g ∘ u₁))) ∘ u₂ ≈⟨ assoc ○ sym-assoc ○ assoc ⟩ 
+                    v₂ ∘ (v₁ ∘ g ∘ u₁) ∘ u₂     ∎)
+        , λ { {h} →
+            let module ϕ = NaturalTransformation ϕ
+                module ϕ' = NaturalTransformation ϕ'
+            in
+            begin
+              [ u₁ ∘ u₂ , id ]₁ ∘ ϕ.η h              ≈⟨ ∘-resp-≈ Equiv.refl (ϕ≈ϕ' {h}) ⟩
+              [ u₁ ∘ u₂ , id ]₁ ∘ ϕ'.η h             ≈⟨ Hom[-1].homomorphism ⟩∘⟨refl ⟩
+              ([ u₂ , id ]₁ ∘ [ u₁ , id ]₁) ∘ ϕ'.η h ≈⟨ assoc ⟩
+              [ u₂ , id ]₁ ∘ ([ u₁ , id ]₁ ∘ ϕ'.η h) ∎ } })
+     }
   ; F-resp-≈ = λ { {(A , B)} {(A' , B')} {f = (u , v)} {g = (u' , v')} (u≈u' , v≈v') {⟪ f , ϕ ⟫} {⟪ g , ϕ' ⟫} →
-      let module Hom = Functor [-,-] in 
-        ( λ { (f≈g , ϕ≈ϕ') → 
-          (begin v ∘ f ∘ u   ≈⟨ ∘-resp-≈ v≈v' (∘-resp-≈ʳ u≈u') ⟩ 
-                 v' ∘ f ∘ u' ≈⟨ refl⟩∘⟨ f≈g ⟩∘⟨refl ⟩
-                 v' ∘ g ∘ u' ∎) 
-        , λ {h} → {!  !} })
-    }
+       let module Hom = Functor [-,-] in 
+         ( λ { (f≈g , ϕ≈ϕ') → 
+           (begin v ∘ f ∘ u   ≈⟨ ∘-resp-≈ v≈v' (∘-resp-≈ʳ u≈u') ⟩ 
+                  v' ∘ f ∘ u' ≈⟨ refl⟩∘⟨ f≈g ⟩∘⟨refl ⟩
+                  v' ∘ g ∘ u' ∎) 
+        , λ { {h} →
+            let module ϕ = NaturalTransformation ϕ
+                module ϕ' = NaturalTransformation ϕ'
+            in
+            begin
+              [ u , id ]₁ ∘ ϕ.η h   ≈⟨ ∘-resp-≈ʳ (ϕ≈ϕ' {h}) ⟩
+              [ u , id ]₁ ∘ ϕ'.η h  ≈⟨ ∘-resp-≈ˡ (Hom.F-resp-≈ (u≈u' , Equiv.refl)) ⟩
+              [ u' , id ]₁ ∘ ϕ'.η h ∎ } })
+     }
   }
 
-open import Categories.Functor.Hom using (Hom[_][-,-])
 open import Categories.NaturalTransformation renaming (id to idN)
 open import Categories.Functor.Profunctor.Tabulator
 open import Categories.Functor.Construction.LiftSetoids using (LiftSetoids)
@@ -140,30 +165,17 @@ open import Categories.Functor.Construction.LiftSetoids using (LiftSetoids)
   ; F-resp-≈ = λ { x → x }
   }
 
--- gives ϕ? Probably it's not a functor
-∇_ : Functor 𝕋MRS Arr.Arrow
-∇_ = record
-  { F₀ = λ { ((A , B) ∣ ξ) → 
-    let module phi = NaturalTransformation (MR2.ϕ ξ) in record { arr = phi.η (record { arr = MR2.f ξ }) } }
-  ; F₁ = λ { {(A , B) ∣ ⟪ f , ϕ ⟫} {(A' , B') ∣ ⟪ g , ϕ' ⟫} (l , r ∥ eq) → 
-    let module phi = NaturalTransformation (MR2.ϕ ⟪ f , ϕ ⟫) in
-        mor⇒ {dom⇒ = r} {cod⇒ = Functor.F₁ [-,-] ({!  !} , r)} {!  !} }
-        {-
-        B ------phi_f---> [A , B]
-        |                    |
-        r                    | [? , r]
-        |                    |
-        V                    V
-        B' ----phi'_g--> [A' , B']
-        -}
-  ; identity = 
-      Equiv.refl 
-    , {!  !}
-  ; homomorphism = 
-      Equiv.refl 
-    , {!  !}
-  ; F-resp-≈ = λ { x → {!  !} }
-  }
+-- Object part of the would-be “nabla” map:
+-- it sends (A , B ∣ ⟪ f , ϕ ⟫) to the arrow B → [ A , B ] given by ϕ at f.
+--
+-- This does not extend to a functor 𝕋MRS → Arrow(C) in general: a morphism
+-- (l , r ∥ eq) has l : A ⇒ A′, but functoriality would require a canonical
+-- morphism [ A , B ] ⇒ [ A′ , B′ ], and [-,-] is contravariant in its first
+-- argument (so it wants A′ ⇒ A instead).
+-- ∇₀ : 𝕋MRS .Obj → Arr.Arrow .Obj
+-- ∇₀ ((A , B) ∣ ξ) =
+--   let module phi = NaturalTransformation (MR2.ϕ ξ) in
+--   record { arr = phi.η (record { arr = MR2.f ξ }) }
 
 ϵ  : NaturalTransformation MRS-Profunctor (LiftSetoids (o ⊔ e) (o ⊔ ℓ) ∘F Hom[ C ][-,-])
 ϵ = ntHelper record 
@@ -171,5 +183,6 @@ open import Categories.Functor.Construction.LiftSetoids using (LiftSetoids)
     { _⟨$⟩_ = λ {⟪ f , ϕ ⟫ → lift f }
     ; cong = λ { {⟪ f , ϕ ⟫} {⟪ g , ϕ' ⟫} eq → lift (proj₁ eq) }
     } }
-  ; commute = λ { {(A , B)} {(A' , B')} (u , v) {⟪ f , ϕ ⟫} {⟪ g , ϕ' ⟫} eq → lift {!  !} }
+  ; commute = λ { {(A , B)} {(A' , B')} (u , v) {⟪ f , ϕ ⟫} {⟪ g , ϕ' ⟫} eq →
+      lift (∘-resp-≈ʳ (∘-resp-≈ˡ (proj₁ eq))) }
   }
