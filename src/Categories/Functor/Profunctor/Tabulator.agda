@@ -229,3 +229,34 @@ open import Categories.NaturalTransformation.NaturalIsomorphism
         ; iso = λ X → record { isoˡ = identityˡ , identityˡ ; isoʳ = identity² , identity² } 
         }) }
   }
+
+
+module _ where
+  open Equiv
+  
+
+  open import Categories.Functor.Hom using (Hom[_][-,-])
+  
+  open import Categories.Functor.Construction.LiftSetoids using (LiftSetoids)
+  -- gives the universal property of the tabulator, i.e. the unique functor from any other cone to the tabulator.
+  -- universal : ∀ {D} {p : Bifunctor (Category.op C) C (Setoids (o ⊔ ℓ ⊔ e) (o ⊔ ℓ ⊔ e))} (F : Functor D C) (G : Functor D C) (cell : NaturalTransformation (LiftSetoids zero (o ⊔ ℓ) ∘F Hom[ D ][-,-]) (p ∘F (Functor.op F ⁂ G))) → Functor D (Tabulator p)
+  -- universal F G cell = {!  !}
+   -- record
+  --   { F₀ = λ {X → record { Car = F₀ F X , proj₁ = F₀ F X , proj₂ = F₀ G X } ∣ cell.η {X} } 
+  --   ; F₁ = λ {f → record 
+  --     { _⟨$⟩_ = λ {X} → let module cellX = tab₀ (cell.η {X}) in cellX._⟨$⟩_ 
+  --     ; cong = λ { {lift i₁} {lift j₁} i≈j → 
+  --         let module celli₁ = tab₀ (cell.η {i₁}) 
+  --             module cellj₁ = tab₀ (cell.η {j₁}) in
+  --         celli₁.cong i≈j
+  --       }
+  --     } }
+  --   ; identity = λ {X} → let module cellX = tab₀ (cell.η {X}) in cellX.identity
+  --   ; homomorphism = λ {f g h} → let module cellf = tab₀ (cell.η {f}) 
+  --                                     module cellg = tab₀ (cell.η {g}) 
+  --                                     module cellh = tab₀ (cell.η {h}) in
+  --                                 cellf.commute g h
+  --   ; F-resp-≈ = λ {i j} i≈j → let module celli = tab₀ (cell.η {i}) 
+  --                                    module cellj = tab₀ (cell.η {j}) in
+  --                                celli.sym-commute i≈j
+  --   }

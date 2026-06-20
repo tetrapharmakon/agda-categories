@@ -2,7 +2,7 @@
 
 open import Level using (_⊔_;lift;lower;zero;suc)
 
-open import Data.Product using (_,_; proj₂; _×_)
+open import Data.Product using (_,_; proj₁; proj₂; _×_)
 open import Relation.Binary using (IsEquivalence)
 open import Relation.Binary.Bundles using (Setoid)
 
@@ -127,21 +127,49 @@ open import Categories.Functor.Construction.LiftSetoids using (LiftSetoids)
 ∫_ : Functor 𝕋MRS Arr.Arrow
 ∫_ = record
   { F₀ = λ { ((A , B) ∣ ξ) → record { arr = MR2.f ξ } }
-  ; F₁ = λ { {(A , B) ∣ ξ} {(A' , B') ∣ ξ'} (l , r ∥ eq) → mor⇒ {dom⇒ = l} {cod⇒ = r} {!   !}}
-  ; identity = {!  !}
-  ; homomorphism = {!  !}
-  ; F-resp-≈ = {!  !}
+  ; F₁ = λ { {(A , B) ∣ ⟪ f , ϕ ⟫} {(A' , B') ∣ ⟪ g , ϕ' ⟫} (l , r ∥ eq) → mor⇒ {dom⇒ = l} {cod⇒ = r} 
+    (begin r ∘ f ≈˘⟨ refl⟩∘⟨ identityʳ ⟩ 
+           r ∘ f ∘ id ≈⟨ (proj₁ eq) ○ identityˡ ⟩
+           g ∘ l ∎) }
+  ; identity = 
+      Equiv.refl 
+    , Equiv.refl
+  ; homomorphism = 
+      Equiv.refl 
+    , Equiv.refl
+  ; F-resp-≈ = λ { x → x }
   }
 
--- gives ϕ
+-- gives ϕ? Probably it's not a functor
 ∇_ : Functor 𝕋MRS Arr.Arrow
 ∇_ = record
-  { F₀ = λ { ((A , B) ∣ ξ) → let module phi = NaturalTransformation (MR2.ϕ ξ) in record { arr = phi.η (record { arr = MR2.f ξ }) } }
-  ; F₁ = {!  !}
-  ; identity = {!  !}
-  ; homomorphism = {!  !}
-  ; F-resp-≈ = {!  !}
+  { F₀ = λ { ((A , B) ∣ ξ) → 
+    let module phi = NaturalTransformation (MR2.ϕ ξ) in record { arr = phi.η (record { arr = MR2.f ξ }) } }
+  ; F₁ = λ { {(A , B) ∣ ⟪ f , ϕ ⟫} {(A' , B') ∣ ⟪ g , ϕ' ⟫} (l , r ∥ eq) → 
+    let module phi = NaturalTransformation (MR2.ϕ ⟪ f , ϕ ⟫) in
+        mor⇒ {dom⇒ = r} {cod⇒ = Functor.F₁ [-,-] ({!  !} , r)} {!  !} }
+        {-
+        B ------phi_f---> [A , B]
+        |                    |
+        r                    | [? , r]
+        |                    |
+        V                    V
+        B' ----phi'_g--> [A' , B']
+        -}
+  ; identity = 
+      Equiv.refl 
+    , {!  !}
+  ; homomorphism = 
+      Equiv.refl 
+    , {!  !}
+  ; F-resp-≈ = λ { x → {!  !} }
   }
 
 ϵ  : NaturalTransformation MRS-Profunctor (LiftSetoids (o ⊔ e) (o ⊔ ℓ) ∘F Hom[ C ][-,-])
-ϵ = ntHelper record { η = {!  !} ; commute = {!  !} }
+ϵ = ntHelper record 
+  { η = λ { (A , B) → record 
+    { _⟨$⟩_ = λ {⟪ f , ϕ ⟫ → lift f }
+    ; cong = λ { {⟪ f , ϕ ⟫} {⟪ g , ϕ' ⟫} eq → lift (proj₁ eq) }
+    } }
+  ; commute = λ { {(A , B)} {(A' , B')} (u , v) {⟪ f , ϕ ⟫} {⟪ g , ϕ' ⟫} eq → lift {!  !} }
+  }
