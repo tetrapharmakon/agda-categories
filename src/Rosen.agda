@@ -186,7 +186,7 @@ module _ where
       eqf : r ∘ f ≈ g ∘ l
       eqϕ : l*ψ.η (record { arr = g }) ∘ r ≈ Functor.F₁ [ x.L ,-] r ∘ ϕ.η (record { arr = f })
 
-  total : Category (o ⊔ ℓ ⊔ e) (o ⊔ ℓ ⊔ e) {!  !} 
+  total : Category (o ⊔ ℓ ⊔ e) (o ⊔ ℓ ⊔ e) e
   total = record
     { Obj = tab₀ MRS-Profunctor
     ; _⇒_ = λ s t → tot⇒ s t
@@ -208,16 +208,25 @@ module _ where
     ; _∘_ = λ {t t' → let module t = tot⇒ t
                           module t' = tot⇒ t'
                       in [ t.l ∘ t'.l , t.r ∘ t'.r ∥ 
-                           {!  !} 
-                         , {!  !} 
+                           (begin (t.r ∘ t'.r) ∘ t'.f ≈⟨ pullʳ C t'.eqf ⟩ 
+                                  t.r ∘ MR2.f t'.y.ξ ∘ t'.l ≈⟨ pullˡ C t.eqf ⟩ 
+                                  (MR2.f t.y.ξ ∘ t.l) ∘ t'.l ≈⟨ assoc ⟩ 
+                                  MR2.f t.y.ξ ∘ t.l ∘ t'.l ∎) 
+                         , (begin {!  !} ≈⟨ {!  !} ⟩ 
+                                  {!  !} ≈⟨ {!  !} ⟩ 
+                                  {!  !} ∎) 
                          ]}
-    ; assoc = assoc , {!  !}
-    ; sym-assoc = sym-assoc , {!  !}
-    ; identityˡ = identityˡ , {!  !}
-    ; identityʳ = identityʳ , {!  !}
-    ; identity² = identity² , {!  !}
-    ; equiv = {!  !}
-    ; ∘-resp-≈ = {!  !}
+    ; assoc = assoc , assoc
+    ; sym-assoc = sym-assoc , sym-assoc
+    ; identityˡ = identityˡ , identityˡ
+    ; identityʳ = identityʳ , identityʳ
+    ; identity² = identity² , identity²
+    ; equiv = record
+      { refl = Equiv.refl , Equiv.refl
+      ; sym = λ { (p , q) → Equiv.sym p , Equiv.sym q }
+      ; trans = λ { (p₁ , q₁) (p₂ , q₂) → Equiv.trans p₁ p₂ , Equiv.trans q₁ q₂ }
+      }
+    ; ∘-resp-≈ = λ { (p₁ , q₁) (p₂ , q₂) → ∘-resp-≈ p₁ p₂ , ∘-resp-≈ q₁ q₂ }
     }
 
 open import Categories.Functor.Construction.LiftSetoids using (LiftSetoids)
@@ -256,12 +265,12 @@ V₁ = record
 --   let module phi = NaturalTransformation (MR2.ϕ ξ) in
 --   record { arr = phi.η (record { arr = MR2.f ξ }) }
 
-∇ : Functor 𝕋MRS Arr.Arrow
+∇ : Functor total Arr.Arrow
 ∇ = record
   { F₀ = λ ((A , B) ∣ ξ) → 
   let module phi = NaturalTransformation (MR2.ϕ ξ) in
   record { arr = phi.η (record { arr = MR2.f ξ }) }
-  ; F₁ = λ { {(A , B) ∣ ⟪ f , ϕ ⟫} {(A' , B') ∣ ⟪ g , ψ ⟫} (l , r ∥ eq) → mor⇒ (begin {!  !} ≈⟨ {!  !} ⟩ 
+  ; F₁ = λ { {(A , B) ∣ ⟪ f , ϕ ⟫} {(A' , B') ∣ ⟪ g , ψ ⟫} ([ l , r ∥ eqf , eqϕ ]) → mor⇒ (begin {!  !} ≈⟨ {!  !} ⟩ 
               {!  !} ≈⟨ {!  !} ⟩ 
               {!  !} ∎)}
   ; identity = {!  !}
