@@ -6,9 +6,10 @@ open import Data.Product using (_,_; proj₁; proj₂; _×_)
 open import Relation.Binary using (IsEquivalence)
 open import Relation.Binary.Bundles using (Setoid)
 
-open import Categories.Category using (Category)
+open import Categories.Category using (Category;_[_,_])
 open import Categories.Category.Construction.Arrow
 open import Categories.Category.Instance.Setoids
+open import Relation.Binary.Bundles renaming (Setoid to S)
 open import Categories.Category.Monoidal using (Monoidal)
 open import Categories.Category.Monoidal.Closed using (Closed)
 open import Categories.Functor using (Functor; _∘F_)
@@ -91,14 +92,14 @@ totalAtA A = record
   }
 
 ∇ : {A : Obj} → Functor (totalAtA A) Arr.Arrow
-∇ = record
+∇ {A} = record
   { F₀ = λ (B ∣ ξ) → 
   let module phi = NaturalTransformation (MR2.ϕ ξ) 
   in record { arr = phi.η (record { arr = MR2.f ξ }) }
   ; F₁ = λ { {X ∣ ⟪ f , ϕ ⟫} {Y ∣ ⟪ g , ψ ⟫} (record { r = r ; eqϕ = eqϕ }) → mor⇒ eqϕ }
-  ; identity = λ {A} → Equiv.refl , Functor.identity [ A ,-]
-  ; homomorphism = λ { {A} {X} {Y} {Z} {f} {g} → Equiv.refl , Functor.homomorphism [ A ,-] }
-  ; F-resp-≈ = λ {A = A₁} {B} {f} {g} z → z , Functor.F-resp-≈ [ A₁ ,-] z
+  ; identity = λ { {X} → Equiv.refl , (Functor.identity [ A ,-])}
+  ; homomorphism = λ { {X} {Y} {Z} {f} {g} → Equiv.refl , Functor.homomorphism [ A ,-] }
+  ; F-resp-≈ = λ {X} {Y} {f} {g} z → z , Functor.F-resp-≈ [ A ,-] z
   }
 
 -- Pullback of two functors, ∇ and V₁.
@@ -113,12 +114,14 @@ module _ (A : Obj) where
     module F  = Functor (∇ {A})
     module G  = Functor V₁
 
+  import Categories.Morphism as M using (_≅_)
+  open M Arr.Arrow using (_≅_)
   record FibreA₀ : Set (o ⊔ ℓ ⊔ e) where
     constructor ⟨_,_,_⟩
     field
       x   : TA.Obj
       y   : TM.Obj
-      iso : F.F₀ x ≅ G.F₀ y
+      iso : (F.F₀ x) ≅ (G.F₀ y)
 
   record FibreA⇒ (P Q : FibreA₀) : Set (o ⊔ ℓ ⊔ e) where
     constructor ⟪_,_,_⟫
@@ -127,27 +130,27 @@ module _ (A : Obj) where
     module iP = _≅_ P.iso
     module iQ = _≅_ Q.iso
     field
-      f : TA [ P.x , Q.x ]
-      g : TM [ P.y , Q.y ]
-      commute : Ar [ Ar._∘_ (G.F₁ g) iP.from ≈ Ar._∘_ iQ.from (F.F₁ f) ]
+      f : TA._⇒_ P.x Q.x
+      g : TM._⇒_ P.y Q.y
+      commute : (G.F₁ g Ar.∘ iP.from) Ar.≈ {!  !} -- Ar._∘_ (iQ.from (F.F₁ f)) -- Ar._≈_ (Ar._∘_ (G.F₁ g) iP.from) ≈ Ar._∘_ (iQ.from (F.F₁ f))
 
-  FibreA : Category (o ⊔ ℓ ⊔ e) (o ⊔ ℓ ⊔ e) (e ⊔ ℓ)
-  FibreA = record
+  MRS3 : Category (o ⊔ ℓ ⊔ e) (o ⊔ ℓ ⊔ e) e 
+  MRS3 = record
     { Obj = FibreA₀
     ; _⇒_ = FibreA⇒
-    ; _≈_ = λ u v → FibreA⇒.f u TA.≈ FibreA⇒.f v × FibreA⇒.g u TM.≈ FibreA⇒.g v
+    ; _≈_ = λ { u v → FibreA⇒.f u TA.≈ FibreA⇒.f v × FibreA⇒.g u TM.≈ FibreA⇒.g v }
     ; id = λ { {P} →
         let module P = FibreA₀ P
             module iP = _≅_ P.iso
             open Ar.HomReasoning
-        in
-        ⟪ TA.id , TM.id ,
-          (begin
-             Ar._∘_ (G.F₁ TM.id) iP.from   ≈⟨ Ar.∘-resp-≈ (G.identity) Ar.Equiv.refl ⟩
-             Ar._∘_ Ar.id iP.from          ≈⟨ Ar.identityˡ ⟩
-             iP.from                       ≈˘⟨ Ar.identityʳ ⟩
-             Ar._∘_ iP.from Ar.id          ≈˘⟨ Ar.∘-resp-≈ Ar.Equiv.refl (F.identity) ⟩
-             Ar._∘_ iP.from (F.F₁ TA.id)   ∎) ⟫ }
+        in {!  !} }
+        -- ⟪ TA.id , TM.id ,
+        --   (begin
+        --      Ar._∘_ (G.F₁ TM.id) iP.from   ≈⟨ Ar.∘-resp-≈ (G.identity) Ar.Equiv.refl ⟩
+        --      Ar._∘_ Ar.id iP.from          ≈⟨ Ar.identityˡ ⟩
+        --      iP.from                       ≈˘⟨ Ar.identityʳ ⟩
+        --      Ar._∘_ iP.from Ar.id          ≈˘⟨ Ar.∘-resp-≈ Ar.Equiv.refl (F.identity) ⟩
+        --      Ar._∘_ iP.from (F.F₁ TA.id)   ∎) ⟫ }
     ; _∘_ = λ { {P} {Q} {R} u v →
         let module P = FibreA₀ P
             module Q = FibreA₀ Q
@@ -158,25 +161,25 @@ module _ (A : Obj) where
             module iQ = _≅_ Q.iso
             module iR = _≅_ R.iso
             open Ar.HomReasoning
-        in
-        ⟪ TA [ u.f TA.∘ v.f ] , TM [ u.g TM.∘ v.g ] ,
-          (begin
-             Ar._∘_ (G.F₁ (TM [ u.g TM.∘ v.g ])) iP.from
-               ≈⟨ Ar.∘-resp-≈ (G.homomorphism) Ar.Equiv.refl ⟩
-             Ar._∘_ (Ar._∘_ (G.F₁ u.g) (G.F₁ v.g)) iP.from
-               ≈⟨ Ar.assoc ⟩
-             Ar._∘_ (G.F₁ u.g) (Ar._∘_ (G.F₁ v.g) iP.from)
-               ≈⟨ Ar.∘-resp-≈ Ar.Equiv.refl v.commute ⟩
-             Ar._∘_ (G.F₁ u.g) (Ar._∘_ iQ.from (F.F₁ v.f))
-               ≈˘⟨ Ar.assoc ⟩
-             Ar._∘_ (Ar._∘_ (G.F₁ u.g) iQ.from) (F.F₁ v.f)
-               ≈⟨ Ar.∘-resp-≈ u.commute Ar.Equiv.refl ⟩
-             Ar._∘_ (Ar._∘_ iR.from (F.F₁ u.f)) (F.F₁ v.f)
-               ≈⟨ Ar.assoc ⟩
-             Ar._∘_ iR.from (Ar._∘_ (F.F₁ u.f) (F.F₁ v.f))
-               ≈˘⟨ Ar.∘-resp-≈ Ar.Equiv.refl (F.homomorphism) ⟩
-             Ar._∘_ iR.from (F.F₁ (TA [ u.f TA.∘ v.f ]))
-             ∎) ⟫ }
+        in {!  !} }
+        -- ⟪ TA [ u.f TA.∘ v.f ] , TM [ u.g TM.∘ v.g ] ,
+        --   (begin
+        --      Ar._∘_ (G.F₁ (TM [ u.g TM.∘ v.g ])) iP.from
+        --        ≈⟨ Ar.∘-resp-≈ (G.homomorphism) Ar.Equiv.refl ⟩
+        --      Ar._∘_ (Ar._∘_ (G.F₁ u.g) (G.F₁ v.g)) iP.from
+        --        ≈⟨ Ar.assoc ⟩
+        --      Ar._∘_ (G.F₁ u.g) (Ar._∘_ (G.F₁ v.g) iP.from)
+        --        ≈⟨ Ar.∘-resp-≈ Ar.Equiv.refl v.commute ⟩
+        --      Ar._∘_ (G.F₁ u.g) (Ar._∘_ iQ.from (F.F₁ v.f))
+        --        ≈˘⟨ Ar.assoc ⟩
+        --      Ar._∘_ (Ar._∘_ (G.F₁ u.g) iQ.from) (F.F₁ v.f)
+        --        ≈⟨ Ar.∘-resp-≈ u.commute Ar.Equiv.refl ⟩
+        --      Ar._∘_ (Ar._∘_ iR.from (F.F₁ u.f)) (F.F₁ v.f)
+        --        ≈⟨ Ar.assoc ⟩
+        --      Ar._∘_ iR.from (Ar._∘_ (F.F₁ u.f) (F.F₁ v.f))
+        --        ≈˘⟨ Ar.∘-resp-≈ Ar.Equiv.refl (F.homomorphism) ⟩
+        --      Ar._∘_ iR.from (F.F₁ (TA [ u.f TA.∘ v.f ]))
+        --      ∎) ⟫ }
     ; assoc = TA.assoc , TM.assoc
     ; sym-assoc = TA.sym-assoc , TM.sym-assoc
     ; identityˡ = TA.identityˡ , TM.identityˡ
@@ -193,5 +196,7 @@ module _ (A : Obj) where
 
 -- But also, a comma category.
 -- Objects are commutative squares in Arrow(C):  ∇ x ⇒ V₁ y.
+
+open import Categories.Category.Construction.Comma
 FibreA : (A : Obj) → Category _ _ _
 FibreA A = (∇ {A} ↓ V₁)
