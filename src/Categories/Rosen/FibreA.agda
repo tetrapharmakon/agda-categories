@@ -7,7 +7,6 @@ open import Relation.Binary using (IsEquivalence) renaming (Setoid to S)
 open import Relation.Binary.Bundles using (Setoid)
 
 open import Categories.Category using (Category;_[_,_])
-open import Categories.Category.Construction.Arrow
 open import Categories.Category.Instance.Setoids
 open import Categories.Category.Monoidal using (Monoidal)
 open import Categories.Category.Monoidal.Closed using (Closed)
@@ -31,6 +30,7 @@ import Categories.Morphism.Reasoning as MR
 open HomReasoning hiding (begin_;step-≈;step-≈-⟨;step-≈-⟩;step-≈˘;step-≡-∣;step-≡-⟨;step-≡-⟩;step-≡˘; _∎)
 open MR
 
+open import Categories.Category.Construction.Arrow C using (Morphism; Morphism⇒; mor⇒)
 open import Categories.Rosen.Core Cl
 open import Categories.Rosen.Tabulator Cl using (𝕋MRS; V₁)
 
@@ -69,7 +69,7 @@ totalAtA A = record
                       module y = totalAtA₁ y in x.r ≈ y.r
   ; id = record 
       { r = id 
-      ; eqϕ = elimˡ C (Functor.identity [ A ,-]) ○ introʳ C Equiv.refl 
+      ; eqϕ = MR.elimˡ C (Functor.identity [ A ,-]) ○ MR.introʳ C Equiv.refl 
       }
   ; _∘_ = λ u v → let module u = totalAtA₁ u 
                       module v = totalAtA₁ v 
@@ -144,7 +144,7 @@ module _ (A : Obj) where
         in record 
           { f = TA.id 
           ; g = TM.id 
-          ; commute = Ar.Equiv.trans (elimˡ Arr.Arrow G.identity) (introʳ Arr.Arrow F.identity)
+          ; commute = Ar.Equiv.trans (MR.elimˡ Arr.Arrow G.identity) (MR.introʳ Arr.Arrow F.identity)
           }
           }  
     ; _∘_ = λ { {P} {Q} {R} u v →
@@ -162,13 +162,13 @@ module _ (A : Obj) where
           ; g = u.g TM.∘ v.g 
           ; commute = begin
             (G.F₁ (u.g TM.∘ v.g) Ar.∘ iP.from)
-          ≈⟨ pushˡ Arr.Arrow G.homomorphism ⟩
+          ≈⟨ MR.pushˡ Arr.Arrow G.homomorphism ⟩
             G.F₁ u.g Ar.∘ (G.F₁ v.g Ar.∘ iP.from) 
           ≈⟨ Ar.∘-resp-≈ Ar.Equiv.refl v.commute ⟩
             G.F₁ u.g Ar.∘ iQ.from Ar.∘ F.F₁ v.f
-          ≈⟨ pullˡ Arr.Arrow u.commute ⟩
+          ≈⟨ MR.pullˡ Arr.Arrow u.commute ⟩
             (iR.from Ar.∘ F.F₁ u.f) Ar.∘ F.F₁ v.f
-          ≈⟨ pullʳ Arr.Arrow (Ar.Equiv.sym F.homomorphism) ⟩
+          ≈⟨ MR.pullʳ Arr.Arrow (Ar.Equiv.sym F.homomorphism) ⟩
             (iR.from Ar.∘ F.F₁ (u.f TA.∘ v.f))
           ∎
           } }
