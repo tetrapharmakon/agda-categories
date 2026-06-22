@@ -3,13 +3,12 @@
 open import Level using (_⊔_;lift;lower;zero;suc)
 
 open import Data.Product using (_,_; proj₁; proj₂; _×_)
-open import Relation.Binary using (IsEquivalence)
+open import Relation.Binary using (IsEquivalence) renaming (Setoid to S)
 open import Relation.Binary.Bundles using (Setoid)
 
 open import Categories.Category using (Category;_[_,_])
 open import Categories.Category.Construction.Arrow
 open import Categories.Category.Instance.Setoids
-open import Relation.Binary.Bundles renaming (Setoid to S)
 open import Categories.Category.Monoidal using (Monoidal)
 open import Categories.Category.Monoidal.Closed using (Closed)
 open import Categories.Functor using (Functor; _∘F_)
@@ -117,14 +116,12 @@ module _ (A : Obj) where
   import Categories.Morphism as M using (_≅_)
   open M Arr.Arrow using (_≅_)
   record FibreA₀ : Set (o ⊔ ℓ ⊔ e) where
-    constructor ⟨_,_,_⟩
     field
       x   : TA.Obj
       y   : TM.Obj
       iso : (F.F₀ x) ≅ (G.F₀ y)
 
   record FibreA⇒ (P Q : FibreA₀) : Set (o ⊔ ℓ ⊔ e) where
-    constructor ⟪_,_,_⟫
     module P = FibreA₀ P
     module Q = FibreA₀ Q
     module iP = _≅_ P.iso
@@ -132,7 +129,7 @@ module _ (A : Obj) where
     field
       f : TA._⇒_ P.x Q.x
       g : TM._⇒_ P.y Q.y
-      commute : (G.F₁ g Ar.∘ iP.from) Ar.≈ {!  !} -- Ar._∘_ (iQ.from (F.F₁ f)) -- Ar._≈_ (Ar._∘_ (G.F₁ g) iP.from) ≈ Ar._∘_ (iQ.from (F.F₁ f))
+      commute : (G.F₁ g Ar.∘ iP.from) Ar.≈ iQ.from Ar.∘ F.F₁ f
 
   MRS3 : Category (o ⊔ ℓ ⊔ e) (o ⊔ ℓ ⊔ e) e 
   MRS3 = record
@@ -143,14 +140,13 @@ module _ (A : Obj) where
         let module P = FibreA₀ P
             module iP = _≅_ P.iso
             open Ar.HomReasoning
-        in {!  !} }
-        -- ⟪ TA.id , TM.id ,
-        --   (begin
-        --      Ar._∘_ (G.F₁ TM.id) iP.from   ≈⟨ Ar.∘-resp-≈ (G.identity) Ar.Equiv.refl ⟩
-        --      Ar._∘_ Ar.id iP.from          ≈⟨ Ar.identityˡ ⟩
-        --      iP.from                       ≈˘⟨ Ar.identityʳ ⟩
-        --      Ar._∘_ iP.from Ar.id          ≈˘⟨ Ar.∘-resp-≈ Ar.Equiv.refl (F.identity) ⟩
-        --      Ar._∘_ iP.from (F.F₁ TA.id)   ∎) ⟫ }
+        in record 
+          { f = TA.id 
+          ; g = TM.id 
+          ; commute = {!  !} 
+                    , {!  !}
+          }
+          }  
     ; _∘_ = λ { {P} {Q} {R} u v →
         let module P = FibreA₀ P
             module Q = FibreA₀ Q
@@ -161,8 +157,12 @@ module _ (A : Obj) where
             module iQ = _≅_ Q.iso
             module iR = _≅_ R.iso
             open Ar.HomReasoning
-        in {!  !} }
-        -- ⟪ TA [ u.f TA.∘ v.f ] , TM [ u.g TM.∘ v.g ] ,
+        in record 
+          { f = u.f TA.∘ v.f 
+          ; g = u.g TM.∘ v.g 
+          ; commute = {!  !} 
+                    , {!  !} 
+          } }
         --   (begin
         --      Ar._∘_ (G.F₁ (TM [ u.g TM.∘ v.g ])) iP.from
         --        ≈⟨ Ar.∘-resp-≈ (G.homomorphism) Ar.Equiv.refl ⟩
