@@ -1,60 +1,52 @@
 {
-  "nodes": {
-    "flake-utils": {
-      "inputs": {
-        "systems": "systems"
-      },
-      "locked": {
-        "lastModified": 1731533236,
-        "narHash": "sha256-l0KFg5HjrsfsO/JpG+r7fRrqm12kzFHyUHqHCVpMMbI=",
-        "owner": "numtide",
-        "repo": "flake-utils",
-        "rev": "11707dc2f618dd54ca8739b309ec4fc024de578b",
-        "type": "github"
-      },
-      "original": {
-        "id": "flake-utils",
-        "type": "indirect"
+  inputs.nixpkgs.url = "github:NixOS/nixpkgs/nixpkgs-unstable";
+  outputs = { self, nixpkgs, flake-utils }:
+    flake-utils.lib.eachDefaultSystem (system:
+      let
+        pkgs = import nixpkgs { inherit system; };
+        agdaDependencies = [
+          pkgs.agdaPackages.agda-categories
+          (pkgs.agdaPackages.standard-library.overrideAttrs (oldAttrs: {
+            version = "2.3";
+            src = pkgs.fetchFromGitHub {
+              repo = "agda-stdlib";
+              owner = "agda";
+              rev = "v2.3";
+              hash = "sha256-JOeoek6OfyIk9vwTj5QUJU6LnRzwfiG0e0ysW6zbhZ8=";
+            };
+          }))
+        ];
+        agda-html = pkgs.agdaPackages.mkDerivation {
+          pname = "dinaturals";
+          version = "0.1.0";
+          src = builtins.path { path = ./.; name = "dinaturals"; };
+          everythingFile = ./All.agda;
+          buildInputs = agdaDependencies;
+
+          installPhase = '''';
+
+          buildPhase = ''
+            runHook preBuild
+            # Make sure this builds with --safe
+            agda --html --html-dir=$out --highlight-occurrences --safe All.agda +RTS -M32G
+            runHook postBuild
+          '';
+
+          preConfigure = ''export AGDA_EXEC=agda'';
+          # LC_ALL = "en_US.UTF-8";
+          nativeBuildInputs = [ pkgs.glibcLocales ];
+
+          meta = {
+            platforms = pkgs.lib.platforms.unix;
+          };
+        }; in {
+        devShells.default = pkgs.mkShell { buildInputs = [
+          (pkgs.agda.withPackages agdaDependencies)
+        ]; };
+        packages = {
+          inherit agda-html;
+          default = agda-html;
+        };
       }
-    },
-    "nixpkgs": {
-      "locked": {
-        "lastModified": 1780365719,
-        "narHash": "sha256-QfWfccTN+70ZQ4m2qlU9PiKfz2Yppq94058iJyARNwc=",
-        "owner": "NixOS",
-        "repo": "nixpkgs",
-        "rev": "ffa10e26ae11d676b2db836259889f1f571cb14f",
-        "type": "github"
-      },
-      "original": {
-        "owner": "NixOS",
-        "ref": "nixpkgs-unstable",
-        "repo": "nixpkgs",
-        "type": "github"
-      }
-    },
-    "root": {
-      "inputs": {
-        "flake-utils": "flake-utils",
-        "nixpkgs": "nixpkgs"
-      }
-    },
-    "systems": {
-      "locked": {
-        "lastModified": 1681028828,
-        "narHash": "sha256-Vy1rq5AaRuLzOxct8nz4T6wlgyUR7zLU309k9mBC768=",
-        "owner": "nix-systems",
-        "repo": "default",
-        "rev": "da67096a3b9bf56a91d16901293e51ba5b49a27e",
-        "type": "github"
-      },
-      "original": {
-        "owner": "nix-systems",
-        "repo": "default",
-        "type": "github"
-      }
-    }
-  },
-  "root": "root",
-  "version": 7
+    );
 }

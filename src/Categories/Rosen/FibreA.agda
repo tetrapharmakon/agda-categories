@@ -22,13 +22,12 @@ module Categories.Rosen.FibreA {o ℓ e} {C : Category o ℓ e} {M : Monoidal C}
 private
   module 𝒞 = Category C
 
-open 𝒞
+import Reason
+open Reason C
 
 open Closed Cl using ([-,-]; [_,_]₀; [_,-]; [_,_]₁; Hom[-⊗_,-]; Hom[-,[_,-]]; Hom-NI)
 
 import Categories.Morphism.Reasoning as MR
-open HomReasoning hiding (begin_;step-≈;step-≈-⟨;step-≈-⟩;step-≈˘;step-≡-∣;step-≡-⟨;step-≡-⟩;step-≡˘; _∎)
-open MR
 
 open import Categories.Category.Construction.Arrow C using (Morphism; Morphism⇒; mor⇒)
 open import Categories.Rosen.Core Cl
@@ -47,7 +46,7 @@ record totalAtA₀ (A : Obj) : Set (o ⊔ ℓ ⊔ e) where
     ξ : S.Carrier (Functor.F₀ MRS-Profunctor (A , B))
 
 record totalAtA₁ {A : Obj} (x y : totalAtA₀ A) : Set (o ⊔ ℓ ⊔ e) where
-  module x = totalAtA₀ x 
+  module x = totalAtA₀ x
   module y = totalAtA₀ y
   field
     r : x.B ⇒ y.B
@@ -65,17 +64,17 @@ totalAtA : (A : Obj) → Category (o ⊔ ℓ ⊔ e) (o ⊔ ℓ ⊔ e) e
 totalAtA A = record
   { Obj = totalAtA₀ A
   ; _⇒_ = λ { s t → totalAtA₁ s t}
-  ; _≈_ = λ x y → let module x = totalAtA₁ x 
+  ; _≈_ = λ x y → let module x = totalAtA₁ x
                       module y = totalAtA₁ y in x.r ≈ y.r
-  ; id = record 
-      { r = id 
-      ; eqϕ = MR.elimˡ C (Functor.identity [ A ,-]) ○ MR.introʳ C Equiv.refl 
+  ; id = record
+      { r = id
+      ; eqϕ = cancel [-,-].identity ∙ sym-id-1
       }
-  ; _∘_ = λ u v → let module u = totalAtA₁ u 
-                      module v = totalAtA₁ v 
-                  in record 
-                    { r = u.r ∘ v.r 
-                    ; eqϕ = Functor.homomorphism [ A ,-] ⟩∘⟨refl ○ pullʳ C v.eqϕ  ○ pullˡ C u.eqϕ ○ assoc 
+  ; _∘_ = λ u v → let module u = totalAtA₁ u
+                      module v = totalAtA₁ v
+                  in record
+                    { r = u.r ∘ v.r
+                    ; eqϕ = rw-1-2 (Functor.homomorphism [ A ,-]) ∙ skip v.eqϕ ∙ rw-2 u.eqϕ
                     }
   ; assoc = assoc
   ; sym-assoc = sym-assoc
@@ -92,8 +91,8 @@ totalAtA A = record
 
 ∇ : {A : Obj} → Functor (totalAtA A) Arr.Arrow
 ∇ {A} = record
-  { F₀ = λ (B ∣ ξ) → 
-  let module phi = NaturalTransformation (MR2.ϕ ξ) 
+  { F₀ = λ (B ∣ ξ) →
+  let module phi = NaturalTransformation (MR2.ϕ ξ)
   in record { dom = B ; cod = [ A , B ]₀ ; arr = phi.η (record { dom = A ; cod = B ; arr = MR2.f ξ }) }
   ; F₁ = λ { {X ∣ ⟪ f , ϕ ⟫} {Y ∣ ⟪ g , ψ ⟫} (record { r = r ; eqϕ = eqϕ }) → mor⇒ {dom⇒ = r} {cod⇒ = Functor.F₁ [ A ,-] r} eqϕ }
   ; identity = λ { {X} → Equiv.refl , (Functor.identity [ A ,-])}
@@ -131,7 +130,7 @@ module _ (A : Obj) where
       g : TM._⇒_ P.y Q.y
       commute : (G.F₁ g Ar.∘ iP.from) Ar.≈ iQ.from Ar.∘ F.F₁ f
 
-  MRS3 : Category (o ⊔ ℓ ⊔ e) (o ⊔ ℓ ⊔ e) e 
+  MRS3 : Category (o ⊔ ℓ ⊔ e) (o ⊔ ℓ ⊔ e) e
   MRS3 = record
     { Obj = FibreA₀
     ; _⇒_ = FibreA⇒
@@ -139,14 +138,12 @@ module _ (A : Obj) where
     ; id = λ { {P} →
         let module P = FibreA₀ P
             module iP = _≅_ P.iso
-            open Ar.HomReasoning
-            open MR
-        in record 
-          { f = TA.id 
-          ; g = TM.id 
-          ; commute = Ar.Equiv.trans (MR.elimˡ Arr.Arrow G.identity) (MR.introʳ Arr.Arrow F.identity)
+        in record
+          { f = TA.id
+          ; g = TM.id
+          ; commute = sym-id-swap , id-0 ∙ sym-id-1 ∙ skip (sym [-,-].identity)
           }
-          }  
+          }
     ; _∘_ = λ { {P} {Q} {R} u v →
         let module P  = FibreA₀ P
             module Q  = FibreA₀ Q
@@ -157,33 +154,24 @@ module _ (A : Obj) where
             module iQ = _≅_ Q.iso
             module iR = _≅_ R.iso
             open Ar.HomReasoning
-        in record 
-          { f = u.f TA.∘ v.f 
-          ; g = u.g TM.∘ v.g 
-          ; commute = begin
-            (G.F₁ (u.g TM.∘ v.g) Ar.∘ iP.from)
-          ≈⟨ MR.pushˡ Arr.Arrow G.homomorphism ⟩
-            G.F₁ u.g Ar.∘ (G.F₁ v.g Ar.∘ iP.from) 
-          ≈⟨ Ar.∘-resp-≈ Ar.Equiv.refl v.commute ⟩
-            G.F₁ u.g Ar.∘ iQ.from Ar.∘ F.F₁ v.f
-          ≈⟨ MR.pullˡ Arr.Arrow u.commute ⟩
-            (iR.from Ar.∘ F.F₁ u.f) Ar.∘ F.F₁ v.f
-          ≈⟨ MR.pullʳ Arr.Arrow (Ar.Equiv.sym F.homomorphism) ⟩
-            (iR.from Ar.∘ F.F₁ (u.f TA.∘ v.f))
-          ∎
+        in record
+          { f = u.f TA.∘ v.f
+          ; g = u.g TM.∘ v.g
+          ; commute = assoc ∙ skip (proj₁ v.commute) ∙ rw-2 (proj₁ u.commute)
+                    , assoc ∙ skip (proj₂ v.commute) ∙ rw-2 (proj₂ u.commute) ∙ skip (sym (Functor.homomorphism [ _ ,-]))
           } }
-    ; assoc = TA.assoc , TM.assoc
-    ; sym-assoc = TA.sym-assoc , TM.sym-assoc
-    ; identityˡ = TA.identityˡ , TM.identityˡ
-    ; identityʳ = TA.identityʳ , TM.identityʳ
-    ; identity² = TA.identity² , TM.identity²
+    ; assoc     = assoc     , assoc     , assoc
+    ; sym-assoc = sym-assoc , sym-assoc , sym-assoc
+    ; identityˡ = identityˡ , identityˡ , identityˡ
+    ; identityʳ = identityʳ , identityʳ , identityʳ
+    ; identity² = identity² , identity² , identity²
     ; equiv = record
-      { refl = TA.Equiv.refl , TM.Equiv.refl
-      ; sym = λ { (p , q) → TA.Equiv.sym p , TM.Equiv.sym q }
-      ; trans = λ { (p₁ , q₁) (p₂ , q₂) → TA.Equiv.trans p₁ p₂ , TM.Equiv.trans q₁ q₂ }
+      { refl = refl , refl , refl
+      ; sym = λ { (p , q , r) → sym p , sym q , sym r }
+      ; trans = λ { (p₁ , q₁ , r₁) (p₂ , q₂ , r₂) → trans p₁ p₂ , trans q₁ q₂ , trans r₁ r₂ }
       }
-    ; ∘-resp-≈ = λ { (p₁ , q₁) (p₂ , q₂) → TA.∘-resp-≈ p₁ p₂ , TM.∘-resp-≈ q₁ q₂ }
-    }    
+    ; ∘-resp-≈ = λ { (p₁ , q₁ , r₁) (p₂ , q₂ , r₂) → ∘-resp-≈ p₁ p₂ , ∘-resp-≈ q₁ q₂ , ∘-resp-≈ r₁ r₂ }
+    }
 -- But also, a comma category.
 -- Objects are commutative squares in Arrow(C):  ∇ x ⇒ V₁ y.
 
@@ -194,5 +182,8 @@ open Relation.Binary.PropositionalEquality.≡-Reasoning
 commaNablaV : {T : Obj} → Category (ℓ ⊔ e ⊔ (o ⊔ ℓ ⊔ e)) (e ⊔ (o ⊔ ℓ ⊔ e)) e
 commaNablaV {T} = (∇ {T} ↓ V₁)
 
-_ : {T : Obj} → (Category.Obj (commaNablaV {T})) ≡ {!   !}
-_ = refl
+_ : {T : Obj} → (Category.Obj (commaNablaV {T})) ≡ CommaObj ∇ V₁
+_ = _≡_.refl
+
+_ : {T : Obj} → (Category._⇒_ (commaNablaV {T})) ≡ Comma⇒
+_ = _≡_.refl
