@@ -114,8 +114,8 @@ total = record
   ; ∘-resp-≈ = λ { (p₁ , q₁) (p₂ , q₂) → ∘-resp-≈ p₁ p₂ , ∘-resp-≈ q₁ q₂ }
   }
 
-∇ : Functor total Arr.Arrow
-∇ = record
+broken∇ : Functor total Arr.Arrow
+broken∇ = record
   { F₀ = λ ((A , B) ∣ ξ) → 
   let module phi = NaturalTransformation (MR2.ϕ ξ) 
   in record { arr = phi.η (record { arr = MR2.f ξ }) }
@@ -123,8 +123,8 @@ total = record
           let module ϕ = NaturalTransformation ϕ
               module ψ = NaturalTransformation ψ
           in
-          mor⇒ {dom⇒ = r} {cod⇒ = {!  !} ∘ Functor.F₁ [ A ,-] r} (begin
-            _ ∘ ϕ.η (record { arr = f }) ≈⟨ {!  !} ⟩
+          mor⇒ {dom⇒ = r} {cod⇒ = {! ? ∘ ψ.η (record { arr = g }) !} ∘ Functor.F₁ [ A ,-] r} (begin
+            _ ∘ ϕ.η (record { arr = f }) ≈⟨ {! eqϕ !} ⟩
             {!  !}                       ≈⟨ {!  !} ⟩
             ψ.η (record { arr = g }) ∘ r
             ∎)}

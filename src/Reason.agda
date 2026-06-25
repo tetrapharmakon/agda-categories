@@ -151,6 +151,9 @@ cancel : ∀ {A B} {f : A ⇒ A} {g : B ⇒ A}
          → f ∘ g ≈ g
 cancel eq = rw eq ∙ identityˡ
 
+identityˡʳ : ∀ {A B} {f : A ⇒ B} → id ∘ f ∘ id ≈ f 
+identityˡʳ = trans identityˡ identityʳ
+
 cancel-1 : ∀ {A B} {f : A ⇒ B} {g : A ⇒ A}
          → g ≈ id
          → f ∘ g ≈ f

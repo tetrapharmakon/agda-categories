@@ -57,7 +57,7 @@ record totalAtA₁ {A : Obj} (x y : totalAtA₀ A) : Set (o ⊔ ℓ ⊔ e) where
   module ϕ = NaturalTransformation (MR2.ϕ x.ξ)
   module ψ = NaturalTransformation (MR2.ϕ y.ξ)
   field
-    eqϕ : Functor.F₁ [ A ,-] r ∘ ϕ.η (record { dom = A ; cod = x.B ; arr = f }) ≈ ψ.η (record { dom = A ; cod = y.B ; arr = g }) ∘ r
+    eqϕ : [ id , r ]₁ ∘ ϕ.η (record { dom = A ; cod = x.B ; arr = f }) ≈ ψ.η (record { dom = A ; cod = y.B ; arr = g }) ∘ r
 
 
 totalAtA : (A : Obj) → Category (o ⊔ ℓ ⊔ e) (o ⊔ ℓ ⊔ e) e
@@ -103,6 +103,18 @@ totalAtA A = record
 -- Pullback of two functors, ∇ and V₁.
 -- In Cats, the categorical pullback is (in general) a pseudo-pullback; concretely this
 -- is the “iso-comma” construction: objects are pairs plus an isomorphism in Arrow(C).
+
+reindex : {A A' : Obj} → (u : A ⇒ A') → Functor (totalAtA A') (totalAtA A)
+reindex u = record
+  { F₀ = λ { (B ∣ ξ) → B ∣ ⟪ MR2.f ξ ∘ u , (nHom u ∘ʳ Cod) ∘ᵥ MR2.ϕ ξ ⟫}
+  ; F₁ = λ { {(B ∣ ξ)} {(B' ∣ ξ')} (record { r = r ; eqϕ = eq}) → record 
+      { r = r 
+      ; eqϕ = {!   !} 
+      }}
+  ; identity = {!   !}
+  ; homomorphism = {!   !}
+  ; F-resp-≈ = {!   !}
+  }
 
 module _ (A : Obj) where
   private

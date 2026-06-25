@@ -23,15 +23,18 @@ module Categories.Rosen.StrictSets {o ℓ e} {C : Category o ℓ e} {M : Monoida
 private
   module 𝒞 = Category C
 
-open 𝒞
+-- open 𝒞
 
 open Closed Cl using ([-,-]; [_,_]₀; [_,-]; [_,_]₁; Hom[-⊗_,-]; Hom[-,[_,-]]; Hom-NI)
 
-import Categories.Morphism.Reasoning as MR
-open HomReasoning 
-open MR
+-- import Categories.Morphism.Reasoning as MR
+-- open HomReasoning 
+-- open MR
 
-open import Core Cl
+import Reason
+open Reason C
+
+open import Categories.Rosen.Core Cl
 open import Categories.Functor.Profunctor.Tabulator
 
 open import Categories.Category.Instance.Sets
@@ -41,7 +44,7 @@ MRS-SetP = record
   { F₀ = λ {(A , B) → MR2 A B}
   ; F₁ = λ { {(A , B)} {(A' , B')} (u , v) ⟪ f , ϕ ⟫ → let module ϕ = NaturalTransformation ϕ in
     ⟪ v ∘ f ∘ u , (nHom u ∘ʳ Cod) ∘ᵥ ϕ ⟫}
-  ; identity = {!  !}
+  ; identity = λ { {(X , Y)} {⟪ f , phi ⟫} →  {! identityˡʳ !}}
   ; homomorphism = {!  !}
   ; F-resp-≈ = {!  !}
   }

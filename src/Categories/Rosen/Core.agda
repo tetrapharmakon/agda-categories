@@ -24,7 +24,9 @@ module Categories.Rosen.Core {o ℓ e} {C : Category o ℓ e} {M : Monoidal C} (
 private
   module 𝒞 = Category C
 
-open 𝒞
+-- open 𝒞
+import Reason
+open Reason C
 
 open Closed Cl using ([-,-]; [_,_]₀; [_,-]; [_,_]₁; Hom[-⊗_,-]; Hom[-,[_,-]]; Hom-NI)
 
@@ -98,17 +100,8 @@ MRS-Profunctor = record
   ; identity = λ { {(A , B)} {⟪ f , ϕ ⟫} {⟪ g , ϕ' ⟫} →
       let module Hom = Functor [-,-] in
       let module CodF = Functor Cod in
-        ( λ (f≈g , ϕ≈ϕ') → (begin id ∘ f ∘ id ≈⟨ identityˡ ⟩
-                                  f ∘ id      ≈⟨ identityʳ ⟩
-                                  f           ≈⟨ f≈g ⟩
-                                  g           ∎)
-        , λ { {h} →
-            let module ϕ = NaturalTransformation ϕ
-                module ϕ' = NaturalTransformation ϕ' in
-            begin [ id , id ]₁ ∘ ϕ.η h ≈⟨ ∘-resp-≈ Hom.identity Equiv.refl ⟩
-                  id ∘ ϕ.η h           ≈⟨ identityˡ ⟩
-                  ϕ.η h                ≈⟨ ϕ≈ϕ' {h} ⟩
-                  ϕ'.η h               ∎ })
+        ( λ (f≈g , ϕ≈ϕ') → Equiv.trans identityˡʳ f≈g
+        , λ { {h} → Equiv.trans (elimˡ C Hom.identity) (ϕ≈ϕ' {h}) })
      }
   ; homomorphism = λ { {(A , B)} {(A' , B')} {(A'' , B'')} {f = (u₁ , v₁)} {g = (u₂ , v₂)} {⟪ f , ϕ ⟫} {⟪ g , ϕ' ⟫} →
        let module Hom = Functor [-,-]
@@ -131,17 +124,11 @@ MRS-Profunctor = record
      }
   ; F-resp-≈ = λ { {(A , B)} {(A' , B')} {f = (u , v)} {g = (u' , v')} (u≈u' , v≈v') {⟪ f , ϕ ⟫} {⟪ g , ϕ' ⟫} →
        let module Hom = Functor [-,-] in
-         ( λ { (f≈g , ϕ≈ϕ') →
-           (begin v ∘ f ∘ u   ≈⟨ ∘-resp-≈ v≈v' (∘-resp-≈ʳ u≈u') ⟩
-                  v' ∘ f ∘ u' ≈⟨ refl⟩∘⟨ f≈g ⟩∘⟨refl ⟩
-                  v' ∘ g ∘ u' ∎)
+         ( λ { (f≈g , ϕ≈ϕ') → ∘-resp-≈ v≈v' (∘-resp-≈ f≈g u≈u')
         , λ { {h} →
             let module ϕ = NaturalTransformation ϕ
                 module ϕ' = NaturalTransformation ϕ'
-            in
-            begin
-              [ u , id ]₁ ∘ ϕ.η h   ≈⟨ ∘-resp-≈ʳ (ϕ≈ϕ' {h}) ⟩
-              [ u , id ]₁ ∘ ϕ'.η h  ≈⟨ ∘-resp-≈ˡ (Hom.F-resp-≈ (u≈u' , Equiv.refl)) ⟩
-              [ u' , id ]₁ ∘ ϕ'.η h ∎ } })
+            in ∘-resp-≈ (Hom.F-resp-≈ (u≈u' , Equiv.refl)) (ϕ≈ϕ' {h})
+              } })
      }
   }

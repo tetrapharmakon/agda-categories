@@ -24,7 +24,9 @@ module Categories.Rosen.Tabulator {o ℓ e} {C : Category o ℓ e} {M : Monoidal
 private
   module 𝒞 = Category C
 
-open 𝒞
+
+import Reason
+open Reason C
 
 open Closed Cl using ([-,-]; [_,_]₀; [_,-]; [_,_]₁; Hom[-⊗_,-]; Hom[-,[_,-]]; Hom-NI)
 import Categories.Morphism.Reasoning as MR
@@ -45,9 +47,9 @@ open import Categories.Functor.Construction.LiftSetoids using (LiftSetoids)
 V₁ : Functor 𝕋MRS Arr.Arrow
 V₁ = record
   { F₀ = λ { ((A , B) ∣ ξ) → record { arr = MR2.f ξ } }
-  ; F₁ = λ { {(A , B) ∣ ⟪ f , ϕ ⟫} {(A' , B') ∣ ⟪ g , ϕ' ⟫} (l , r ∥ eq) → mor⇒ {dom⇒ = l} {cod⇒ = r} 
-    (begin r ∘ f      ≈˘⟨ refl⟩∘⟨ identityʳ ⟩ 
-           r ∘ f ∘ id ≈⟨ (proj₁ eq) ○ identityˡ ⟩
+  ; F₁ = λ { {(A , B) ∣ ⟪ f , ϕ ⟫} {(A' , B') ∣ ⟪ g , ϕ' ⟫} (l , r ∥ (eq , eq')) → mor⇒ {dom⇒ = l} {cod⇒ = r} 
+    (begin r ∘ f      ≈˘⟨ id-2 ⟩ 
+           r ∘ f ∘ id ≈⟨ eq ○ identityˡ ⟩
            g ∘ l      ∎) }
   ; identity = 
       Equiv.refl 
