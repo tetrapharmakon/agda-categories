@@ -196,3 +196,21 @@ intro-2 : ∀ {A B Z} {f : B ⇒ A} {g : A ⇒ B} {z : Z ⇒ A}
          → f ∘ g ≈ id
          → z ≈ f ∘ g ∘ z
 intro-2 eq = sym (cancel-2 eq)
+
+replace-3 : ∀ {A B C D} {f f' : C ⇒ D} {g g' : B ⇒ C} {h h' : A ⇒ B} → f ≈ f' → g ≈ g' → h ≈ h' → f ∘ g ∘ h ≈ f' ∘ g' ∘ h'
+replace-3 f≈f' g≈g' h≈h' = rw f≈f' ∙ skip-1 (∘-resp-≈ g≈g' h≈h')
+
+replace-4 : ∀ {A B C D E} {f f' : D ⇒ E} {g g' : C ⇒ D} {h h' : B ⇒ C} {i i' : A ⇒ B}
+         → f ≈ f' → g ≈ g' → h ≈ h' → i ≈ i'
+         → f ∘ g ∘ h ∘ i ≈ f' ∘ g' ∘ h' ∘ i'
+replace-4 f≈f' g≈g' h≈h' i≈i' = rw f≈f' ∙ skip-1 (replace-3 g≈g' h≈h' i≈i')
+
+replace-5 : ∀ {A B C D E F} {f f' : E ⇒ F} {g g' : D ⇒ E} {h h' : C ⇒ D} {i i' : B ⇒ C} {j j' : A ⇒ B}
+         → f ≈ f' → g ≈ g' → h ≈ h' → i ≈ i' → j ≈ j'
+         → f ∘ g ∘ h ∘ i ∘ j ≈ f' ∘ g' ∘ h' ∘ i' ∘ j'
+replace-5 f≈f' g≈g' h≈h' i≈i' j≈j' = rw f≈f' ∙ skip-1 (replace-4 g≈g' h≈h' i≈i' j≈j')
+
+replace-6 : ∀ {A B C D E F G} {f f' : F ⇒ G} {g g' : E ⇒ F} {h h' : D ⇒ E} {i i' : C ⇒ D} {j j' : B ⇒ C} {k k' : A ⇒ B}
+         → f ≈ f' → g ≈ g' → h ≈ h' → i ≈ i' → j ≈ j' → k ≈ k'
+         → f ∘ g ∘ h ∘ i ∘ j ∘ k ≈ f' ∘ g' ∘ h' ∘ i' ∘ j' ∘ k'
+replace-6 f≈f' g≈g' h≈h' i≈i' j≈j' k≈k' = rw f≈f' ∙ skip-1 (replace-5 g≈g' h≈h' i≈i' j≈j' k≈k')

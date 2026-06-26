@@ -28,7 +28,7 @@ private
 import Reason
 open Reason C
 
-open Closed Cl using ([-,-]; [_,_]₀; [_,-]; [_,_]₁; Hom[-⊗_,-]; Hom[-,[_,-]]; Hom-NI)
+open Closed Cl using ([-,-]; [_,_]₀; [_,-];[-,_]; [_,_]₁; Hom[-⊗_,-]; Hom[-,[_,-]]; Hom-NI)
 
 module Arr = Categories.Category.Construction.Arrow C
 
@@ -131,4 +131,44 @@ MRS-Profunctor = record
             in ∘-resp-≈ (Hom.F-resp-≈ (u≈u' , Equiv.refl)) (ϕ≈ϕ' {h})
               } })
      }
+  }
+
+
+-- Fibration of repairs 
+
+
+record rep₀ : Set (o ⊔ ℓ ⊔ e) where
+  field
+    A : Obj
+    ϕ : NaturalTransformation Cod (([_,-] A) ∘F Cod)
+
+record rep⇒ (X Y : rep₀) : Set (o ⊔ ℓ ⊔ e) where
+  module X = rep₀ X
+  module Y = rep₀ Y
+  field
+    u : X.A ⇒ Y.A 
+    eq : (nHom u ∘ʳ Cod) ∘ᵥ Y.ϕ ≃ X.ϕ
+
+repairs : Category (o ⊔ ℓ ⊔ e) (o ⊔ ℓ ⊔ e) e 
+repairs = record
+  { Obj = rep₀
+  ; _⇒_ = λ s t → rep⇒ s t
+  ; _≈_ = λ f g → 
+    let module f = rep⇒ f 
+        module g = rep⇒ g 
+    in f.u ≈ g.u
+  ; id = record { u = id 
+       ; eq = cancel (Functor.identity [-,-]) }
+  ; _∘_ = λ f g → 
+    let module f = rep⇒ f 
+        module g = rep⇒ g 
+    in record { u = f.u ∘ g.u 
+         ; eq = λ {x} → (Functor.homomorphism [-, _ ] ⟩∘⟨refl) ∙ assoc ∙ (refl⟩∘⟨ f.eq) ∙ g.eq }
+  ; assoc = assoc
+  ; sym-assoc = sym-assoc
+  ; identityˡ = identityˡ
+  ; identityʳ = identityʳ
+  ; identity² = identity²
+  ; equiv = record { refl = refl ; sym = sym ; trans = trans }
+  ; ∘-resp-≈ = ∘-resp-≈
   }
