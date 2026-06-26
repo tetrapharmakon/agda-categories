@@ -157,20 +157,31 @@ private
   A A' B B' : Obj
 
 left : (u : A ⇒ A') → Functor (iMR2ᴿ A') (iMR2ᴿ A)
-left u = record
+left {A} {A'} u = record
   { F₀ = λ { x → 
     let module x = iMR2ᴿ₀ x 
     in record 
     { B = x.B
     ; ξ = ⟪ iMR2.f x.ξ ∘ u , [ u , id ]₁ ∘ iMR2.ϕ x.ξ ⟫ 
     }}
-  ; F₁ = λ f → let module f = iMR2ᴿ⇒ f in record 
-    { v = {!  !} -- f.v? 
-    ; eqf = {!  !} 
-    ; eqϕ = {!  !} }
-  ; identity = {!  !}
-  ; homomorphism = {!  !}
-  ; F-resp-≈ = {!  !}
+  ; F₁ = λ { {x} {y} f → 
+      let module x   = iMR2ᴿ₀ x
+          module ξx  = iMR2 x.ξ
+          module y   = iMR2ᴿ₀ y
+          module ξy  = iMR2 y.ξ
+          module f = iMR2ᴿ⇒ f 
+      in record 
+    { v = f.v
+    ; eqf = begin f.v ∘ f.ξX.f ∘ u   ≈⟨ sym-assoc ⟩ 
+                  (f.v ∘ f.ξX.f) ∘ u ≈⟨ f.eqf ⟩∘⟨refl ⟩ 
+                  f.ξY.f ∘ u         ∎
+    ; eqϕ = begin [ id , f.v ]₁ ∘ [ u , id ]₁ ∘ f.ξX.ϕ ≈⟨ sym-assoc ∙ ([ [-,-] ]-commute ⟩∘⟨refl) ∙ assoc ⟩
+                  [ u , id ]₁ ∘ [ id , f.v ]₁ ∘ f.ξX.ϕ ≈⟨ (refl⟩∘⟨ f.eqϕ) ∙ sym-assoc ⟩ 
+                  ([ u , id ]₁ ∘ f.ξY.ϕ) ∘ f.v ∎
+    }}
+  ; identity = λ {A} → refl
+  ; homomorphism = λ {X} {Y} {Z} {f} {g} → refl
+  ; F-resp-≈ = λ x → x
   }
 
 
@@ -221,41 +232,19 @@ right v = record
               u' = t.u ∘ u ∘ s.u
               eqf' : v ∘ ξx'.f ≈ ξy'.f ∘ u'
               eqf' = begin
-                v ∘ ξx'.f                    ≈⟨ refl⟩∘⟨ s.eqf ⟩
-                v ∘ (ξx.f ∘ s.u)            ≈⟨ sym-assoc ⟩
-                (v ∘ ξx.f) ∘ s.u            ≈⟨ rw eqf ⟩
-                (ξy.f ∘ u) ∘ s.u            ≈⟨ assoc ⟩
-                ξy.f ∘ (u ∘ s.u)            ≈⟨ rw t.eqf ⟩
-                (ξy'.f ∘ t.u) ∘ (u ∘ s.u)   ≈⟨ assoc ⟩
+                v ∘ ξx'.f                   ≈⟨ (refl⟩∘⟨ s.eqf) ∙ sym-assoc ⟩
+                (v ∘ ξx.f) ∘ s.u            ≈⟨ rw eqf ∙ assoc ⟩
+                ξy.f ∘ (u ∘ s.u)            ≈⟨ rw t.eqf ∙ assoc ⟩
                 ξy'.f ∘ (t.u ∘ (u ∘ s.u))   ∎
               eqϕ' : [ id , v ]₁ ∘ ξx'.ϕ ≈ [ u' , id ]₁ ∘ ξy'.ϕ ∘ v
               eqϕ' = begin
-                [ id , v ]₁ ∘ ξx'.ϕ
-                  ≈⟨ refl⟩∘⟨ s.eqϕ ⟩
-                [ id , v ]₁ ∘ ([ s.u , id ]₁ ∘ ξx.ϕ)
-                  ≈⟨ sym-assoc ⟩
-                ([ id , v ]₁ ∘ [ s.u , id ]₁) ∘ ξx.ϕ
-                  ≈⟨ rw [ [-,-] ]-commute ⟩
-                ([ s.u , id ]₁ ∘ [ id , v ]₁) ∘ ξx.ϕ
-                  ≈⟨ assoc ⟩
-                [ s.u , id ]₁ ∘ ([ id , v ]₁ ∘ ξx.ϕ)
-                  ≈⟨ refl⟩∘⟨ eqϕ ⟩
-                [ s.u , id ]₁ ∘ ([ u , id ]₁ ∘ (ξy.ϕ ∘ v))
-                  ≈⟨ sym-assoc ⟩
-                ([ s.u , id ]₁ ∘ [ u , id ]₁) ∘ (ξy.ϕ ∘ v)
-                  ≈⟨ rw (Equiv.sym Hom[-1].homomorphism) ⟩
-                [ u ∘ s.u , id ]₁ ∘ (ξy.ϕ ∘ v)
-                  ≈⟨ skip (rw t.eqϕ) ⟩
-                [ u ∘ s.u , id ]₁ ∘ (([ t.u , id ]₁ ∘ ξy'.ϕ) ∘ v)
-                  ≈⟨ sym-assoc ⟩
-                ([ u ∘ s.u , id ]₁ ∘ ([ t.u , id ]₁ ∘ ξy'.ϕ)) ∘ v
-                  ≈⟨ sym-assoc ⟩∘⟨refl ⟩
-                (([ u ∘ s.u , id ]₁ ∘ [ t.u , id ]₁) ∘ ξy'.ϕ) ∘ v
-                  ≈⟨ assoc ⟩
-                ([ u ∘ s.u , id ]₁ ∘ [ t.u , id ]₁) ∘ (ξy'.ϕ ∘ v)
-                  ≈⟨ rw (Equiv.sym Hom[-1].homomorphism) ⟩
-                [ t.u ∘ u ∘ s.u , id ]₁ ∘ (ξy'.ϕ ∘ v)
-                  ∎
+                [ id , v ]₁ ∘ ξx'.ϕ                               ≈⟨ (refl⟩∘⟨ s.eqϕ) ∙ sym-assoc ⟩
+                ([ id , v ]₁ ∘ [ s.u , id ]₁) ∘ ξx.ϕ              ≈⟨ (rw [ [-,-] ]-commute) ∙ assoc ⟩
+                [ s.u , id ]₁ ∘ ([ id , v ]₁ ∘ ξx.ϕ)              ≈⟨ (refl⟩∘⟨ eqϕ) ∙ sym-assoc ⟩
+                ([ s.u , id ]₁ ∘ [ u , id ]₁) ∘ (ξy.ϕ ∘ v)        ≈⟨ rw (Equiv.sym Hom[-1].homomorphism) ⟩
+                [ u ∘ s.u , id ]₁ ∘ (ξy.ϕ ∘ v)                    ≈⟨ skip (rw t.eqϕ) ∙ sym-assoc ∙ (sym-assoc ⟩∘⟨refl) ∙ assoc ⟩
+                ([ u ∘ s.u , id ]₁ ∘ [ t.u , id ]₁) ∘ (ξy'.ϕ ∘ v) ≈⟨ rw (Equiv.sym Hom[-1].homomorphism) ⟩
+                [ t.u ∘ u ∘ s.u , id ]₁ ∘ (ξy'.ϕ ∘ v)             ∎
           in (u' , (eqf' , eqϕ')) }
   ; cong = λ { {p} {q} p≈q → skip (rw p≈q) }
   } }
@@ -273,38 +262,9 @@ right v = record
           module t' = iMR2ᴸ⇒ t'
           u  = proj₁ p
           u' = proj₁ q
-
-          innerEq : t.u ∘ (u' ∘ (s.u ∘ s'.u)) ≈ (t.u ∘ (u' ∘ s.u)) ∘ s'.u
-          innerEq = begin
-            t.u ∘ (u' ∘ (s.u ∘ s'.u))
-              ≈⟨ skip sym-assoc ⟩
-            t.u ∘ ((u' ∘ s.u) ∘ s'.u)
-              ≈⟨ sym-assoc ⟩
-            (t.u ∘ (u' ∘ s.u)) ∘ s'.u
-              ∎
       in begin
-        (t'.u ∘ t.u) ∘ (u ∘ (s.u ∘ s'.u))
-          ≈⟨ skip (rw p≈q) ⟩
-        (t'.u ∘ t.u) ∘ (u' ∘ (s.u ∘ s'.u))
-          ≈⟨ assoc ⟩
-        t'.u ∘ (t.u ∘ (u' ∘ (s.u ∘ s'.u)))
-          ≈⟨ skip innerEq ⟩
-        t'.u ∘ ((t.u ∘ (u' ∘ s.u)) ∘ s'.u)
-          ∎ }
-  ; F-resp-≈ = λ { {(x , y)} {(x' , y')} {(s , t)} {(s₁ , t₁)} (s≈s₁ , t≈t₁) {p} {q} p≈q →
-      let module s  = iMR2ᴸ⇒ s
-          module t  = iMR2ᴸ⇒ t
-          module s₁ = iMR2ᴸ⇒ s₁
-          module t₁ = iMR2ᴸ⇒ t₁
-          u  = proj₁ p
-          u' = proj₁ q
-      in begin
-        t.u ∘ (u ∘ s.u)
-          ≈⟨ rw t≈t₁ ⟩
-        t₁.u ∘ (u ∘ s.u)
-          ≈⟨ skip (rw p≈q) ⟩
-        t₁.u ∘ (u' ∘ s.u)
-          ≈⟨ skip (skip s≈s₁) ⟩
-        t₁.u ∘ (u' ∘ s₁.u)
-          ∎ }
+        (t'.u ∘ t.u) ∘ (u ∘ (s.u ∘ s'.u))  ≈⟨ skip (rw p≈q) ∙ assoc ⟩
+        t'.u ∘ (t.u ∘ (u' ∘ (s.u ∘ s'.u))) ≈⟨ skip (skip sym-assoc ∙ sym-assoc) ⟩
+        t'.u ∘ ((t.u ∘ (u' ∘ s.u)) ∘ s'.u) ∎ }
+  ; F-resp-≈ = λ { (s≈s' , t≈t') p≈q → replace-3 t≈t' p≈q s≈s' }
   }

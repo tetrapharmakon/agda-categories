@@ -114,6 +114,8 @@ total = record
   ; ∘-resp-≈ = λ { (p₁ , q₁) (p₂ , q₂) → ∘-resp-≈ p₁ p₂ , ∘-resp-≈ q₁ q₂ }
   }
 
+
+{-
 broken∇ : Functor total Arr.Arrow
 broken∇ = record
   { F₀ = λ ((A , B) ∣ ξ) → 
@@ -131,4 +133,24 @@ broken∇ = record
   ; identity = Equiv.refl , {!  !}
   ; homomorphism = Equiv.refl , {!  !}
   ; F-resp-≈ = λ x → {!  !} , {!  !}
+  }
+-}
+
+∇maybe : Functor total repairs
+∇maybe = record
+  { F₀ = λ x → 
+      let module x = tab₀ x
+          module ξx = MR2 x.ξ 
+      in record { A = x.L ; ϕ = ξx.ϕ }
+  ; F₁ = λ { {x} {y} f → 
+      let module x = tab₀ x
+          module y = tab₀ y
+          module f = tot⇒ f 
+      in record { u = f.l ; eq = λ {t} → 
+        (begin [ f.l , id ]₁ ∘ {!  !} ≈⟨ {!  !} ⟩ 
+              {!  !} ≈⟨ {! f.eqϕ  !} ⟩ 
+              f.ϕ.η t ∎) } }
+  ; identity = {!  !}
+  ; homomorphism = {!  !}
+  ; F-resp-≈ = {!  !}
   }
