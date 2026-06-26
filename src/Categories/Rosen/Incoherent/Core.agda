@@ -45,7 +45,11 @@ record iMR2 (A B : Obj) : Set (o ⊔ ℓ ⊔ e) where
     ϕ : B ⇒ [ A , B ]₀
 
 -- iMR2 (_ , B) è funtoriale per ogni B fissato; C^op --> Setoids
--- iMR2 (A , _) forse induce un *profuntore* tra iMR2(A,B) e iMR2(A, B')...
+-- iMR2 (A , _) induce un *profuntore* tra iMR2(A,B) e iMR2(A, B')...
+
+{-
+
+-}
 
 record iMR2ᴸ₀ (B : Obj) : Set (o ⊔ ℓ ⊔ e) where
   field
@@ -245,7 +249,7 @@ right v = record
                 [ u ∘ s.u , id ]₁ ∘ (([ t.u , id ]₁ ∘ ξy'.ϕ) ∘ v)
                   ≈⟨ sym-assoc ⟩
                 ([ u ∘ s.u , id ]₁ ∘ ([ t.u , id ]₁ ∘ ξy'.ϕ)) ∘ v
-                  ≈⟨ sym-assoc⟩∘⟨refl ⟩
+                  ≈⟨ sym-assoc ⟩∘⟨refl ⟩
                 (([ u ∘ s.u , id ]₁ ∘ [ t.u , id ]₁) ∘ ξy'.ϕ) ∘ v
                   ≈⟨ assoc ⟩
                 ([ u ∘ s.u , id ]₁ ∘ [ t.u , id ]₁) ∘ (ξy'.ϕ ∘ v)
@@ -253,9 +257,54 @@ right v = record
                 [ t.u ∘ u ∘ s.u , id ]₁ ∘ (ξy'.ϕ ∘ v)
                   ∎
           in (u' , (eqf' , eqϕ')) }
-      ; cong = λ { {p} {q} p≈q → skip (rw p≈q) }
-      } }
-  ; identity = {!  !}
-  ; homomorphism = {!  !}
-  ; F-resp-≈ = {!  !}
+  ; cong = λ { {p} {q} p≈q → skip (rw p≈q) }
+  } }
+  ; identity = λ { {(x , y)} {p} {q} p≈q →
+      let u  = proj₁ p
+          u' = proj₁ q
+      in begin
+        id ∘ u ∘ id  ≈⟨ identityˡʳ ⟩
+        u            ≈⟨ p≈q ⟩
+        u'           ∎ }
+  ; homomorphism = λ { {(x , y)} {(x' , y')} {(x'' , y'')} {(s , t)} {(s' , t')} {p} {q} p≈q →
+      let module s  = iMR2ᴸ⇒ s
+          module t  = iMR2ᴸ⇒ t
+          module s' = iMR2ᴸ⇒ s'
+          module t' = iMR2ᴸ⇒ t'
+          u  = proj₁ p
+          u' = proj₁ q
+
+          innerEq : t.u ∘ (u' ∘ (s.u ∘ s'.u)) ≈ (t.u ∘ (u' ∘ s.u)) ∘ s'.u
+          innerEq = begin
+            t.u ∘ (u' ∘ (s.u ∘ s'.u))
+              ≈⟨ skip sym-assoc ⟩
+            t.u ∘ ((u' ∘ s.u) ∘ s'.u)
+              ≈⟨ sym-assoc ⟩
+            (t.u ∘ (u' ∘ s.u)) ∘ s'.u
+              ∎
+      in begin
+        (t'.u ∘ t.u) ∘ (u ∘ (s.u ∘ s'.u))
+          ≈⟨ skip (rw p≈q) ⟩
+        (t'.u ∘ t.u) ∘ (u' ∘ (s.u ∘ s'.u))
+          ≈⟨ assoc ⟩
+        t'.u ∘ (t.u ∘ (u' ∘ (s.u ∘ s'.u)))
+          ≈⟨ skip innerEq ⟩
+        t'.u ∘ ((t.u ∘ (u' ∘ s.u)) ∘ s'.u)
+          ∎ }
+  ; F-resp-≈ = λ { {(x , y)} {(x' , y')} {(s , t)} {(s₁ , t₁)} (s≈s₁ , t≈t₁) {p} {q} p≈q →
+      let module s  = iMR2ᴸ⇒ s
+          module t  = iMR2ᴸ⇒ t
+          module s₁ = iMR2ᴸ⇒ s₁
+          module t₁ = iMR2ᴸ⇒ t₁
+          u  = proj₁ p
+          u' = proj₁ q
+      in begin
+        t.u ∘ (u ∘ s.u)
+          ≈⟨ rw t≈t₁ ⟩
+        t₁.u ∘ (u ∘ s.u)
+          ≈⟨ skip (rw p≈q) ⟩
+        t₁.u ∘ (u' ∘ s.u)
+          ≈⟨ skip (skip s≈s₁) ⟩
+        t₁.u ∘ (u' ∘ s₁.u)
+          ∎ }
   }
