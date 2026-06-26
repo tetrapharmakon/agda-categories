@@ -46,11 +46,18 @@ record tot⇒ (x y : tab₀ MRS-Profunctor) : Set (o ⊔ ℓ ⊔ e) where
   g = MR2.f y.ξ
 
   module ϕ = NaturalTransformation (MR2.ϕ x.ξ)
+  module ψ = NaturalTransformation (MR2.ϕ y.ξ)
   module l*ψ = NaturalTransformation ((nHom l ∘ʳ Cod) ∘ᵥ MR2.ϕ y.ξ)
   
   field
     eqf : r ∘ f ≈ g ∘ l
-    eqϕ : l*ψ.η (record { arr = g }) ∘ r ≈ Functor.F₁ [ x.L ,-] r ∘ ϕ.η (record { arr = f })
+    -- TODO: this condition supersedes eqϕ, which is just `nat {id}`; 
+    -- ϕ.η t ∘ r ≈ [ A , r ] ∘ ϕ.η t
+    -- is the naturality square of ϕ
+    -- nat : ∀ {t} {r} → l*ψ.η t ∘ r ≈ Functor.F₁ [ x.L ,-] r ∘ ϕ.η t
+    -- it's not a one-shot ojb because it requires to change the def of the `total` category
+  
+    eqϕ : ∀ {t} → l*ψ.η t ≈ ϕ.η t
 
 total : Category (o ⊔ ℓ ⊔ e) (o ⊔ ℓ ⊔ e) e
 total = record
@@ -63,44 +70,36 @@ total = record
        in
        [ id , id
        ∥ id-comm-sym C
-       , (begin
-            l*ϕ.η (record { arr = f }) ∘ id
-              ≈⟨ identityʳ ⟩
-            l*ϕ.η (record { arr = f })
-              ≈⟨ Equiv.refl ⟩
-            Functor.F₁ [ A ,-] id ∘ ϕNT.η (record { arr = f })
-          ∎)
+       , (λ {t} →
+           begin
+             l*ϕ.η t               ≈⟨ Functor.identity [-,-] ⟩∘⟨refl ⟩
+             id ∘ ϕNT.η t          ≈⟨ identityˡ ⟩
+             ϕNT.η t              ∎)
        ]}
-  ; _∘_ = λ {t t' → let module t = tot⇒ t
-                        module t' = tot⇒ t'
-                     in [ t.l ∘ t'.l , t.r ∘ t'.r ∥ 
-                          (begin (t.r ∘ t'.r) ∘ t'.f ≈⟨ pullʳ C t'.eqf ⟩ 
-                                 t.r ∘ MR2.f t'.y.ξ ∘ t'.l ≈⟨ pullˡ C t.eqf ⟩ 
-                                 (MR2.f t.y.ξ ∘ t.l) ∘ t'.l ≈⟨ assoc ⟩ 
-                                 MR2.f t.y.ξ ∘ t.l ∘ t'.l ∎) 
-                        , (let module Hx = Functor [ t'.x.L ,-]
-                               module Hy = Functor [ t.x.L ,-]
-                               module ψ = NaturalTransformation (MR2.ϕ t.y.ξ)
-                               ψ₁ = ψ.η (record { arr = t.g })
-                               ϕ₁ = t.ϕ.η (record { arr = t.f })
-                               ϕ'₁ = t'.ϕ.η (record { arr = t'.f })
-                               module Hom[-1] {X} = Functor (appʳ [-,-] X)
-                           in
-                           begin
-                             ([ t.l ∘ t'.l , id ]₁ ∘ ψ₁) ∘ (t.r ∘ t'.r)             ≈⟨ ∘-resp-≈ (∘-resp-≈ (Hom[-1].homomorphism {f = t.l} {g = t'.l}) Equiv.refl) Equiv.refl ⟩
-                             (([ t'.l , id ]₁ ∘ [ t.l , id ]₁) ∘ ψ₁) ∘ (t.r ∘ t'.r) ≈⟨ ∘-resp-≈ assoc Equiv.refl ⟩
-                             ([ t'.l , id ]₁ ∘ ([ t.l , id ]₁ ∘ ψ₁)) ∘ (t.r ∘ t'.r) ≈˘⟨ assoc ⟩
-                             (([ t'.l , id ]₁ ∘ ([ t.l , id ]₁ ∘ ψ₁)) ∘ t.r) ∘ t'.r ≈⟨ ∘-resp-≈ assoc Equiv.refl ⟩
-                             ([ t'.l , id ]₁ ∘ (([ t.l , id ]₁ ∘ ψ₁) ∘ t.r)) ∘ t'.r ≈⟨ ∘-resp-≈ (∘-resp-≈ Equiv.refl t.eqϕ) Equiv.refl ⟩
-                             ([ t'.l , id ]₁ ∘ (Hy.F₁ t.r ∘ ϕ₁)) ∘ t'.r             ≈⟨ ∘-resp-≈ (Equiv.sym assoc) Equiv.refl ⟩
-                             (([ t'.l , id ]₁ ∘ Hy.F₁ t.r) ∘ ϕ₁) ∘ t'.r             ≈⟨ ∘-resp-≈ (∘-resp-≈ (Equiv.sym [ [-,-] ]-commute) Equiv.refl) Equiv.refl ⟩
-                             ((Hx.F₁ t.r ∘ [ t'.l , id ]₁) ∘ ϕ₁) ∘ t'.r             ≈⟨ ∘-resp-≈ assoc Equiv.refl ⟩
-                             (Hx.F₁ t.r ∘ ([ t'.l , id ]₁ ∘ ϕ₁)) ∘ t'.r             ≈⟨ assoc ⟩
-                             Hx.F₁ t.r ∘ (([ t'.l , id ]₁ ∘ ϕ₁) ∘ t'.r)             ≈⟨ ∘-resp-≈ Equiv.refl t'.eqϕ ⟩
-                             Hx.F₁ t.r ∘ (Hx.F₁ t'.r ∘ ϕ'₁)                         ≈˘⟨ assoc ⟩
-                             (Hx.F₁ t.r ∘ Hx.F₁ t'.r) ∘ ϕ'₁                         ≈⟨ ∘-resp-≈ (Equiv.sym Hx.homomorphism) Equiv.refl ⟩
-                             Hx.F₁ (t.r ∘ t'.r) ∘ ϕ'₁                               ∎)
-                        ]}
+  ; _∘_ = λ {t t' →
+      let module t  = tot⇒ t
+          module t' = tot⇒ t'
+          module ψ  = NaturalTransformation (MR2.ϕ t.y.ξ)
+          module Hom[-1] {X} = Functor (appʳ [-,-] X)
+      in
+      [ t.l ∘ t'.l , t.r ∘ t'.r ∥ 
+        (begin (t.r ∘ t'.r) ∘ t'.f ≈⟨ pullʳ C t'.eqf ⟩ 
+               t.r ∘ MR2.f t'.y.ξ ∘ t'.l ≈⟨ pullˡ C t.eqf ⟩ 
+               (MR2.f t.y.ξ ∘ t.l) ∘ t'.l ≈⟨ assoc ⟩ 
+               MR2.f t.y.ξ ∘ t.l ∘ t'.l ∎)
+      , (λ {h} →
+          begin
+            [ t.l ∘ t'.l , id ]₁ ∘ ψ.η h
+              ≈⟨ Hom[-1].homomorphism {f = t.l} {g = t'.l} ⟩∘⟨refl ⟩
+            ([ t'.l , id ]₁ ∘ [ t.l , id ]₁) ∘ ψ.η h
+              ≈⟨ assoc ⟩
+            [ t'.l , id ]₁ ∘ ([ t.l , id ]₁ ∘ ψ.η h)
+              ≈⟨ refl⟩∘⟨ t.eqϕ {t = h} ⟩
+            [ t'.l , id ]₁ ∘ t.ϕ.η h
+              ≈⟨ t'.eqϕ {t = h} ⟩
+            t'.ϕ.η h
+              ∎)
+      ]}
   ; assoc = assoc , assoc
   ; sym-assoc = sym-assoc , sym-assoc
   ; identityˡ = identityˡ , identityˡ
@@ -125,7 +124,7 @@ broken∇ = record
           let module ϕ = NaturalTransformation ϕ
               module ψ = NaturalTransformation ψ
           in
-          mor⇒ {dom⇒ = r} {cod⇒ = {! ? ∘ ψ.η (record { arr = g }) !} ∘ Functor.F₁ [ A ,-] r} (begin
+          mor⇒ {dom⇒ = r} {cod⇒ = {! ? ∘ ψ.η t !} ∘ Functor.F₁ t
             _ ∘ ϕ.η (record { arr = f }) ≈⟨ {! eqϕ !} ⟩
             {!  !}                       ≈⟨ {!  !} ⟩
             ψ.η (record { arr = g }) ∘ r
@@ -146,10 +145,7 @@ broken∇ = record
       let module x = tab₀ x
           module y = tab₀ y
           module f = tot⇒ f 
-      in record { u = f.l ; eq = λ {t} → 
-        (begin [ f.l , id ]₁ ∘ {!  !} ≈⟨ {!  !} ⟩ 
-              {!  !} ≈⟨ {! f.eqϕ  !} ⟩ 
-              f.ϕ.η t ∎) } }
+      in record { u = f.l ; eq = f.eqϕ } }
   ; identity = {!  !}
   ; homomorphism = {!  !}
   ; F-resp-≈ = {!  !}
