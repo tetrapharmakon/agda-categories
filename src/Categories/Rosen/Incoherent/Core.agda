@@ -170,30 +170,91 @@ left u = record
   }
 
 
-wrong : (v : B ⇒ B') → Functor (iMR2ᴸ B) (iMR2ᴸ B')
-wrong v = record
-  { F₀ = λ x → 
-  let module x = iMR2ᴸ₀ x 
-      module ξx = iMR2 x.ξ
-  in record 
-   { A = x.A 
-   ; ξ = ⟪ v ∘ ξx.f , {!  !} ⟫ 
-   }
-  ; F₁ = {!  !}
-  ; identity = {!  !}
-  ; homomorphism = {!  !}
-  ; F-resp-≈ = {!  !}
-  }
+-- wrong : (v : B ⇒ B') → Functor (iMR2ᴸ B) (iMR2ᴸ B')
+-- wrong v = record
+--   { F₀ = λ x → 
+--   let module x = iMR2ᴸ₀ x 
+--       module ξx = iMR2 x.ξ
+--   in record 
+--    { A = x.A 
+--    ; ξ = ⟪ v ∘ ξx.f , {!  !} ⟫ 
+--    }
+--   ; F₁ = {!  !}
+--   ; identity = {!  !}
+--   ; homomorphism = {!  !}
+--   ; F-resp-≈ = {!  !}
+--   }
 
-right : (v : B ⇒ B') → Bifunctor (iMR2ᴸ B) (iMR2ᴸ B') (Setoids {!  !} {!  !})
+right : (v : B ⇒ B') → Bifunctor (Category.op (iMR2ᴸ B)) (iMR2ᴸ B') (Setoids (ℓ ⊔ e) e)
 right v = record
   { F₀ = λ {(x , y) → 
-    let module x = iMR2ᴸ₀ x 
-        module ξx = iMR2 x.ξ
-        module y = iMR2ᴸ₀ y 
-        module ξy = iMR2 y.ξ
-    in {!  !}}
-  ; F₁ = {!  !}
+     let module x  = iMR2ᴸ₀ x 
+         module ξx = iMR2 x.ξ
+         module y  = iMR2ᴸ₀ y 
+         module ξy = iMR2 y.ξ
+     in record
+       { Carrier = Σ (x.A ⇒ y.A) (λ u →
+           (v ∘ ξx.f ≈ ξy.f ∘ u)
+         × ([ id , v ]₁ ∘ ξx.ϕ ≈ [ u , id ]₁ ∘ ξy.ϕ ∘ v))
+       ; _≈_ = λ p q → proj₁ p ≈ proj₁ q
+       ; isEquivalence = record { refl = refl ; sym = sym ; trans = trans }
+       }}
+  ; F₁ = λ { {(x , y)} {(x' , y')} (s , t) →
+      let module x   = iMR2ᴸ₀ x
+          module ξx  = iMR2 x.ξ
+          module x'  = iMR2ᴸ₀ x'
+          module ξx' = iMR2 x'.ξ
+          module y   = iMR2ᴸ₀ y
+          module ξy  = iMR2 y.ξ
+          module y'  = iMR2ᴸ₀ y'
+          module ξy' = iMR2 y'.ξ
+          module s   = iMR2ᴸ⇒ s
+          module t   = iMR2ᴸ⇒ t
+          module Hom[-1] {A} = Functor (appʳ [-,-] A)
+      in record
+      { _⟨$⟩_ = λ { (u , (eqf , eqϕ)) →
+          let u' : x'.A ⇒ y'.A
+              u' = t.u ∘ u ∘ s.u
+              eqf' : v ∘ ξx'.f ≈ ξy'.f ∘ u'
+              eqf' = begin
+                v ∘ ξx'.f                    ≈⟨ refl⟩∘⟨ s.eqf ⟩
+                v ∘ (ξx.f ∘ s.u)            ≈⟨ sym-assoc ⟩
+                (v ∘ ξx.f) ∘ s.u            ≈⟨ rw eqf ⟩
+                (ξy.f ∘ u) ∘ s.u            ≈⟨ assoc ⟩
+                ξy.f ∘ (u ∘ s.u)            ≈⟨ rw t.eqf ⟩
+                (ξy'.f ∘ t.u) ∘ (u ∘ s.u)   ≈⟨ assoc ⟩
+                ξy'.f ∘ (t.u ∘ (u ∘ s.u))   ∎
+              eqϕ' : [ id , v ]₁ ∘ ξx'.ϕ ≈ [ u' , id ]₁ ∘ ξy'.ϕ ∘ v
+              eqϕ' = begin
+                [ id , v ]₁ ∘ ξx'.ϕ
+                  ≈⟨ refl⟩∘⟨ s.eqϕ ⟩
+                [ id , v ]₁ ∘ ([ s.u , id ]₁ ∘ ξx.ϕ)
+                  ≈⟨ sym-assoc ⟩
+                ([ id , v ]₁ ∘ [ s.u , id ]₁) ∘ ξx.ϕ
+                  ≈⟨ rw [ [-,-] ]-commute ⟩
+                ([ s.u , id ]₁ ∘ [ id , v ]₁) ∘ ξx.ϕ
+                  ≈⟨ assoc ⟩
+                [ s.u , id ]₁ ∘ ([ id , v ]₁ ∘ ξx.ϕ)
+                  ≈⟨ refl⟩∘⟨ eqϕ ⟩
+                [ s.u , id ]₁ ∘ ([ u , id ]₁ ∘ (ξy.ϕ ∘ v))
+                  ≈⟨ sym-assoc ⟩
+                ([ s.u , id ]₁ ∘ [ u , id ]₁) ∘ (ξy.ϕ ∘ v)
+                  ≈⟨ rw (Equiv.sym Hom[-1].homomorphism) ⟩
+                [ u ∘ s.u , id ]₁ ∘ (ξy.ϕ ∘ v)
+                  ≈⟨ skip (rw t.eqϕ) ⟩
+                [ u ∘ s.u , id ]₁ ∘ (([ t.u , id ]₁ ∘ ξy'.ϕ) ∘ v)
+                  ≈⟨ sym-assoc ⟩
+                ([ u ∘ s.u , id ]₁ ∘ ([ t.u , id ]₁ ∘ ξy'.ϕ)) ∘ v
+                  ≈⟨ sym-assoc⟩∘⟨refl ⟩
+                (([ u ∘ s.u , id ]₁ ∘ [ t.u , id ]₁) ∘ ξy'.ϕ) ∘ v
+                  ≈⟨ assoc ⟩
+                ([ u ∘ s.u , id ]₁ ∘ [ t.u , id ]₁) ∘ (ξy'.ϕ ∘ v)
+                  ≈⟨ rw (Equiv.sym Hom[-1].homomorphism) ⟩
+                [ t.u ∘ u ∘ s.u , id ]₁ ∘ (ξy'.ϕ ∘ v)
+                  ∎
+          in (u' , (eqf' , eqϕ')) }
+      ; cong = λ { {p} {q} p≈q → skip (rw p≈q) }
+      } }
   ; identity = {!  !}
   ; homomorphism = {!  !}
   ; F-resp-≈ = {!  !}
