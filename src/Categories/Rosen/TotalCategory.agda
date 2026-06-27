@@ -54,10 +54,12 @@ record tot⇒ (x y : tab₀ MRS-Profunctor) : Set (o ⊔ ℓ ⊔ e) where
     -- TODO: this condition supersedes eqϕ, which is just `nat {id}`; 
     -- ϕ.η t ∘ r ≈ [ A , r ] ∘ ϕ.η t
     -- is the naturality square of ϕ
-    -- nat : ∀ {t} {r} → l*ψ.η t ∘ r ≈ Functor.F₁ [ x.L ,-] r ∘ ϕ.η t
+    nat : ∀ {t} {r} → l*ψ.η t ∘ r ≈ Functor.F₁ [ x.L ,-] r ∘ ϕ.η t
     -- it's not a one-shot ojb because it requires to change the def of the `total` category
   
-    eqϕ : ∀ {t} → l*ψ.η t ≈ ϕ.η t
+  eqϕ : ∀ {t} → l*ψ.η t ≈ ϕ.η t
+  eqϕ = Equiv.sym identityʳ ○ nat {r = id} ○ elimˡ C [-,-].identity
+
 
 total : Category (o ⊔ ℓ ⊔ e) (o ⊔ ℓ ⊔ e) e
 total = record
@@ -70,16 +72,18 @@ total = record
        in
        [ id , id
        ∥ id-comm-sym C
-       , (λ {t} →
+       , (λ {t} {r} → 
            begin
-             l*ϕ.η t               ≈⟨ Functor.identity [-,-] ⟩∘⟨refl ⟩
-             id ∘ ϕNT.η t          ≈⟨ identityˡ ⟩
-             ϕNT.η t              ∎)
+             NaturalTransformation.η ((nHom id ∘ʳ Cod) ∘ᵥ ϕ) t ∘ r ≈⟨ elimˡ C [-,-].identity ⟩∘⟨refl ⟩ -- Functor.identity [-,-] ⟩∘⟨refl ⟩
+             {!  !}          ≈⟨ ϕNT.commute {!  !} ⟩
+             [ id , r ]₁ ∘ ϕNT.η t              ∎
+            )
        ]}
-  ; _∘_ = λ {t t' →
+  ; _∘_ = λ { {A} {B} {X} t t' →
       let module t  = tot⇒ t
           module t' = tot⇒ t'
           module ψ  = NaturalTransformation (MR2.ϕ t.y.ξ)
+          module ϕNT = NaturalTransformation (MR2.ϕ t'.y.ξ)
           module Hom[-1] {X} = Functor (appʳ [-,-] X)
       in
       [ t.l ∘ t'.l , t.r ∘ t'.r ∥ 
@@ -87,18 +91,21 @@ total = record
                t.r ∘ MR2.f t'.y.ξ ∘ t'.l ≈⟨ pullˡ C t.eqf ⟩ 
                (MR2.f t.y.ξ ∘ t.l) ∘ t'.l ≈⟨ assoc ⟩ 
                MR2.f t.y.ξ ∘ t.l ∘ t'.l ∎)
-      , (λ {h} →
-          begin
-            [ t.l ∘ t'.l , id ]₁ ∘ ψ.η h
-              ≈⟨ Hom[-1].homomorphism {f = t.l} {g = t'.l} ⟩∘⟨refl ⟩
-            ([ t'.l , id ]₁ ∘ [ t.l , id ]₁) ∘ ψ.η h
-              ≈⟨ assoc ⟩
-            [ t'.l , id ]₁ ∘ ([ t.l , id ]₁ ∘ ψ.η h)
-              ≈⟨ refl⟩∘⟨ t.eqϕ {t = h} ⟩
-            [ t'.l , id ]₁ ∘ t.ϕ.η h
-              ≈⟨ t'.eqϕ {t = h} ⟩
-            t'.ϕ.η h
-              ∎)
+      , (λ {h} {r} → 
+          begin -- {!  !}
+             ([ t.l ∘ t'.l , id ]₁ ∘ ψ.η h) ∘ r
+              ≈⟨ Hom[-1].homomorphism ⟩∘⟨refl ⟩∘⟨refl ⟩ -- Hom[-1].homomorphism {f = t.l} {g = t'.l} ⟩∘⟨refl ⟩
+          (([ t'.l , id ]₁ ∘ [ t.l , id ]₁) ∘ ψ.η h) ∘ r
+              ≈⟨ assoc ⟩∘⟨refl ⟩ -- assoc ⟩
+          ([ t'.l , id ]₁ ∘ ([ t.l , id ]₁ ∘ ψ.η h)) ∘ r
+              ≈⟨ (refl⟩∘⟨ t.eqϕ) ⟩∘⟨refl ⟩
+          ([ t'.l , id ]₁ ∘ t.ϕ.η h) ∘ r
+              ≈⟨ t'.eqϕ ⟩∘⟨refl ⟩
+          t'.ϕ.η h ∘ r 
+             ≈⟨ {! ϕNT.commute ? !} ⟩ 
+          [ id , r ]₁ ∘ t'.ϕ.η h --   t'.ϕ.η h
+              ∎
+              )
       ]}
   ; assoc = assoc , assoc
   ; sym-assoc = sym-assoc , sym-assoc
@@ -112,7 +119,6 @@ total = record
     }
   ; ∘-resp-≈ = λ { (p₁ , q₁) (p₂ , q₂) → ∘-resp-≈ p₁ p₂ , ∘-resp-≈ q₁ q₂ }
   }
-
 
 {-
 broken∇ : Functor total Arr.Arrow
@@ -133,7 +139,6 @@ broken∇ = record
   ; homomorphism = Equiv.refl , {!  !}
   ; F-resp-≈ = λ x → {!  !} , {!  !}
   }
--}
 
 ∇maybe : Functor total repairs
 ∇maybe = record
@@ -146,7 +151,8 @@ broken∇ = record
           module y = tab₀ y
           module f = tot⇒ f 
       in record { u = f.l ; eq = f.eqϕ } }
-  ; identity = {!  !}
+  ; identity = λ {A} → {!  !}
   ; homomorphism = {!  !}
   ; F-resp-≈ = {!  !}
   }
+-}
