@@ -34,6 +34,22 @@ open MR
 open import Categories.Rosen.Core Cl
 open import Categories.Functor.Profunctor.Tabulator
 
+{-
+The category of elements of the presheaf
+
+Cᵒᵖ → Set
+
+sending A to Nat( Cod , [ A , Cod ] )
+
+a typical object of such a category is a pair (A, ϕ) and arrows are
+
+u : A ⇒ A' such that 
+
+[u,1] ∘ ψ ≈ ϕ where
+
+[u,1] ∘ ψ : c ⇒ [A',c] ⇒ [A,c]
+-}
+
 record tot⇒ (x y : tab₀ MRS-Profunctor) : Set (o ⊔ ℓ ⊔ e) where
   constructor [_,_∥_,_]
   module x = tab₀ x
@@ -54,11 +70,16 @@ record tot⇒ (x y : tab₀ MRS-Profunctor) : Set (o ⊔ ℓ ⊔ e) where
     -- TODO: this condition supersedes eqϕ, which is just `nat {id}`; 
     -- ϕ.η t ∘ r ≈ [ A , r ] ∘ ϕ.η t
     -- is the naturality square of ϕ
-    nat : ∀ {t} {r} → l*ψ.η t ∘ r ≈ Functor.F₁ [ x.L ,-] r ∘ ϕ.η t
+    nat : ∀ {s t} (α : Arr.Morphism⇒ s t)
+        → l*ψ.η t ∘ Arr.Morphism⇒.cod⇒ α
+        ≈ Functor.F₁ [ x.L ,-] (Arr.Morphism⇒.cod⇒ α) ∘ ϕ.η s
     -- it's not a one-shot ojb because it requires to change the def of the `total` category
   
   eqϕ : ∀ {t} → l*ψ.η t ≈ ϕ.η t
-  eqϕ = Equiv.sym identityʳ ○ nat {r = id} ○ elimˡ C [-,-].identity
+  eqϕ {t} =
+    Equiv.sym identityʳ
+    ○ nat (Category.id Arr.Arrow {A = t})
+    ○ elimˡ C [-,-].identity
 
 
 total : Category (o ⊔ ℓ ⊔ e) (o ⊔ ℓ ⊔ e) e
@@ -72,41 +93,30 @@ total = record
        in
        [ id , id
        ∥ id-comm-sym C
-       , (λ {t} {r} → 
-           begin
-             NaturalTransformation.η ((nHom id ∘ʳ Cod) ∘ᵥ ϕ) t ∘ r ≈⟨ elimˡ C [-,-].identity ⟩∘⟨refl ⟩ -- Functor.identity [-,-] ⟩∘⟨refl ⟩
-             {!  !}          ≈⟨ ϕNT.commute {!  !} ⟩
-             [ id , r ]₁ ∘ ϕNT.η t              ∎
-            )
+       , (λ {s} {t} α → 
+         elimˡ C [-,-].identity ⟩∘⟨refl 
+         ○ ϕNT.commute α)
        ]}
   ; _∘_ = λ { {A} {B} {X} t t' →
-      let module t  = tot⇒ t
-          module t' = tot⇒ t'
-          module ψ  = NaturalTransformation (MR2.ϕ t.y.ξ)
-          module ϕNT = NaturalTransformation (MR2.ϕ t'.y.ξ)
-          module Hom[-1] {X} = Functor (appʳ [-,-] X)
-      in
-      [ t.l ∘ t'.l , t.r ∘ t'.r ∥ 
-        (begin (t.r ∘ t'.r) ∘ t'.f ≈⟨ pullʳ C t'.eqf ⟩ 
-               t.r ∘ MR2.f t'.y.ξ ∘ t'.l ≈⟨ pullˡ C t.eqf ⟩ 
-               (MR2.f t.y.ξ ∘ t.l) ∘ t'.l ≈⟨ assoc ⟩ 
-               MR2.f t.y.ξ ∘ t.l ∘ t'.l ∎)
-      , (λ {h} {r} → 
-          begin -- {!  !}
-             ([ t.l ∘ t'.l , id ]₁ ∘ ψ.η h) ∘ r
-              ≈⟨ Hom[-1].homomorphism ⟩∘⟨refl ⟩∘⟨refl ⟩ -- Hom[-1].homomorphism {f = t.l} {g = t'.l} ⟩∘⟨refl ⟩
-          (([ t'.l , id ]₁ ∘ [ t.l , id ]₁) ∘ ψ.η h) ∘ r
-              ≈⟨ assoc ⟩∘⟨refl ⟩ -- assoc ⟩
-          ([ t'.l , id ]₁ ∘ ([ t.l , id ]₁ ∘ ψ.η h)) ∘ r
-              ≈⟨ (refl⟩∘⟨ t.eqϕ) ⟩∘⟨refl ⟩
-          ([ t'.l , id ]₁ ∘ t.ϕ.η h) ∘ r
-              ≈⟨ t'.eqϕ ⟩∘⟨refl ⟩
-          t'.ϕ.η h ∘ r 
-             ≈⟨ {! ϕNT.commute ? !} ⟩ 
-          [ id , r ]₁ ∘ t'.ϕ.η h --   t'.ϕ.η h
-              ∎
-              )
-      ]}
+       let module t  = tot⇒ t
+           module t' = tot⇒ t'
+           module ψ  = NaturalTransformation (MR2.ϕ t.y.ξ)
+           module Hom[-1] {X} = Functor (appʳ [-,-] X)
+           module Hx = Functor [ t'.x.L ,-]
+           module Hy = Functor [ t.x.L ,-]
+       in
+       [ t.l ∘ t'.l , t.r ∘ t'.r ∥ 
+         pullʳ C t'.eqf ○ pullˡ C t.eqf ○ assoc
+       , (λ {s} {t₀} α →
+           let r = Arr.Morphism⇒.cod⇒ α in
+           begin
+             ([ t.l ∘ t'.l , id ]₁ ∘ ψ.η t₀) ∘ r             ≈⟨ ∘-resp-≈ (∘-resp-≈ (Hom[-1].homomorphism) Equiv.refl) Equiv.refl ⟩
+             (([ t'.l , id ]₁ ∘ [ t.l , id ]₁) ∘ ψ.η t₀) ∘ r ≈⟨ ∘-resp-≈ assoc Equiv.refl ○ assoc ⟩
+             [ t'.l , id ]₁ ∘ (([ t.l , id ]₁ ∘ ψ.η t₀) ∘ r) ≈⟨ (refl⟩∘⟨ t.nat α) ○  sym-assoc ⟩
+            ([ t'.l , id ]₁ ∘ Hy.F₁ r) ∘ t.ϕ.η s             ≈⟨ (∘-resp-≈ (Equiv.sym [ [-,-] ]-commute) Equiv.refl) ○ assoc ⟩
+             Hx.F₁ r ∘ ([ t'.l , id ]₁ ∘ t.ϕ.η s)            ≈⟨ refl⟩∘⟨ t'.eqϕ {t = s} ⟩
+             Hx.F₁ r ∘ t'.ϕ.η s                              ∎)
+       ]}
   ; assoc = assoc , assoc
   ; sym-assoc = sym-assoc , sym-assoc
   ; identityˡ = identityˡ , identityˡ
@@ -120,7 +130,6 @@ total = record
   ; ∘-resp-≈ = λ { (p₁ , q₁) (p₂ , q₂) → ∘-resp-≈ p₁ p₂ , ∘-resp-≈ q₁ q₂ }
   }
 
-{-
 broken∇ : Functor total Arr.Arrow
 broken∇ = record
   { F₀ = λ ((A , B) ∣ ξ) → 
@@ -129,30 +138,8 @@ broken∇ = record
   ; F₁ = λ { {(A , B) ∣ ⟪ f , ϕ ⟫} {(A' , B') ∣ ⟪ g , ψ ⟫} ([ l , r ∥ eqf , eqϕ ]) → 
           let module ϕ = NaturalTransformation ϕ
               module ψ = NaturalTransformation ψ
-          in
-          mor⇒ {dom⇒ = r} {cod⇒ = {! ? ∘ ψ.η t !} ∘ Functor.F₁ t
-            _ ∘ ϕ.η (record { arr = f }) ≈⟨ {! eqϕ !} ⟩
-            {!  !}                       ≈⟨ {!  !} ⟩
-            ψ.η (record { arr = g }) ∘ r
-            ∎)}
+          in {!  !}  } 
   ; identity = Equiv.refl , {!  !}
   ; homomorphism = Equiv.refl , {!  !}
-  ; F-resp-≈ = λ x → {!  !} , {!  !}
+  ; F-resp-≈ = λ x → Equiv.refl , {!  !}
   }
-
-∇maybe : Functor total repairs
-∇maybe = record
-  { F₀ = λ x → 
-      let module x = tab₀ x
-          module ξx = MR2 x.ξ 
-      in record { A = x.L ; ϕ = ξx.ϕ }
-  ; F₁ = λ { {x} {y} f → 
-      let module x = tab₀ x
-          module y = tab₀ y
-          module f = tot⇒ f 
-      in record { u = f.l ; eq = f.eqϕ } }
-  ; identity = λ {A} → {!  !}
-  ; homomorphism = {!  !}
-  ; F-resp-≈ = {!  !}
-  }
--}
