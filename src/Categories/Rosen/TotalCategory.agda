@@ -130,16 +130,18 @@ total = record
   ; ∘-resp-≈ = λ { (p₁ , q₁) (p₂ , q₂) → ∘-resp-≈ p₁ p₂ , ∘-resp-≈ q₁ q₂ }
   }
 
-broken∇ : Functor total Arr.Arrow
-broken∇ = record
-  { F₀ = λ ((A , B) ∣ ξ) → 
-  let module phi = NaturalTransformation (MR2.ϕ ξ) 
-  in record { arr = phi.η (record { arr = MR2.f ξ }) }
-  ; F₁ = λ { {(A , B) ∣ ⟪ f , ϕ ⟫} {(A' , B') ∣ ⟪ g , ψ ⟫} ([ l , r ∥ eqf , eqϕ ]) → 
-          let module ϕ = NaturalTransformation ϕ
-              module ψ = NaturalTransformation ψ
-          in {!  !}  } 
-  ; identity = Equiv.refl , {!  !}
-  ; homomorphism = Equiv.refl , {!  !}
-  ; F-resp-≈ = λ x → Equiv.refl , {!  !}
+∇maybe : Functor total repairs
+∇maybe = record
+  { F₀ = λ x → 
+      let module x = tab₀ x
+          module ξx = MR2 x.ξ 
+      in record { A = x.L ; ϕ = ξx.ϕ }
+  ; F₁ = λ { {x} {y} f → 
+      let module x = tab₀ x
+          module y = tab₀ y
+          module f = tot⇒ f 
+      in record { u = f.l ; eq = f.eqϕ } }
+  ; identity = λ {A} → Equiv.refl
+  ; homomorphism = Equiv.refl
+  ; F-resp-≈ = proj₁
   }
