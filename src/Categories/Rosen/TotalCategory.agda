@@ -130,6 +130,7 @@ total = record
   ; ∘-resp-≈ = λ { (p₁ , q₁) (p₂ , q₂) → ∘-resp-≈ p₁ p₂ , ∘-resp-≈ q₁ q₂ }
   }
 
+-- this functor is likely an equivalence that presents `total` as the category of repairs
 ∇maybe : Functor total repairs
 ∇maybe = record
   { F₀ = λ x → 
@@ -144,4 +145,31 @@ total = record
   ; identity = λ {A} → Equiv.refl
   ; homomorphism = Equiv.refl
   ; F-resp-≈ = proj₁
+  }
+
+-- Instead, one would like a functor tabulator -> repairs to define MR3 as pullback?
+
+{-
+
+tab(MRS-Profunctor) -----V₁----> C^→ <----?---- repairs <---∇---- total
+
+probably this functor `?` does not exist...
+It seems that the only way to define a pullback is done in 
+
+https://github.com/tetrapharmakon/agda-categories/blob/5b97012b94ad174962a136951e9ab9e73d7cbcb0/src/Categories/Rosen/FibreA.agda#L145
+
+where the "basepoint" A is taken into consideration.
+-}
+
+Q : Functor repairs Arr.Arrow
+Q = record
+  { F₀ = λ x → let module x = rep₀ x in (record { arr = NaturalTransformation.η x.ϕ (record { arr = id }) })
+  ; F₁ = λ { {x} {y} f → 
+    let module x = rep₀ x 
+        module y = rep₀ y
+        module f = rep⇒ f
+    in mor⇒ {!  !}}
+  ; identity = {!  !}
+  ; homomorphism = {!  !}
+  ; F-resp-≈ = {!  !}
   }
