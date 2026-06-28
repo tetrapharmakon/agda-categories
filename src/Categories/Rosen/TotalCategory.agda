@@ -232,3 +232,75 @@ where the "basepoint" A is taken into consideration.
 --   ; homomorphism = {!  !}
 --   ; F-resp-≈ = {!  !}
 --   }
+
+
+
+-- total is a subcategory of the tabulator.
+-- it would be nice to invoke the adjoint functor theorem to prove that the inclusion has an adjoint, giving the "universal" (free or cofree) compatible object of the tabulator, universally imposing the equation `nat` on morphisms
+
+
+incl : Functor total (Tabulator MRS-Profunctor) 
+incl = record
+  { F₀ = λ x → x
+  ; F₁ = λ { {x} {y} f →
+      let module x = tab₀ x
+          module y = tab₀ y
+          module f = tot⇒ f
+          module ϕ = NT (MR2.ϕ x.ξ)
+          module l*ψ = NT ((nHom f.l ∘ʳ Cod) ∘ᵥ MR2.ϕ y.ξ)
+      in
+      f.l , f.r ∥
+        ( (begin
+             f.r ∘ MR2.f x.ξ ∘ id            ≈⟨ refl⟩∘⟨ identityʳ ⟩
+             f.r ∘ MR2.f x.ξ                 ≈⟨ f.eqf ⟩
+             MR2.f y.ξ ∘ f.l                 ≈⟨ Equiv.sym identityˡ ⟩
+             id ∘ (MR2.f y.ξ ∘ f.l)          ∎)
+        , (λ {t} →
+            begin
+              NT.η ((nHom id ∘ʳ Cod) ∘ᵥ MR2.ϕ x.ξ) t
+                ≈⟨ elimˡ C [-,-].identity ⟩
+              ϕ.η t
+                ≈⟨ Equiv.sym (f.eqϕ {t = t}) ⟩
+              l*ψ.η t
+                ∎)) }
+  ; identity = Equiv.refl , Equiv.refl
+  ; homomorphism = Equiv.refl , Equiv.refl
+  ; F-resp-≈ = λ x → x
+  }
+
+forse : Functor (Tabulator MRS-Profunctor) total 
+forse = record
+  { F₀ = λ x → x
+  ; F₁ = λ { {x} {y} f →
+      let module x  = tab₀ x
+          module y  = tab₀ y
+          module f  = tab⇒ f
+          module ϕ  = NT (MR2.ϕ x.ξ)
+          module l*ψ = NT ((nHom f.l ∘ʳ Cod) ∘ᵥ MR2.ϕ y.ξ)
+          eqf =
+            let eqf' = proj₁ f.eq in
+            begin
+              f.r ∘ MR2.f x.ξ           ≈⟨ refl⟩∘⟨ Equiv.sym identityʳ ⟩
+              f.r ∘ MR2.f x.ξ ∘ id      ≈⟨ eqf' ⟩
+              id ∘ (MR2.f y.ξ ∘ f.l)    ≈⟨ identityˡ ⟩
+              MR2.f y.ξ ∘ f.l           ∎
+          eqϕ = proj₂ f.eq
+      in
+      [ f.l , f.r
+      ∥ eqf
+      , (λ {s} {t} α →
+          let r = Arr.Morphism⇒.cod⇒ α
+              eqϕt : l*ψ.η t ≈ ϕ.η t
+              eqϕt = Equiv.trans (Equiv.sym (eqϕ {x = t})) (elimˡ C [-,-].identity)
+          in
+          begin
+            l*ψ.η t ∘ r                                ≈⟨ ∘-resp-≈ eqϕt Equiv.refl ⟩
+            ϕ.η t ∘ r                                  ≈⟨ ϕ.commute α ⟩
+            Functor.F₁ [ x.L ,-] r ∘ ϕ.η s              ∎) ] }
+  ; identity = Equiv.refl , Equiv.refl
+  ; homomorphism = Equiv.refl , Equiv.refl
+  ; F-resp-≈ = λ x → x
+  }
+
+
+
