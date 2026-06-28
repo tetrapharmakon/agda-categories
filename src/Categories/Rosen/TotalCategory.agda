@@ -132,6 +132,14 @@ total = record
   ; ∘-resp-≈ = λ { (p₁ , q₁) (p₂ , q₂) → ∘-resp-≈ p₁ p₂ , ∘-resp-≈ q₁ q₂ }
   }
 
+
+
+
+
+
+
+-- ====
+-- all below this line ^ should appear in a separate module, in the folder src/Categories/Rosen/FibredFunctors.agda
 -- This functor works.
 K : Functor total repairs
 K = record
@@ -303,4 +311,18 @@ forse = record
   }
 
 
-
+-- Surprise motherfucker: the tabulator and total are equivalent categories!!!
+-- at first, it seems `total` is imposing a stronger condition, but in the end naturality of ϕ allows to deduce it from first principles.
+incl⊣forse : incl ⊣ forse
+incl⊣forse = record
+  { unit = ntHelper (record
+    { η = λ _ → Category.id total
+    ; commute = λ f → (id-comm-sym C , id-comm-sym C)
+    })
+  ; counit = ntHelper (record
+    { η = λ _ → Category.id (Tabulator MRS-Profunctor)
+    ; commute = λ f → (id-comm-sym C , id-comm-sym C)
+    })
+  ; zig = identity² , identity²
+  ; zag = identity² , identity²
+  }
