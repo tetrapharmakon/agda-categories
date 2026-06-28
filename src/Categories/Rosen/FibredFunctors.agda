@@ -74,6 +74,7 @@ K = record
   }
 
 𝕁⊣K : 𝕁 ⊣ K -- J and K are adjoint 
+-- J is full and faithful (unit is id)
 𝕁⊣K = record 
  { unit = ntHelper (record 
    { η = λ {record { A = A ; ϕ = ϕ } → record 
@@ -151,18 +152,15 @@ incl = record
       in
       f.l , f.r ∥
         ( (begin
-             f.r ∘ MR2.f x.ξ ∘ id            ≈⟨ refl⟩∘⟨ identityʳ ⟩
-             f.r ∘ MR2.f x.ξ                 ≈⟨ f.eqf ⟩
-             MR2.f y.ξ ∘ f.l                 ≈⟨ Equiv.sym identityˡ ⟩
-             id ∘ (MR2.f y.ξ ∘ f.l)          ∎)
+             f.r ∘ MR2.f x.ξ ∘ id   ≈⟨ refl⟩∘⟨ identityʳ ⟩
+             f.r ∘ MR2.f x.ξ        ≈⟨ f.eqf ⟩
+             MR2.f y.ξ ∘ f.l        ≈⟨ Equiv.sym identityˡ ⟩
+             id ∘ (MR2.f y.ξ ∘ f.l) ∎)
         , (λ {t} →
             begin
-              NT.η ((nHom id ∘ʳ Cod) ∘ᵥ MR2.ϕ x.ξ) t
-                ≈⟨ elimˡ C [-,-].identity ⟩
-              ϕ.η t
-                ≈⟨ Equiv.sym (f.eqϕ {t = t}) ⟩
-              l*ψ.η t
-                ∎)) }
+              NT.η ((nHom id ∘ʳ Cod) ∘ᵥ MR2.ϕ x.ξ) t ≈⟨ elimˡ C [-,-].identity ⟩
+              ϕ.η t                                  ≈⟨ Equiv.sym (f.eqϕ {t = t}) ⟩
+              l*ψ.η t                                ∎)) }
   ; identity = Equiv.refl , Equiv.refl
   ; homomorphism = Equiv.refl , Equiv.refl
   ; F-resp-≈ = λ x → x
@@ -180,10 +178,9 @@ forse = record
           eqf =
             let eqf' = proj₁ f.eq in
             begin
-              f.r ∘ MR2.f x.ξ           ≈⟨ refl⟩∘⟨ Equiv.sym identityʳ ⟩
-              f.r ∘ MR2.f x.ξ ∘ id      ≈⟨ eqf' ⟩
-              id ∘ (MR2.f y.ξ ∘ f.l)    ≈⟨ identityˡ ⟩
-              MR2.f y.ξ ∘ f.l           ∎
+              f.r ∘ MR2.f x.ξ        ≈⟨ refl⟩∘⟨ Equiv.sym identityʳ ⟩
+              f.r ∘ MR2.f x.ξ ∘ id   ≈⟨ eqf' ○ identityˡ ⟩
+              MR2.f y.ξ ∘ f.l        ∎
           eqϕ = proj₂ f.eq
       in
       [ f.l , f.r
@@ -192,11 +189,7 @@ forse = record
           let r = Arr.Morphism⇒.cod⇒ α
               eqϕt : l*ψ.η t ≈ ϕ.η t
               eqϕt = Equiv.trans (Equiv.sym (eqϕ {x = t})) (elimˡ C [-,-].identity)
-          in
-          begin
-            l*ψ.η t ∘ r                                ≈⟨ ∘-resp-≈ eqϕt Equiv.refl ⟩
-            ϕ.η t ∘ r                                  ≈⟨ ϕ.commute α ⟩
-            Functor.F₁ [ x.L ,-] r ∘ ϕ.η s              ∎) ] }
+          in eqϕt ⟩∘⟨refl ○ ϕ.commute α) ] }
   ; identity = Equiv.refl , Equiv.refl
   ; homomorphism = Equiv.refl , Equiv.refl
   ; F-resp-≈ = λ x → x
