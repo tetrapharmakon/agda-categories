@@ -177,15 +177,20 @@ K = record
 𝕁⊣K = record 
  { unit = ntHelper (record 
    { η = λ {record { A = A ; ϕ = ϕ } → record 
-     { u = id 
-     ; eq =  elimˡ C [-,-].identity
-     } }
-   ; commute = {!  !} }) 
+      { u = id 
+      ; eq =  elimˡ C [-,-].identity
+      } }
+    ; commute = λ f →
+        let module f = rep⇒ f in
+        begin
+          id ∘ f.u ≈⟨ identityˡ ⟩
+          f.u      ≈⟨ Equiv.sym identityʳ ⟩
+          f.u ∘ id ∎ }) 
   ; counit = ntHelper (record 
     { η = λ {((L , R) ∣ ξ) → 
       [ id , MR2.f ξ 
       ∥ Equiv.refl 
-      , (λ {s} {t} α →
+     , (λ {s} {t} α →
            let module ϕ = NT (MR2.ϕ ξ)
                r = Arr.Morphism⇒.cod⇒ α
            in
@@ -193,9 +198,12 @@ K = record
              (([ id , id ]₁ ∘ ϕ.η t) ∘ r) ≈⟨ assoc ○ (elimˡ C [-,-].identity) ⟩
              ϕ.η t ∘ r                    ≈⟨ ϕ.commute α ⟩
              Functor.F₁ [ L ,-] r ∘ ϕ.η s ∎) ] }
-    ; commute = {!  !} }) 
-  ; zig = {!  !} , {!  !} 
-  ; zag = λ {B} → {!  !} 
+    ; commute = λ f →
+        let module f = tot⇒ f in
+        ( Equiv.trans identityˡ (Equiv.sym identityʳ)
+        , Equiv.sym f.eqf ) }) 
+  ; zig = identity² , identity² 
+  ; zag = λ {B} → identity² 
   }
 
 -- Instead, one would like a functor tabulator -> repairs to define MR3 as pullback?
