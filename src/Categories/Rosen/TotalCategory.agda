@@ -14,7 +14,7 @@ open import Categories.Category.Monoidal.Closed using (Closed)
 open import Categories.Functor using (Functor; _∘F_)
 open import Categories.Functor.Bifunctor using (Bifunctor; appˡ; appʳ)
 open import Categories.Functor.Bifunctor.Properties using ([_]-commute)
-open import Categories.NaturalTransformation using (NaturalTransformation;_∘ᵥ_; _∘ₕ_; _∘ˡ_; _∘ʳ_)
+open import Categories.NaturalTransformation using (_∘ᵥ_; _∘ₕ_; _∘ˡ_; _∘ʳ_) renaming (NaturalTransformation to NT)
 open import Categories.NaturalTransformation.Equivalence using (_≃_; ≃-isEquivalence)
 
 open import Categories.Functor.Hom using (Hom[_][-,-]; Hom[_][_,_])
@@ -61,9 +61,9 @@ record tot⇒ (x y : tab₀ MRS-Profunctor) : Set (o ⊔ ℓ ⊔ e) where
   f = MR2.f x.ξ
   g = MR2.f y.ξ
 
-  module ϕ = NaturalTransformation (MR2.ϕ x.ξ)
-  module ψ = NaturalTransformation (MR2.ϕ y.ξ)
-  module l*ψ = NaturalTransformation ((nHom l ∘ʳ Cod) ∘ᵥ MR2.ϕ y.ξ)
+  module ϕ = NT (MR2.ϕ x.ξ)
+  module ψ = NT (MR2.ϕ y.ξ)
+  module l*ψ = NT ((nHom l ∘ʳ Cod) ∘ᵥ MR2.ϕ y.ξ)
   
   field
     eqf : r ∘ f ≈ g ∘ l
@@ -88,8 +88,8 @@ total = record
   ; _⇒_ = λ s t → tot⇒ s t
   ; _≈_ = λ h k → tot⇒.l h ≈ tot⇒.l k × tot⇒.r h ≈ tot⇒.r k
   ; id = λ { {(A , B) ∣ ⟪ f , ϕ ⟫} → 
-       let module ϕNT = NaturalTransformation ϕ
-           module l*ϕ = NaturalTransformation ((nHom id ∘ʳ Cod) ∘ᵥ ϕ)
+       let module ϕNT = NT ϕ
+           module l*ϕ = NT ((nHom id ∘ʳ Cod) ∘ᵥ ϕ)
        in
        [ id , id
        ∥ id-comm-sym C
@@ -100,7 +100,7 @@ total = record
   ; _∘_ = λ { {A} {B} {X} t t' →
        let module t  = tot⇒ t
            module t' = tot⇒ t'
-           module ψ  = NaturalTransformation (MR2.ϕ t.y.ξ)
+           module ψ  = NT (MR2.ϕ t.y.ξ)
            module Hom[-1] {X} = Functor (appʳ [-,-] X)
            module Hx = Functor [ t'.x.L ,-]
            module Hy = Functor [ t.x.L ,-]
@@ -153,10 +153,21 @@ total = record
   { F₀ = λ {(record { A = A ; ϕ = ϕ }) → (A , A) ∣ ⟪ id , ϕ ⟫}
   ; F₁ = λ { {X} {Y} f → let module f = rep⇒ f in
   [ f.u , f.u 
-  ∥ id-comm C , (λ α → {!  !}) ]}
+  ∥ id-comm C , (λ {s} {t} α →
+      let module X₀ = rep₀ X
+          module Y₀ = rep₀ Y
+          module ϕX = NT X₀.ϕ
+          module ϕY = NT Y₀.ϕ
+          r = Arr.Morphism⇒.cod⇒ α
+      in
+      begin
+        (NT.η ((nHom f.u ∘ʳ Cod) ∘ᵥ Y₀.ϕ) t) ∘ r                      ≈⟨ assoc ○ (refl⟩∘⟨ ϕY.commute α) ○ sym-assoc ⟩
+        (NT.η (nHom f.u ∘ʳ Cod) t ∘ Functor.F₁ [ Y₀.A ,-] r) ∘ ϕY.η s ≈⟨ (∘-resp-≈ (NT.commute (nHom f.u ∘ʳ Cod) α) Equiv.refl) ○ assoc ⟩
+        Functor.F₁ [ X₀.A ,-] r ∘ (NT.η (nHom f.u ∘ʳ Cod) s ∘ ϕY.η s) ≈⟨ refl⟩∘⟨ f.eq {x = s} ⟩
+        Functor.F₁ [ X₀.A ,-] r ∘ ϕX.η s                              ∎) ]}
   ; identity = Equiv.refl , Equiv.refl
   ; homomorphism = Equiv.refl , Equiv.refl
-  ; F-resp-≈ = λ x → x , {! Equiv.refl !}
+  ; F-resp-≈ = λ x → x , {!  !}
   }
 
 -- Instead, one would like a functor tabulator -> repairs to define MR3 as pullback?
@@ -175,7 +186,7 @@ where the "basepoint" A is taken into consideration.
 
 Q : Functor repairs Arr.Arrow
 Q = record
-  { F₀ = λ x → let module x = rep₀ x in (record { arr = NaturalTransformation.η x.ϕ (record { arr = id }) })
+  { F₀ = λ x → let module x = rep₀ x in (record { arr = NT.η x.ϕ (record { arr = id }) })
   ; F₁ = λ { {x} {y} f → 
     let module x = rep₀ x 
         module y = rep₀ y
