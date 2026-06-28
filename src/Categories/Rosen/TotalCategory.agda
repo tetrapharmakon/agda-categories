@@ -130,7 +130,7 @@ total = record
   ; ∘-resp-≈ = λ { (p₁ , q₁) (p₂ , q₂) → ∘-resp-≈ p₁ p₂ , ∘-resp-≈ q₁ q₂ }
   }
 
--- this functor is likely an equivalence that presents `total` as the category of repairs
+-- This functor works.
 ∇maybe : Functor total repairs
 ∇maybe = record
   { F₀ = λ x → 
@@ -145,6 +145,18 @@ total = record
   ; identity = λ {A} → Equiv.refl
   ; homomorphism = Equiv.refl
   ; F-resp-≈ = proj₁
+  }
+
+-- Is there a functor in the opposite direction?
+∇⁻¹maybe : Functor repairs total 
+∇⁻¹maybe = record
+  { F₀ = λ {(record { A = A ; ϕ = ϕ }) → (A , A) ∣ ⟪ id , ϕ ⟫}
+  ; F₁ = λ { {X} {Y} f → let module f = rep⇒ f in
+  [ f.u , f.u 
+  ∥ id-comm C , (λ α → {!  !}) ]}
+  ; identity = Equiv.refl , Equiv.refl
+  ; homomorphism = Equiv.refl , Equiv.refl
+  ; F-resp-≈ = λ x → x , {! Equiv.refl !}
   }
 
 -- Instead, one would like a functor tabulator -> repairs to define MR3 as pullback?
