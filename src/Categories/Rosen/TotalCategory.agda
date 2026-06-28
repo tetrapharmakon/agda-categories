@@ -14,8 +14,10 @@ open import Categories.Category.Monoidal.Closed using (Closed)
 open import Categories.Functor using (Functor; _∘F_)
 open import Categories.Functor.Bifunctor using (Bifunctor; appˡ; appʳ)
 open import Categories.Functor.Bifunctor.Properties using ([_]-commute)
-open import Categories.NaturalTransformation using (_∘ᵥ_; _∘ₕ_; _∘ˡ_; _∘ʳ_) renaming (NaturalTransformation to NT)
+open import Categories.NaturalTransformation using (ntHelper;_∘ᵥ_; _∘ₕ_; _∘ˡ_; _∘ʳ_) renaming (NaturalTransformation to NT)
 open import Categories.NaturalTransformation.Equivalence using (_≃_; ≃-isEquivalence)
+
+open import Categories.Adjoint using (_⊣_)
 
 open import Categories.Functor.Hom using (Hom[_][-,-]; Hom[_][_,_])
 module Categories.Rosen.TotalCategory {o ℓ e} {C : Category o ℓ e} {M : Monoidal C} (Cl : Closed M) where
@@ -131,8 +133,8 @@ total = record
   }
 
 -- This functor works.
-∇maybe : Functor total repairs
-∇maybe = record
+K : Functor total repairs
+K = record
   { F₀ = λ x → 
       let module x = tab₀ x
           module ξx = MR2 x.ξ 
@@ -148,8 +150,9 @@ total = record
   }
 
 -- Is there a functor in the opposite direction?
-∇⁻¹maybe : Functor repairs total 
-∇⁻¹maybe = record
+-- Clearly they can't be an equivalence
+𝕁 : Functor repairs total 
+𝕁 = record
   { F₀ = λ {(record { A = A ; ϕ = ϕ }) → (A , A) ∣ ⟪ id , ϕ ⟫}
   ; F₁ = λ { {X} {Y} f → let module f = rep⇒ f in
   [ f.u , f.u 
@@ -167,7 +170,32 @@ total = record
         Functor.F₁ [ X₀.A ,-] r ∘ ϕX.η s                              ∎) ]}
   ; identity = Equiv.refl , Equiv.refl
   ; homomorphism = Equiv.refl , Equiv.refl
-  ; F-resp-≈ = λ x → x , {!  !}
+  ; F-resp-≈ = λ x → x , x
+  }
+
+𝕁⊣K : 𝕁 ⊣ K -- J and K are adjoint 
+𝕁⊣K = record 
+ { unit = ntHelper (record 
+   { η = λ {record { A = A ; ϕ = ϕ } → record 
+     { u = id 
+     ; eq =  elimˡ C [-,-].identity
+     } }
+   ; commute = {!  !} }) 
+  ; counit = ntHelper (record 
+    { η = λ {((L , R) ∣ ξ) → 
+      [ id , MR2.f ξ 
+      ∥ Equiv.refl 
+      , (λ {s} {t} α →
+           let module ϕ = NT (MR2.ϕ ξ)
+               r = Arr.Morphism⇒.cod⇒ α
+           in
+           begin
+             (([ id , id ]₁ ∘ ϕ.η t) ∘ r) ≈⟨ assoc ○ (elimˡ C [-,-].identity) ⟩
+             ϕ.η t ∘ r                    ≈⟨ ϕ.commute α ⟩
+             Functor.F₁ [ L ,-] r ∘ ϕ.η s ∎) ] }
+    ; commute = {!  !} }) 
+  ; zig = {!  !} , {!  !} 
+  ; zag = λ {B} → {!  !} 
   }
 
 -- Instead, one would like a functor tabulator -> repairs to define MR3 as pullback?
@@ -184,15 +212,15 @@ https://github.com/tetrapharmakon/agda-categories/blob/5b97012b94ad174962a136951
 where the "basepoint" A is taken into consideration.
 -}
 
-Q : Functor repairs Arr.Arrow
-Q = record
-  { F₀ = λ x → let module x = rep₀ x in (record { arr = NT.η x.ϕ (record { arr = id }) })
-  ; F₁ = λ { {x} {y} f → 
-    let module x = rep₀ x 
-        module y = rep₀ y
-        module f = rep⇒ f
-    in mor⇒ {!  !}}
-  ; identity = {!  !}
-  ; homomorphism = {!  !}
-  ; F-resp-≈ = {!  !}
-  }
+-- Q : Functor repairs Arr.Arrow
+-- Q = record
+--   { F₀ = λ x → let module x = rep₀ x in (record { arr = NT.η x.ϕ (record { arr = id }) })
+--   ; F₁ = λ { {x} {y} f → 
+--     let module x = rep₀ x 
+--         module y = rep₀ y
+--         module f = rep⇒ f
+--     in mor⇒ {!  !}}
+--   ; identity = {!  !}
+--   ; homomorphism = {!  !}
+--   ; F-resp-≈ = {!  !}
+--   }
