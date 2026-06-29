@@ -76,16 +76,24 @@ record iMR2⇒ (X Y : iMR2₀) : Set (o ⊔ ℓ ⊔ e) where
   ; _∘_ = λ f g → 
     let module f = iMR2⇒ f  
         module g = iMR2⇒ g 
+        module Hom = Functor [-,-]
     in record { l = f.l ∘ g.l 
               ; r = f.r ∘ g.r 
-              ; eqf = {!  !} 
-              ; eqϕ = {!  !} }
+              ; eqf = assoc ○ refl⟩∘⟨ g.eqf ○ rw-2-1 f.eqf ○ assoc 
+              ; eqϕ = begin [ f.l ∘ g.l , id ]₁ ∘ f.ξY.ϕ ∘ f.r ∘ g.r ≈⟨ {!  !} ⟩∘⟨refl ⟩ 
+                            ([ f.l , id ]₁ ∘ [ g.l , id ]₁) ∘ f.ξY.ϕ ∘ f.r ∘ g.r ≈⟨ {!  !} ⟩ 
+                            {!  !} ≈⟨ {!  !} ⟩ 
+                            [ id , f.r ∘ g.r ]₁ ∘ g.ξX.ϕ ∎ }
   ; assoc = assoc , assoc
   ; sym-assoc = sym-assoc , sym-assoc 
   ; identityˡ = identityˡ , identityˡ 
   ; identityʳ = identityʳ , identityʳ 
   ; identity² = identity² , identity² 
-  ; equiv = record { refl = refl , refl ; sym = {!  !} ; trans = {!  !} }
+  ; equiv = record 
+    { refl = refl , refl 
+    ; sym = λ x → (sym (proj₁ x)) , (sym (proj₂ x)) 
+    ; trans = λ eq eq' → (trans (proj₁ eq) (proj₁ eq')) , (trans (proj₂ eq) (proj₂ eq')) 
+    }
   ; ∘-resp-≈ = λ eq eq' → (∘-resp-≈ (proj₁ eq) (proj₁ eq')) , (∘-resp-≈ (proj₂ eq) (proj₂ eq'))
   }
 
