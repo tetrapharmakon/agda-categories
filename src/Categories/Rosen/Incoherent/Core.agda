@@ -37,12 +37,57 @@ open Closed Cl using ([-,-]; [_,_]₀; [_,-]; [_,_]₁; Hom[-⊗_,-]; Hom[-,[_,-
 
 module Arr = Categories.Category.Construction.Arrow C
 
-record iMR2 (A B : Obj) : Set (o ⊔ ℓ ⊔ e) where
-  eta-equality
+record iMR2 (A B : Obj) : Set (o ⊔ ℓ) where
   constructor ⟪_,_⟫
   field
     f : A ⇒ B
     ϕ : B ⇒ [ A , B ]₀
+
+record iMR2₀ : Set (o ⊔ ℓ) where
+  field
+    A B : Obj
+    ξ : iMR2 A B
+
+record iMR2⇒ (X Y : iMR2₀) : Set (o ⊔ ℓ ⊔ e) where
+  module X = iMR2₀ X
+  module Y = iMR2₀ Y
+  module ξX = iMR2 X.ξ
+  module ξY = iMR2 Y.ξ
+  field
+    l : X.A ⇒ Y.A
+    r : X.B ⇒ Y.B
+    eqf : r ∘ ξX.f ≈ ξY.f ∘ l
+    eqϕ : [ l , id ]₁ ∘ ξY.ϕ ∘ r ≈ [ id , r ]₁ ∘ ξX.ϕ
+
+-- total category of incoherent MR systems
+τ[iMR2] : Category (o ⊔ ℓ) (o ⊔ ℓ ⊔ e) e 
+τ[iMR2] = record
+  { Obj = iMR2₀
+  ; _⇒_ = λ s t → iMR2⇒ s t
+  ; _≈_ = λ f g → 
+    let module f = iMR2⇒ f  
+        module g = iMR2⇒ g in f.l ≈ g.l × f.r ≈ g.r
+  ; id = record 
+    { l = id 
+    ; r = id 
+    ; eqf = sym-id-swap 
+    ; eqϕ = id-2 
+    }
+  ; _∘_ = λ f g → 
+    let module f = iMR2⇒ f  
+        module g = iMR2⇒ g 
+    in record { l = f.l ∘ g.l 
+              ; r = f.r ∘ g.r 
+              ; eqf = {!  !} 
+              ; eqϕ = {!  !} }
+  ; assoc = assoc , assoc
+  ; sym-assoc = sym-assoc , sym-assoc 
+  ; identityˡ = identityˡ , identityˡ 
+  ; identityʳ = identityʳ , identityʳ 
+  ; identity² = identity² , identity² 
+  ; equiv = record { refl = refl , refl ; sym = {!  !} ; trans = {!  !} }
+  ; ∘-resp-≈ = λ eq eq' → (∘-resp-≈ (proj₁ eq) (proj₁ eq')) , (∘-resp-≈ (proj₂ eq) (proj₂ eq'))
+  }
 
 -- iMR2 (_ , B) è funtoriale per ogni B fissato; C^op --> Setoids
 -- iMR2 (A , _) induce un *profuntore* tra iMR2(A,B) e iMR2(A, B')...

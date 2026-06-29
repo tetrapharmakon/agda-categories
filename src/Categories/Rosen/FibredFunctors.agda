@@ -188,7 +188,9 @@ forse = record
       , (λ {s} {t} α →
           let r = Arr.Morphism⇒.cod⇒ α
               eqϕt : l*ψ.η t ≈ ϕ.η t
-              eqϕt = Equiv.trans (Equiv.sym (eqϕ {x = t})) (elimˡ C [-,-].identity)
+              eqϕt = begin l*ψ.η t ≈⟨ Equiv.sym eqϕ ⟩ 
+                           [ id , id ]₁ ∘ ϕ.η t ≈⟨ (elimˡ C [-,-].identity) ⟩ 
+                           ϕ.η t ∎
           in eqϕt ⟩∘⟨refl ○ ϕ.commute α) ] }
   ; identity = Equiv.refl , Equiv.refl
   ; homomorphism = Equiv.refl , Equiv.refl
