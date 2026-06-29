@@ -75,7 +75,9 @@ record tot⇒ (x y : tab₀ MRS-Profunctor) : Set (o ⊔ ℓ ⊔ e) where
     nat : ∀ {s t} (α : Arr.Morphism⇒ s t)
         → l*ψ.η t ∘ Arr.Morphism⇒.cod⇒ α
         ≈ Functor.F₁ [ x.L ,-] (Arr.Morphism⇒.cod⇒ α) ∘ ϕ.η s
-    -- it's not a one-shot ojb because it requires to change the def of the `total` category
+    -- it's not a one-shot job because it requires to change the def of the `total` category
+    -- and after all one can incorporate nat into a theorem in tabulator and get rid of this `total` category
+    -- given their equivalence
   
   eqϕ : ∀ {t} → l*ψ.η t ≈ ϕ.η t
   eqϕ {t} =

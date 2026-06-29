@@ -80,8 +80,9 @@ record iMR2⇒ (X Y : iMR2₀) : Set (o ⊔ ℓ ⊔ e) where
     in record { l = f.l ∘ g.l 
               ; r = f.r ∘ g.r 
               ; eqf = assoc ○ refl⟩∘⟨ g.eqf ○ rw-2-1 f.eqf ○ assoc 
-              ; eqϕ = begin [ f.l ∘ g.l , id ]₁ ∘ f.ξY.ϕ ∘ f.r ∘ g.r ≈⟨ {!  !} ⟩∘⟨refl ⟩ 
-                            ([ f.l , id ]₁ ∘ [ g.l , id ]₁) ∘ f.ξY.ϕ ∘ f.r ∘ g.r ≈⟨ {!  !} ⟩ 
+              ; eqϕ = begin [ f.l ∘ g.l , id ]₁ ∘ f.ξY.ϕ ∘ f.r ∘ g.r ≈⟨ ? ⟩∘⟨refl ⟩ 
+                            ([ g.l , id ]₁ ∘ [ f.l , id ]₁) ∘ f.ξY.ϕ ∘ f.r ∘ g.r ≈⟨ assoc ⟩ 
+                            [ g.l , id ]₁ ∘ [ f.l , id ]₁ ∘ f.ξY.ϕ ∘ f.r ∘ g.r ≈⟨ {!  !} ⟩ 
                             {!  !} ≈⟨ {!  !} ⟩ 
                             [ id , f.r ∘ g.r ]₁ ∘ g.ξX.ϕ ∎ }
   ; assoc = assoc , assoc
