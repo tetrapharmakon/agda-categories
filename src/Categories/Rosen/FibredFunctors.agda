@@ -121,21 +121,6 @@ https://github.com/tetrapharmakon/agda-categories/blob/5b97012b94ad174962a136951
 where the "basepoint" A is taken into consideration.
 -}
 
--- Q : Functor repairs Arr.Arrow
--- Q = record
---   { F₀ = λ x → let module x = rep₀ x in (record { arr = NT.η x.ϕ (record { arr = id }) })
---   ; F₁ = λ { {x} {y} f → 
---     let module x = rep₀ x 
---         module y = rep₀ y
---         module f = rep⇒ f
---     in mor⇒ {!  !}}
---   ; identity = {!  !}
---   ; homomorphism = {!  !}
---   ; F-resp-≈ = {!  !}
---   }
-
-
-
 -- total is a subcategory of the tabulator.
 -- it would be nice to invoke the adjoint functor theorem to prove that the inclusion has an adjoint, giving the "universal" (free or cofree) compatible object of the tabulator, universally imposing the equation `nat` on morphisms
 
