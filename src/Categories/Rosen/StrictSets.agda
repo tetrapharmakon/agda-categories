@@ -2,7 +2,7 @@
 
 open import Level using (_⊔_;lift;lower;zero;suc)
 
-open import Data.Product using (_,_; proj₁; proj₂; _×_)
+open import Data.Product using (_,_; proj₁; proj₂; _×_;Σ)
 open import Relation.Binary using (IsEquivalence)
 open import Relation.Binary.Bundles using (Setoid)
 
@@ -37,8 +37,9 @@ open Reason C
 open import Categories.Rosen.Core Cl
 open import Categories.Functor.Profunctor.Tabulator
 
-open import Categories.Category.Instance.Sets
+-- open import Categories.Category.Instance.Sets
 
+{-
 MRS-SetP : Bifunctor (Category.op C) C (Sets (o ⊔ ℓ ⊔ e))
 MRS-SetP = record
   { F₀ = λ {(A , B) → MR2 A B}
@@ -48,9 +49,27 @@ MRS-SetP = record
   ; homomorphism = {!  !}
   ; F-resp-≈ = {!  !}
   }
+-}
+-- open import Categories.Category.Construction.Elements using (Elements)
 
-open import Categories.Category.Construction.Elements using (Elements)
+-- a modified category of elements definition
 
-𝓔MRS = Elements MRS-SetP
+Elts : Bifunctor (Category.op C) C (Setoids (o ⊔ ℓ ⊔ e) (o ⊔ ℓ ⊔ e)) → Category ? ? ?
+Elts F = record
+  { Obj       = ? -- Σ (Obj × Obj) F₀
+  ; _⇒_       = ? -- λ { (c , x) (c′ , x′) → Σ (c ⇒ c′) (λ f → F₁ f x ≡ x′)  }
+  ; _≈_       = ? -- λ p q → proj₁ p ≈ proj₁ q
+  ; id        = ? -- id , identity
+  ; _∘_       = ? -- λ { (f , Ff≡) (g , Fg≡) → f ∘ g ,  trans homomorphism (trans (cong (F₁ f) Fg≡) Ff≡)}
+  ; assoc     = assoc
+  ; sym-assoc = sym-assoc
+  ; identityˡ = identityˡ
+  ; identityʳ = identityʳ
+  ; identity² = identity²
+  ; equiv     = record { refl = Equiv.refl ; sym = Equiv.sym ; trans = Equiv.trans }
+  ; ∘-resp-≈  = ∘-resp-≈
+  } where open Functor F
+
+𝓔MRS = ? --  Elements MRS-SetP
 
 import Categories.Morphism.Reasoning as MR
