@@ -109,6 +109,9 @@ K = record
 -- One can define (after so much effort) MRS3 as the pullback of V₁ and the functor ℝ:
 
 
+-- import Reason
+-- open Reason C
+
 open import Categories.Rosen.Tabulator Cl using (V₁;𝕋MRS)
 
 module _ (A : Obj) where
@@ -142,8 +145,29 @@ module _ (A : Obj) where
     { Obj = psdPB₀
     ; _⇒_ = psdPB⇒
     ; _≈_ = λ { u v → psdPB⇒.f u El.≈ psdPB⇒.f v × psdPB⇒.g u TM.≈ psdPB⇒.g v }
-    ; id = {!  !}
-    ; _∘_ = {!  !}
+    ; id = λ { {P} →
+        let module P = psdPB₀ P
+            module iP = _≅_ P.iso
+        in record 
+        { f = El.id 
+        ; g = TM.id 
+        ; commute = {!  !} , {!  !}
+        } }
+    ; _∘_ = λ { {P} {Q} {R} u v →
+        let module P  = psdPB₀ P
+            module Q  = psdPB₀ Q
+            module R  = psdPB₀ R
+            module u  = psdPB⇒ u
+            module v  = psdPB⇒ v
+            module iP = _≅_ P.iso
+            module iQ = _≅_ Q.iso
+            module iR = _≅_ R.iso
+            open Ar.HomReasoning
+        in record 
+        { f = u.f El.∘ v.f
+        ; g = u.g TM.∘ v.g
+        ; commute = {!  !} , {!  !} 
+        } }
     ; assoc = {!  !}
     ; sym-assoc = {!  !}
     ; identityˡ = {!  !}
