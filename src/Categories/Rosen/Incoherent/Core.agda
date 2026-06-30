@@ -87,7 +87,7 @@ record iMR2⇒ (X Y : iMR2₀) : Set (o ⊔ ℓ ⊔ e) where
                             [ g.l , id ]₁ ∘ ([ id , f.r ]₁ ∘ g.ξY.ϕ) ∘ g.r ≈⟨ refl⟩∘⟨ assoc ⟩ 
                             [ g.l , id ]₁ ∘ [ id , f.r ]₁ ∘ g.ξY.ϕ ∘ g.r ≈⟨ sym-assoc ○ Equiv.sym [ [-,-] ]-commute ⟩∘⟨refl ⟩ 
                             ([ id , f.r ]₁ ∘ [ g.l , id ]₁) ∘ g.ξY.ϕ ∘ g.r ≈⟨ assoc ○ refl⟩∘⟨ g.eqϕ ⟩ 
-                            {!  !} ≈⟨ pullˡ C (Equiv.sym Hom'.homomorphism) ⟩ 
+                            [ id , f.r ]₁ ∘ [ id , g.r ]₁ ∘ g.ξX.ϕ ≈⟨ pullˡ C (Equiv.sym Hom'.homomorphism) ⟩ 
                             [ id , f.r ∘ g.r ]₁ ∘ g.ξX.ϕ ∎ 
     }
   ; assoc = {!  !} -- assoc , assoc
