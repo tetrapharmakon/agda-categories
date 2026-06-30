@@ -57,7 +57,7 @@ MRS-SetP = record
 -- a modified category of elements definition
 
 
-module _ {F : Bifunctor (Category.op C) C (Setoids (o ⊔ ℓ ⊔ e) (o ⊔ ℓ ⊔ e))} where
+module EltsMod {F : Bifunctor (Category.op C) C (Setoids (o ⊔ ℓ ⊔ e) (o ⊔ ℓ ⊔ e))} where
 
   record Elts₀ : Set (o ⊔ ℓ ⊔ e) where
     field
@@ -113,3 +113,21 @@ module _ {F : Bifunctor (Category.op C) C (Setoids (o ⊔ ℓ ⊔ e) (o ⊔ ℓ 
     ; ∘-resp-≈ = λ {(fst , snd) (fst' , snd') → (∘-resp-≈ fst' fst) , (∘-resp-≈ snd snd')}
     } 
 
+ElMRS : Category (o ⊔ ℓ ⊔ e) (o ⊔ ℓ ⊔ e) e
+ElMRS = EltsMod.Elts {F = MRS-Profunctor}
+
+ℝ : Functor ElMRS Arr.Arrow
+ℝ = record
+  { F₀ = λ x → let module x = EltsMod.Elts₀ x in record { arr = MR2.ϕη₀ x.el }
+  ; F₁ = λ { {X} {Y} f → 
+    let module X = EltsMod.Elts₀ X 
+        module Y = EltsMod.Elts₀ Y
+        module f = EltsMod.Elts⇒ f 
+    in (record 
+    { dom⇒ = f.r
+    ; cod⇒ = [ f.l , f.r ]₁  
+    ; square = {!  !} }) }
+  ; identity = Equiv.refl , [-,-].identity
+  ; homomorphism = Equiv.refl , [-,-].homomorphism
+  ; F-resp-≈ = λ (f≈gL , f≈gR) → f≈gR , ([-,-].F-resp-≈ (f≈gL , f≈gR))
+  }

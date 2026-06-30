@@ -50,6 +50,7 @@ record MR2 (A B : Obj) : Set (o ⊔ ℓ ⊔ e) where
     ϕ : NaturalTransformation Cod (([_,-] A) ∘F Cod)
 
   ϕη = NaturalTransformation.η ϕ
+  ϕη₀ = ϕη (record { arr = f })
   ϕcommute = λ {X Y : Category.Obj Arr.Arrow} t → NaturalTransformation.commute ϕ {X} {Y} t
   ϕf = ϕη (record { arr = f }) ∘ f
   -- ϕ[ϕf] = {!  !}
