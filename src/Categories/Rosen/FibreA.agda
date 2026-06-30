@@ -104,6 +104,7 @@ totalAtA A = record
 -- In Cats, the categorical pullback is (in general) a pseudo-pullback; concretely this
 -- is the “iso-comma” construction: objects are pairs plus an isomorphism in Arrow(C).
 
+{-
 reindex : {A A' : Obj} → (u : A ⇒ A') → Functor (totalAtA A') (totalAtA A)
 reindex u = record
   { F₀ = λ { (B ∣ ξ) → B ∣ ⟪ MR2.f ξ ∘ u , (nHom u ∘ʳ Cod) ∘ᵥ MR2.ϕ ξ ⟫}
@@ -115,6 +116,7 @@ reindex u = record
   ; homomorphism = {!   !}
   ; F-resp-≈ = {!   !}
   }
+-}
 
 module _ (A : Obj) where
   private

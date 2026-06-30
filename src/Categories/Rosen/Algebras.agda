@@ -59,6 +59,8 @@ _⊗[I+_] {A} = A ⊗- ∘F unit+-
 F-Algebra-Category : {A : Obj} → Category _ _ _
 F-Algebra-Category {A} = F-Algebras (_⊗[I+_] {A})
 
+
+{-
 to : {A : Obj} → Functor (totalAtA A) (F-Algebra-Category {A})
 to {A} = record
   { F₀ = λ {(B ∣ ξ) → record { A = B ; α = [ MR2.f ξ , {!   !} ] ∘ {! Functor.F₁ (-+ (A ⊗₀ B)) ∘ ?  !} }}
@@ -85,3 +87,5 @@ AlgA≣MRS^A {A} = record
   ; G = from 
   ; weak-inverse = {!   !} 
   }
+
+-}
