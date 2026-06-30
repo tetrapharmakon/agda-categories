@@ -118,6 +118,7 @@ reindex u = record
   }
 -}
 
+{-
 module _ (A : Obj) where
   private
     module TA = Category (totalAtA A)
@@ -144,8 +145,8 @@ module _ (A : Obj) where
       g : TM._⇒_ P.y Q.y
       commute : (G.F₁ g Ar.∘ iP.from) Ar.≈ iQ.from Ar.∘ F.F₁ f
 
-  MRS3 : Category (o ⊔ ℓ ⊔ e) (o ⊔ ℓ ⊔ e) e
-  MRS3 = record
+  fakeMRS3 : Category (o ⊔ ℓ ⊔ e) (o ⊔ ℓ ⊔ e) e
+  fakeMRS3 = record
     { Obj = FibreA₀
     ; _⇒_ = FibreA⇒
     ; _≈_ = λ { u v → FibreA⇒.f u TA.≈ FibreA⇒.f v × FibreA⇒.g u TM.≈ FibreA⇒.g v }
@@ -201,3 +202,4 @@ _ = _≡_.refl
 
 _ : {T : Obj} → (Category._⇒_ (commaNablaV {T})) ≡ Comma⇒
 _ = _≡_.refl
+-}

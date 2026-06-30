@@ -29,10 +29,11 @@ open MR
 
 open import Categories.Rosen.Core Cl
 open import Categories.Rosen.TotalCategory Cl using (tot⇒; total; [_,_∥_,_])
+open import Categories.Rosen.ProElements Cl {F = MRS-Profunctor}
 
 open import Categories.Functor.Profunctor.Tabulator
 
--- This functor works.
+-- The coreflector of total on the category of repairs
 K : Functor total repairs
 K = record
   { F₀ = λ x → 
@@ -49,8 +50,7 @@ K = record
   ; F-resp-≈ = proj₁
   }
 
--- Is there a functor in the opposite direction?
--- Clearly they can't be an equivalence
+-- the inclusion of repairs in total
 𝕁 : Functor repairs total 
 𝕁 = record
   { F₀ = λ {(record { A = A ; ϕ = ϕ }) → (A , A) ∣ ⟪ id , ϕ ⟫}
@@ -73,8 +73,9 @@ K = record
   ; F-resp-≈ = λ x → x , x
   }
 
-𝕁⊣K : 𝕁 ⊣ K -- J and K are adjoint 
--- J is full and faithful (unit is id)
+-- J and K are adjoint 
+𝕁⊣K : 𝕁 ⊣ K 
+-- note that J is full and faithful (unit is id)
 𝕁⊣K = record 
  { unit = ntHelper (record 
    { η = λ {record { A = A ; ϕ = ϕ } → record 
@@ -107,6 +108,95 @@ K = record
   ; zag = λ {B} → identity² 
   }
 
+-- One can define (after so much effort) MRS3 as the pullback of V₁ and the functor ℝ:
+
+
+open import Categories.Rosen.Tabulator Cl using (V₁;𝕋MRS)
+
+module _ (A : Obj) where
+  private
+    module El = Category ElMRS
+    module TM = Category 𝕋MRS
+    module Ar = Category Arr.Arrow
+    module F  = Functor ℝ
+    module G  = Functor V₁
+
+  import Categories.Morphism as M using (_≅_)
+  open M Arr.Arrow using (_≅_)
+  record psdPB₀ : Set (o ⊔ ℓ ⊔ e) where
+    field
+      x   : El.Obj
+      y   : TM.Obj
+      iso : (F.F₀ x) ≅ (G.F₀ y)
+
+  record psdPB⇒ (P Q : psdPB₀) : Set (o ⊔ ℓ ⊔ e) where
+    module P = psdPB₀ P
+    module Q = psdPB₀ Q
+    module iP = _≅_ P.iso
+    module iQ = _≅_ Q.iso
+    field
+      f : El._⇒_ P.x Q.x
+      g : TM._⇒_ P.y Q.y
+      commute : G.F₁ g Ar.∘ iP.from Ar.≈ iQ.from Ar.∘ F.F₁ f
+
+  MRS3 : Category (o ⊔ ℓ ⊔ e) (o ⊔ ℓ ⊔ e) e
+  MRS3 = record
+    { Obj = psdPB₀
+    ; _⇒_ = psdPB⇒
+    ; _≈_ = λ { u v → psdPB⇒.f u El.≈ psdPB⇒.f v × psdPB⇒.g u TM.≈ psdPB⇒.g v }
+    ; id = {!  !}
+    ; _∘_ = {!  !}
+    ; assoc = {!  !}
+    ; sym-assoc = {!  !}
+    ; identityˡ = {!  !}
+    ; identityʳ = {!  !}
+    ; identity² = {!  !}
+    ; equiv = {!  !}
+    ; ∘-resp-≈ = {!  !}
+    }
+    
+    -- record
+    -- { Obj = psdPB₀
+    -- ; _⇒_ = psdPB⇒
+    -- ; _≈_ = λ { u v → psdPB⇒.f u TA.≈ psdPB⇒.f v × psdPB⇒.g u TM.≈ psdPB⇒.g v }
+    -- ; id = λ { {P} →
+    --     let module P = psdPB₀ P
+    --         module iP = _≅_ P.iso
+    --     in record
+    --       { f = TA.id
+    --       ; g = TM.id
+    --       ; commute = sym-id-swap , id-0 ∙ sym-id-1 ∙ skip (sym [-,-].identity)
+    --       }
+    --       }
+    -- ; _∘_ = λ { {P} {Q} {R} u v →
+    --     let module P  = psdPB₀ P
+    --         module Q  = psdPB₀ Q
+    --         module R  = psdPB₀ R
+    --         module u  = psdPB⇒ u
+    --         module v  = psdPB⇒ v
+    --         module iP = _≅_ P.iso
+    --         module iQ = _≅_ Q.iso
+    --         module iR = _≅_ R.iso
+    --         open Ar.HomReasoning
+    --     in record
+    --       { f = u.f TA.∘ v.f
+    --       ; g = u.g TM.∘ v.g
+    --       ; commute = assoc ∙ skip (proj₁ v.commute) ∙ rw-2 (proj₁ u.commute)
+    --                 , assoc ∙ skip (proj₂ v.commute) ∙ rw-2 (proj₂ u.commute) ∙ skip (sym (Functor.homomorphism [ _ ,-]))
+    --       } }
+    -- ; assoc     = assoc     , assoc     , assoc
+    -- ; sym-assoc = sym-assoc , sym-assoc , sym-assoc
+    -- ; identityˡ = identityˡ , identityˡ , identityˡ
+    -- ; identityʳ = identityʳ , identityʳ , identityʳ
+    -- ; identity² = identity² , identity² , identity²
+    -- ; equiv = record
+    --   { refl = refl , refl , refl
+    --   ; sym = λ { (p , q , r) → sym p , sym q , sym r }
+    --   ; trans = λ { (p₁ , q₁ , r₁) (p₂ , q₂ , r₂) → trans p₁ p₂ , trans q₁ q₂ , trans r₁ r₂ }
+    --   }
+    -- ; ∘-resp-≈ = λ { (p₁ , q₁ , r₁) (p₂ , q₂ , r₂) → ∘-resp-≈ p₁ p₂ , ∘-resp-≈ q₁ q₂ , ∘-resp-≈ r₁ r₂ }
+    -- }
+
 -- Instead, one would like a functor tabulator -> repairs to define MR3 as pullback?
 
 {-
@@ -120,10 +210,6 @@ https://github.com/tetrapharmakon/agda-categories/blob/5b97012b94ad174962a136951
 
 where the "basepoint" A is taken into consideration.
 -}
-
--- total is a subcategory of the tabulator.
--- it would be nice to invoke the adjoint functor theorem to prove that the inclusion has an adjoint, giving the "universal" (free or cofree) compatible object of the tabulator, universally imposing the equation `nat` on morphisms
-
 
 incl : Functor total (Tabulator MRS-Profunctor) 
 incl = record
