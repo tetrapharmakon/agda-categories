@@ -148,10 +148,14 @@ module _ (A : Obj) where
     ; id = λ { {P} →
         let module P = psdPB₀ P
             module iP = _≅_ P.iso
+            d = iP.from .Arr.Morphism⇒.dom⇒
+            c = iP.from .Arr.Morphism⇒.cod⇒
         in record 
         { f = El.id 
         ; g = TM.id 
-        ; commute = {!  !} , {!  !}
+        ; commute = id-comm-sym C {f = d}
+          , Equiv.trans (id-comm-sym C {f = c})
+                        (Equiv.sym (refl⟩∘⟨ ([-,-].identity)))
         } }
     ; _∘_ = λ { {P} {Q} {R} u v →
         let module P  = psdPB₀ P
