@@ -15,7 +15,7 @@ open import Categories.Category.Monoidal.Closed using (Closed)
 open import Categories.Functor using (Functor; _∘F_)
 open import Function.Equality using (Π; _⟶_; _⟨$⟩_; cong) renaming (_∘_ to _∗_)
 open import Categories.Functor.Bifunctor using (Bifunctor; appˡ; appʳ)
-open import Categories.Functor.Bifunctor.Properties using ([_]-commute)
+open import Categories.Functor.Bifunctor.Properties using ([_]-commute; [_]-decompose₁)
 open import Categories.NaturalTransformation using (NaturalTransformation;_∘ᵥ_; _∘ₕ_; _∘ˡ_; _∘ʳ_)
 open import Categories.NaturalTransformation.Equivalence using (_≃_; ≃-isEquivalence)
 
@@ -123,10 +123,68 @@ ElMRS = EltsMod.Elts {F = MRS-Profunctor}
     let module X = EltsMod.Elts₀ X 
         module Y = EltsMod.Elts₀ Y
         module f = EltsMod.Elts⇒ f 
-    in (record 
+    in let
+      open NaturalTransformation
+      open HomReasoning
+
+      module XE = MR2 X.el
+      module YE = MR2 Y.el
+      a = record { arr = XE.f }
+      b = record { arr = XE.f ∘ f.l }
+      c = record { arr = f.r ∘ XE.f ∘ f.l }
+      d = record { arr = YE.f }
+      module Hom  {A} = Functor (appʳ [-,-] A)
+      module Hom' {A} = Functor (appˡ [-,-] A)
+
+      t₁ : Arr.Morphism⇒ b a
+      t₁ = record { dom⇒ = f.l ; cod⇒ = id ; square = identityˡ }
+      t₂ : Arr.Morphism⇒ b c
+      t₂ = record { dom⇒ = id ; cod⇒ = f.r ; square = Equiv.sym identityʳ }
+      t₃ : Arr.Morphism⇒ d c
+      t₃ = record { dom⇒ = id ; cod⇒ = id ; square = identityˡ ○ Equiv.sym (proj₁ f.eqElts) ○ Equiv.sym identityʳ }
+
+      eqϕ : ∀ (m : Arr.Morphism) → [ f.l , id ]₁ ∘ η XE.ϕ m ≈ η YE.ϕ m
+      eqϕ m = proj₂ f.eqElts {x = m}
+
+      lem1 : η XE.ϕ a ≈ η XE.ϕ b
+      lem1 = begin
+        η XE.ϕ a           ≈˘⟨ identityʳ ⟩
+        η XE.ϕ a ∘ id     ≈⟨ commute XE.ϕ t₁ ⟩ -- commute XE.ϕ t₁ ⟩
+        [ id , id ]₁ ∘ η XE.ϕ b  ≈⟨ (Hom.identity ⟩∘⟨refl) ⟩ 
+        id ∘ η XE.ϕ b     ≈⟨ identityˡ ⟩
+        η XE.ϕ b          ∎
+
+      lem2 : η XE.ϕ c ∘ f.r ≈ [ id , f.r ]₁ ∘ η XE.ϕ b
+      lem2 = commute XE.ϕ t₂
+
+      lem3 : η YE.ϕ c ≈ η YE.ϕ d
+      lem3 = begin
+        η YE.ϕ c           ≈˘⟨ identityʳ ⟩
+        η YE.ϕ c ∘ id     ≈⟨ commute YE.ϕ t₃ ⟩ -- commute YE.ϕ t₃ ⟩
+        [ id , id ]₁ ∘ η YE.ϕ d ≈⟨ Hom.identity ⟩∘⟨refl ⟩ 
+        id ∘ η YE.ϕ d     ≈⟨ identityˡ ⟩
+        η YE.ϕ d          ∎
+
+      decompose : [ f.l , f.r ]₁ ≈ [ f.l , id ]₁ ∘ [ id , f.r ]₁
+      decompose = [ [-,-] ]-decompose₁
+
+    in record 
     { dom⇒ = f.r
     ; cod⇒ = [ f.l , f.r ]₁  
-    ; square = {!  !} }) }
+    ; square = begin
+      [ f.l , f.r ]₁ ∘ η XE.ϕ a
+        ≈⟨ decompose ⟩∘⟨refl ○ assoc ⟩
+      [ f.l , id ]₁ ∘ ([ id , f.r ]₁ ∘ η XE.ϕ a)
+        ≈˘⟨ refl⟩∘⟨ Equiv.trans lem2 (refl⟩∘⟨ Equiv.sym lem1) ⟩
+      [ f.l , id ]₁ ∘ (η XE.ϕ c ∘ f.r)
+        ≈⟨ sym-assoc ⟩
+      ([ f.l , id ]₁ ∘ η XE.ϕ c) ∘ f.r
+        ≈⟨ ∘-resp-≈ (eqϕ c) refl ⟩
+      (η YE.ϕ c) ∘ f.r
+        ≈⟨ ∘-resp-≈ lem3 refl ⟩
+      η YE.ϕ d ∘ f.r
+        ∎
+    } }
   ; identity = Equiv.refl , [-,-].identity
   ; homomorphism = Equiv.refl , [-,-].homomorphism
   ; F-resp-≈ = λ (f≈gL , f≈gR) → f≈gR , ([-,-].F-resp-≈ (f≈gL , f≈gR))
