@@ -116,6 +116,8 @@ module EltsMod {F : Bifunctor (Category.op C) C (Setoids (o ⊔ ℓ ⊔ e) (o �
 ElMRS : Category (o ⊔ ℓ ⊔ e) (o ⊔ ℓ ⊔ e) e
 ElMRS = EltsMod.Elts {F = MRS-Profunctor}
 
+
+-- a functor that extracts repair maps without the assumption to fix the domain
 ℝ : Functor ElMRS Arr.Arrow
 ℝ = record
   { F₀ = λ x → let module x = EltsMod.Elts₀ x in record { arr = MR2.ϕη₀ x.el }
