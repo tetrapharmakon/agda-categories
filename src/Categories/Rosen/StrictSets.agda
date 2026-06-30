@@ -9,9 +9,11 @@ open import Relation.Binary.Bundles using (Setoid)
 open import Categories.Category using (Category)
 open import Categories.Category.Construction.Arrow
 open import Categories.Category.Instance.Setoids
+import Relation.Binary.Reasoning.Setoid as SetoidR
 open import Categories.Category.Monoidal using (Monoidal)
 open import Categories.Category.Monoidal.Closed using (Closed)
 open import Categories.Functor using (Functor; _∘F_)
+open import Function.Equality using (Π; _⟶_; _⟨$⟩_; cong) renaming (_∘_ to _∗_)
 open import Categories.Functor.Bifunctor using (Bifunctor; appˡ; appʳ)
 open import Categories.Functor.Bifunctor.Properties using ([_]-commute)
 open import Categories.NaturalTransformation using (NaturalTransformation;_∘ᵥ_; _∘ₕ_; _∘ˡ_; _∘ʳ_)
@@ -54,22 +56,60 @@ MRS-SetP = record
 
 -- a modified category of elements definition
 
-Elts : Bifunctor (Category.op C) C (Setoids (o ⊔ ℓ ⊔ e) (o ⊔ ℓ ⊔ e)) → Category ? ? ?
-Elts F = record
-  { Obj       = ? -- Σ (Obj × Obj) F₀
-  ; _⇒_       = ? -- λ { (c , x) (c′ , x′) → Σ (c ⇒ c′) (λ f → F₁ f x ≡ x′)  }
-  ; _≈_       = ? -- λ p q → proj₁ p ≈ proj₁ q
-  ; id        = ? -- id , identity
-  ; _∘_       = ? -- λ { (f , Ff≡) (g , Fg≡) → f ∘ g ,  trans homomorphism (trans (cong (F₁ f) Fg≡) Ff≡)}
-  ; assoc     = assoc
-  ; sym-assoc = sym-assoc
-  ; identityˡ = identityˡ
-  ; identityʳ = identityʳ
-  ; identity² = identity²
-  ; equiv     = record { refl = Equiv.refl ; sym = Equiv.sym ; trans = Equiv.trans }
-  ; ∘-resp-≈  = ∘-resp-≈
-  } where open Functor F
 
-𝓔MRS = ? --  Elements MRS-SetP
+module _ {F : Bifunctor (Category.op C) C (Setoids (o ⊔ ℓ ⊔ e) (o ⊔ ℓ ⊔ e))} where
 
-import Categories.Morphism.Reasoning as MR
+  record Elts₀ : Set (o ⊔ ℓ ⊔ e) where
+    field
+      A : Obj
+      B : Obj
+      el : Setoid.Carrier (Functor.F₀ F (A , B))
+
+  record Elts⇒ (X Y : Elts₀) : Set (o ⊔ ℓ ⊔ e) where
+    module X = Elts₀ X 
+    module Y = Elts₀ Y
+    field 
+      l : Y.A ⇒ X.A 
+      r : X.B ⇒ Y.B 
+      eqElts : Setoid._≈_ (Functor.F₀ F (Y.A , Y.B)) (Functor.F₁ F (l , r) ⟨$⟩ X.el) Y.el 
+
+  Elts : Category (o ⊔ ℓ ⊔ e) (o ⊔ ℓ ⊔ e) e
+  Elts = record
+    { Obj       = Elts₀
+    ; _⇒_       = λ X Y → Elts⇒ X Y
+    ; _≈_       = λ f g → let module f = Elts⇒ f 
+                              module g = Elts⇒ g
+                          in f.l ≈ g.l × f.r ≈ g.r
+    ; id        = λ { {A} → record 
+      { l = id 
+      ; r = id 
+      ; eqElts = Functor.identity F (Setoid.refl (Functor.F₀ F (Elts₀.A A , Elts₀.B A)))
+      }}
+    ; _∘_       = λ { {A} {B} {C} f g → 
+      let module f = Elts⇒ f 
+          module g = Elts⇒ g
+          module F = Functor F
+          Fff = F.F₀ (f.Y.A , f.Y.B)
+          Fgg = F.F₀ (g.X.A , g.X.B)
+          open SetoidR Fff
+      in record 
+      { l = g.l ∘ f.l 
+      ; r = f.r ∘ g.r 
+      ; eqElts = begin F.F₁ (g.l ∘ f.l , f.r ∘ g.r) ⟨$⟩ g.X.el ≈⟨ F.homomorphism (Setoid.sym Fgg (Setoid.refl Fgg)) ⟩ 
+                       F.F₁ (f.l , f.r) ⟨$⟩ (F.F₁ (g.l , g.r) ⟨$⟩ g.X.el) ≈⟨ cong (F.F₁ (f.l , f.r)) g.eqElts ⟩ 
+                       F.F₁ (f.l , f.r) ⟨$⟩ f.X.el ≈⟨ f.eqElts ⟩ 
+                       f.Y.el ∎
+      } }
+    ; assoc     = sym-assoc , assoc
+    ; sym-assoc = assoc , sym-assoc
+    ; identityˡ = identityʳ , identityˡ
+    ; identityʳ = identityˡ , identityʳ
+    ; identity² = identity² , identity²
+    ; equiv = record 
+    { refl = refl , refl 
+    ; sym = λ x → (sym (proj₁ x)) , (sym (proj₂ x)) 
+    ; trans = λ eq eq' → (trans (proj₁ eq) (proj₁ eq')) , (trans (proj₂ eq) (proj₂ eq')) 
+    }
+    ; ∘-resp-≈ = λ {(fst , snd) (fst' , snd') → (∘-resp-≈ fst' fst) , (∘-resp-≈ snd snd')}
+    } 
+
