@@ -106,7 +106,7 @@ record iMR2⇒ (X Y : iMR2₀) : Set (o ⊔ ℓ ⊔ e) where
   ; equiv = record 
     { refl = refl , refl 
     ; sym = λ x → (sym (proj₁ x)) , (sym (proj₂ x)) 
-    ; trans = λ eq eq' → (trans (proj₁ eq) (proj₁ eq')) , (trans (proj₂ eq) (proj₂ eq')) 
+    ; trans = λ { (eq-l , eq-r) (eq'-l , eq'-r) → (trans eq-l eq'-l) , (trans eq-r eq'-r) }
     }
-  ; ∘-resp-≈ = λ eq eq' → (∘-resp-≈ (proj₁ eq) (proj₁ eq')) , (∘-resp-≈ (proj₂ eq) (proj₂ eq'))
+  ; ∘-resp-≈ = λ { (eq-l , eq-r) (eq'-l , eq'-r) → (∘-resp-≈ eq-l eq'-l) , (∘-resp-≈ eq-r eq'-r) }
   }
