@@ -90,17 +90,21 @@ record iMR2⇒ (X Y : iMR2₀) : Set (o ⊔ ℓ ⊔ e) where
                             [ id , f.r ]₁ ∘ [ id , g.r ]₁ ∘ g.ξX.ϕ ≈⟨ pullˡ C (Equiv.sym Hom'.homomorphism) ⟩ 
                             [ id , f.r ∘ g.r ]₁ ∘ g.ξX.ϕ ∎ 
     }
-  ; assoc = {!  !} -- assoc , assoc
+  ; assoc = λ { {A} {B} {C} {D} {f} {g} {h} → {! assoc {f = iMR2⇒.l f} {g = iMR2⇒.l g} {h = iMR2⇒.l h} !} , {! assoc {f = iMR2⇒.r f} {g = iMR2⇒.r g} {h = iMR2⇒.r h} !} } -- assoc , assoc
   ; sym-assoc = {!  !} -- sym-assoc , sym-assoc 
-  ; identityˡ = identityˡ , identityˡ 
-  ; identityʳ = identityʳ , identityʳ 
+  ; identityˡ = λ { {A} {B} {f} → identityˡ {f = iMR2⇒.l f} 
+                  , identityˡ {f = iMR2⇒.r f} 
+                  } -- identityˡ , identityˡ 
+  ; identityʳ = λ { {A} {B} {f} → identityʳ {f = iMR2⇒.l f} 
+                  , identityʳ {f = iMR2⇒.r f} 
+                  } -- identityʳ , identityʳ 
   ; identity² = identity² , identity² 
   ; equiv = record 
     { refl = refl , refl 
     ; sym = λ x → (sym (proj₁ x)) , (sym (proj₂ x)) 
     ; trans = λ eq eq' → (trans (proj₁ eq) (proj₁ eq')) , (trans (proj₂ eq) (proj₂ eq')) 
     }
-  ; ∘-resp-≈ = {!  !} -- λ eq eq' → (∘-resp-≈ (proj₁ eq) (proj₁ eq')) , (∘-resp-≈ (proj₂ eq) (proj₂ eq'))
+  ; ∘-resp-≈ = λ eq eq' → (∘-resp-≈ (proj₁ eq) (proj₁ eq')) , (∘-resp-≈ (proj₂ eq) (proj₂ eq'))
   }
 
 -- iMR2 (_ , B) è funtoriale per ogni B fissato; C^op --> Setoids
