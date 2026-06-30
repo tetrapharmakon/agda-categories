@@ -1,17 +1,15 @@
 {-# OPTIONS --without-K --safe --warning=noUserWarning --warning=noUselessPrivate #-}
 
-open import Level using (_⊔_; lift; lower; zero; suc)
+open import Level using (_⊔_)
 
 open import Data.Product using (_,_; proj₁; proj₂; _×_)
 
 open import Categories.Category using (Category)
 open import Categories.Category.Construction.Arrow
-open import Categories.Category.Instance.Setoids
 open import Categories.Category.Monoidal using (Monoidal)
 open import Categories.Category.Monoidal.Closed using (Closed)
-open import Categories.Functor using (Functor; _∘F_)
-open import Categories.NaturalTransformation using (ntHelper; _∘ᵥ_; _∘ₕ_; _∘ˡ_; _∘ʳ_) renaming (NaturalTransformation to NT)
-open import Categories.NaturalTransformation.Equivalence using (_≃_; ≃-isEquivalence)
+open import Categories.Functor using (Functor)
+open import Categories.NaturalTransformation using (ntHelper; _∘ᵥ_; _∘ʳ_) renaming (NaturalTransformation to NT)
 open import Categories.Adjoint using (_⊣_)
 
 module Categories.Rosen.FibredFunctors {o ℓ e} {C : Category o ℓ e} {M : Monoidal C} (Cl : Closed M) where
