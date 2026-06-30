@@ -1,9 +1,8 @@
 {-# OPTIONS --without-K --safe --warning=noUserWarning --warning=noUselessPrivate #-}
 
-open import Level using (_⊔_;lift;lower;zero;suc)
+open import Level using (_⊔_)
 
-open import Data.Product using (_,_; proj₁; proj₂; _×_;Σ)
-open import Relation.Binary using (IsEquivalence)
+open import Data.Product using (_,_; proj₁; proj₂; _×_)
 open import Relation.Binary.Bundles using (Setoid)
 
 open import Categories.Category using (Category)
@@ -12,20 +11,17 @@ open import Categories.Category.Instance.Setoids
 import Relation.Binary.Reasoning.Setoid as SetoidR
 open import Categories.Category.Monoidal using (Monoidal)
 open import Categories.Category.Monoidal.Closed using (Closed)
-open import Categories.Functor using (Functor; _∘F_)
-open import Function.Equality using (Π; _⟶_; _⟨$⟩_; cong) renaming (_∘_ to _∗_)
+open import Categories.Functor using (Functor)
+open import Function.Equality using (_⟨$⟩_; cong)
 open import Categories.Functor.Bifunctor using (Bifunctor; appˡ; appʳ)
-open import Categories.Functor.Bifunctor.Properties using ([_]-commute; [_]-decompose₁)
-open import Categories.NaturalTransformation using (NaturalTransformation;_∘ᵥ_; _∘ₕ_; _∘ˡ_; _∘ʳ_)
-open import Categories.NaturalTransformation.Equivalence using (_≃_; ≃-isEquivalence)
-
-open import Categories.Functor.Hom using (Hom[_][-,-]; Hom[_][_,_])
+open import Categories.Functor.Bifunctor.Properties using ([_]-decompose₁)
+open import Categories.NaturalTransformation using (NaturalTransformation)
 module Categories.Rosen.ProElements {o ℓ e} {C : Category o ℓ e} {M : Monoidal C} (Cl : Closed M) {F : Bifunctor (Category.op C) C (Setoids (o ⊔ ℓ ⊔ e) (o ⊔ ℓ ⊔ e))} where
 
 private
   module 𝒞 = Category C
 
-open Closed Cl using ([-,-]; [_,_]₀; [_,-]; [_,_]₁; Hom[-⊗_,-]; Hom[-,[_,-]]; Hom-NI)
+open Closed Cl using ([-,-]; [_,_]₁)
 
 import Reason
 open Reason C
