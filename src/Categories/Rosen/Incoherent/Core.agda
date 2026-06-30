@@ -81,17 +81,21 @@ record iMR2⇒ (X Y : iMR2₀) : Set (o ⊔ ℓ ⊔ e) where
     in record { l = f.l ∘ g.l 
               ; r = f.r ∘ g.r 
               ; eqf = assoc ○ refl⟩∘⟨ g.eqf ○ rw-2-1 f.eqf ○ assoc 
-              ; eqϕ = begin [ f.l ∘ g.l , id ]₁ ∘ f.ξY.ϕ ∘ f.r ∘ g.r ≈⟨ Hom.homomorphism ⟩∘⟨refl ⟩ 
+              ; eqϕ = begin [ f.l ∘ g.l , id ]₁ ∘ f.ξY.ϕ ∘ f.r ∘ g.r             ≈⟨ Hom.homomorphism ⟩∘⟨refl ⟩ 
                             ([ g.l , id ]₁ ∘ [ f.l , id ]₁) ∘ f.ξY.ϕ ∘ f.r ∘ g.r ≈⟨ assoc ⟩ 
-                            [ g.l , id ]₁ ∘ [ f.l , id ]₁ ∘ f.ξY.ϕ ∘ f.r ∘ g.r ≈⟨ refl⟩∘⟨ rw-3-1 f.eqϕ ⟩ 
-                            [ g.l , id ]₁ ∘ ([ id , f.r ]₁ ∘ g.ξY.ϕ) ∘ g.r ≈⟨ refl⟩∘⟨ assoc ⟩ 
-                            [ g.l , id ]₁ ∘ [ id , f.r ]₁ ∘ g.ξY.ϕ ∘ g.r ≈⟨ sym-assoc ○ Equiv.sym [ [-,-] ]-commute ⟩∘⟨refl ⟩ 
-                            ([ id , f.r ]₁ ∘ [ g.l , id ]₁) ∘ g.ξY.ϕ ∘ g.r ≈⟨ assoc ○ refl⟩∘⟨ g.eqϕ ⟩ 
-                            [ id , f.r ]₁ ∘ [ id , g.r ]₁ ∘ g.ξX.ϕ ≈⟨ pullˡ C (Equiv.sym Hom'.homomorphism) ⟩ 
+                            [ g.l , id ]₁ ∘ [ f.l , id ]₁ ∘ f.ξY.ϕ ∘ f.r ∘ g.r   ≈⟨ refl⟩∘⟨ rw-3-1 f.eqϕ ⟩ 
+                            [ g.l , id ]₁ ∘ ([ id , f.r ]₁ ∘ g.ξY.ϕ) ∘ g.r       ≈⟨ refl⟩∘⟨ assoc ⟩ 
+                            [ g.l , id ]₁ ∘ [ id , f.r ]₁ ∘ g.ξY.ϕ ∘ g.r         ≈⟨ sym-assoc ○ Equiv.sym [ [-,-] ]-commute ⟩∘⟨refl ⟩ 
+                            ([ id , f.r ]₁ ∘ [ g.l , id ]₁) ∘ g.ξY.ϕ ∘ g.r       ≈⟨ assoc ○ refl⟩∘⟨ g.eqϕ ⟩ 
+                            [ id , f.r ]₁ ∘ [ id , g.r ]₁ ∘ g.ξX.ϕ               ≈⟨ pullˡ C (Equiv.sym Hom'.homomorphism) ⟩ 
                             [ id , f.r ∘ g.r ]₁ ∘ g.ξX.ϕ ∎ 
     }
-  ; assoc = λ { {A} {B} {C} {D} {f} {g} {h} → {! assoc {f = iMR2⇒.l f} {g = iMR2⇒.l g} {h = iMR2⇒.l h} !} , {! assoc {f = iMR2⇒.r f} {g = iMR2⇒.r g} {h = iMR2⇒.r h} !} } -- assoc , assoc
-  ; sym-assoc = {!  !} -- sym-assoc , sym-assoc 
+  ; assoc = λ { {A} {B} {C} {D} {f} {g} {h} → 
+    ( assoc {f = iMR2⇒.l f} {g = iMR2⇒.l g} {h = iMR2⇒.l h}) 
+    , (assoc {f = iMR2⇒.r f} {g = iMR2⇒.r g} {h = iMR2⇒.r h}) } -- assoc , assoc
+  ; sym-assoc = λ { {A} {B} {C} {D} {f} {g} {h} → 
+    ( sym-assoc {f = iMR2⇒.l f} {g = iMR2⇒.l g} {h = iMR2⇒.l h}) 
+    , (sym-assoc {f = iMR2⇒.r f} {g = iMR2⇒.r g} {h = iMR2⇒.r h}) } -- sym-assoc , sym-assoc 
   ; identityˡ = λ { {A} {B} {f} → identityˡ {f = iMR2⇒.l f} 
                   , identityˡ {f = iMR2⇒.r f} 
                   } -- identityˡ , identityˡ 
