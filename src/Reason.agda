@@ -2,7 +2,6 @@
 
 open import Categories.Category using (Category)
 open import Categories.Functor using (Functor)
-open import Function using (flip)
 
 -- A custom module to *quickly* reason about morphisms in a category in the agda-categories library
 
