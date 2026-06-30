@@ -64,9 +64,9 @@ record iMR2⇒ (X Y : iMR2₀) : Set (o ⊔ ℓ ⊔ e) where
 τ[iMR2] = record
   { Obj = iMR2₀
   ; _⇒_ = λ s t → iMR2⇒ s t
-  ; _≈_ = λ f g → 
-    let module f = iMR2⇒ f  
-        module g = iMR2⇒ g in f.l ≈ g.l × f.r ≈ g.r
+  ; _≈_ = λ f g → let open iMR2⇒ in f .l ≈ g .l × f .r ≈ g .r
+    -- let module f = iMR2⇒ f  
+    --     module g = iMR2⇒ g in f.l ≈ g.l × f.r ≈ g.r
   ; id = record 
     { l = id 
     ; r = id 
@@ -76,17 +76,22 @@ record iMR2⇒ (X Y : iMR2₀) : Set (o ⊔ ℓ ⊔ e) where
   ; _∘_ = λ f g → 
     let module f = iMR2⇒ f  
         module g = iMR2⇒ g 
-        module Hom = Functor [-,-]
+        module Hom  {A} = Functor (appʳ [-,-] A)
+        module Hom' {A} = Functor (appˡ [-,-] A)
     in record { l = f.l ∘ g.l 
               ; r = f.r ∘ g.r 
               ; eqf = assoc ○ refl⟩∘⟨ g.eqf ○ rw-2-1 f.eqf ○ assoc 
-              ; eqϕ = begin [ f.l ∘ g.l , id ]₁ ∘ f.ξY.ϕ ∘ f.r ∘ g.r ≈⟨ ? ⟩∘⟨refl ⟩ 
+              ; eqϕ = begin [ f.l ∘ g.l , id ]₁ ∘ f.ξY.ϕ ∘ f.r ∘ g.r ≈⟨ Hom.homomorphism ⟩∘⟨refl ⟩ 
                             ([ g.l , id ]₁ ∘ [ f.l , id ]₁) ∘ f.ξY.ϕ ∘ f.r ∘ g.r ≈⟨ assoc ⟩ 
-                            [ g.l , id ]₁ ∘ [ f.l , id ]₁ ∘ f.ξY.ϕ ∘ f.r ∘ g.r ≈⟨ {!  !} ⟩ 
-                            {!  !} ≈⟨ {!  !} ⟩ 
-                            [ id , f.r ∘ g.r ]₁ ∘ g.ξX.ϕ ∎ }
-  ; assoc = assoc , assoc
-  ; sym-assoc = sym-assoc , sym-assoc 
+                            [ g.l , id ]₁ ∘ [ f.l , id ]₁ ∘ f.ξY.ϕ ∘ f.r ∘ g.r ≈⟨ refl⟩∘⟨ rw-3-1 f.eqϕ ⟩ 
+                            [ g.l , id ]₁ ∘ ([ id , f.r ]₁ ∘ g.ξY.ϕ) ∘ g.r ≈⟨ refl⟩∘⟨ assoc ⟩ 
+                            [ g.l , id ]₁ ∘ [ id , f.r ]₁ ∘ g.ξY.ϕ ∘ g.r ≈⟨ sym-assoc ○ Equiv.sym [ [-,-] ]-commute ⟩∘⟨refl ⟩ 
+                            ([ id , f.r ]₁ ∘ [ g.l , id ]₁) ∘ g.ξY.ϕ ∘ g.r ≈⟨ assoc ○ refl⟩∘⟨ g.eqϕ ⟩ 
+                            {!  !} ≈⟨ pullˡ C (Equiv.sym Hom'.homomorphism) ⟩ 
+                            [ id , f.r ∘ g.r ]₁ ∘ g.ξX.ϕ ∎ 
+    }
+  ; assoc = {!  !} -- assoc , assoc
+  ; sym-assoc = {!  !} -- sym-assoc , sym-assoc 
   ; identityˡ = identityˡ , identityˡ 
   ; identityʳ = identityʳ , identityʳ 
   ; identity² = identity² , identity² 
@@ -95,7 +100,7 @@ record iMR2⇒ (X Y : iMR2₀) : Set (o ⊔ ℓ ⊔ e) where
     ; sym = λ x → (sym (proj₁ x)) , (sym (proj₂ x)) 
     ; trans = λ eq eq' → (trans (proj₁ eq) (proj₁ eq')) , (trans (proj₂ eq) (proj₂ eq')) 
     }
-  ; ∘-resp-≈ = λ eq eq' → (∘-resp-≈ (proj₁ eq) (proj₁ eq')) , (∘-resp-≈ (proj₂ eq) (proj₂ eq'))
+  ; ∘-resp-≈ = {!  !} -- λ eq eq' → (∘-resp-≈ (proj₁ eq) (proj₁ eq')) , (∘-resp-≈ (proj₂ eq) (proj₂ eq'))
   }
 
 -- iMR2 (_ , B) è funtoriale per ogni B fissato; C^op --> Setoids
