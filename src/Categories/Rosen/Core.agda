@@ -1,9 +1,8 @@
 {-# OPTIONS --without-K --safe --warning=noUserWarning --warning=noUselessPrivate #-}
 
-open import Level using (_⊔_;lift;lower;zero;suc)
+open import Level using (_⊔_)
 
 open import Data.Product using (_,_; proj₁; proj₂; _×_)
-open import Relation.Binary using (IsEquivalence)
 open import Relation.Binary.Bundles using (Setoid)
 
 open import Categories.Category using (Category)
@@ -15,9 +14,7 @@ open import Categories.Functor using (Functor; _∘F_)
 open import Categories.Functor.Bifunctor using (Bifunctor; appˡ; appʳ)
 open import Categories.Functor.Bifunctor.Properties using ([_]-commute)
 open import Categories.NaturalTransformation using (NaturalTransformation;_∘ᵥ_; _∘ₕ_; _∘ˡ_; _∘ʳ_)
-open import Categories.NaturalTransformation.Equivalence using (_≃_; ≃-isEquivalence)
-
-open import Categories.Functor.Hom using (Hom[_][-,-]; Hom[_][_,_])
+open import Categories.NaturalTransformation.Equivalence using (_≃_)
 
 module Categories.Rosen.Core {o ℓ e} {C : Category o ℓ e} {M : Monoidal C} (Cl : Closed M) where
 
@@ -28,7 +25,7 @@ private
 import Reason
 open Reason C
 
-open Closed Cl using ([-,-]; [_,_]₀; [_,-];[-,_]; [_,_]₁; Hom[-⊗_,-]; Hom[-,[_,-]]; Hom-NI)
+open Closed Cl using ([-,-]; [_,_]₀; [_,-]; [-,_]; [_,_]₁)
 
 module Arr = Categories.Category.Construction.Arrow C
 
@@ -76,8 +73,6 @@ nHom {A} {B} f = record
 
 
 open import Categories.NaturalTransformation renaming (id to idN)
-open import Categories.NaturalTransformation.NaturalIsomorphism
-  using (niHelper)
 
 nHom-identity : ∀ {A} → nHom (id {A}) ≃ idN
 nHom-identity = [-,-].identity
