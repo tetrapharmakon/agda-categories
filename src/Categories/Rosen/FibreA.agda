@@ -1,22 +1,16 @@
 {-# OPTIONS --without-K --safe --warning=noUserWarning --warning=noUselessPrivate #-}
 
-open import Level using (_⊔_;lift;lower;zero;suc)
+open import Level using (_⊔_)
 
-open import Data.Product using (_,_; proj₁; proj₂; _×_)
-open import Relation.Binary using (IsEquivalence) renaming (Setoid to S)
-open import Relation.Binary.Bundles using (Setoid)
+open import Data.Product using (_,_)
+open import Relation.Binary using () renaming (Setoid to S)
 
-open import Categories.Category using (Category;_[_,_])
-open import Categories.Category.Instance.Setoids
+open import Categories.Category using (Category)
 open import Categories.Category.Monoidal using (Monoidal)
 open import Categories.Category.Monoidal.Closed using (Closed)
-open import Categories.Functor using (Functor; _∘F_)
-open import Categories.Functor.Bifunctor using (Bifunctor; appˡ; appʳ)
-open import Categories.Functor.Bifunctor.Properties using ([_]-commute)
-open import Categories.NaturalTransformation using (NaturalTransformation;_∘ᵥ_; _∘ₕ_; _∘ˡ_; _∘ʳ_)
-open import Categories.NaturalTransformation.Equivalence using (_≃_; ≃-isEquivalence)
-
-open import Categories.Functor.Hom using (Hom[_][-,-]; Hom[_][_,_])
+open import Categories.Functor using (Functor)
+open import Categories.Functor.Bifunctor using (appˡ; appʳ)
+open import Categories.NaturalTransformation using (NaturalTransformation)
 module Categories.Rosen.FibreA {o ℓ e} {C : Category o ℓ e} {M : Monoidal C} (Cl : Closed M) where
 
 private
@@ -25,7 +19,7 @@ private
 import Reason
 open Reason C
 
-open Closed Cl using ([-,-]; [_,_]₀; [_,-]; [_,_]₁; Hom[-⊗_,-]; Hom[-,[_,-]]; Hom-NI)
+open Closed Cl using ([-,-]; [_,_]₀; [_,-]; [_,_]₁)
 
 import Categories.Morphism.Reasoning as MR
 
