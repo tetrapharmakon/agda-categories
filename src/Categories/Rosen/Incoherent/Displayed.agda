@@ -89,8 +89,8 @@ private
  variable
   A A' B B' : Obj
 
-right : (v : B ⇒ B') → Bifunctor (Category.op (iMR2ᴸ B)) (iMR2ᴸ B') (Setoids (ℓ ⊔ e) e)
-right v = record
+MRSdisplay : (v : B ⇒ B') → Bifunctor (Category.op (iMR2ᴸ B)) (iMR2ᴸ B') (Setoids (ℓ ⊔ e) e)
+MRSdisplay v = record
   { F₀ = λ {(x , y) → 
      let module x  = iMR2ᴸ₀ x 
          module ξx = iMR2 x.ξ

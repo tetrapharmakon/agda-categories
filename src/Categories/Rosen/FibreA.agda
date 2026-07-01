@@ -94,94 +94,7 @@ totalAtA A = record
   ; F-resp-≈ = λ {X} {Y} {f} {g} z → z , Functor.F-resp-≈ [ A ,-] z
   }
 
--- Pullback of two functors, ∇ and V₁.
--- In Cats, the categorical pullback is (in general) a pseudo-pullback; concretely this
--- is the “iso-comma” construction: objects are pairs plus an isomorphism in Arrow(C).
-
-{-
-reindex : {A A' : Obj} → (u : A ⇒ A') → Functor (totalAtA A') (totalAtA A)
-reindex u = record
-  { F₀ = λ { (B ∣ ξ) → B ∣ ⟪ MR2.f ξ ∘ u , (nHom u ∘ʳ Cod) ∘ᵥ MR2.ϕ ξ ⟫}
-  ; F₁ = λ { {(B ∣ ξ)} {(B' ∣ ξ')} (record { r = r ; eqϕ = eq}) → record 
-      { r = r 
-      ; eqϕ = {!   !} 
-      }}
-  ; identity = {!   !}
-  ; homomorphism = {!   !}
-  ; F-resp-≈ = {!   !}
-  }
--}
-
-{-
-module _ (A : Obj) where
-  private
-    module TA = Category (totalAtA A)
-    module TM = Category 𝕋MRS
-    module Ar = Category Arr.Arrow
-    module F  = Functor (∇ {A})
-    module G  = Functor V₁
-
-  import Categories.Morphism as M using (_≅_)
-  open M Arr.Arrow using (_≅_)
-  record FibreA₀ : Set (o ⊔ ℓ ⊔ e) where
-    field
-      x   : TA.Obj
-      y   : TM.Obj
-      iso : (F.F₀ x) ≅ (G.F₀ y)
-
-  record FibreA⇒ (P Q : FibreA₀) : Set (o ⊔ ℓ ⊔ e) where
-    module P = FibreA₀ P
-    module Q = FibreA₀ Q
-    module iP = _≅_ P.iso
-    module iQ = _≅_ Q.iso
-    field
-      f : TA._⇒_ P.x Q.x
-      g : TM._⇒_ P.y Q.y
-      commute : (G.F₁ g Ar.∘ iP.from) Ar.≈ iQ.from Ar.∘ F.F₁ f
-
-  fakeMRS3 : Category (o ⊔ ℓ ⊔ e) (o ⊔ ℓ ⊔ e) e
-  fakeMRS3 = record
-    { Obj = FibreA₀
-    ; _⇒_ = FibreA⇒
-    ; _≈_ = λ { u v → FibreA⇒.f u TA.≈ FibreA⇒.f v × FibreA⇒.g u TM.≈ FibreA⇒.g v }
-    ; id = λ { {P} →
-        let module P = FibreA₀ P
-            module iP = _≅_ P.iso
-        in record
-          { f = TA.id
-          ; g = TM.id
-          ; commute = sym-id-swap , id-0 ∙ sym-id-1 ∙ skip (sym [-,-].identity)
-          }
-          }
-    ; _∘_ = λ { {P} {Q} {R} u v →
-        let module P  = FibreA₀ P
-            module Q  = FibreA₀ Q
-            module R  = FibreA₀ R
-            module u  = FibreA⇒ u
-            module v  = FibreA⇒ v
-            module iP = _≅_ P.iso
-            module iQ = _≅_ Q.iso
-            module iR = _≅_ R.iso
-            open Ar.HomReasoning
-        in record
-          { f = u.f TA.∘ v.f
-          ; g = u.g TM.∘ v.g
-          ; commute = assoc ∙ skip (proj₁ v.commute) ∙ rw-2 (proj₁ u.commute)
-                    , assoc ∙ skip (proj₂ v.commute) ∙ rw-2 (proj₂ u.commute) ∙ skip (sym (Functor.homomorphism [ _ ,-]))
-          } }
-    ; assoc     = assoc     , assoc     , assoc
-    ; sym-assoc = sym-assoc , sym-assoc , sym-assoc
-    ; identityˡ = identityˡ , identityˡ , identityˡ
-    ; identityʳ = identityʳ , identityʳ , identityʳ
-    ; identity² = identity² , identity² , identity²
-    ; equiv = record
-      { refl = refl , refl , refl
-      ; sym = λ { (p , q , r) → sym p , sym q , sym r }
-      ; trans = λ { (p₁ , q₁ , r₁) (p₂ , q₂ , r₂) → trans p₁ p₂ , trans q₁ q₂ , trans r₁ r₂ }
-      }
-    ; ∘-resp-≈ = λ { (p₁ , q₁ , r₁) (p₂ , q₂ , r₂) → ∘-resp-≈ p₁ p₂ , ∘-resp-≈ q₁ q₂ , ∘-resp-≈ r₁ r₂ }
-    }
--- But also, a comma category.
+-- The same construction of HigherMRS.agda, but with a comma category instead of PB.
 -- Objects are commutative squares in Arrow(C):  ∇ x ⇒ V₁ y.
 
 open import Categories.Category.Construction.Comma
@@ -196,4 +109,3 @@ _ = _≡_.refl
 
 _ : {T : Obj} → (Category._⇒_ (commaNablaV {T})) ≡ Comma⇒
 _ = _≡_.refl
--}

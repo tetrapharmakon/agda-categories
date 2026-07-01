@@ -87,8 +87,8 @@ private
  variable
   A A' B B' : Obj
 
-left : (u : A ⇒ A') → Functor (iMR2ᴿ A') (iMR2ᴿ A)
-left {A} {A'} u = record
+MRSreindex : (u : A ⇒ A') → Functor (iMR2ᴿ A') (iMR2ᴿ A)
+MRSreindex {A} {A'} u = record
   { F₀ = λ { x → 
     let module x = iMR2ᴿ₀ x 
     in record 

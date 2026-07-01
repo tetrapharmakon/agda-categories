@@ -11,7 +11,7 @@ open import Categories.Functor using (Functor; _∘F_)
 open import Categories.Category.Cocartesian using (BinaryCoproducts)
 open import Categories.Category.Construction.F-Algebras using (F-Algebras)
 open import Categories.Category.Equivalence using (StrongEquivalence)
-
+open import Categories.Adjoint using (Radjunct)
 module Categories.Rosen.Algebras {o ℓ e} {C : Category o ℓ e} (M : Monoidal C) (Cl : Closed M) (BC : BinaryCoproducts C) where
 
 private
@@ -28,7 +28,8 @@ open MR C
 
 open Monoidal M using (_⊗-;unit;_⊗₀_;_⊗₁_)
 open BinaryCoproducts BC
-open import Categories.Rosen.Core Cl
+open import Categories.Rosen.Incoherent.Core Cl
+open import Categories.Rosen.Incoherent.Fibred Cl using (iMR2ᴿ;iMR2ᴿ₀;iMR2ᴿ⇒)
 open import Categories.Rosen.FibreA Cl using (totalAtA;_∣_)
 
 private
@@ -42,15 +43,27 @@ private
     }
 
 _⊗[I+_] : {A : Obj} → Functor C C
-_⊗[I+_] {A} = A ⊗- ∘F unit+-
+_⊗[I+_] {A} = A +- ∘F A ⊗- 
 
 F-Algebra-Category : {A : Obj} → Category _ _ _
 F-Algebra-Category {A} = F-Algebras (_⊗[I+_] {A})
 
 
-{-
-to : {A : Obj} → Functor (totalAtA A) (F-Algebra-Category {A})
+to : {A : Obj} → Functor (iMR2ᴿ A) (F-Algebra-Category {A})
 to {A} = record
+  { F₀ = λ x → 
+    let module x = iMR2ᴿ₀ x 
+        -- module ϕ* = iMR2.ϕ x.ξ
+    in record 
+    { A = x.B ; α = [ iMR2.f x.ξ , Closed.adjoint.Radjunct {! iMR2.ϕ x.ξ !} Cl ] }
+  ; F₁ = {!  !}
+  ; identity = {!  !}
+  ; homomorphism = {!  !}
+  ; F-resp-≈ = {!  !}
+  }
+  
+{-
+  record
   { F₀ = λ {(B ∣ ξ) → record { A = B ; α = [ MR2.f ξ , {!   !} ] ∘ {! Functor.F₁ (-+ (A ⊗₀ B)) ∘ ?  !} }}
   ; F₁ = {!   !}
   ; identity = {!   !}

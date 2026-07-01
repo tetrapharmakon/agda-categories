@@ -50,7 +50,6 @@ record MR2 (A B : Obj) : Set (o ⊔ ℓ ⊔ e) where
   ϕη₀ = ϕη (record { arr = f })
   ϕcommute = λ {X Y : Category.Obj Arr.Arrow} t → NaturalTransformation.commute ϕ {X} {Y} t
   ϕf = ϕη (record { arr = f }) ∘ f
-  -- ϕ[ϕf] = {!  !}
 
 MR2-Setoid : Obj → Obj → Setoid (o ⊔ ℓ ⊔ e) (o ⊔ ℓ ⊔ e)
 MR2-Setoid A B = record
@@ -63,14 +62,12 @@ MR2-Setoid A B = record
     }
   }
 
-
 nHom : ∀ {A B} → A ⇒ B → NaturalTransformation ([_,-] B) ([_,-] A)
 nHom {A} {B} f = record
   { η = λ X → [ f , id ]₁
   ; commute = λ h → Equiv.sym [ [-,-] ]-commute
   ; sym-commute = λ h → [ [-,-] ]-commute
   }
-
 
 open import Categories.NaturalTransformation renaming (id to idN)
 
@@ -82,7 +79,8 @@ import Categories.Morphism.Reasoning as MR
 open HomReasoning
 open MR
 
--- Type of the desired profunctor C.op × C → Sets sending (A , B) ↦ MR2 A B.
+-- Type of the desired profunctor C.op × C → Sets 
+-- sending (A , B) ↦ MR2 A B.
 MRS-Profunctor : Bifunctor (Category.op C) C (Setoids (o ⊔ ℓ ⊔ e) (o ⊔ ℓ ⊔ e))
 MRS-Profunctor = record
   { F₀ = λ { (A , B) → MR2-Setoid A B }
@@ -99,7 +97,7 @@ MRS-Profunctor = record
         ( λ (f≈g , ϕ≈ϕ') → Equiv.trans identityˡʳ f≈g
         , λ { {h} → Equiv.trans (elimˡ C Hom.identity) (ϕ≈ϕ' {h}) })
      }
-  ; homomorphism = λ { {(A , B)} {(A' , B')} {(A'' , B'')} {f = (u₁ , v₁)} {g = (u₂ , v₂)} {⟪ f , ϕ ⟫} {⟪ g , ϕ' ⟫} →
+  ; homomorphism = λ { {f = (u₁ , v₁)} {g = (u₂ , v₂)} {⟪ f , ϕ ⟫} {⟪ g , ϕ' ⟫} →
        let module Hom = Functor [-,-]
            module Hom[1-] {A} = Functor (appˡ [-,-] A)
            module Hom[-1] {A} = Functor (appʳ [-,-] A) in
