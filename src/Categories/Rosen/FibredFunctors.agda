@@ -166,7 +166,12 @@ module _ (A : Obj) where
             module iP = _≅_ P.iso
             module iQ = _≅_ Q.iso
             module iR = _≅_ R.iso
-            open Ar.HomReasoning
+            p₀ = iP.from .Arr.Morphism⇒.dom⇒
+            p₁ = iP.from .Arr.Morphism⇒.cod⇒
+            q₀ = iQ.from .Arr.Morphism⇒.dom⇒
+            q₁ = iQ.from .Arr.Morphism⇒.cod⇒
+            r₀ = iR.from .Arr.Morphism⇒.dom⇒
+            r₁ = iR.from .Arr.Morphism⇒.cod⇒
         in record 
         { f = u.f El.∘ v.f
         ; g = u.g TM.∘ v.g
