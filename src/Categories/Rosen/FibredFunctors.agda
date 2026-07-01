@@ -175,8 +175,19 @@ module _ (A : Obj) where
         in record 
         { f = u.f El.∘ v.f
         ; g = u.g TM.∘ v.g
-        ; commute = {!  !} , {!  !} 
-        } }
+        ; commute = {!  !} -- assoc ○ ? -- (refl⟩∘⟨ (proj₁ v.commute)) ○ ? -- (sym-assoc ○ ((proj₁ u.commute) ⟩∘⟨refl) ○ assoc)
+                  , {!  !} -- assoc ○ (refl⟩∘⟨ (proj₂ v.commute)) ○ (sym-assoc ○ ((proj₂ u.commute) ⟩∘⟨refl) ○ assoc) ○ (refl⟩∘⟨ (sym (Functor.homomorphism [ _ ,-])))
+        --   ( begin
+        --       Arr.Morphism⇒.dom⇒ (G.F₁ (u.g TM.∘ v.g) Ar.∘ iP.from)
+        --     ≈⟨ ? ⟩
+        --       Arr.Morphism⇒.dom⇒ (iR.from Ar.∘ F.F₁ (u.f El.∘ v.f))
+        --     ∎ )
+        -- , ( begin
+        --       Arr.Morphism⇒.cod⇒ (G.F₁ (u.g TM.∘ v.g)) ∘ Arr.Morphism⇒.cod⇒ iP.from
+        --     ≈⟨ ? ⟩
+        --       Arr.Morphism⇒.cod⇒ iR.from ∘ Arr.Morphism⇒.cod⇒ (F.F₁ (u.f El.∘ v.f))
+        --     ∎ )
+              } }
     ; assoc = {!  !}
     ; sym-assoc = {!  !}
     ; identityˡ = {!  !}
@@ -314,4 +325,18 @@ incl⊣forse = record
     })
   ; zig = identity² , identity²
   ; zag = identity² , identity²
+  }
+
+
+-- sending an arrow h : A ⇒ B to the MR system
+-- (h, const) exists only on a Cartesian ambient category C
+𝕀 : Functor Arr.Arrow 𝕋MRS 
+𝕀 = record
+  { F₀ = λ {record { dom = dom ; cod = cod ; arr = a } → 
+       (dom , cod) 
+       ∣ ⟪ a , {!  !} ⟫}
+  ; F₁ = {!  !}
+  ; identity = {!  !}
+  ; homomorphism = {!  !}
+  ; F-resp-≈ = {!  !}
   }
