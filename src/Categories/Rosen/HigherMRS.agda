@@ -1,6 +1,6 @@
 {-# OPTIONS --without-K --safe --warning=noUserWarning --warning=noUselessPrivate #-}
 
-open import Level using (_⊔_)
+open import Level using (0ℓ; _⊔_)
 
 open import Categories.Category using (Category)
 open import Categories.Category.Construction.Arrow
@@ -30,24 +30,14 @@ open import Categories.Rosen.Tabulator Cl using (V₁; 𝕋MRS)
 MRS3 : Category (o ⊔ ℓ ⊔ e) (o ⊔ ℓ ⊔ e) e
 MRS3 = IsoComma ℝ V₁
 
-
-{-
-
-Now I want something ambitious:
-
-1. Import Natural numbers from the standard library
-
-2. define
-
--}
-
--- V : (n : ℕ) → Functor 
-
-open import Data.Nat using (ℕ; zero; suc)
+open import Data.Nat using (ℕ; zero; suc; _≤_; z≤n; s≤s)
+open import Data.Nat.Properties using (≤-poset)
 open import Data.Product using (Σ;_,_;proj₁;proj₂)
+open import Categories.Category.Instance.Cats using (Cats)
+open import Categories.Category.Construction.Thin 0ℓ ≤-poset
+open import Categories.Functor using (_∘F_) renaming (id to idF)
 
 𝕄ℝ𝕊 : (n : ℕ) → Σ (Category (o ⊔ ℓ ⊔ e) (o ⊔ ℓ ⊔ e) e) (λ x → Functor x Arr.Arrow)
--- 𝕄ℝ𝕊 zero = 𝕋MRS , V₁ 
 𝕄ℝ𝕊 zero = MRS3 , V₂
   where 
     V₂ : Functor MRS3 Arr.Arrow 
@@ -80,7 +70,7 @@ open import Data.Product using (Σ;_,_;proj₁;proj₂)
         let module x = IsoCommaObj x 
             module y = IsoCommaObj y 
             module f = IsoComma⇒ f
-        in Vₙ.F₁ f.g } --  mor⇒ {dom⇒ = {! Morphism⇒.dom⇒ (Vₙ.F₁ f.g)  !}} {cod⇒ = {!  !}} {!  !}  }
+        in Vₙ.F₁ f.g }
       ; identity = Vₙ.identity
       ; homomorphism = Vₙ.homomorphism
       ; F-resp-≈ = λ f≈g → Vₙ.F-resp-≈ (proj₂ f≈g)
@@ -89,7 +79,7 @@ open import Data.Product using (Σ;_,_;proj₁;proj₂)
 𝕄ℝ𝕊ₒ : (n : ℕ) → Category (o ⊔ ℓ ⊔ e) (o ⊔ ℓ ⊔ e) e
 𝕄ℝ𝕊ₒ n = proj₁ (𝕄ℝ𝕊 n)
 
-𝕄ℝ𝕊ₐ : (n : ℕ) → _ -- (n : ℕ) → 
+𝕄ℝ𝕊ₐ : (n : ℕ) → _
 𝕄ℝ𝕊ₐ n = proj₂ (𝕄ℝ𝕊 n)
 
 Π-MRS : (n : ℕ) → Functor (𝕄ℝ𝕊ₒ (suc n)) (𝕄ℝ𝕊ₒ n)
@@ -101,12 +91,43 @@ open import Data.Product using (Σ;_,_;proj₁;proj₂)
   ; F-resp-≈ = {!  !}
   }
 
-{-
-use Categories.Category.Construction.Thin
-to instantiate the category pℕ as the poset of natural numbers 
-seen as category.
+pℕ : Category 0ℓ 0ℓ 0ℓ
+pℕ = Thin
 
-Then define a (contravariant) functor from pℕ into the category of categories
-Categories.Category.Instance.Cats 
-sending n to 𝕄ℝ𝕊ₒ n and an inequality n ≤ n+1 to the functor Π-MRS
- -}
+𝕄ℝ𝕊-down : ∀ {n m} → m ≤ n → Functor (𝕄ℝ𝕊ₒ n) (𝕄ℝ𝕊ₒ m)
+𝕄ℝ𝕊-down {n} z≤n = reduce n
+  where
+    reduce : (k : ℕ) → Functor (𝕄ℝ𝕊ₒ k) (𝕄ℝ𝕊ₒ 0)
+    reduce 0 = idF -- idF
+    reduce (suc k) = reduce k ∘F Π-MRS k
+𝕄ℝ𝕊-down (s≤s {m} {n} m≤n) = lift (𝕄ℝ𝕊-down m≤n)
+  where
+    lift : Functor (𝕄ℝ𝕊ₒ n) (𝕄ℝ𝕊ₒ m) → Functor (𝕄ℝ𝕊ₒ (suc n)) (𝕄ℝ𝕊ₒ (suc m))
+    lift F = let module F' = Functor F in record
+      { F₀ = λ x →
+        let module x = IsoCommaObj x
+        in record { a = x.a ; b = F'.F₀ x.b ; iso = {! !} }
+      ; F₁ = λ { {x} {y} f →
+        let module x = IsoCommaObj x
+            module y = IsoCommaObj y
+            module f = IsoComma⇒ f
+        in record { f = f.f ; g = F'.F₁ f.g ; commute = {! !} } }
+      ; identity = {!  !} -- Category.Equiv.refl ElMRS , F'.identity
+      ; homomorphism = {!  !} -- Category.Equiv.refl ElMRS , F'.homomorphism
+      ; F-resp-≈ = λ eq → {!  !} , F'.F-resp-≈ (proj₂ eq)
+      }
+
+MRS-chain : Functor (Category.op pℕ) (Cats (o ⊔ ℓ ⊔ e) (o ⊔ ℓ ⊔ e) e)
+MRS-chain = record
+  { F₀ = 𝕄ℝ𝕊ₒ
+  ; F₁ = λ {n} {m} m≤n → 𝕄ℝ𝕊-down m≤n
+  ; identity = {! !}
+  ; homomorphism = {! !}
+  ; F-resp-≈ = {! !}
+  }
+
+open import Categories.Diagram.Limit MRS-chain renaming (Limit to MRS-Limit)
+
+MRS∞ = MRS-Limit.apex
+MRS∞-proj = MRS-Limit.proj
+MRS∞-commute = MRS-Limit.limit-commute
