@@ -85,4 +85,28 @@ open import Data.Product using (Σ;_,_;proj₁;proj₂)
       ; homomorphism = Vₙ.homomorphism
       ; F-resp-≈ = λ f≈g → Vₙ.F-resp-≈ (proj₂ f≈g)
       }
-         
+
+𝕄ℝ𝕊ₒ : (n : ℕ) → Category (o ⊔ ℓ ⊔ e) (o ⊔ ℓ ⊔ e) e
+𝕄ℝ𝕊ₒ n = proj₁ (𝕄ℝ𝕊 n)
+
+𝕄ℝ𝕊ₐ : (n : ℕ) → _ -- (n : ℕ) → 
+𝕄ℝ𝕊ₐ n = proj₂ (𝕄ℝ𝕊 n)
+
+Π-MRS : (n : ℕ) → Functor (𝕄ℝ𝕊ₒ (suc n)) (𝕄ℝ𝕊ₒ n)
+Π-MRS n = record
+  { F₀ = λ x → {!  !}
+  ; F₁ = {!  !}
+  ; identity = {!  !}
+  ; homomorphism = {!  !}
+  ; F-resp-≈ = {!  !}
+  }
+
+{-
+use Categories.Category.Construction.Thin
+to instantiate the category pℕ as the poset of natural numbers 
+seen as category.
+
+Then define a (contravariant) functor from pℕ into the category of categories
+Categories.Category.Instance.Cats 
+sending n to 𝕄ℝ𝕊ₒ n and an inequality n ≤ n+1 to the functor Π-MRS
+ -}
