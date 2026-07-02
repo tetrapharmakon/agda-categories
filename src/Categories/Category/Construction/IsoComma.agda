@@ -1,7 +1,7 @@
 {-# OPTIONS --without-K --safe #-}
 module Categories.Category.Construction.IsoComma where
 
-open import Data.Product using (_×_; _,_; zip; map)
+open import Data.Product using (_×_; _,_; zip; map;proj₁;proj₂)
 open import Level
 
 open import Categories.Category using (Category; _[_,_]; _[_≈_]; _[_∘_]; module Definitions)
@@ -102,3 +102,26 @@ module _ {A : Category o₁ ℓ₁ e₁} {B : Category o₂ ℓ₂ e₂} {C : Ca
   infix 4 _↓≅_
   _↓≅_ : Functor A C → Functor B C → Category _ _ _
   _↓≅_ = IsoComma
+
+
+  -- left and right projection functors
+
+  ICproj₁ : {F : Functor A C} {G : Functor B C} → Functor (F ↓≅ G) A 
+  ICproj₁ = record
+    { F₀ = λ x → let module x = IsoCommaObj x in x.a
+    ; F₁ = λ f → let module f = IsoComma⇒ f in f.f
+    ; identity = λ {A₁} → A.Equiv.refl
+    ; homomorphism = A.Equiv.refl
+    ; F-resp-≈ = λ x → proj₁ x
+    }
+
+
+
+  ICproj₂ : {F : Functor A C} {G : Functor B C} → Functor (F ↓≅ G) B
+  ICproj₂ = record
+    { F₀ = λ x → let module x = IsoCommaObj x in x.b
+    ; F₁ = λ f → let module f = IsoComma⇒ f in f.g
+    ; identity = λ {A₁} → B.Equiv.refl
+    ; homomorphism = B.Equiv.refl
+    ; F-resp-≈ = λ x → proj₂ x
+    }

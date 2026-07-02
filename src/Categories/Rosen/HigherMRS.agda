@@ -69,11 +69,13 @@ open import Data.Product using (Σ;_,_;proj₁;proj₂)
       ; F-resp-≈ = λ {(_ , dat) → (dat .proj₁) , (dat .proj₂)}
       }
 𝕄ℝ𝕊 (suc n) 
-  = let MRSn = proj₂ (𝕄ℝ𝕊 n) in IsoComma ℝ MRSn
+  = let MRSn = proj₂ (𝕄ℝ𝕊 n) 
+        module Vₙ = Functor MRSn
+    in IsoComma ℝ MRSn
   , record
       { F₀ = λ x → 
         let module x = IsoCommaObj x
-        in record { arr = MR2.f (tab₀.ξ {! x.b !}) }
+        in Vₙ.F₀ x.b
       ; F₁ = λ { {x} {y} f → 
         let module x = IsoCommaObj x 
             module y = IsoCommaObj y 
