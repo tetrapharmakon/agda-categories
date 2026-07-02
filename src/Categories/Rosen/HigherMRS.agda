@@ -80,9 +80,9 @@ open import Data.Product using (Σ;_,_;proj₁;proj₂)
         let module x = IsoCommaObj x 
             module y = IsoCommaObj y 
             module f = IsoComma⇒ f
-        in {!  !} }
-      ; identity = {!  !}
-      ; homomorphism = {!  !}
-      ; F-resp-≈ = {!  !}
+        in Vₙ.F₁ f.g } --  mor⇒ {dom⇒ = {! Morphism⇒.dom⇒ (Vₙ.F₁ f.g)  !}} {cod⇒ = {!  !}} {!  !}  }
+      ; identity = Vₙ.identity
+      ; homomorphism = Vₙ.homomorphism
+      ; F-resp-≈ = λ f≈g → Vₙ.F-resp-≈ (proj₂ f≈g)
       }
          
