@@ -21,6 +21,7 @@ module _ {A : Category o₁ ℓ₁ e₁} {B : Category o₂ ℓ₂ e₂} {C : Ca
   open import Categories.Morphism C using (_≅_)
 
   record IsoCommaObj (F : Functor A C) (G : Functor B C) : Set (o₁ ⊔ o₂ ⊔ ℓ₃ ⊔ e₃) where
+    eta-equality
     open Functor F renaming (F₀ to F₀)
     open Functor G renaming (F₀ to G₀)
     field
@@ -29,6 +30,7 @@ module _ {A : Category o₁ ℓ₁ e₁} {B : Category o₂ ℓ₂ e₂} {C : Ca
       iso : (F₀ a) ≅ (G₀ b)
 
   record IsoComma⇒ {F : Functor A C} {G : Functor B C} (X Y : IsoCommaObj F G) : Set (ℓ₁ ⊔ ℓ₂ ⊔ e₃) where
+    eta-equality
     open IsoCommaObj X renaming (a to a₁; b to b₁; iso to iso₁)
     open IsoCommaObj Y renaming (a to a₂; b to b₂; iso to iso₂)
     open Functor F renaming (F₁ to F₁)

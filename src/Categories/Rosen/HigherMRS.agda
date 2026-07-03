@@ -36,7 +36,7 @@ open import Data.Product using (Σ;_,_;proj₁;proj₂)
 open import Categories.Category.Instance.Cats using (Cats)
 open import Categories.Category.Construction.Thin 0ℓ ≤-poset
 open import Categories.Functor using (_∘F_) renaming (id to idF)
-open import Categories.NaturalTransformation.NaturalIsomorphism using (niHelper)
+open import Categories.NaturalTransformation.NaturalIsomorphism using (NaturalIsomorphism;niHelper)
 
 𝕄ℝ𝕊 : (n : ℕ) → Σ (Category (o ⊔ ℓ ⊔ e) (o ⊔ ℓ ⊔ e) e) (λ x → Functor x Arr.Arrow)
 𝕄ℝ𝕊 zero = MRS3 , V₂
@@ -111,6 +111,40 @@ pℕ = Thin
       ; homomorphism = (refl , refl) , F'.homomorphism
       ; F-resp-≈ = λ eq → ((eq .proj₁ .proj₁) , (eq .proj₁ .proj₂)) , F'.F-resp-≈ (proj₂ eq)
       }
+
+hop : ∀ {n m} → Functor (𝕄ℝ𝕊ₒ n) (𝕄ℝ𝕊ₒ m) → Functor (𝕄ℝ𝕊ₒ (suc n)) (𝕄ℝ𝕊ₒ (suc m))
+hop F = let module F' = Functor F in record
+  { F₀ = λ x →
+    let module x = IsoCommaObj x
+    in record { a = x.a ; b = F'.F₀ x.b ; iso = {! !} }
+  ; F₁ = λ { {x} {y} f →
+    let module x = IsoCommaObj x
+        module y = IsoCommaObj y
+        module f = IsoComma⇒ f
+    in record { f = f.f ; g = F'.F₁ f.g ; commute = {! !} } }
+  ; identity = (refl , refl) , F'.identity
+  ; homomorphism = (refl , refl) , F'.homomorphism
+  ; F-resp-≈ = λ eq → ((eq .proj₁ .proj₁) , (eq .proj₁ .proj₂)) , F'.F-resp-≈ (proj₂ eq)
+  }
+
+lemma : ∀ {n : ℕ} → NaturalIsomorphism (hop {n = n} {m = n} (idF {C = 𝕄ℝ𝕊ₒ n})) (idF {C = 𝕄ℝ𝕊ₒ (suc n)})
+lemma {zero} = niHelper 
+  (record 
+  { η = λ { X → Category.id (𝕄ℝ𝕊ₒ 1) {A = X} }
+  ; η⁻¹ = λ { X → Category.id (𝕄ℝ𝕊ₒ 1) {A = X} }
+  ; commute = λ { {X} {Y} f → id-comm-sym (𝕄ℝ𝕊ₒ 1) {f = f} }
+    ; iso = λ X → record 
+    { isoˡ = Category.identityˡ (𝕄ℝ𝕊ₒ 1)
+    ; isoʳ = Category.identityˡ (𝕄ℝ𝕊ₒ 1)
+    } 
+  })
+lemma {suc n} = niHelper 
+  (record 
+  { η = λ { X → {!  !} }
+  ; η⁻¹ = λ { X → {!  !} }
+  ; commute = {!  !} 
+  ; iso = {!  !} 
+  })
 
 MRS-chain : Functor (Category.op pℕ) (Cats (o ⊔ ℓ ⊔ e) (o ⊔ ℓ ⊔ e) e)
 MRS-chain = record
