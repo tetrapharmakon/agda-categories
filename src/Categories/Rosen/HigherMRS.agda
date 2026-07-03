@@ -5,7 +5,7 @@ open import Level using (0ℓ; _⊔_)
 open import Categories.Category using (Category)
 open import Categories.Category.Construction.Arrow
 open import Categories.Functor using (Functor)
-open import Categories.Category.Construction.IsoComma using (IsoComma;IsoCommaObj;IsoComma⇒)
+open import Categories.Category.Construction.IsoComma using (IsoComma;IsoCommaObj;IsoComma⇒;ICproj₁;ICproj₂)
 open import Categories.Category.Monoidal using (Monoidal)
 open import Categories.Category.Monoidal.Closed using (Closed)
 
@@ -36,6 +36,7 @@ open import Data.Product using (Σ;_,_;proj₁;proj₂)
 open import Categories.Category.Instance.Cats using (Cats)
 open import Categories.Category.Construction.Thin 0ℓ ≤-poset
 open import Categories.Functor using (_∘F_) renaming (id to idF)
+open import Categories.NaturalTransformation.NaturalIsomorphism using (niHelper)
 
 𝕄ℝ𝕊 : (n : ℕ) → Σ (Category (o ⊔ ℓ ⊔ e) (o ⊔ ℓ ⊔ e) e) (λ x → Functor x Arr.Arrow)
 𝕄ℝ𝕊 zero = MRS3 , V₂
@@ -83,13 +84,7 @@ open import Categories.Functor using (_∘F_) renaming (id to idF)
 𝕄ℝ𝕊ₐ n = proj₂ (𝕄ℝ𝕊 n)
 
 Π-MRS : (n : ℕ) → Functor (𝕄ℝ𝕊ₒ (suc n)) (𝕄ℝ𝕊ₒ n)
-Π-MRS n = record
-  { F₀ = λ x → {!  !}
-  ; F₁ = {!  !}
-  ; identity = {!  !}
-  ; homomorphism = {!  !}
-  ; F-resp-≈ = {!  !}
-  }
+Π-MRS n = ICproj₂
 
 pℕ : Category 0ℓ 0ℓ 0ℓ
 pℕ = Thin
@@ -112,18 +107,36 @@ pℕ = Thin
             module y = IsoCommaObj y
             module f = IsoComma⇒ f
         in record { f = f.f ; g = F'.F₁ f.g ; commute = {! !} } }
-      ; identity = {!  !} -- Category.Equiv.refl ElMRS , F'.identity
-      ; homomorphism = {!  !} -- Category.Equiv.refl ElMRS , F'.homomorphism
-      ; F-resp-≈ = λ eq → {!  !} , F'.F-resp-≈ (proj₂ eq)
+      ; identity = (refl , refl) , F'.identity
+      ; homomorphism = (refl , refl) , F'.homomorphism
+      ; F-resp-≈ = λ eq → ((eq .proj₁ .proj₁) , (eq .proj₁ .proj₂)) , F'.F-resp-≈ (proj₂ eq)
       }
 
 MRS-chain : Functor (Category.op pℕ) (Cats (o ⊔ ℓ ⊔ e) (o ⊔ ℓ ⊔ e) e)
 MRS-chain = record
   { F₀ = 𝕄ℝ𝕊ₒ
   ; F₁ = λ {n} {m} m≤n → 𝕄ℝ𝕊-down m≤n
-  ; identity = {! !}
-  ; homomorphism = {! !}
-  ; F-resp-≈ = {! !}
+  ; identity = λ { {n} → niHelper 
+    (record 
+    { η = λ { X → {!  !} }
+    ; η⁻¹ = λ { X → {!  !} }
+    ; commute = {!  !} 
+    ; iso = {!  !} 
+    })}
+  ; homomorphism = niHelper 
+    (record 
+    { η = {!  !} 
+    ; η⁻¹ = {!  !} 
+    ; commute = {!  !} 
+    ; iso = {!  !} 
+    })
+  ; F-resp-≈ = λ f≈g → niHelper 
+    (record 
+    { η = {!  !} 
+    ; η⁻¹ = {!  !} 
+    ; commute = {!  !} 
+    ; iso = {!  !} 
+    })
   }
 
 open import Categories.Diagram.Limit MRS-chain renaming (Limit to MRS-Limit)
