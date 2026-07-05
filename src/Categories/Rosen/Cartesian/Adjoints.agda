@@ -100,5 +100,17 @@ L = record
   ; F-resp-≈ = λ { {A} {B} {f} {g} (u≈u′ , v≈v′) → u≈u′ , v≈v′ }
   }
 
+
+open import Categories.Category.Construction.TwistedArrow S
+
+TwSet = TwistedArrow
 -- the other functor exists from the twisted arrow category 
--- L' : Functor Twisted ElMRS
+L' : Functor TwSet ElMRS
+L' = record
+  { F₀ = {!  !}
+  ; F₁ = {!  !}
+  ; identity = {!  !}
+  ; homomorphism = {!  !}
+  ; F-resp-≈ = {!  !}
+  }
+  
