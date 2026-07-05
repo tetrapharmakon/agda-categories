@@ -1,4 +1,4 @@
-{-# OPTIONS --without-K --safe --warning=noUserWarning --warning=noUselessPrivate #-}
+{-# OPTIONS --without-K --allow-unsolved-metas --warning=noUserWarning --warning=noUselessPrivate #-}
 
 open import Level using (0ℓ; _⊔_)
 
