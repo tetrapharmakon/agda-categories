@@ -7,7 +7,10 @@ module Categories.Rosen.Cartesian.Adjoints (o : Level) where
 open import Categories.Category using (Category)
 open import Categories.Category.Instance.Sets
 open import Data.Product using (_×_; _,_; proj₁; proj₂)
-open import Relation.Binary.PropositionalEquality as ≡ using (refl)
+open import Relation.Binary.PropositionalEquality as ≡
+open import Data.Empty using (⊥)
+open import Data.Unit using (⊤; tt)
+import Relation.Binary.Reasoning.Setoid as SetoidR
 open import Categories.Category.Construction.Arrow
 open import Categories.Category.Monoidal using (Monoidal)
 open import Categories.Category.Monoidal.Closed using (Closed)
@@ -35,8 +38,8 @@ open HomReasoning
 open Closed Cl using ([-,-]; [_,_]₀; [_,-]; [-,_]; [_,_]₁)
 
 open import Categories.Rosen.Core Cl
-open import Categories.Rosen.Tabulator Cl using (𝕋MRS;⟪_,_⟫)
-open import Categories.Rosen.ProElements Cl {F = MRS-Profunctor}
+open import Categories.Rosen.Tabulator Cl using (𝕋MRS)
+open import Categories.Rosen.ProElements Cl {F = MRS-Profunctor} using (ElMRS)
 
 open import Categories.Functor.Profunctor.Tabulator
 
@@ -54,7 +57,16 @@ const-ϕ A = record
 -- Yoneda: in the Cartesian case, Cod is represented in Arrow S by the terminal arrow ∅ → 1,
 -- so Nat(Cod, [A,-]∘Cod) has exactly one element.
 yoneda-argument : ∀ A → (ϕ ψ : NaturalTransformation Cod (([ A ,-] ∘F Cod))) → ϕ ≃ ψ
-yoneda-argument A ϕ ψ {x} {v} = {!  !}
+yoneda-argument A ϕ ψ {X} {z} =
+  let α : Arr.Morphism⇒ ⊤-arr X
+      α = record { dom⇒ = λ { (lift ()) } ; cod⇒ = λ _ → z ; square = λ { {lift ()} } }
+  in extensionality {f = NaturalTransformation.η ϕ X z} {g = NaturalTransformation.η ψ X z} λ a →
+    ≡.trans
+      (≡.cong (λ f → f a) (NaturalTransformation.commute ϕ α {x = lift tt}))
+      (≡.sym (≡.cong (λ f → f a) (NaturalTransformation.commute ψ α {x = lift tt})))
+  where
+    ⊤-arr : Arr.Morphism
+    ⊤-arr = record { dom = Lift o ⊥ ; cod = Lift o ⊤ ; arr = λ { (lift ()) } }
 
 -- Uniqueness: any such natural transformation equals const-ϕ A.
 unique-ϕ : ∀ A → (ϕ : NaturalTransformation Cod (([ A ,-] ∘F Cod))) → const-ϕ A ≃ ϕ
@@ -66,35 +78,27 @@ L = record
   { F₀ = λ x → 
     let module x = Arr.Morphism x 
     in (x.dom , x.cod) ∣ ⟪ x.arr , const-ϕ (x.dom) ⟫
-  ; F₁ = λ { {u} {v} f → 
-    let module f = Arr.Morphism⇒ f
-        module u = Arr.Morphism u
-        module v = Arr.Morphism v
-        eq₂-lemma : ∀ {A B} (u : A ⇒ B) → (nHom id ∘ʳ Cod) ∘ᵥ const-ϕ A ≃ (nHom u ∘ʳ Cod) ∘ᵥ const-ϕ B
-        eq₂-lemma u = {!!}
-    in f.dom⇒ , f.cod⇒ ∥ (f.square , eq₂-lemma f.dom⇒)}
-  ; identity = {!  !}
-  ; homomorphism = {!  !}
-  ; F-resp-≈ = {!  !}
-  }
-{-
-L = record
-  { F₀ = λ m → (Arr.Morphism.dom m , Arr.Morphism.cod m) ∣ ⟪ Arr.Morphism.arr m , const-ϕ (Arr.Morphism.dom m) ⟫
-  ; F₁ = λ { {m} {n} α →
-      let A₁ = Arr.Morphism.dom m
-          A₂ = Arr.Morphism.dom n
-          u = Arr.Morphism⇒.dom⇒ α
-          v = Arr.Morphism⇒.cod⇒ α
-          square = Arr.Morphism⇒.square α
-          eq₂ : (nHom id ∘ʳ Cod) ∘ᵥ const-ϕ A₁ ≃ (nHom u ∘ʳ Cod) ∘ᵥ const-ϕ A₂
-          eq₂ = λ {x} → {!!}
-      in u , v ∥ (square , eq₂) }
-  ; identity = Equiv.refl , Equiv.refl
-  ; homomorphism = Equiv.refl , Equiv.refl
-  ; F-resp-≈ = λ { (u≈u′ , v≈v′) → u≈u′ , v≈v′ }
+  ; F₁ = λ { {m} {n} α@(record { dom⇒ = u ; cod⇒ = v ; square = square }) →
+    let A = Arr.Morphism.dom m -- m : A ⇒ X
+        B = Arr.Morphism.dom n -- n : B ⇒ Y
+        -- square : v ∘ m.arr ≈ n.arr ∘ u
+        X = Arr.Morphism.cod m
+        Y = Arr.Morphism.cod n
+        module m = Arr.Morphism m
+        module n = Arr.Morphism n
+        module p = Functor MRS-Profunctor
+        pAY = p.F₀ (A , Y)
+        open SetoidR pAY
+    in record
+      { l = u
+      ; r = v
+      ; eq = square 
+           , yoneda-argument A ((nHom id ∘ʳ Cod) ∘ᵥ const-ϕ A) ((nHom u ∘ʳ Cod) ∘ᵥ const-ϕ B) {_} {_}
+      } }
+  ; identity = λ { {A} → refl , refl }
+  ; homomorphism = λ { {X} {Y} {Z} {f} {g} → refl , refl }
+  ; F-resp-≈ = λ { {A} {B} {f} {g} (u≈u′ , v≈v′) → u≈u′ , v≈v′ }
   }
 
--- The adjunction L ⊣ V₁.
-L⊣V₁ : L ⊣ V₁
-L⊣V₁ = {!!}
--}
+-- the other functor exists from the twisted arrow category 
+-- L' : Functor Twisted ElMRS
