@@ -7,6 +7,7 @@ module Categories.Rosen.Cartesian.Adjoints (o : Level) where
 open import Categories.Category using (Category)
 open import Categories.Category.Instance.Sets
 open import Data.Product using (_×_; _,_; proj₁; proj₂)
+open import Relation.Binary.PropositionalEquality as ≡ using (refl)
 open import Categories.Category.Construction.Arrow
 open import Categories.Category.Monoidal using (Monoidal)
 open import Categories.Category.Monoidal.Closed using (Closed)
@@ -46,19 +47,32 @@ private
 const-ϕ : (A : Obj) → NaturalTransformation Cod (([ A ,-] ∘F Cod))
 const-ϕ A = record
   { η = λ m y a → y
-  ; commute = λ { {X} {Y} α {z} → Equiv.refl }
-  ; sym-commute = λ { {X} {Y} α {z} → Equiv.refl }
+  ; commute = λ { {X} {Y} α {z} → ≡.refl }
+  ; sym-commute = λ { {X} {Y} α {z} → ≡.refl }
   }
+
+-- Yoneda: in the Cartesian case, Cod is represented in Arrow S by the terminal arrow ∅ → 1,
+-- so Nat(Cod, [A,-]∘Cod) has exactly one element.
+yoneda-argument : ∀ A → (ϕ ψ : NaturalTransformation Cod (([ A ,-] ∘F Cod))) → ϕ ≃ ψ
+yoneda-argument A ϕ ψ {x} {v} = {!  !}
 
 -- Uniqueness: any such natural transformation equals const-ϕ A.
 unique-ϕ : ∀ A → (ϕ : NaturalTransformation Cod (([ A ,-] ∘F Cod))) → const-ϕ A ≃ ϕ
-unique-ϕ A ϕ = Equiv.refl
+unique-ϕ A ϕ = yoneda-argument A (const-ϕ A) ϕ
 
 -- The left adjoint L : Arrow S → 𝕋MRS.
 L : Functor Arr.Arrow 𝕋MRS
 L = record
-  { F₀ = λ x → let module x = Arr.Morphism x in (x.dom , x.cod) ∣ {!  !}
-  ; F₁ = {!  !}
+  { F₀ = λ x → 
+    let module x = Arr.Morphism x 
+    in (x.dom , x.cod) ∣ ⟪ x.arr , const-ϕ (x.dom) ⟫
+  ; F₁ = λ { {u} {v} f → 
+    let module f = Arr.Morphism⇒ f
+        module u = Arr.Morphism u
+        module v = Arr.Morphism v
+        eq₂-lemma : ∀ {A B} (u : A ⇒ B) → (nHom id ∘ʳ Cod) ∘ᵥ const-ϕ A ≃ (nHom u ∘ʳ Cod) ∘ᵥ const-ϕ B
+        eq₂-lemma u = {!!}
+    in f.dom⇒ , f.cod⇒ ∥ (f.square , eq₂-lemma f.dom⇒)}
   ; identity = {!  !}
   ; homomorphism = {!  !}
   ; F-resp-≈ = {!  !}
