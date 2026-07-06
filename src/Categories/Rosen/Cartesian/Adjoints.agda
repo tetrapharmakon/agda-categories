@@ -57,14 +57,13 @@ const-ϕ A = record
 -- Yoneda: in the Cartesian case, Cod is represented in Arrow S by the terminal arrow ∅ → 1,
 -- so Nat(Cod, [A,-]∘Cod) has exactly one element.
 yoneda-argument : ∀ A → (ϕ ψ : NaturalTransformation Cod (([ A ,-] ∘F Cod))) → ϕ ≃ ψ
-yoneda-argument A ϕ ψ {X} =
-  extensionality λ z →
-    let α : Arr.Morphism⇒ ⊤-arr X
-        α = record { dom⇒ = λ { (lift ()) } ; cod⇒ = λ _ → z ; square = λ { {lift ()} → refl } }
-    in extensionality {f = NaturalTransformation.η ϕ X z} {g = NaturalTransformation.η ψ X z} λ a →
-      ≡.trans
-        (≡.cong (λ f → f a) (NaturalTransformation.commute ϕ α {x = lift tt}))
-        (≡.sym (≡.cong (λ f → f a) (NaturalTransformation.commute ψ α {x = lift tt})))
+yoneda-argument A ϕ ψ {X} {z} =
+  let α : Arr.Morphism⇒ ⊤-arr X
+      α = record { dom⇒ = λ { (lift ()) } ; cod⇒ = λ _ → z ; square = λ { {lift ()} } }
+  in extensionality {f = NaturalTransformation.η ϕ X z} {g = NaturalTransformation.η ψ X z} λ a →
+    ≡.trans
+      (≡.cong (λ f → f a) (NaturalTransformation.commute ϕ α {x = lift tt}))
+      (≡.sym (≡.cong (λ f → f a) (NaturalTransformation.commute ψ α {x = lift tt})))
   where
     ⊤-arr : Arr.Morphism
     ⊤-arr = record { dom = Lift o ⊥ ; cod = Lift o ⊤ ; arr = λ { (lift ()) } }
@@ -94,7 +93,7 @@ L = record
       { l = u
       ; r = v
       ; eq = square 
-           , yoneda-argument A ((nHom id ∘ʳ Cod) ∘ᵥ const-ϕ A) ((nHom u ∘ʳ Cod) ∘ᵥ const-ϕ B)
+           , yoneda-argument A ((nHom id ∘ʳ Cod) ∘ᵥ const-ϕ A) ((nHom u ∘ʳ Cod) ∘ᵥ const-ϕ B) {_} {_}
       } }
   ; identity = λ { {A} → refl , refl }
   ; homomorphism = λ { {X} {Y} {Z} {f} {g} → refl , refl }
