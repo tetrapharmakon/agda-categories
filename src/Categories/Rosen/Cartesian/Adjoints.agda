@@ -15,7 +15,7 @@ open import Categories.Category.Construction.Arrow
 open import Categories.Category.Monoidal using (Monoidal)
 open import Categories.Category.Monoidal.Closed using (Closed)
 open import Categories.Functor using (Functor; _∘F_)
-open import Categories.NaturalTransformation using (NaturalTransformation; _∘ᵥ_; _∘ʳ_)
+open import Categories.NaturalTransformation using (NaturalTransformation; _∘ᵥ_; _∘ʳ_;ntHelper)
 open import Categories.NaturalTransformation.Equivalence using (_≃_)
 open import Categories.Adjoint using (_⊣_)
 
@@ -38,7 +38,7 @@ open HomReasoning
 open Closed Cl using ([-,-]; [_,_]₀; [_,-]; [-,_]; [_,_]₁)
 
 open import Categories.Rosen.Core Cl
-open import Categories.Rosen.Tabulator Cl using (𝕋MRS)
+open import Categories.Rosen.Tabulator Cl using (𝕋MRS; V₁)
 open import Categories.Rosen.ProElements Cl {F = MRS-Profunctor} using (ElMRS)
 
 open import Categories.Functor.Profunctor.Tabulator
@@ -50,20 +50,21 @@ private
 const-ϕ : (A : Obj) → NaturalTransformation Cod (([ A ,-] ∘F Cod))
 const-ϕ A = record
   { η = λ m y a → y
-  ; commute = λ { {X} {Y} α {z} → ≡.refl }
-  ; sym-commute = λ { {X} {Y} α {z} → ≡.refl }
+  ; commute = λ { _ → ≡.refl }
+  ; sym-commute = λ { _ → ≡.refl }
   }
 
 -- Yoneda: in the Cartesian case, Cod is represented in Arrow S by the terminal arrow ∅ → 1,
 -- so Nat(Cod, [A,-]∘Cod) has exactly one element.
 yoneda-argument : ∀ A → (ϕ ψ : NaturalTransformation Cod (([ A ,-] ∘F Cod))) → ϕ ≃ ψ
-yoneda-argument A ϕ ψ {X} {z} =
-  let α : Arr.Morphism⇒ ⊤-arr X
-      α = record { dom⇒ = λ { (lift ()) } ; cod⇒ = λ _ → z ; square = λ { {lift ()} } }
-  in extensionality {f = NaturalTransformation.η ϕ X z} {g = NaturalTransformation.η ψ X z} λ a →
-    ≡.trans
-      (≡.cong (λ f → f a) (NaturalTransformation.commute ϕ α {x = lift tt}))
-      (≡.sym (≡.cong (λ f → f a) (NaturalTransformation.commute ψ α {x = lift tt})))
+yoneda-argument A ϕ ψ {X} =
+  extensionality λ z →
+    let α : Arr.Morphism⇒ ⊤-arr X
+        α = record { dom⇒ = λ { (lift ()) } ; cod⇒ = λ _ → z ; square = λ { {lift ()} → refl } }
+    in extensionality {f = NaturalTransformation.η ϕ X z} {g = NaturalTransformation.η ψ X z} λ a →
+      ≡.trans
+        (≡.cong (λ f → f a) (NaturalTransformation.commute ϕ α {x = lift tt}))
+        (≡.sym (≡.cong (λ f → f a) (NaturalTransformation.commute ψ α {x = lift tt})))
   where
     ⊤-arr : Arr.Morphism
     ⊤-arr = record { dom = Lift o ⊥ ; cod = Lift o ⊤ ; arr = λ { (lift ()) } }
@@ -93,7 +94,7 @@ L = record
       { l = u
       ; r = v
       ; eq = square 
-           , yoneda-argument A ((nHom id ∘ʳ Cod) ∘ᵥ const-ϕ A) ((nHom u ∘ʳ Cod) ∘ᵥ const-ϕ B) {_} {_}
+           , yoneda-argument A ((nHom id ∘ʳ Cod) ∘ᵥ const-ϕ A) ((nHom u ∘ʳ Cod) ∘ᵥ const-ϕ B)
       } }
   ; identity = λ { {A} → refl , refl }
   ; homomorphism = λ { {X} {Y} {Z} {f} {g} → refl , refl }
@@ -101,16 +102,55 @@ L = record
   }
 
 
-open import Categories.Category.Construction.TwistedArrow S
+open import Categories.Category.Construction.TwistedArrow S renaming (Morphism to tMorphism; Morphism⇒ to tMorphism⇒)
 
 TwSet = TwistedArrow
 -- the other functor exists from the twisted arrow category 
 L' : Functor TwSet ElMRS
 L' = record
-  { F₀ = {!  !}
-  ; F₁ = {!  !}
-  ; identity = {!  !}
-  ; homomorphism = {!  !}
-  ; F-resp-≈ = {!  !}
+  { F₀ = λ x → 
+    let module x = tMorphism x 
+    in record { A = x.dom ; B = x.cod ; el = ⟪ x.arr , const-ϕ x.dom ⟫ }
+  ; F₁ = λ { {m} {n} α@(record { dom⇐ = u ; cod⇒ = v ; square = square }) →
+    let A = tMorphism.dom m -- m : A ⇒ X
+        B = tMorphism.dom n -- n : B ⇒ Y
+        -- square : ...
+        X = tMorphism.cod m
+        Y = tMorphism.cod n
+        module m = tMorphism m
+        module n = tMorphism n
+        module p = Functor MRS-Profunctor
+        pAY = p.F₀ (A , Y)
+        open SetoidR pAY
+    in record { l = u ; r = v ; eqElts = square , (λ {x} {x = x₁} → refl) } }
+  ; identity = λ {A} → (λ {x} → refl) , (λ {x} → refl)
+  ; homomorphism = λ {X} {Y} {Z} {f} {g} → (λ {x} → refl) , (λ {x} → refl)
+  ; F-resp-≈ = λ {A} {B} {f} {g} z → z
   }
   
+L⊣V₁ : L ⊣ V₁
+L⊣V₁ = record 
+  { unit = ntHelper 
+    (record 
+      { η = λ X → mor⇒ {dom⇒ = λ z → z} {cod⇒ = λ z → z} λ {x} → refl 
+      ; commute = λ f → (λ {x} → refl) , (λ {x} → refl) 
+      }) 
+  ; counit = ntHelper 
+    (record 
+      { η = λ X → let module X = tab₀ X in (λ z → z) , (λ z → z) ∥ {!  !} 
+      ; commute = {!  !} 
+      }) 
+  ; zig = refl 
+        , refl 
+  ; zag = refl 
+        , refl 
+  }
+
+{-
+L(V₁ (f , Phi)) = 
+Lf = 
+A --f--> B --const--> [A,B] --->
+||
+||
+A --f-> B --phi----> [A,B] --->
+-}
