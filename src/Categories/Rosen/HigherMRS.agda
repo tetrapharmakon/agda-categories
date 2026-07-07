@@ -11,6 +11,12 @@ open import Categories.Category.Monoidal.Closed using (Closed)
 
 module Categories.Rosen.HigherMRS {o ℓ e} {C : Category o ℓ e} {M : Monoidal C} (Cl : Closed M) where
 
+-- Higher-order (M,R)-systems following a Fibonacci-style construction:
+-- each step A → B → [A,B] → [B,[A,B]] → ... embeds the two previous
+-- levels into an internal hom.  Built as iterated IsoCommas of ℝ and Vᵢ.
+-- Exports: MRS3, 𝕄ℝ𝕊, 𝕄ℝ𝕊ₒ, 𝕄ℝ𝕊ₐ, Π-MRS, pℕ, 𝕄ℝ𝕊-down, lemma,
+--          MRS-chain, MRS∞, MRS∞-proj, MRS∞-commute.
+
 private
   module 𝒞 = Category C
 
@@ -27,6 +33,7 @@ open import Categories.Rosen.Core Cl
 open import Categories.Rosen.ProElements Cl {F = MRS-Profunctor}
 open import Categories.Rosen.Tabulator Cl using (V₁; 𝕋MRS)
 
+-- MRS3: the 3rd level, IsoComma of ℝ (from ProElements) and V₁ (from Tabulator).
 MRS3 : Category (o ⊔ ℓ ⊔ e) (o ⊔ ℓ ⊔ e) e
 MRS3 = IsoComma ℝ V₁
 
@@ -38,9 +45,11 @@ open import Categories.Category.Construction.Thin 0ℓ ≤-poset
 open import Categories.Functor using (_∘F_) renaming (id to idF)
 open import Categories.NaturalTransformation.NaturalIsomorphism using (NaturalIsomorphism;niHelper)
 
+-- 𝕄ℝ𝕊 n: the n-th level category together with a functor to Arr.Arrow.
 𝕄ℝ𝕊 : (n : ℕ) → Σ (Category (o ⊔ ℓ ⊔ e) (o ⊔ ℓ ⊔ e) e) (λ x → Functor x Arr.Arrow)
 𝕄ℝ𝕊 zero = MRS3 , V₂
   where 
+    -- Base level: functor V₂ from MRS3 to Arr.Arrow.
     V₂ : Functor MRS3 Arr.Arrow 
     V₂ = record
       { F₀ = λ x → 
@@ -77,18 +86,23 @@ open import Categories.NaturalTransformation.NaturalIsomorphism using (NaturalIs
       ; F-resp-≈ = λ f≈g → Vₙ.F-resp-≈ (proj₂ f≈g)
       }
 
+-- 𝕄ℝ𝕊ₒ n: the n-th level category.
 𝕄ℝ𝕊ₒ : (n : ℕ) → Category (o ⊔ ℓ ⊔ e) (o ⊔ ℓ ⊔ e) e
 𝕄ℝ𝕊ₒ n = proj₁ (𝕄ℝ𝕊 n)
 
-𝕄ℝ𝕊ₐ : (n : ℕ) → _
+-- 𝕄ℝ𝕊ₐ n: the functor from the n-th level to Arr.Arrow.
+𝕄ℝ𝕊ₐ : (n : ℕ) → Functor (𝕄ℝ𝕊ₒ n) Arr.Arrow
 𝕄ℝ𝕊ₐ n = proj₂ (𝕄ℝ𝕊 n)
 
+-- Π-MRS n: projection from level (suc n) down to level n.
 Π-MRS : (n : ℕ) → Functor (𝕄ℝ𝕊ₒ (suc n)) (𝕄ℝ𝕊ₒ n)
 Π-MRS n = ICproj₂
 
+-- ℕ as a poset category.
 pℕ : Category 0ℓ 0ℓ 0ℓ
 pℕ = Thin
 
+-- 𝕄ℝ𝕊-down: functor from level n down to level m when m ≤ n.
 𝕄ℝ𝕊-down : ∀ {n m} → m ≤ n → Functor (𝕄ℝ𝕊ₒ n) (𝕄ℝ𝕊ₒ m)
 𝕄ℝ𝕊-down {n} z≤n = reduce n
   where
@@ -114,6 +128,7 @@ pℕ = Thin
       ; F-resp-≈ = λ eq → ((eq .proj₁ .proj₁) , (eq .proj₁ .proj₂)) , F-down.F-resp-≈ (proj₂ eq)
       }
 
+-- lemma: 𝕄ℝ𝕊-down at level n is naturally ≃ to the identity. (WIP: has holes)
 lemma : ∀ {n : ℕ} → NaturalIsomorphism (𝕄ℝ𝕊-down {n} {n} ≤-refl) (idF {C = 𝕄ℝ𝕊ₒ n})
 lemma {zero} = niHelper (record 
   { η = λ X → {! id  !} 
@@ -128,6 +143,7 @@ lemma {suc n} = niHelper (record
   ; iso = {!  !} 
   })
   
+-- MRS-chain: the chain ... → 𝕄ℝ𝕊ₒ 2 → 𝕄ℝ𝕊ₒ 1 → 𝕄ℝ𝕊ₒ 0 as ℕ^op → Cats. (WIP: has holes)
 MRS-chain : Functor (Category.op pℕ) (Cats (o ⊔ ℓ ⊔ e) (o ⊔ ℓ ⊔ e) e)
 MRS-chain = record
   { F₀ = 𝕄ℝ𝕊ₒ
@@ -157,6 +173,10 @@ MRS-chain = record
 
 open import Categories.Diagram.Limit MRS-chain renaming (Limit to MRS-Limit)
 
+-- Limit of MRS-chain.
+-- MRS∞: the limit object (the "∞-level" MRS category).
 MRS∞ = MRS-Limit.apex
+-- MRS∞-proj: projection functors MRS∞ → 𝕄ℝ𝕊ₒ n.
 MRS∞-proj = MRS-Limit.proj
+-- MRS∞-commute: universal property of the limit.
 MRS∞-commute = MRS-Limit.limit-commute

@@ -28,21 +28,8 @@ open MR
 open import Categories.Rosen.Core Cl
 open import Categories.Functor.Profunctor.Tabulator
 
-{-
-The category of elements of the presheaf
-
-Cᵒᵖ → Set
-
-sending A to Nat( Cod , [ A , Cod ] )
-
-a typical object of such a category is a pair (A, ϕ) and arrows are
-
-u : A ⇒ A' such that 
-
-[u,1] ∘ ψ ≈ ϕ where
-
-[u,1] ∘ ψ : c ⇒ [A',c] ⇒ [A,c]
--}
+-- The total category of the MRS-profunctor tabulator.
+-- Equivalent to the tabulator of MRS-Profunctor (see Tabulator.agda).
 
 record tot⇒ (x y : tab₀ MRS-Profunctor) : Set (o ⊔ ℓ ⊔ e) where
   constructor [_,_∥_,_]
@@ -61,15 +48,9 @@ record tot⇒ (x y : tab₀ MRS-Profunctor) : Set (o ⊔ ℓ ⊔ e) where
   
   field
     eqf : r ∘ f ≈ g ∘ l
-    -- TODO: this condition supersedes eqϕ, which is just `nat {id}`; 
-    -- ϕ.η t ∘ r ≈ [ A , r ] ∘ ϕ.η t
-    -- is the naturality square of ϕ
     nat : ∀ {s t} (α : Arr.Morphism⇒ s t)
         → l*ψ.η t ∘ Arr.Morphism⇒.cod⇒ α
         ≈ Functor.F₁ [ x.L ,-] (Arr.Morphism⇒.cod⇒ α) ∘ ϕ.η s
-    -- it's not a one-shot job because it requires to change the def of the `total` category
-    -- and after all one can incorporate nat into a theorem in tabulator and get rid of this `total` category
-    -- given their equivalence
   
   eqϕ : ∀ {t} → l*ψ.η t ≈ ϕ.η t
   eqϕ {t} =

@@ -15,13 +15,16 @@ open import Categories.Functor.Hom using (Hom[_][-,-])
 
 module Categories.Rosen.Tabulator {o ℓ e} {C : Category o ℓ e} {M : Monoidal C} (Cl : Closed M) where
 
+-- Tabulator of MRS-Profunctor: a canonical category 𝕋MRS attached to the
+-- profunctor MRS-Profunctor : C^op × C → Sets, equipped with a universal
+-- 2-cell. This is the heart of the Rosen fibration.
+-- Exports: 𝕋MRS, π, þ, V₁, ϵ.
+
 private
   module 𝒞 = Category C
 
-
 import Reason
 open Reason C
-
 
 import Categories.Morphism.Reasoning as MR
 open HomReasoning 
@@ -32,12 +35,15 @@ open import Categories.Functor.Profunctor.Tabulator
 
 open import Categories.Functor.Construction.LiftSetoids using (LiftSetoids)
 
+-- The tabulator category of MRS-Profunctor.
 𝕋MRS = Tabulator MRS-Profunctor
 
+-- Left projection 𝕋MRS → C.
 π  = projection {p = MRS-Profunctor}
+-- The universal terminal 2-cell of the tabulator.
 þ  = cell {p = MRS-Profunctor}
 
--- gives f
+-- V₁: extracts the "f" component (the morphism) from each MR2 object.
 V₁ : Functor 𝕋MRS Arr.Arrow
 V₁ = record
   { F₀ = λ { ((A , B) ∣ ξ) → record { arr = MR2.f ξ } }
@@ -56,6 +62,7 @@ V₁ = record
 
 
 
+-- ϵ: natural transformation from MRS-Profunctor to the lifted hom functor.
 ϵ  : NaturalTransformation MRS-Profunctor (LiftSetoids (o ⊔ e) (o ⊔ ℓ) ∘F Hom[ C ][-,-])
 ϵ = ntHelper record 
   { η = λ { (A , B) → record 

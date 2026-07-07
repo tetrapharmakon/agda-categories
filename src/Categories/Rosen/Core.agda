@@ -18,6 +18,9 @@ open import Categories.NaturalTransformation.Equivalence using (_≃_)
 
 module Categories.Rosen.Core {o ℓ e} {C : Category o ℓ e} {M : Monoidal C} (Cl : Closed M) where
 
+-- Core definitions for the category of (M,R)-systems.
+-- Exports: Cod, nHom, nHom-identity, MR2, MR2-Setoid, MRS-Profunctor.
+
 private
   module 𝒞 = Category C
 
@@ -38,6 +41,21 @@ Cod = record
   ; F-resp-≈     = λ eq → proj₂ eq
   }
 
+-- nHom sends f : A ⇒ B to the induced natural transformation [-,f] : [B,-] ⇒ [A,-].
+nHom : ∀ {A B} → A ⇒ B → NaturalTransformation ([_,-] B) ([_,-] A)
+nHom {A} {B} f = record
+  { η = λ X → [ f , id ]₁
+  ; commute = λ h → Equiv.sym [ [-,-] ]-commute
+  ; sym-commute = λ h → [ [-,-] ]-commute
+  }
+
+open import Categories.NaturalTransformation renaming (id to idN)
+
+-- nHom-identity: nHom respects identity.
+nHom-identity : ∀ {A} → nHom (id {A}) ≃ idN
+nHom-identity = [-,-].identity
+
+-- definition of an (M,R)-system according to Rosen
 record MR2 (A B : Obj) : Set (o ⊔ ℓ ⊔ e) where
   eta-equality
   constructor ⟪_,_⟫
@@ -49,6 +67,8 @@ record MR2 (A B : Obj) : Set (o ⊔ ℓ ⊔ e) where
   ϕη₀ = ϕη (record { arr = f })
   ϕcommute = λ {X Y : Category.Obj Arr.Arrow} t → NaturalTransformation.commute ϕ {X} {Y} t
 
+-- MR2 as a Setoid: two MR2 elements are equal when their f components are equal
+-- and their ϕ components are ≃-equal.
 MR2-Setoid : Obj → Obj → Setoid (o ⊔ ℓ ⊔ e) (o ⊔ ℓ ⊔ e)
 MR2-Setoid A B = record
   { Carrier = MR2 A B
@@ -59,18 +79,6 @@ MR2-Setoid A B = record
     ; trans = λ (pf₁ , h) (pf₂ , k) → Equiv.trans pf₁ pf₂ , Equiv.trans h k
     }
   }
-
-nHom : ∀ {A B} → A ⇒ B → NaturalTransformation ([_,-] B) ([_,-] A)
-nHom {A} {B} f = record
-  { η = λ X → [ f , id ]₁
-  ; commute = λ h → Equiv.sym [ [-,-] ]-commute
-  ; sym-commute = λ h → [ [-,-] ]-commute
-  }
-
-open import Categories.NaturalTransformation renaming (id to idN)
-
-nHom-identity : ∀ {A} → nHom (id {A}) ≃ idN
-nHom-identity = [-,-].identity
 
 import Categories.Morphism.Reasoning as MR
 
