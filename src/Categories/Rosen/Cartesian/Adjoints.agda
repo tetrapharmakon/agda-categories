@@ -157,15 +157,6 @@ L⊣V₁ = record
         , refl 
   }
 
-{-
-L(V₁ (f , Phi)) = 
-Lf = 
-A --f--> B --const--> [A,B] --->
-||
-||
-A --f-> B --phi----> [A,B] --->
--}
-
 L'⊣U₁ : L' ⊣ U₁
 L'⊣U₁ = record 
   { unit = ntHelper (record 
