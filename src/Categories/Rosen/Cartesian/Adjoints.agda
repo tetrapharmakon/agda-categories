@@ -179,11 +179,7 @@ L'⊣U₁ = record
       ; r = id 
       ; eqElts = refl ,
           let module X = Elts₀ X in
-          {!  !}
-            --  yoneda-argument X.A
-            --    ((nHom (id {X.A}) ∘ʳ Cod) ∘ᵥ const-ϕ X.A)
-            --    (MR2.ϕ X.el)
-            --    {x} {z})
+          yoneda-argument X.A ((nHom (id {X.A}) ∘ʳ Cod) ∘ᵥ const-ϕ X.A) (MR2.ϕ X.el)
       } 
     ; commute = λ _ → refl 
               , (λ {x} → refl) 
