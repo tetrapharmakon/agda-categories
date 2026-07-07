@@ -93,7 +93,11 @@ L = record
       { l = u
       ; r = v
       ; eq = square 
-           , yoneda-argument A ((nHom id ∘ʳ Cod) ∘ᵥ const-ϕ A) ((nHom u ∘ʳ Cod) ∘ᵥ const-ϕ B) {_} {_}
+           , (λ {x} {z} →
+               yoneda-argument A
+                 ((nHom (id {A}) ∘ʳ Cod) ∘ᵥ const-ϕ A)
+                 ((nHom u ∘ʳ Cod) ∘ᵥ const-ϕ B)
+                 {x} {z})
       } }
   ; identity = λ { {A} → refl , refl }
   ; homomorphism = λ { {X} {Y} {Z} {f} {g} → refl , refl }
@@ -135,8 +139,17 @@ L⊣V₁ = record
       }) 
   ; counit = ntHelper 
     (record 
-      { η = λ { ((A , B) ∣ ξ) → let ϕ = MR2.ϕ ξ in (λ z → z) , (λ z → z) ∥ {!  !} }
-      ; commute = {!  !} 
+      { η = λ { ((A , B) ∣ ξ) →
+          let ϕ = MR2.ϕ ξ in
+          (λ z → z) , (λ z → z) ∥
+            ( refl
+            , (λ {x} {z} →
+                yoneda-argument A
+                  ((nHom (id {A}) ∘ʳ Cod) ∘ᵥ const-ϕ A)
+                  ((nHom (id {A}) ∘ʳ Cod) ∘ᵥ ϕ)
+                  {x} {z})
+            ) }
+      ; commute = λ _ → (λ {x} → refl) , (λ {x} → refl)
       }) 
   ; zig = refl 
         , refl 
@@ -163,7 +176,13 @@ L'⊣U₁ = record
     { η = λ X → record 
       { l = id 
       ; r = id 
-      ; eqElts = refl , {!  !} 
+      ; eqElts = refl ,
+          let module X = Elts₀ X in
+          {!  !}
+            --  yoneda-argument X.A
+            --    ((nHom (id {X.A}) ∘ʳ Cod) ∘ᵥ const-ϕ X.A)
+            --    (MR2.ϕ X.el)
+            --    {x} {z})
       } 
     ; commute = λ _ → refl 
               , (λ {x} → refl) 
