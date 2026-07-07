@@ -6,6 +6,7 @@ open import Categories.Category using (Category)
 open import Categories.Category.Construction.Arrow
 open import Categories.Category.Monoidal using (Monoidal)
 open import Categories.Category.Monoidal.Closed using (Closed)
+-- this module has to assume that the ambient category is *symmetric* monoidal; the definition of the endofunctor is agnostic about preservation of coproducts by ⊗ ... 
 open import Categories.Category.Monoidal.Symmetric using (Symmetric)
 open import Categories.Functor using (Functor; _∘F_)
 
@@ -34,6 +35,7 @@ open MR C
 
 open Monoidal M using (_⊗-;unit;_⊗₀_;_⊗₁_)
 open BinaryCoproducts BC
+open Symmetric S
 open import Categories.Rosen.Incoherent.Core Cl
 open import Categories.Rosen.Incoherent.Fibred Cl using (iMR2ᴿ;iMR2ᴿ₀;iMR2ᴿ⇒)
 open import Categories.Rosen.FibreA Cl using (totalAtA;_∣_)
@@ -67,30 +69,26 @@ to {A} = record
         -- module ϕ* = iMR2.ϕ x.ξ
     in record 
     { A = x.B ; α = [ iMR2.f x.ξ , Closed.adjoint.Radjunct Cl (iMR2.ϕ x.ξ) ∘ Symmetric.braided-iso.from S ] }
-  ; F₁ = {!  !}
-  ; identity = {!  !}
-  ; homomorphism = {!  !}
-  ; F-resp-≈ = {!  !}
+  ; F₁ = λ f → 
+    let module f = iMR2ᴿ⇒ f 
+    in record { f = f.v ; commutes = {!  !} }
+    -- commutes is the only part that is not trivial to implement; it requires a lot of yoga with mates and the braiding of C...
+  ; identity = Equiv.refl
+  ; homomorphism = Equiv.refl
+  ; F-resp-≈ = λ x → x
   }
   
 -- WIP: the converse, from, and equivalence AlgA≣MRS^A are not yet implemented.
-{-  record
-  { F₀ = λ {(B ∣ ξ) → record { A = B ; α = [ MR2.f ξ , {!   !} ] ∘ {! Functor.F₁ (-+ (A ⊗₀ B)) ∘ ?  !} }}
-  ; F₁ = {!   !}
-  ; identity = {!   !}
-  ; homomorphism = {!   !}
-  ; F-resp-≈ = {!   !}
-  }
-
 from : {A : Obj} → Functor (F-Algebra-Category {A}) (totalAtA A) 
 from = record
-  { F₀ = {!   !}
+  { F₀ = λ x → {!  !}
   ; F₁ = {!   !}
   ; identity = {!   !}
   ; homomorphism = {!   !}
   ; F-resp-≈ = {!   !}
   }
 
+{-  
 
 
 AlgA≣MRS^A : {A : Obj} → StrongEquivalence (totalAtA A) (F-Algebra-Category {A})
