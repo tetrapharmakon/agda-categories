@@ -1,4 +1,4 @@
-{-# OPTIONS --without-K --safe --warning=noUserWarning --warning=noUselessPrivate #-}
+{-# OPTIONS --without-K --allow-unsolved-metas --warning=noUserWarning --warning=noUselessPrivate #-}
 
 open import Level using (_⊔_)
 
@@ -163,4 +163,17 @@ ElMRS = MRS.Elts
   ; identity = Equiv.refl , [-,-].identity
   ; homomorphism = Equiv.refl , [-,-].homomorphism
   ; F-resp-≈ = λ (f≈gL , f≈gR) → f≈gR , ([-,-].F-resp-≈ (f≈gL , f≈gR))
+  }
+
+open import Categories.Category.Construction.TwistedArrow C renaming (Morphism to tMorphism; Morphism⇒ to tMorphism⇒)
+
+U₁ : Functor ElMRS TwistedArrow
+U₁ = record
+  { F₀ = λ {record { A = A ; B = B ; el = el } → 
+   record { arr = MR2.f el }}
+  ; F₁ = λ {record { l = l ; r = r ; eqElts = eqElts } → mor⇒ {dom⇐ = l} {cod⇒ = r} (proj₁ eqElts) }
+  ; identity = let open HomReasoning in 
+    (sym identityˡ ○ identityʳ) , refl
+  ; homomorphism = refl , refl
+  ; F-resp-≈ = λ {A} {B} {f} {g} z → z
   }

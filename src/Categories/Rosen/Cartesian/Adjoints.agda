@@ -39,7 +39,7 @@ open Closed Cl using ([-,-]; [_,_]₀; [_,-]; [-,_]; [_,_]₁)
 
 open import Categories.Rosen.Core Cl
 open import Categories.Rosen.Tabulator Cl using (𝕋MRS; V₁)
-open import Categories.Rosen.ProElements Cl {F = MRS-Profunctor} using (ElMRS)
+open import Categories.Rosen.ProElements Cl {F = MRS-Profunctor} using (ElMRS;Elts₀;Elts⇒;U₁)
 
 open import Categories.Functor.Profunctor.Tabulator
 
@@ -100,7 +100,6 @@ L = record
   ; F-resp-≈ = λ { {A} {B} {f} {g} (u≈u′ , v≈v′) → u≈u′ , v≈v′ }
   }
 
-
 open import Categories.Category.Construction.TwistedArrow S renaming (Morphism to tMorphism; Morphism⇒ to tMorphism⇒)
 
 TwSet = TwistedArrow
@@ -136,7 +135,7 @@ L⊣V₁ = record
       }) 
   ; counit = ntHelper 
     (record 
-      { η = λ X → let module X = tab₀ X in (λ z → z) , (λ z → z) ∥ {!  !} 
+      { η = λ { ((A , B) ∣ ξ) → let ϕ = MR2.ϕ ξ in (λ z → z) , (λ z → z) ∥ {!  !} }
       ; commute = {!  !} 
       }) 
   ; zig = refl 
@@ -153,3 +152,22 @@ A --f--> B --const--> [A,B] --->
 ||
 A --f-> B --phi----> [A,B] --->
 -}
+
+L'⊣U₁ : L' ⊣ U₁
+L'⊣U₁ = record 
+  { unit = ntHelper (record 
+    { η = λ X → mor⇒ {dom⇐ = id} {cod⇒ = id} λ {x} → refl 
+    ; commute = λ {X} {Y} f → (λ {x} → refl) , (λ {x} → refl) 
+    }) 
+  ; counit = ntHelper (record 
+    { η = λ X → record 
+      { l = id 
+      ; r = id 
+      ; eqElts = refl , {!  !} 
+      } 
+    ; commute = λ _ → refl 
+              , (λ {x} → refl) 
+    }) 
+  ; zig = refl , refl
+  ; zag = refl , refl
+  }
