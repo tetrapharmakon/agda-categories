@@ -12,7 +12,7 @@ open import Categories.Functor using (Functor; _∘F_)
 open import Categories.Category.Cocartesian using (BinaryCoproducts)
 open import Categories.Category.Construction.F-Algebras using (F-Algebras)
 open import Categories.Category.Equivalence using (StrongEquivalence)
-open import Categories.Adjoint using (Radjunct)
+open import Categories.Adjoint using (Adjoint)
 module Categories.Rosen.Algebras {o ℓ e} {C : Category o ℓ e} (M : Monoidal C) (Cl : Closed M) (S : Symmetric M) (BC : BinaryCoproducts C) where
 
 private
@@ -56,7 +56,7 @@ to {A} = record
     let module x = iMR2ᴿ₀ x 
         -- module ϕ* = iMR2.ϕ x.ξ
     in record 
-    { A = x.B ; α = [ iMR2.f x.ξ , Closed.adjoint.Radjunct {! iMR2.ϕ x.ξ !} Cl ] }
+    { A = x.B ; α = [ iMR2.f x.ξ , Closed.adjoint.Radjunct Cl (iMR2.ϕ x.ξ) ∘ Symmetric.braided-iso.from S ] }
   ; F₁ = {!  !}
   ; identity = {!  !}
   ; homomorphism = {!  !}

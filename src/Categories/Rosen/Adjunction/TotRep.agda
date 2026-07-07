@@ -26,6 +26,7 @@ open HomReasoning
 open MR
 
 open import Categories.Rosen.Core Cl
+open import Categories.Rosen.Repairs Cl
 open import Categories.Rosen.TotalCategory Cl using (tot⇒; total; [_,_∥_,_])
 open import Categories.Rosen.ProElements Cl {F = MRS-Profunctor}
 
