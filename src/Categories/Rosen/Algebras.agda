@@ -39,7 +39,7 @@ open Symmetric S hiding (_⊗-; unit; _⊗₀_; _⊗₁_) renaming (braided-iso 
 open Closed Cl using (adjoint)
 open import Categories.Rosen.Incoherent.Core Cl
 open import Categories.Rosen.Incoherent.Fibred Cl using (iMR2ᴿ;iMR2ᴿ₀;iMR2ᴿ⇒)
-open import Categories.Rosen.FibreA Cl using (totalAtA;_∣_)
+-- open import Categories.Rosen.FibreA Cl using (totalAtA;_∣_)
 
 private
   -- unit+-: endofunctor X ↦ 𝟙 + X (coproduct with the monoidal unit).
@@ -80,7 +80,7 @@ to {A} = record
   }
   
 -- WIP: the converse, from, and equivalence AlgA≣MRS^A are not yet implemented.
-from : {A : Obj} → Functor (F-Algebra-Category {A}) (totalAtA A) 
+from : {A : Obj} → Functor (F-Algebra-Category {A}) (iMR2ᴿ A) 
 from = record
   { F₀ = λ x → {!  !}
   ; F₁ = {!   !}
@@ -89,14 +89,11 @@ from = record
   ; F-resp-≈ = {!   !}
   }
 
-{-  
 
 
-AlgA≣MRS^A : {A : Obj} → StrongEquivalence (totalAtA A) (F-Algebra-Category {A})
+AlgA≣MRS^A : {A : Obj} → StrongEquivalence (iMR2ᴿ A) (F-Algebra-Category {A})
 AlgA≣MRS^A {A} = record 
-  { F = to 
-  ; G = from 
+  { F = to {A} 
+  ; G = from {A}
   ; weak-inverse = {!   !} 
   }
-
--}
