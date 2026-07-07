@@ -11,8 +11,10 @@ open import Categories.Category.Monoidal.Symmetric using (Symmetric)
 open import Categories.Functor using (Functor; _∘F_)
 
 open import Categories.Category.Cocartesian using (BinaryCoproducts)
+open import Categories.Functor.Algebra using (F-Algebra; F-Algebra-Morphism)
 open import Categories.Category.Construction.F-Algebras using (F-Algebras)
 open import Categories.Category.Equivalence using (StrongEquivalence)
+open import Categories.NaturalTransformation.NaturalIsomorphism using (niHelper)
 open import Categories.Adjoint using (Adjoint)
 module Categories.Rosen.Algebras {o ℓ e} {C : Category o ℓ e} (M : Monoidal C) (Cl : Closed M) (S : Symmetric M) (BC : BinaryCoproducts C) where
 
@@ -82,11 +84,24 @@ to {A} = record
 -- WIP: the converse, from, and equivalence AlgA≣MRS^A are not yet implemented.
 from : {A : Obj} → Functor (F-Algebra-Category {A}) (iMR2ᴿ A) 
 from = record
-  { F₀ = λ x → {!  !}
-  ; F₁ = {!   !}
-  ; identity = {!   !}
-  ; homomorphism = {!   !}
-  ; F-resp-≈ = {!   !}
+  { F₀ = λ x → 
+    let module x = F-Algebra x 
+        α = x.α
+    in record 
+    { B = x.A 
+    ; ξ = ⟪ α ∘ i₁ , adjoint.Ladjunct (α ∘ i₂ ∘ β.from) ⟫  
+    }
+  ; F₁ = λ f → 
+    let module f = F-Algebra-Morphism 
+        f' = f .F-Algebra-Morphism.f 
+    in record 
+      { v = f'
+      ; eqf = pullˡ (f.commutes f) ○ assoc ○ ∘-resp-≈ʳ (Equiv.trans inject₁ identityʳ) 
+      ; eqϕ = {!  !} 
+      }
+  ; identity = Equiv.refl
+  ; homomorphism = Equiv.refl
+  ; F-resp-≈ = λ z → z
   }
 
 
@@ -95,5 +110,31 @@ AlgA≣MRS^A : {A : Obj} → StrongEquivalence (iMR2ᴿ A) (F-Algebra-Category {
 AlgA≣MRS^A {A} = record 
   { F = to {A} 
   ; G = from {A}
-  ; weak-inverse = {!   !} 
+  ; weak-inverse = record 
+    { F∘G≈id = niHelper (record 
+      { η = λ X → record 
+        { f = id 
+        ; commutes = identityˡ ○ introʳ (Functor.identity _⊗[I+_]) ○ {!  !} ⟩∘⟨refl -- Equiv.sym (Functor.identity _⊗[I+_] ○ {!  !}) 
+        } 
+      ; η⁻¹ = λ X → record 
+        { f = id 
+        ; commutes = identityˡ ○ {!  !} 
+        } 
+      ; commute = λ f → Equiv.trans identityˡ (Equiv.sym identityʳ) 
+      ; iso = λ X → record 
+        { isoˡ = identityˡ 
+        ; isoʳ = identityˡ 
+        } 
+      }) 
+    ; G∘F≈id = niHelper (record 
+      { η = λ X → record 
+        { v = id 
+        ; eqf = identityˡ ○ inject₁ 
+        ; eqϕ = {!  !} -- (elimˡ (Functor.identity _⊗[I+_]) ○ {!  !}) ○ Equiv.sym identityʳ 
+        } 
+      ; η⁻¹ = {!  !} 
+      ; commute = {!  !} 
+      ; iso = {!  !} 
+      }) 
+    } 
   }
