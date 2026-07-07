@@ -17,6 +17,9 @@ open import Categories.Functor.Bifunctor.Properties using ([_]-commute)
 
 module Categories.Rosen.Incoherent.Displayed {o ℓ e} {C : Category o ℓ e} {M : Monoidal C} (Cl : Closed M) where
 
+-- Displayed incoherent (M,R)-systems: the fibre over a fixed codomain B.
+-- Reindexing along v : B ⇒ B' is *pro*functorial in B (hence a displayed category).
+
 private
   module 𝒞 = Category C
 
@@ -34,11 +37,13 @@ module Arr = Categories.Category.Construction.Arrow C
 
 open import Categories.Rosen.Incoherent.Core Cl
 
+-- iMR2ᴸ₀: object of the left-fibre over B: a domain A plus an iMR2 A B.
 record iMR2ᴸ₀ (B : Obj) : Set (o ⊔ ℓ ⊔ e) where
   field
     A : Obj
     ξ : iMR2 A B 
 
+-- iMR2ᴸ⇒: morphisms in the left-fibre over B: u : X.A ⇒ Y.A compatible with f and ϕ.
 record iMR2ᴸ⇒ {B : Obj} (X Y : iMR2ᴸ₀ B) : Set (o ⊔ ℓ ⊔ e) where
   module X = iMR2ᴸ₀ X
   module Y = iMR2ᴸ₀ Y   
@@ -49,6 +54,7 @@ record iMR2ᴸ⇒ {B : Obj} (X Y : iMR2ᴸ₀ B) : Set (o ⊔ ℓ ⊔ e) where
     eqf : ξX.f ≈ ξY.f ∘ u
     eqϕ : ξX.ϕ ≈ [ u , id ]₁ ∘ ξY.ϕ
 
+-- iMR2ᴸ B: the left-fibre category over B (fibre over the codomain).
 iMR2ᴸ : (B : Obj) → Category (o ⊔ ℓ ⊔ e) (o ⊔ ℓ ⊔ e) e
 iMR2ᴸ B = record
   { Obj = iMR2ᴸ₀ B
@@ -88,6 +94,8 @@ private
  variable
   A A' B B' : Obj
 
+-- MRSdisplay v: bifunctor (iMR2ᴸ B)^op × iMR2ᴸ B' → Setoids,
+-- capturing the *pro*functorial structure in the codomain parameter.
 MRSdisplay : (v : B ⇒ B') → Bifunctor (Category.op (iMR2ᴸ B)) (iMR2ᴸ B') (Setoids (ℓ ⊔ e) e)
 MRSdisplay v = record
   { F₀ = λ {(x , y) → 

@@ -14,6 +14,9 @@ open import Categories.Functor.Bifunctor.Properties using ([_]-commute)
 
 module Categories.Rosen.Incoherent.Core {o ℓ e} {C : Category o ℓ e} {M : Monoidal C} (Cl : Closed M) where
 
+-- Incoherent (M,R)-systems: a simple diagram A —f→ B —ϕ→ [A,B]
+-- without the natural transformation condition of full MR2.
+
 private
   module 𝒞 = Category C
 
@@ -29,17 +32,20 @@ open Closed Cl using ([-,-]; [_,_]₀; [_,_]₁)
 
 module Arr = Categories.Category.Construction.Arrow C
 
+-- iMR2: an incoherent (M,R)-system: a pair (f, ϕ).
 record iMR2 (A B : Obj) : Set (o ⊔ ℓ) where
   constructor ⟪_,_⟫
   field
     f : A ⇒ B
     ϕ : B ⇒ [ A , B ]₀
 
+-- iMR2₀: an object of the total category (a pair of objects plus an iMR2).
 record iMR2₀ : Set (o ⊔ ℓ) where
   field
     A B : Obj
     ξ : iMR2 A B
 
+-- iMR2⇒: morphisms of the incoherent total category.
 record iMR2⇒ (X Y : iMR2₀) : Set (o ⊔ ℓ ⊔ e) where
   module X = iMR2₀ X
   module Y = iMR2₀ Y
@@ -51,7 +57,7 @@ record iMR2⇒ (X Y : iMR2₀) : Set (o ⊔ ℓ ⊔ e) where
     eqf : r ∘ ξX.f ≈ ξY.f ∘ l
     eqϕ : [ l , id ]₁ ∘ ξY.ϕ ∘ r ≈ [ id , r ]₁ ∘ ξX.ϕ
 
--- total category of incoherent MR systems
+-- τ[iMR2]: total category of incoherent (M,R)-systems.
 τ[iMR2] : Category (o ⊔ ℓ) (o ⊔ ℓ ⊔ e) e 
 τ[iMR2] = record
   { Obj = iMR2₀

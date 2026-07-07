@@ -69,6 +69,47 @@ tabulator of `MRS-Profunctor` (see `Tabulator.agda`).
 - `Eq` / `Eq⁻¹` — inverse functors (identity on objects) establishing the equivalence.
 - `Eq⊣Eq⁻¹` — the adjoint equivalence.
 
+### `Incoherent/Core.agda`
+Incoherent (M,R)-systems: a simpler variant where `ϕ : B ⇒ [A,B]` is just a
+morphism (not a natural transformation).
+- `iMR2` — an incoherent (M,R)-system: `(f : A ⇒ B, ϕ : B ⇒ [A,B])`.
+- `iMR2₀` / `iMR2⇒` — objects and morphisms of the total category.
+- `τ[iMR2]` — total category of incoherent (M,R)-systems.
+
+### `Incoherent/Fibred.agda`
+Fibred incoherent (M,R)-systems: the fibre over a fixed domain A.
+Reindexing along `u : A ⇒ A'` is functorial (contravariant) in A.
+- `iMR2ᴿ₀` / `iMR2ᴿ⇒` — objects and morphisms of the fibre over A.
+- `iMR2ᴿ A` — the fibre category over A.
+- `MRSreindex u` — reindexing functor `iMR2ᴿ A' → iMR2ᴿ A`.
+
+### `Incoherent/Displayed.agda`
+Displayed incoherent (M,R)-systems: the fibre over a fixed codomain B.
+Reindexing along `v : B ⇒ B'` is *pro*functorial in B (hence a displayed category).
+- `iMR2ᴸ₀` / `iMR2ᴸ⇒` — objects and morphisms of the left-fibre over B.
+- `iMR2ᴸ B` — the left-fibre category over B.
+- `MRSdisplay v` — bifunctor `(iMR2ᴸ B)^op × iMR2ᴸ B' → Setoids`.
+
+### `Adjunction/TotRep.agda`
+Import module tying together `Core` and `Repairs` (no new definitions).
+
+### `Cartesian/Sets.agda`
+The category of Sets as a Cartesian closed monoidal category,
+used to instantiate the Rosen constructions concretely.
+
+### `Cartesian/Concrete.agda`
+Generic instance: all Rosen modules instantiated for Sets,
+serving as a type-checking test.
+
+### `Cartesian/Adjoints.agda`
+Instances of the Rosen constructions for the Cartesian (Sets) case.
+In this setting, V₁ and U₁ acquire left adjoints.
+- `const-ϕ` — the unique natural transformation `Cod ⇒ [A,-]∘Cod` in Sets.
+- `yoneda-argument` — `Nat(Cod, [A,-]∘Cod)` is a singleton.
+- `unique-ϕ` — every such ϕ equals `const-ϕ A`.
+- `L` / `L⊣V₁` — left adjoint to V₁.
+- `L'` / `L'⊣U₁` — left adjoint to U₁ (WIP: hole in counit).
+
 ### `ProElements.agda`
 Modified category of elements for a bifunctor `F : C^op × C → Sets`, specialised to `MRS-Profunctor`.
 - `EltsCat` — generic (modified) category-of-elements construction.

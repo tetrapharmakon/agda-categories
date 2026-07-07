@@ -14,6 +14,9 @@ open import Categories.Functor.Bifunctor.Properties using ([_]-commute)
 
 module Categories.Rosen.Incoherent.Fibred {o ℓ e} {C : Category o ℓ e} {M : Monoidal C} (Cl : Closed M) where
 
+-- Fibred incoherent (M,R)-systems: the fibre over a fixed domain A.
+-- Reindexing along u : A ⇒ A' is functorial (contravariant) in A.
+
 private
   module 𝒞 = Category C
 
@@ -33,11 +36,13 @@ open import Categories.Rosen.Incoherent.Core Cl
 
 
 
+-- iMR2ᴿ₀: object of the fibre over A: a codomain B plus an iMR2 A B.
 record iMR2ᴿ₀ (A : Obj) : Set (o ⊔ ℓ ⊔ e) where
   field
     B : Obj
     ξ : iMR2 A B 
 
+-- iMR2ᴿ⇒: morphisms in the fibre over A: v : X.B ⇒ Y.B compatible with f and ϕ.
 record iMR2ᴿ⇒ {A : Obj} (X Y : iMR2ᴿ₀ A) : Set (o ⊔ ℓ ⊔ e) where
   module X = iMR2ᴿ₀ X
   module Y = iMR2ᴿ₀ Y   
@@ -48,6 +53,7 @@ record iMR2ᴿ⇒ {A : Obj} (X Y : iMR2ᴿ₀ A) : Set (o ⊔ ℓ ⊔ e) where
     eqf : v ∘ ξX.f ≈ ξY.f
     eqϕ : [ id , v ]₁ ∘ ξX.ϕ ≈ ξY.ϕ ∘ v
 
+-- iMR2ᴿ A: the fibre category over A of the incoherent MRS profunctor.
 iMR2ᴿ : (A : Obj) → Category (o ⊔ ℓ ⊔ e) (o ⊔ ℓ ⊔ e) e
 iMR2ᴿ A = record
   { Obj = iMR2ᴿ₀ A
@@ -86,6 +92,7 @@ private
  variable
   A A' B B' : Obj
 
+-- MRSreindex u: reindexing functor iMR2ᴿ A' → iMR2ᴿ A along u : A ⇒ A'.
 MRSreindex : (u : A ⇒ A') → Functor (iMR2ᴿ A') (iMR2ᴿ A)
 MRSreindex {A} {A'} u = record
   { F₀ = λ { x → 
