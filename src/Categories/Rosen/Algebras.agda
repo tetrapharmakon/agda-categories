@@ -15,6 +15,11 @@ open import Categories.Category.Equivalence using (StrongEquivalence)
 open import Categories.Adjoint using (Adjoint)
 module Categories.Rosen.Algebras {o ℓ e} {C : Category o ℓ e} (M : Monoidal C) (Cl : Closed M) (S : Symmetric M) (BC : BinaryCoproducts C) where
 
+-- Incoherent (M,R)-systems as endofunctor algebras.
+-- The endofunctor X ↦ A ⊗ (𝟙 + X) (conceptually; implemented via
+-- distributivity as A + (A ⊗ X)) captures a certain class of
+-- (M,R)-systems.  WIP: the equivalence with iMR2ᴿ A is incomplete.
+
 private
   module 𝒞 = Category C
 
@@ -34,6 +39,7 @@ open import Categories.Rosen.Incoherent.Fibred Cl using (iMR2ᴿ;iMR2ᴿ₀;iMR2
 open import Categories.Rosen.FibreA Cl using (totalAtA;_∣_)
 
 private
+  -- unit+-: endofunctor X ↦ 𝟙 + X (coproduct with the monoidal unit).
   unit+- : Functor C C
   unit+- = record
     { F₀ = λ X → unit + X
@@ -43,13 +49,17 @@ private
     ; F-resp-≈ = λ eq → []-cong₂ Equiv.refl (∘-resp-≈ʳ eq)
     }
 
+-- _⊗[I+_] : endofunctor X ↦ A ⊗ (𝟙 + X) on C (conceptually).
+-- The implementation uses distributivity: A ⊗ (𝟙 + X) ≅ A + (A ⊗ X).
 _⊗[I+_] : {A : Obj} → Functor C C
 _⊗[I+_] {A} = A +- ∘F A ⊗- 
 
+-- Category of F-algebras for the endofunctor X ↦ A ⊗ (𝟙 + X).
 F-Algebra-Category : {A : Obj} → Category _ _ _
 F-Algebra-Category {A} = F-Algebras (_⊗[I+_] {A})
 
 
+-- to: comparison functor from iMR2ᴿ A to F-algebras. (WIP: has holes)
 to : {A : Obj} → Functor (iMR2ᴿ A) (F-Algebra-Category {A})
 to {A} = record
   { F₀ = λ x → 
@@ -63,8 +73,8 @@ to {A} = record
   ; F-resp-≈ = {!  !}
   }
   
-{-
-  record
+-- WIP: the converse, from, and equivalence AlgA≣MRS^A are not yet implemented.
+{-  record
   { F₀ = λ {(B ∣ ξ) → record { A = B ; α = [ MR2.f ξ , {!   !} ] ∘ {! Functor.F₁ (-+ (A ⊗₀ B)) ∘ ?  !} }}
   ; F₁ = {!   !}
   ; identity = {!   !}
