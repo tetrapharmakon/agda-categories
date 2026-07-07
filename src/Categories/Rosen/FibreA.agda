@@ -12,6 +12,10 @@ open import Categories.Functor using (Functor)
 open import Categories.NaturalTransformation using (NaturalTransformation)
 module Categories.Rosen.FibreA {o ℓ e} {C : Category o ℓ e} {M : Monoidal C} (Cl : Closed M) where
 
+-- Fibre-at-A: alternative construction for higher (M,R)-systems by
+-- fixing the domain object A, which simplifies the definitions.
+-- Also includes commaNablaV, a weaker comma-object invariant (historical).
+
 private
   module 𝒞 = Category C
 
@@ -26,12 +30,14 @@ open import Categories.Category.Construction.Arrow C using (Morphism; Morphism�
 open import Categories.Rosen.Core Cl
 open import Categories.Rosen.Tabulator Cl using (𝕋MRS; V₁)
 
+-- Objects of the fibre at A: a codomain B plus an element ξ of MRS-Profunctor (A, B).
 record totalAtA₀ (A : Obj) : Set (o ⊔ ℓ ⊔ e) where
   constructor _∣_
   field
     B : Obj
     ξ : S.Carrier (Functor.F₀ MRS-Profunctor (A , B))
 
+-- Morphisms of the fibre at A: a map r : x.B ⇒ y.B compatible with ϕ.
 record totalAtA₁ {A : Obj} (x y : totalAtA₀ A) : Set (o ⊔ ℓ ⊔ e) where
   module x = totalAtA₀ x
   module y = totalAtA₀ y
@@ -47,6 +53,7 @@ record totalAtA₁ {A : Obj} (x y : totalAtA₀ A) : Set (o ⊔ ℓ ⊔ e) where
     eqϕ : [ id , r ]₁ ∘ ϕ.η (record { dom = A ; cod = x.B ; arr = f }) ≈ ψ.η (record { dom = A ; cod = y.B ; arr = g }) ∘ r
 
 
+-- Category totalAtA A: the fibre over A of the MRS profunctor.
 totalAtA : (A : Obj) → Category (o ⊔ ℓ ⊔ e) (o ⊔ ℓ ⊔ e) e
 totalAtA A = record
   { Obj = totalAtA₀ A
@@ -76,6 +83,7 @@ totalAtA A = record
   ; ∘-resp-≈ = λ f≈g h≈i → ∘-resp-≈ f≈g h≈i
   }
 
+-- ∇: functor from the fibre to Arrow, sending (B, ξ) to the ϕ-component B → [A,B].
 ∇ : {A : Obj} → Functor (totalAtA A) Arr.Arrow
 ∇ {A} = record
   { F₀ = λ (B ∣ ξ) →
@@ -92,6 +100,7 @@ totalAtA A = record
 
 open import Categories.Category.Construction.Comma
 
+-- commaNablaV: comma category ∇ ↓ V₁.  Weaker than the pullback in HigherMRS.
 commaNablaV : {T : Obj} → Category (ℓ ⊔ e ⊔ (o ⊔ ℓ ⊔ e)) (e ⊔ (o ⊔ ℓ ⊔ e)) e
 commaNablaV {T} = (∇ {T} ↓ V₁)
 

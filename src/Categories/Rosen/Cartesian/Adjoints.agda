@@ -2,6 +2,8 @@
 
 open import Level
 
+-- Instances of the Rosen constructions for the Cartesian (Sets) case.
+-- In this setting, V₁ and U₁ acquire left adjoints (L and Lʹ).
 module Categories.Rosen.Cartesian.Adjoints (o : Level) where
 
 open import Categories.Category using (Category)
@@ -47,6 +49,7 @@ private
   module CodF = Functor Cod
 
 -- The unique natural transformation Cod ⇒ [A,-] ∘ Cod in Sets (constant).
+-- const-ϕ A: the unique natural transformation Cod ⇒ [A,-]∘Cod in Sets (constant).
 const-ϕ : (A : Obj) → NaturalTransformation Cod (([ A ,-] ∘F Cod))
 const-ϕ A = record
   { η = λ m y a → y
@@ -56,6 +59,8 @@ const-ϕ A = record
 
 -- Yoneda: in the Cartesian case, Cod is represented in Arrow S by the terminal arrow ∅ → 1,
 -- so Nat(Cod, [A,-]∘Cod) has exactly one element.
+-- yoneda-argument: in Sets, Cod is represented by the terminal arrow,
+-- so Nat(Cod, [A,-]∘Cod) is a singleton.
 yoneda-argument : ∀ A → (ϕ ψ : NaturalTransformation Cod (([ A ,-] ∘F Cod))) → ϕ ≃ ψ
 yoneda-argument A ϕ ψ {X} {z} =
   let α : Arr.Morphism⇒ ⊤-arr X
@@ -69,10 +74,12 @@ yoneda-argument A ϕ ψ {X} {z} =
     ⊤-arr = record { dom = Lift o ⊥ ; cod = Lift o ⊤ ; arr = λ { (lift ()) } }
 
 -- Uniqueness: any such natural transformation equals const-ϕ A.
+-- unique-ϕ: every such ϕ equals const-ϕ A.
 unique-ϕ : ∀ A → (ϕ : NaturalTransformation Cod (([ A ,-] ∘F Cod))) → const-ϕ A ≃ ϕ
 unique-ϕ A ϕ = yoneda-argument A (const-ϕ A) ϕ
 
 -- The left adjoint L : Arrow S → 𝕋MRS.
+-- L: left adjoint to V₁; sends an arrow (A → X) to the trivial (M,R)-system with ϕ = const-ϕ A.
 L : Functor Arr.Arrow 𝕋MRS
 L = record
   { F₀ = λ x → 
@@ -108,6 +115,7 @@ open import Categories.Category.Construction.TwistedArrow S renaming (Morphism t
 
 TwSet = TwistedArrow
 -- the other functor exists from the twisted arrow category 
+-- Lʹ: left adjoint to U₁; sends a twisted arrow (A → X) to the corresponding element of ElMRS.
 L' : Functor TwSet ElMRS
 L' = record
   { F₀ = λ x → 
@@ -130,6 +138,7 @@ L' = record
   ; F-resp-≈ = λ {A} {B} {f} {g} z → z
   }
   
+-- L⊣V₁: adjunction L ⊣ V₁.
 L⊣V₁ : L ⊣ V₁
 L⊣V₁ = record 
   { unit = ntHelper 
@@ -157,6 +166,7 @@ L⊣V₁ = record
         , refl 
   }
 
+-- L'⊣U₁: adjunction L' ⊣ U₁ (WIP: hole in counit).
 L'⊣U₁ : L' ⊣ U₁
 L'⊣U₁ = record 
   { unit = ntHelper (record 

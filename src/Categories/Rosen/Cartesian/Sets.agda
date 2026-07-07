@@ -1,5 +1,7 @@
 {-# OPTIONS --without-K --warning=noUserWarning --warning=noUselessPrivate #-}
 
+-- The category of Sets as a Cartesian closed monoidal category.
+-- Used to instantiate the Rosen constructions concretely.
 module Categories.Rosen.Cartesian.Sets where
 
 open import Level

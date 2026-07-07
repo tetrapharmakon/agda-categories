@@ -46,6 +46,29 @@ profunctor `MRS-Profunctor : C^op × C → Sets`, equipped with a universal 2-ce
 - `V₁` — extracts the "f" component from each `MR2` object.
 - `ϵ` — natural transformation from `MRS-Profunctor` to the lifted hom functor.
 
+### `FibreA.agda`
+Fibre-at-A construction: an alternative approach to higher (M,R)-systems by fixing
+the domain object `A`, which simplifies the definitions.
+- `totalAtA₀` / `totalAtA₁` — objects and morphisms of the fibre over `A`.
+- `totalAtA` — the category totalAtA A (fibre over `A` of `MRS-Profunctor`).
+- `∇` — functor from the fibre to `Arrow`, sending `(B, ξ)` to `ϕ : B → [A,B]`.
+- `commaNablaV` — comma category `∇ ↓ V₁` (weaker invariant, historical).
+
+### `Algebras.agda`
+Incoherent (M,R)-systems as endofunctor algebras.  The endofunctor is
+`X ↦ A ⊗ (𝟙 + X)` (conceptually; implemented via distributivity as `A + (A ⊗ X)`).
+WIP: `to` has holes and the equivalence is incomplete.
+- `unit+-` — endofunctor `X ↦ 𝟙 + X`.
+- `_⊗[I+_]` — endofunctor `X ↦ A ⊗ (𝟙 + X)`.
+- `F-Algebra-Category` — category of F-algebras for `_⊗[I+_]`.
+- `to` — comparison functor from `iMR2ᴿ A` to F-algebras (WIP).
+
+### `TabEquivalence.agda`
+Equivalence between the total category (see `TotalCategory.agda`) and the
+tabulator of `MRS-Profunctor` (see `Tabulator.agda`).
+- `Eq` / `Eq⁻¹` — inverse functors (identity on objects) establishing the equivalence.
+- `Eq⊣Eq⁻¹` — the adjoint equivalence.
+
 ### `ProElements.agda`
 Modified category of elements for a bifunctor `F : C^op × C → Sets`, specialised to `MRS-Profunctor`.
 - `EltsCat` — generic (modified) category-of-elements construction.

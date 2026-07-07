@@ -14,6 +14,9 @@ open import Categories.Adjoint using (_⊣_)
 
 module Categories.Rosen.TabEquivalence {o ℓ e} {C : Category o ℓ e} {M : Monoidal C} (Cl : Closed M) where
 
+-- Equivalence between the total category (see TotalCategory.agda) and the
+-- tabulator of MRS-Profunctor (see Tabulator.agda).
+
 private
   module 𝒞 = Category C
 
@@ -32,6 +35,7 @@ open import Categories.Rosen.ProElements Cl {F = MRS-Profunctor}
 open import Categories.Functor.Profunctor.Tabulator
 
 
+-- Eq: functor from the total category to the tabulator (identity on objects).
 Eq : Functor total (Tabulator MRS-Profunctor) 
 Eq = record
   { F₀ = λ x → x
@@ -58,6 +62,7 @@ Eq = record
   ; F-resp-≈ = λ x → x
   }
 
+-- Eq⁻¹: functor from the tabulator to the total category (identity on objects).
 Eq⁻¹ : Functor (Tabulator MRS-Profunctor) total 
 Eq⁻¹ = record
   { F₀ = λ x → x
@@ -92,6 +97,7 @@ Eq⁻¹ = record
 
 -- Surprise motherfucker: the tabulator and total are equivalent categories!!!
 -- at first, it seems `total` is imposing a stronger condition, but in the end naturality of ϕ allows to deduce it from first principles.
+-- Eq⊣Eq⁻¹: adjoint equivalence proving the total category ≅ the tabulator.
 Eq⊣Eq⁻¹ : Eq ⊣ Eq⁻¹
 Eq⊣Eq⁻¹ = record
   { unit = ntHelper (record

@@ -2,6 +2,8 @@
 
 open import Level
 
+-- Generic instance: all Rosen modules instantiated for Sets,
+-- serving as a type-checking test and a concrete example.
 module Categories.Rosen.Cartesian.Concrete (o : Level) where
 open import Categories.Category using (Category)
 open import Categories.Category.Instance.Sets
