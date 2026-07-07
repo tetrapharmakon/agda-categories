@@ -65,11 +65,11 @@ F-Algebra-Category {A} = F-Algebras (_⊗[I+_] {A})
 -- to: comparison functor from iMR2ᴿ A to F-algebras. (WIP: has holes)
 to : {A : Obj} → Functor (iMR2ᴿ A) (F-Algebra-Category {A})
 to {A} = record
-  { F₀ = λ x → 
-    let module x = iMR2ᴿ₀ x 
-        -- module ϕ* = iMR2.ϕ x.ξ
-    in record 
-    { A = x.B ; α = [ iMR2.f x.ξ , adjoint.Radjunct (iMR2.ϕ x.ξ) ∘ β.from ] }
+  { F₀ = λ x → let module x = iMR2ᴿ₀ x
+                   module ξ = iMR2 x.ξ
+                   ϕ' = adjoint.Radjunct ξ.ϕ
+               in record 
+    { A = x.B ; α = [ ξ.f , ϕ' ∘ β.from ] }
   ; F₁ = λ f → 
     let module f = iMR2ᴿ⇒ f 
     in record { f = f.v ; commutes = {!  !} }
