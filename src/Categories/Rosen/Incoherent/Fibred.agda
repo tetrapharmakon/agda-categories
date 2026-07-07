@@ -17,7 +17,6 @@ module Categories.Rosen.Incoherent.Fibred {o ℓ e} {C : Category o ℓ e} {M : 
 private
   module 𝒞 = Category C
 
--- open 𝒞
 import Reason
 open Reason C
 

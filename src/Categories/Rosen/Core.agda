@@ -21,7 +21,6 @@ module Categories.Rosen.Core {o ℓ e} {C : Category o ℓ e} {M : Monoidal C} (
 private
   module 𝒞 = Category C
 
--- open 𝒞
 import Reason
 open Reason C
 
@@ -49,7 +48,6 @@ record MR2 (A B : Obj) : Set (o ⊔ ℓ ⊔ e) where
   ϕη = NaturalTransformation.η ϕ
   ϕη₀ = ϕη (record { arr = f })
   ϕcommute = λ {X Y : Category.Obj Arr.Arrow} t → NaturalTransformation.commute ϕ {X} {Y} t
-  ϕf = ϕη (record { arr = f }) ∘ f
 
 MR2-Setoid : Obj → Obj → Setoid (o ⊔ ℓ ⊔ e) (o ⊔ ℓ ⊔ e)
 MR2-Setoid A B = record

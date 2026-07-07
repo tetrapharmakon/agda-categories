@@ -105,18 +105,3 @@ Eq⊣Eq⁻¹ = record
   ; zig = identity² , identity²
   ; zag = identity² , identity²
   }
-
-
--- open import Categories.Rosen.Tabulator Cl using (V₁;𝕋MRS)
--- sending an arrow h : A ⇒ B to the MR system
--- (h, const) exists only on a Cartesian ambient category C
--- 𝕀 : Functor Arr.Arrow 𝕋MRS 
--- 𝕀 = record
---   { F₀ = λ {record { dom = dom ; cod = cod ; arr = a } → 
---        (dom , cod) 
---        ∣ ⟪ a , {!  !} ⟫}
---   ; F₁ = {!  !}
---   ; identity = {!  !}
---   ; homomorphism = {!  !}
---   ; F-resp-≈ = {!  !}
---   }

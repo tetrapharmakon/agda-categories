@@ -6,13 +6,14 @@ open import Categories.Category using (Category)
 open import Categories.Category.Construction.Arrow
 open import Categories.Category.Monoidal using (Monoidal)
 open import Categories.Category.Monoidal.Closed using (Closed)
+open import Categories.Category.Monoidal.Symmetric using (Symmetric)
 open import Categories.Functor using (Functor; _∘F_)
 
 open import Categories.Category.Cocartesian using (BinaryCoproducts)
 open import Categories.Category.Construction.F-Algebras using (F-Algebras)
 open import Categories.Category.Equivalence using (StrongEquivalence)
 open import Categories.Adjoint using (Radjunct)
-module Categories.Rosen.Algebras {o ℓ e} {C : Category o ℓ e} (M : Monoidal C) (Cl : Closed M) (BC : BinaryCoproducts C) where
+module Categories.Rosen.Algebras {o ℓ e} {C : Category o ℓ e} (M : Monoidal C) (Cl : Closed M) (S : Symmetric M) (BC : BinaryCoproducts C) where
 
 private
   module 𝒞 = Category C

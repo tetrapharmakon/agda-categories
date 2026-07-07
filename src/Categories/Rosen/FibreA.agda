@@ -9,7 +9,6 @@ open import Categories.Category using (Category)
 open import Categories.Category.Monoidal using (Monoidal)
 open import Categories.Category.Monoidal.Closed using (Closed)
 open import Categories.Functor using (Functor)
-open import Categories.Functor.Bifunctor using (appˡ; appʳ)
 open import Categories.NaturalTransformation using (NaturalTransformation)
 module Categories.Rosen.FibreA {o ℓ e} {C : Category o ℓ e} {M : Monoidal C} (Cl : Closed M) where
 
@@ -26,12 +25,6 @@ import Categories.Morphism.Reasoning as MR
 open import Categories.Category.Construction.Arrow C using (Morphism; Morphism⇒; mor⇒)
 open import Categories.Rosen.Core Cl
 open import Categories.Rosen.Tabulator Cl using (𝕋MRS; V₁)
-
-MRS[1,-] = appˡ MRS-Profunctor
-
-MRS[-,1] = appʳ MRS-Profunctor
-
--- last attempt
 
 record totalAtA₀ (A : Obj) : Set (o ⊔ ℓ ⊔ e) where
   constructor _∣_
@@ -98,14 +91,8 @@ totalAtA A = record
 -- Objects are commutative squares in Arrow(C):  ∇ x ⇒ V₁ y.
 
 open import Categories.Category.Construction.Comma
-open import Relation.Binary.PropositionalEquality
-open Relation.Binary.PropositionalEquality.≡-Reasoning
 
 commaNablaV : {T : Obj} → Category (ℓ ⊔ e ⊔ (o ⊔ ℓ ⊔ e)) (e ⊔ (o ⊔ ℓ ⊔ e)) e
 commaNablaV {T} = (∇ {T} ↓ V₁)
 
-_ : {T : Obj} → (Category.Obj (commaNablaV {T})) ≡ CommaObj ∇ V₁
-_ = _≡_.refl
 
-_ : {T : Obj} → (Category._⇒_ (commaNablaV {T})) ≡ Comma⇒
-_ = _≡_.refl

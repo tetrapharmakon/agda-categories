@@ -17,7 +17,6 @@ module Categories.Rosen.Incoherent.Core {o ℓ e} {C : Category o ℓ e} {M : Mo
 private
   module 𝒞 = Category C
 
--- open 𝒞
 import Reason
 open Reason C
 
@@ -58,8 +57,6 @@ record iMR2⇒ (X Y : iMR2₀) : Set (o ⊔ ℓ ⊔ e) where
   { Obj = iMR2₀
   ; _⇒_ = λ s t → iMR2⇒ s t
   ; _≈_ = λ f g → let open iMR2⇒ in f .l ≈ g .l × f .r ≈ g .r
-    -- let module f = iMR2⇒ f  
-    --     module g = iMR2⇒ g in f.l ≈ g.l × f.r ≈ g.r
   ; id = record 
     { l = id 
     ; r = id 

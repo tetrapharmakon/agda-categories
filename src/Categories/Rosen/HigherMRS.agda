@@ -114,9 +114,6 @@ pℕ = Thin
       ; F-resp-≈ = λ eq → ((eq .proj₁ .proj₁) , (eq .proj₁ .proj₂)) , F-down.F-resp-≈ (proj₂ eq)
       }
 
--- hop-idF : ∀ {n} → Functor (𝕄ℝ𝕊ₒ (suc n)) (𝕄ℝ𝕊ₒ (suc n))
--- hop-idF = idF
-
 lemma : ∀ {n : ℕ} → NaturalIsomorphism (𝕄ℝ𝕊-down {n} {n} ≤-refl) (idF {C = 𝕄ℝ𝕊ₒ n})
 lemma {zero} = niHelper (record 
   { η = λ X → {! id  !} 
@@ -130,16 +127,7 @@ lemma {suc n} = niHelper (record
   ; commute = {!  !} 
   ; iso = {!  !} 
   })
-  -- (record 
-  -- { η = λ { X → Category.id (𝕄ℝ𝕊ₒ (suc n)) {A = X} }
-  -- ; η⁻¹ = λ { X → Category.id (𝕄ℝ𝕊ₒ (suc n)) {A = X} }
-  -- ; commute = λ { {X} {Y} f → id-comm-sym (𝕄ℝ𝕊ₒ (suc n)) {f = f} }
-  -- ; iso = λ X → record 
-  --   { isoˡ = Category.identityˡ (𝕄ℝ𝕊ₒ (suc n))
-  --   ; isoʳ = Category.identityʳ (𝕄ℝ𝕊ₒ (suc n))
-  --   } 
-  -- })
-
+  
 MRS-chain : Functor (Category.op pℕ) (Cats (o ⊔ ℓ ⊔ e) (o ⊔ ℓ ⊔ e) e)
 MRS-chain = record
   { F₀ = 𝕄ℝ𝕊ₒ
