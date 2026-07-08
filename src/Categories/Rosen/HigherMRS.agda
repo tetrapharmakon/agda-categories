@@ -1,11 +1,7 @@
 {-# OPTIONS --without-K --allow-unsolved-metas --warning=noUserWarning --warning=noUselessPrivate #-}
 
 open import Level using (0ℓ; _⊔_)
-
 open import Categories.Category using (Category)
-open import Categories.Category.Construction.Arrow
-open import Categories.Functor using (Functor)
-open import Categories.Category.Construction.IsoComma using (IsoComma;IsoCommaObj;IsoComma⇒;ICproj₁;ICproj₂)
 open import Categories.Category.Monoidal using (Monoidal)
 open import Categories.Category.Monoidal.Closed using (Closed)
 
@@ -17,33 +13,30 @@ module Categories.Rosen.HigherMRS {o ℓ e} {C : Category o ℓ e} {M : Monoidal
 -- Exports: MRS3, 𝕄ℝ𝕊, 𝕄ℝ𝕊ₒ, 𝕄ℝ𝕊ₐ, Π-MRS, pℕ, 𝕄ℝ𝕊-down, lemma,
 --          MRS-chain, MRS∞, MRS∞-proj, MRS∞-commute.
 
-private
-  module 𝒞 = Category C
+open import Data.Nat using (ℕ; zero; suc; _≤_; z≤n; s≤s)
+open import Data.Nat.Properties using (≤-poset;≤-refl)
+open import Data.Product using (Σ;_,_;proj₁;proj₂)
 
-import Reason
-open Reason C
-
-import Categories.Morphism.Reasoning as MR
-
-open HomReasoning
-open MR
-
+open import Categories.Category.Construction.Arrow
+open import Categories.Category.Construction.IsoComma using (IsoComma;IsoCommaObj;IsoComma⇒;ICproj₁;ICproj₂)
+open import Categories.Category.Construction.Thin 0ℓ ≤-poset
+open import Categories.Category.Instance.Cats using (Cats)
+open import Categories.Functor using (Functor; _∘F_) renaming (id to idF)
 open import Categories.Functor.Profunctor.Tabulator using (tab₀;tab⇒)
+open import Categories.Morphism.Reasoning as MR
+open import Categories.NaturalTransformation.NaturalIsomorphism using (NaturalIsomorphism;niHelper)
 open import Categories.Rosen.Core Cl
 open import Categories.Rosen.ProElements Cl {F = MRS-Profunctor}
 open import Categories.Rosen.Tabulator Cl using (V₁; 𝕋MRS)
 
+import Reason
+open Reason C
+open HomReasoning
+open MR
+
 -- MRS3: the 3rd level, IsoComma of ℝ (from ProElements) and V₁ (from Tabulator).
 MRS3 : Category (o ⊔ ℓ ⊔ e) (o ⊔ ℓ ⊔ e) e
 MRS3 = IsoComma ℝ V₁
-
-open import Data.Nat using (ℕ; zero; suc; _≤_; z≤n; s≤s)
-open import Data.Nat.Properties using (≤-poset;≤-refl)
-open import Data.Product using (Σ;_,_;proj₁;proj₂)
-open import Categories.Category.Instance.Cats using (Cats)
-open import Categories.Category.Construction.Thin 0ℓ ≤-poset
-open import Categories.Functor using (_∘F_) renaming (id to idF)
-open import Categories.NaturalTransformation.NaturalIsomorphism using (NaturalIsomorphism;niHelper)
 
 -- 𝕄ℝ𝕊 n: the n-th level category together with a functor to Arr.Arrow.
 𝕄ℝ𝕊 : (n : ℕ) → Σ (Category (o ⊔ ℓ ⊔ e) (o ⊔ ℓ ⊔ e) e) (λ x → Functor x Arr.Arrow)
