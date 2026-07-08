@@ -1,17 +1,9 @@
 {-# OPTIONS --without-K --safe --warning=noUserWarning --warning=noUselessPrivate #-}
 
 open import Level using (_⊔_; lift)
-
-open import Data.Product using (_,_; proj₁)
-
 open import Categories.Category using (Category)
-open import Categories.Category.Construction.Arrow
 open import Categories.Category.Monoidal using (Monoidal)
 open import Categories.Category.Monoidal.Closed using (Closed)
-open import Categories.Functor using (Functor; _∘F_)
-open import Categories.NaturalTransformation using (NaturalTransformation; ntHelper)
-
-open import Categories.Functor.Hom using (Hom[_][-,-])
 
 module Categories.Rosen.Tabulator {o ℓ e} {C : Category o ℓ e} {M : Monoidal C} (Cl : Closed M) where
 
@@ -20,20 +12,21 @@ module Categories.Rosen.Tabulator {o ℓ e} {C : Category o ℓ e} {M : Monoidal
 -- 2-cell. This is the heart of the Rosen fibration.
 -- Exports: 𝕋MRS, π, þ, V₁, ϵ.
 
-private
-  module 𝒞 = Category C
+open import Data.Product using (_,_; proj₁)
+
+open import Categories.Category.Construction.Arrow
+open import Categories.Functor using (Functor; _∘F_)
+open import Categories.Functor.Construction.LiftSetoids using (LiftSetoids)
+open import Categories.Functor.Hom using (Hom[_][-,-])
+open import Categories.Functor.Profunctor.Tabulator
+open import Categories.Morphism.Reasoning as MR
+open import Categories.NaturalTransformation using (NaturalTransformation; ntHelper)
+open import Categories.Rosen.Core Cl
 
 import Reason
 open Reason C
-
-import Categories.Morphism.Reasoning as MR
-open HomReasoning 
+open HomReasoning
 open MR
-open import Categories.Rosen.Core Cl
-
-open import Categories.Functor.Profunctor.Tabulator
-
-open import Categories.Functor.Construction.LiftSetoids using (LiftSetoids)
 
 -- The tabulator category of MRS-Profunctor.
 𝕋MRS = Tabulator MRS-Profunctor
@@ -47,7 +40,7 @@ open import Categories.Functor.Construction.LiftSetoids using (LiftSetoids)
 V₁ : Functor 𝕋MRS Arr.Arrow
 V₁ = record
   { F₀ = λ { ((A , B) ∣ ξ) → record { arr = MR2.f ξ } }
-  ; F₁ = λ { {(A , B) ∣ ⟪ f , ϕ ⟫} {(A' , B') ∣ ⟪ g , ϕ' ⟫} (l , r ∥ (eq , eq')) → mor⇒ {dom⇒ = l} {cod⇒ = r} 
+  ; F₁ = λ { {(A , B) ∣ ⟪ f , ϕ ⟫} {(A' , B') ∣ ⟪ g , ϕ' ⟫} (l , r ∥ (eq , eq')) → mor⇒ {dom⇒ = l} {cod⇒ = r}
     (begin r ∘ f      ≈˘⟨ id-2 ⟩ 
            r ∘ f ∘ id ≈⟨ eq ○ identityˡ ⟩
            g ∘ l      ∎) }
@@ -59,8 +52,6 @@ V₁ = record
     , Equiv.refl
   ; F-resp-≈ = λ { x → x }
   }
-
-
 
 -- ϵ: natural transformation from MRS-Profunctor to the lifted hom functor.
 ϵ  : NaturalTransformation MRS-Profunctor (LiftSetoids (o ⊔ e) (o ⊔ ℓ) ∘F Hom[ C ][-,-])
