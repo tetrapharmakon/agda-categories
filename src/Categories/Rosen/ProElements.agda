@@ -1,37 +1,35 @@
 {-# OPTIONS --without-K --safe --warning=noUserWarning --warning=noUselessPrivate #-}
 
 open import Level using (_⊔_)
-
-open import Data.Product using (_,_; proj₁; proj₂; _×_)
-open import Relation.Binary.Bundles using (Setoid)
-
 open import Categories.Category using (Category)
-open import Categories.Category.Construction.Arrow
-open import Categories.Category.Instance.Setoids
-import Relation.Binary.Reasoning.Setoid as SetoidR
+open import Categories.Category.Instance.Setoids using (Setoids)
 open import Categories.Category.Monoidal using (Monoidal)
 open import Categories.Category.Monoidal.Closed using (Closed)
 open import Categories.Functor using (Functor)
-open import Function.Equality using (_⟨$⟩_; cong)
 open import Categories.Functor.Bifunctor using (Bifunctor; appˡ; appʳ)
-open import Categories.Functor.Bifunctor.Properties using ([_]-decompose₁)
-open import Categories.NaturalTransformation using (NaturalTransformation)
+
 module Categories.Rosen.ProElements {o ℓ e} {C : Category o ℓ e} {M : Monoidal C} (Cl : Closed M) {F : Bifunctor (Category.op C) C (Setoids (o ⊔ ℓ ⊔ e) (o ⊔ ℓ ⊔ e))} where
 
 -- Modified category of elements for a bifunctor F : C^op × C → Sets, specialised to MRS-Profunctor.
 -- EltsCat is a generic (modified) category-of-elements construction; ElMRS is its instance.
 -- Exports: EltsCat, ElMRS, ℝ, U₁.
 
-private
-  module 𝒞 = Category C
+open import Data.Product using (_,_; proj₁; proj₂; _×_)
+open import Relation.Binary.Bundles using (Setoid)
+open import Categories.Category.Construction.Arrow
+import Relation.Binary.Reasoning.Setoid as SetoidR
+open import Categories.Category.Construction.TwistedArrow C renaming (Morphism to tMorphism; Morphism⇒ to tMorphism⇒)
+open import Categories.Functor.Bifunctor.Properties using ([_]-decompose₁)
+open import Categories.Functor.Profunctor.Tabulator
+open import Categories.NaturalTransformation using (NaturalTransformation)
+open import Categories.Rosen.Core Cl
 
-open Closed Cl using ([-,-]; [_,_]₁)
+open import Function.Equality using (_⟨$⟩_; cong)
 
 import Reason
 open Reason C
 
-open import Categories.Rosen.Core Cl
-open import Categories.Functor.Profunctor.Tabulator
+open Closed Cl using ([-,-]; [_,_]₁)
 
 {- Modified category of elements for a bifunctor Fᵉ : C^op × C → Sets. -}
 module EltsCat (Fᵉ : Bifunctor (Category.op C) C (Setoids (o ⊔ ℓ ⊔ e) (o ⊔ ℓ ⊔ e))) where
@@ -68,14 +66,15 @@ module EltsCat (Fᵉ : Bifunctor (Category.op C) C (Setoids (o ⊔ ℓ ⊔ e) (o
           module F = Functor Fᵉ
           Fff = F.F₀ (f.Y.A , f.Y.B)
           Fgg = F.F₀ (g.X.A , g.X.B)
-          open SetoidR Fff
-      in record 
-      { l = g.l ∘ f.l 
-      ; r = f.r ∘ g.r 
-      ; eqElts = begin F.F₁ (g.l ∘ f.l , f.r ∘ g.r) ⟨$⟩ g.X.el ≈⟨ F.homomorphism (Setoid.sym Fgg (Setoid.refl Fgg)) ⟩ 
-                       F.F₁ (f.l , f.r) ⟨$⟩ (F.F₁ (g.l , g.r) ⟨$⟩ g.X.el) ≈⟨ cong (F.F₁ (f.l , f.r)) g.eqElts ⟩ 
-                       F.F₁ (f.l , f.r) ⟨$⟩ f.X.el ≈⟨ f.eqElts ⟩ 
-                       f.Y.el ∎
+      in let module SR = SetoidR Fff
+             open SR
+         in record 
+         { l = g.l ∘ f.l 
+         ; r = f.r ∘ g.r 
+         ; eqElts = begin F.F₁ (g.l ∘ f.l , f.r ∘ g.r) ⟨$⟩ g.X.el ≈⟨ F.homomorphism (Setoid.sym Fgg (Setoid.refl Fgg)) ⟩ 
+                          F.F₁ (f.l , f.r) ⟨$⟩ (F.F₁ (g.l , g.r) ⟨$⟩ g.X.el) ≈⟨ cong (F.F₁ (f.l , f.r)) g.eqElts ⟩ 
+                          F.F₁ (f.l , f.r) ⟨$⟩ f.X.el ≈⟨ f.eqElts ⟩ 
+                          f.Y.el ∎
       } }
     ; assoc     = sym-assoc , assoc
     ; sym-assoc = assoc , sym-assoc
@@ -119,7 +118,6 @@ ElMRS = MRS.Elts
       c = record { arr = f.r ∘ XE.f ∘ f.l }
       d = record { arr = YE.f }
       module Hom  {A} = Functor (appʳ [-,-] A)
-      module Hom' {A} = Functor (appˡ [-,-] A)
 
       t₁ : Arr.Morphism⇒ b a
       t₁ = record { dom⇒ = f.l ; cod⇒ = id ; square = identityˡ }
@@ -134,7 +132,7 @@ ElMRS = MRS.Elts
       lem1 : η XE.ϕ a ≈ η XE.ϕ b
       lem1 = begin
         η XE.ϕ a           ≈˘⟨ identityʳ ⟩
-        η XE.ϕ a ∘ id     ≈⟨ commute XE.ϕ t₁ ⟩ -- commute XE.ϕ t₁ ⟩
+        η XE.ϕ a ∘ id     ≈⟨ commute XE.ϕ t₁ ⟩
         [ id , id ]₁ ∘ η XE.ϕ b  ≈⟨ (Hom.identity ⟩∘⟨refl) ⟩ 
         id ∘ η XE.ϕ b     ≈⟨ identityˡ ⟩
         η XE.ϕ b          ∎
@@ -145,7 +143,7 @@ ElMRS = MRS.Elts
       lem3 : η YE.ϕ c ≈ η YE.ϕ d
       lem3 = begin
         η YE.ϕ c           ≈˘⟨ identityʳ ⟩
-        η YE.ϕ c ∘ id     ≈⟨ commute YE.ϕ t₃ ⟩ -- commute YE.ϕ t₃ ⟩
+        η YE.ϕ c ∘ id     ≈⟨ commute YE.ϕ t₃ ⟩
         [ id , id ]₁ ∘ η YE.ϕ d ≈⟨ Hom.identity ⟩∘⟨refl ⟩ 
         id ∘ η YE.ϕ d     ≈⟨ identityˡ ⟩
         η YE.ϕ d          ∎
@@ -174,8 +172,6 @@ ElMRS = MRS.Elts
   ; homomorphism = Equiv.refl , [-,-].homomorphism
   ; F-resp-≈ = λ (f≈gL , f≈gR) → f≈gR , ([-,-].F-resp-≈ (f≈gL , f≈gR))
   }
-
-open import Categories.Category.Construction.TwistedArrow C renaming (Morphism to tMorphism; Morphism⇒ to tMorphism⇒)
 
 -- U₁: forgetful functor from ElMRS to the twisted arrow category of C.
 U₁ : Functor ElMRS TwistedArrow
