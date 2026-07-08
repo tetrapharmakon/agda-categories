@@ -14,7 +14,7 @@ module Categories.Rosen.HigherMRS {o ℓ e} {C : Category o ℓ e} {M : Monoidal
 --          MRS-chain, MRS∞, MRS∞-proj, MRS∞-commute.
 
 open import Data.Nat using (ℕ; zero; suc; _≤_; z≤n; s≤s)
-open import Data.Nat.Properties using (≤-poset;≤-refl)
+open import Data.Nat.Properties using (≤-poset;≤-refl;≤-trans)
 open import Data.Product using (Σ;_,_;proj₁;proj₂)
 
 open import Categories.Category.Construction.Arrow
@@ -146,6 +146,43 @@ lemma-id {suc n} = niHelper (record
   ; commute = {!  !} 
   ; iso = {!  !} 
   })
+
+-- lemma-homomorphism: 𝕄ℝ𝕊-down respects composition up to natural isomorphism.
+lemma-homomorphism : ∀ {n m k : ℕ} (m≤n : m ≤ n) (k≤m : k ≤ m) →
+  NaturalIsomorphism (𝕄ℝ𝕊-down (≤-trans k≤m m≤n)) ((𝕄ℝ𝕊-down k≤m) ∘F (𝕄ℝ𝕊-down m≤n))
+lemma-homomorphism z≤n z≤n = niHelper (record
+  { η = λ X → {!  !}
+  ; η⁻¹ = λ X → {!  !}
+  ; commute = λ f → {!  !}
+  ; iso = λ X → {!  !}
+  })
+lemma-homomorphism (s≤s m≤n) z≤n = niHelper (record
+  { η = λ X → {!  !}
+  ; η⁻¹ = λ X → {!  !}
+  ; commute = λ f → {!  !}
+  ; iso = λ X → {!  !}
+  })
+lemma-homomorphism (s≤s m≤n) (s≤s k≤m) = niHelper (record
+  { η = λ X → {!  !}
+  ; η⁻¹ = λ X → {!  !}
+  ; commute = λ f → {!  !}
+  ; iso = λ X → {!  !}
+  })
+
+-- lemma-Fresp: proof-irrelevance for 𝕄ℝ𝕊-down on thin morphisms.
+lemma-Fresp : ∀ {n m : ℕ} (p q : m ≤ n) → NaturalIsomorphism (𝕄ℝ𝕊-down p) (𝕄ℝ𝕊-down q)
+lemma-Fresp z≤n z≤n = niHelper (record
+  { η = λ X → {!  !}
+  ; η⁻¹ = λ X → {!  !}
+  ; commute = λ f → {!  !}
+  ; iso = λ X → {!  !}
+  })
+lemma-Fresp (s≤s p) (s≤s q) = niHelper (record
+  { η = λ X → {!  !}
+  ; η⁻¹ = λ X → {!  !}
+  ; commute = λ f → {!  !}
+  ; iso = λ X → {!  !}
+  })
   
 -- MRS-chain: the chain ... → 𝕄ℝ𝕊ₒ 2 → 𝕄ℝ𝕊ₒ 1 → 𝕄ℝ𝕊ₒ 0 as ℕ^op → Cats. (WIP: has holes)
 MRS-chain : Functor (Category.op pℕ) (Cats (o ⊔ ℓ ⊔ e) (o ⊔ ℓ ⊔ e) e)
@@ -153,20 +190,8 @@ MRS-chain = record
   { F₀ = 𝕄ℝ𝕊ₒ
   ; F₁ = λ {n} {m} m≤n → 𝕄ℝ𝕊-down m≤n
   ; identity = λ { {n} → lemma-id {n} } 
-  ; homomorphism = niHelper 
-    (record 
-    { η = {!  !} 
-    ; η⁻¹ = {!  !} 
-    ; commute = {!  !} 
-    ; iso = {!  !} 
-    })
-  ; F-resp-≈ = λ f≈g → niHelper 
-    (record 
-    { η = λ X → {!  !} 
-    ; η⁻¹ = λ X → {!  !} 
-    ; commute = {!  !} 
-    ; iso = {!  !} 
-    })
+   ; homomorphism = λ { {n} {m} {k} {f} {g} → lemma-homomorphism f g }
+   ; F-resp-≈ = λ { {n} {m} {f} {g} _ → lemma-Fresp f g }
   }
 
 open import Categories.Diagram.Limit MRS-chain renaming (Limit to MRS-Limit)
