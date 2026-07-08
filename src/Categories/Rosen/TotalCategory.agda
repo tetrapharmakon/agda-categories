@@ -1,32 +1,28 @@
 {-# OPTIONS --without-K --safe --warning=noUserWarning --warning=noUselessPrivate #-}
 
 open import Level using (_⊔_)
+open import Categories.Category using (Category)
+open import Categories.Category.Monoidal using (Monoidal)
+open import Categories.Category.Monoidal.Closed using (Closed)
+
+module Categories.Rosen.TotalCategory {o ℓ e} {C : Category o ℓ e} {M : Monoidal C} (Cl : Closed M) where
+
+open Category C
 
 open import Data.Product using (_,_; _×_)
 
-open import Categories.Category using (Category)
 open import Categories.Category.Construction.Arrow
-open import Categories.Category.Monoidal using (Monoidal)
-open import Categories.Category.Monoidal.Closed using (Closed)
 open import Categories.Functor using (Functor)
 open import Categories.Functor.Bifunctor using (appʳ)
 open import Categories.Functor.Bifunctor.Properties using ([_]-commute)
+open import Categories.Functor.Profunctor.Tabulator
+open import Categories.Morphism.Reasoning as MR
 open import Categories.NaturalTransformation using (_∘ᵥ_; _∘ʳ_) renaming (NaturalTransformation to NT)
-module Categories.Rosen.TotalCategory {o ℓ e} {C : Category o ℓ e} {M : Monoidal C} (Cl : Closed M) where
-
-private
-  module 𝒞 = Category C
-
-open 𝒞
+open import Categories.Rosen.Core Cl
 
 open Closed Cl using ([-,-]; [_,-]; [_,_]₁)
-
-import Categories.Morphism.Reasoning as MR
-open HomReasoning 
+open HomReasoning
 open MR
-
-open import Categories.Rosen.Core Cl
-open import Categories.Functor.Profunctor.Tabulator
 
 -- The total category of the MRS-profunctor tabulator.
 -- Equivalent to the tabulator of MRS-Profunctor (see Tabulator.agda).
