@@ -1,16 +1,9 @@
 {-# OPTIONS --without-K --safe --warning=noUserWarning --warning=noUselessPrivate #-}
 
 open import Level using (_⊔_)
-
-open import Data.Product using (_,_)
-
 open import Categories.Category using (Category)
-open import Categories.Category.Construction.Arrow
 open import Categories.Category.Monoidal using (Monoidal)
 open import Categories.Category.Monoidal.Closed using (Closed)
-open import Categories.Functor using (Functor; _∘F_)
-open import Categories.NaturalTransformation using (NaturalTransformation; _∘ᵥ_; _∘ʳ_)
-open import Categories.NaturalTransformation.Equivalence using (_≃_)
 
 module Categories.Rosen.Repairs {o ℓ e} {C : Category o ℓ e} {M : Monoidal C} (Cl : Closed M) where
 
@@ -18,17 +11,20 @@ module Categories.Rosen.Repairs {o ℓ e} {C : Category o ℓ e} {M : Monoidal C
 -- A ↦ Nat(Cod, [A,-]∘Cod).  Objects rep₀ are (A, ϕ) with ϕ : Cod ⇒ [A,-]∘Cod;
 -- morphisms rep⇒ are commuting pairs.  Exports rep₀, rep⇒, repairs.
 
+open import Data.Product using (_,_)
+
+open import Categories.Category.Construction.Arrow
+open import Categories.Functor using (Functor; _∘F_)
+open import Categories.Morphism.Reasoning as MR
+open import Categories.NaturalTransformation using (NaturalTransformation; _∘ᵥ_; _∘ʳ_)
+open import Categories.NaturalTransformation.Equivalence using (_≃_)
+open import Categories.Rosen.Core Cl
+
 import Reason
 open Reason C
-
 open Closed Cl using ([-,-]; [_,_]₀; [_,-]; [-,_]; [_,_]₁)
-
 open HomReasoning
-
-import Categories.Morphism.Reasoning as MR
 open MR
-
-open import Categories.Rosen.Core Cl
 
 -- Objects of the repair fibration: an object A and a natural transformation ϕ : Cod ⇒ [A,-]∘Cod.
 record rep₀ : Set (o ⊔ ℓ ⊔ e) where
