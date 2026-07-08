@@ -2,21 +2,25 @@
 
 -- The category of Sets as a Cartesian closed monoidal category.
 -- Used to instantiate the Rosen constructions concretely.
-module Categories.Rosen.Cartesian.Sets where
 
 open import Level
 open import Relation.Binary.PropositionalEquality using (_≡_; refl; cong₂; sym; trans)
-
-postulate
-  extensionality : ∀ {a b} {A : Set a} {B : A → Set b} {f g : (x : A) → B x}
-                 → (∀ x → f x ≡ g x) → f ≡ g
-
 open import Data.Product using (_×_; _,_; proj₁; proj₂)
 open import Data.Unit.Polymorphic using (⊤; tt)
 
 open import Categories.Category.Instance.Sets
 open import Categories.Category.CartesianClosed.Canonical as Canonical
 open import Categories.Category.CartesianClosed as CCC
+open import Categories.Category.Monoidal
+open import Categories.Category.Cartesian.Monoidal
+open import Categories.Category.Monoidal.Closed
+open import Categories.Functor.Bifunctor using (Bifunctor)
+
+module Categories.Rosen.Cartesian.Sets where
+
+postulate
+  extensionality : ∀ {a b} {A : Set a} {B : A → Set b} {f g : (x : A) → B x}
+                 → (∀ x → f x ≡ g x) → f ≡ g
 
 module _ {o : Level} where
   private
@@ -45,11 +49,6 @@ module _ {o : Level} where
 
   Sets-CCC : CCC.CartesianClosed S
   Sets-CCC = Canonical.Equivalence.fromCanonical _ Sets-Canonical
-
-open import Categories.Category.Monoidal
-open import Categories.Category.Cartesian.Monoidal
-open import Categories.Category.Monoidal.Closed
-open import Categories.Functor.Bifunctor using (Bifunctor)
 
 module Sets-MonoidalClosed {o : Level} where
   private
