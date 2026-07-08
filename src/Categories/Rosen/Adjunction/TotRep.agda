@@ -1,36 +1,30 @@
 {-# OPTIONS --without-K --safe --warning=noUserWarning --warning=noUselessPrivate #-}
 
 open import Level using (_⊔_)
-
-open import Data.Product using (_,_; proj₁; proj₂; _×_)
-
 open import Categories.Category using (Category)
-open import Categories.Category.Construction.Arrow
 open import Categories.Category.Monoidal using (Monoidal)
 open import Categories.Category.Monoidal.Closed using (Closed)
-open import Categories.Functor using (Functor)
-open import Categories.NaturalTransformation using (ntHelper; _∘ᵥ_; _∘ʳ_) renaming (NaturalTransformation to NT)
-open import Categories.Adjoint using (_⊣_)
 
 module Categories.Rosen.Adjunction.TotRep {o ℓ e} {C : Category o ℓ e} {M : Monoidal C} (Cl : Closed M) where
 
-private
-  module 𝒞 = Category C
+open Category C
 
-open 𝒞
+open import Data.Product using (_,_; proj₁; proj₂; _×_)
 
-open Closed Cl using ([-,-]; [_,_]₀; [_,-]; [_,_]₁)
-
-import Categories.Morphism.Reasoning as MR
-open HomReasoning
-open MR
-
+open import Categories.Adjoint using (_⊣_)
+open import Categories.Category.Construction.Arrow
+open import Categories.Functor using (Functor)
+open import Categories.Functor.Profunctor.Tabulator
+open import Categories.Morphism.Reasoning as MR
+open import Categories.NaturalTransformation using (ntHelper; _∘ᵥ_; _∘ʳ_) renaming (NaturalTransformation to NT)
 open import Categories.Rosen.Core Cl
 open import Categories.Rosen.Repairs Cl
 open import Categories.Rosen.TotalCategory Cl using (tot⇒; total; [_,_∥_,_])
 open import Categories.Rosen.ProElements Cl {F = MRS-Profunctor}
 
-open import Categories.Functor.Profunctor.Tabulator
+open Closed Cl using ([-,-]; [_,_]₀; [_,-]; [_,_]₁)
+open HomReasoning
+open MR
 
 
 -- The coreflector of total on the category of repairs
