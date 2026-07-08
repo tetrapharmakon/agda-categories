@@ -1,41 +1,31 @@
 {-# OPTIONS --without-K --safe --warning=noUserWarning --warning=noUselessPrivate #-}
 
 open import Level using (_⊔_)
-
-open import Data.Product using (Σ;_,_; proj₁; _×_)
-
-open import Relation.Binary.Bundles using (Setoid)
-
 open import Categories.Category using (Category)
-open import Categories.Category.Construction.Arrow
-open import Categories.Category.Instance.Setoids
 open import Categories.Category.Monoidal using (Monoidal)
 open import Categories.Category.Monoidal.Closed using (Closed)
-open import Categories.Functor using (Functor)
-open import Categories.Functor.Bifunctor using (Bifunctor; appˡ; appʳ)
-open import Categories.Functor.Bifunctor.Properties using ([_]-commute)
 
 module Categories.Rosen.Incoherent.Displayed {o ℓ e} {C : Category o ℓ e} {M : Monoidal C} (Cl : Closed M) where
 
 -- Displayed incoherent (M,R)-systems: the fibre over a fixed codomain B.
 -- Reindexing along v : B ⇒ B' is *pro*functorial in B (hence a displayed category).
 
-private
-  module 𝒞 = Category C
+open import Data.Product using (Σ;_,_; proj₁; _×_)
+open import Relation.Binary.Bundles using (Setoid)
+
+open import Categories.Category.Construction.Arrow
+open import Categories.Category.Instance.Setoids
+open import Categories.Functor using (Functor)
+open import Categories.Functor.Bifunctor using (Bifunctor; appˡ; appʳ)
+open import Categories.Functor.Bifunctor.Properties using ([_]-commute)
+open import Categories.Morphism.Reasoning as MR
+open import Categories.Rosen.Incoherent.Core Cl
 
 import Reason
 open Reason C
-
-import Categories.Morphism.Reasoning as MR
-
+open Closed Cl using ([-,-]; [_,_]₁)
 open HomReasoning
 open MR
-
-open Closed Cl using ([-,-]; [_,_]₁)
-
-module Arr = Categories.Category.Construction.Arrow C
-
-open import Categories.Rosen.Incoherent.Core Cl
 
 -- iMR2ᴸ₀: object of the left-fibre over B: a domain A plus an iMR2 A B.
 record iMR2ᴸ₀ (B : Obj) : Set (o ⊔ ℓ ⊔ e) where
