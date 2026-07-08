@@ -57,11 +57,12 @@ the domain object `A`, which simplifies the definitions.
 ### `Algebras.agda`
 Incoherent (M,R)-systems as endofunctor algebras.  The endofunctor is
 `X ↦ A ⊗ (𝟙 + X)` (conceptually; implemented via distributivity as `A + (A ⊗ X)`).
-WIP: `to` has holes and the equivalence is incomplete.
-- `unit+-` — endofunctor `X ↦ 𝟙 + X`.
-- `_⊗[I+_]` — endofunctor `X ↦ A ⊗ (𝟙 + X)`.
-- `F-Algebra-Category` — category of F-algebras for `_⊗[I+_]`.
-- `to` — comparison functor from `iMR2ᴿ A` to F-algebras (WIP).
+Provides an explicit equivalence between the fibre category `iMR2ᴿ A` and the
+category of algebras for the endofunctor `X ↦ A + (A ⊗ X)`.
+- `_⊗[I+_]` — endofunctor `X ↦ A + (A ⊗ X)` (representing `A ⊗ (𝟙 + X)` when ⊗ distributes).
+- `F-Algebra-Category` — category of algebras for `_⊗[I+_]`.
+- `to` / `from` — comparison functors between `iMR2ᴿ A` and `F-Algebra-Category {A}`.
+- `AlgA≣MRS^A` — `StrongEquivalence (iMR2ᴿ A) (F-Algebra-Category {A})`.
 
 ### `TabEquivalence.agda`
 Equivalence between the total category (see `TotalCategory.agda`) and the
