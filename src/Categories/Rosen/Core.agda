@@ -1,28 +1,26 @@
 {-# OPTIONS --without-K --safe --warning=noUserWarning --warning=noUselessPrivate #-}
 
 open import Level using (_⊔_)
-
-open import Data.Product using (_,_; proj₁; proj₂; _×_)
-open import Relation.Binary.Bundles using (Setoid)
-
 open import Categories.Category using (Category)
-open import Categories.Category.Construction.Arrow
-open import Categories.Category.Instance.Setoids
 open import Categories.Category.Monoidal using (Monoidal)
 open import Categories.Category.Monoidal.Closed using (Closed)
-open import Categories.Functor using (Functor; _∘F_)
-open import Categories.Functor.Bifunctor using (Bifunctor; appˡ; appʳ)
-open import Categories.Functor.Bifunctor.Properties using ([_]-commute)
-open import Categories.NaturalTransformation using (NaturalTransformation;_∘ᵥ_; _∘ₕ_; _∘ˡ_; _∘ʳ_)
-open import Categories.NaturalTransformation.Equivalence using (_≃_)
 
 module Categories.Rosen.Core {o ℓ e} {C : Category o ℓ e} {M : Monoidal C} (Cl : Closed M) where
 
 -- Core definitions for the category of (M,R)-systems.
 -- Exports: Cod, nHom, nHom-identity, MR2, MR2-Setoid, MRS-Profunctor.
 
-private
-  module 𝒞 = Category C
+open import Data.Product using (_,_; proj₁; proj₂; _×_)
+open import Relation.Binary.Bundles using (Setoid)
+
+open import Categories.Category.Construction.Arrow
+open import Categories.Category.Instance.Setoids using (Setoids)
+open import Categories.Functor using (Functor; _∘F_)
+open import Categories.Functor.Bifunctor using (Bifunctor; appˡ; appʳ)
+open import Categories.Functor.Bifunctor.Properties using ([_]-commute)
+open import Categories.Morphism.Reasoning as MR
+open import Categories.NaturalTransformation using (NaturalTransformation; _∘ᵥ_; _∘ₕ_; _∘ˡ_; _∘ʳ_) renaming (id to idN)
+open import Categories.NaturalTransformation.Equivalence using (_≃_)
 
 import Reason
 open Reason C
@@ -48,8 +46,6 @@ nHom {A} {B} f = record
   ; commute = λ h → Equiv.sym [ [-,-] ]-commute
   ; sym-commute = λ h → [ [-,-] ]-commute
   }
-
-open import Categories.NaturalTransformation renaming (id to idN)
 
 -- nHom-identity: nHom respects identity.
 nHom-identity : ∀ {A} → nHom (id {A}) ≃ idN
@@ -80,12 +76,10 @@ MR2-Setoid A B = record
     }
   }
 
-import Categories.Morphism.Reasoning as MR
-
 open HomReasoning
 open MR
 
--- Type of the desired profunctor C.op × C → Sets 
+-- Type of the desired profunctor C.op × C → Sets
 -- sending (A , B) ↦ MR2 A B.
 MRS-Profunctor : Bifunctor (Category.op C) C (Setoids (o ⊔ ℓ ⊔ e) (o ⊔ ℓ ⊔ e))
 MRS-Profunctor = record
