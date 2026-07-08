@@ -195,10 +195,10 @@ AlgA≣MRS^A {A} = record
                  hₐ = adjoint.Radjunct (adjoint.Ladjunct h)
 
                  h≈ : hₐ ∘ βAB ≈ α ∘ i₂
-                 h≈ = begin hₐ ∘ βAB ≈⟨ ∘-resp-≈ˡ adjoint.RLadjunct≈id ○ assoc ○ refl⟩∘⟨ assoc ⟩
-                            α ∘ (i₂ ∘ (βBA ∘ βAB))                      ≈⟨ refl⟩∘⟨ ∘-resp-≈ʳ (commutative {X = B} {Y = A}) ⟩
-                            α ∘ (i₂ ∘ id)                               ≈⟨ refl⟩∘⟨ identityʳ ⟩
-                            α ∘ i₂                                      ∎
+                 h≈ = begin hₐ ∘ βAB               ≈⟨ ∘-resp-≈ˡ adjoint.RLadjunct≈id ○ assoc ○ refl⟩∘⟨ assoc ⟩
+                            α ∘ (i₂ ∘ (βBA ∘ βAB)) ≈⟨ refl⟩∘⟨ ∘-resp-≈ʳ (commutative {X = B} {Y = A}) ⟩
+                            α ∘ (i₂ ∘ id)          ≈⟨ refl⟩∘⟨ identityʳ ⟩
+                            α ∘ i₂                 ∎
 
                  αFG≈α : [ α ∘ i₁ , hₐ ∘ βAB ] ≈ α
                  αFG≈α = Equiv.trans ([]-cong₂ Equiv.refl h≈) (+-g-η {f = α})
