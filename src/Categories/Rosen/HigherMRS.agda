@@ -180,7 +180,7 @@ lemma-Fresp {n = n} z≤n z≤n = niHelper (record
   { η = λ X → M0.id {Functor.F₀ (reduce n) X}
   ; η⁻¹ = λ X → M0.id {Functor.F₀ (reduce n) X}
   ; commute = λ f → id-comm-sym (𝕄ℝ𝕊ₒ zero) {f = Functor.F₁ (reduce n) f}
-  ; iso = λ X → record { isoˡ = M0.identity² ; isoʳ = M0.identity² }
+  ; iso = λ X → record { isoˡ = M0.identity² {Functor.F₀ (reduce n) X} ; isoʳ = M0.identity² {Functor.F₀ (reduce n) X} }
   })
 lemma-Fresp (s≤s p) (s≤s q) = niHelper (record
   { η = λ X → {!  !}
