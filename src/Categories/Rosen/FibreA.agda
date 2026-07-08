@@ -1,34 +1,30 @@
 {-# OPTIONS --without-K --safe --warning=noUserWarning --warning=noUselessPrivate #-}
 
 open import Level using (_⊔_)
-
-open import Data.Product using (_,_)
-open import Relation.Binary using () renaming (Setoid to S)
-
 open import Categories.Category using (Category)
 open import Categories.Category.Monoidal using (Monoidal)
 open import Categories.Category.Monoidal.Closed using (Closed)
-open import Categories.Functor using (Functor)
-open import Categories.NaturalTransformation using (NaturalTransformation)
+
 module Categories.Rosen.FibreA {o ℓ e} {C : Category o ℓ e} {M : Monoidal C} (Cl : Closed M) where
 
 -- Fibre-at-A: alternative construction for higher (M,R)-systems by
 -- fixing the domain object A, which simplifies the definitions.
 -- Also includes commaNablaV, a weaker comma-object invariant (historical).
 
-private
-  module 𝒞 = Category C
+open import Data.Product using (_,_)
+open import Relation.Binary using () renaming (Setoid to S)
+
+open import Categories.Category.Construction.Arrow C using (Morphism; Morphism⇒; mor⇒)
+open import Categories.Category.Construction.Comma
+open import Categories.Functor using (Functor)
+open import Categories.NaturalTransformation using (NaturalTransformation)
+open import Categories.Rosen.Core Cl
+open import Categories.Rosen.Tabulator Cl using (𝕋MRS; V₁)
 
 import Reason
 open Reason C
 
 open Closed Cl using ([-,-]; [_,_]₀; [_,-]; [_,_]₁)
-
-import Categories.Morphism.Reasoning as MR
-
-open import Categories.Category.Construction.Arrow C using (Morphism; Morphism⇒; mor⇒)
-open import Categories.Rosen.Core Cl
-open import Categories.Rosen.Tabulator Cl using (𝕋MRS; V₁)
 
 -- Objects of the fibre at A: a codomain B plus an element ξ of MRS-Profunctor (A, B).
 record totalAtA₀ (A : Obj) : Set (o ⊔ ℓ ⊔ e) where
@@ -97,8 +93,6 @@ totalAtA A = record
 
 -- The same construction of HigherMRS.agda, but with a comma category instead of PB.
 -- Objects are commutative squares in Arrow(C):  ∇ x ⇒ V₁ y.
-
-open import Categories.Category.Construction.Comma
 
 -- commaNablaV: comma category ∇ ↓ V₁.  Weaker than the pullback in HigherMRS.
 commaNablaV : {T : Obj} → Category (ℓ ⊔ e ⊔ (o ⊔ ℓ ⊔ e)) (e ⊔ (o ⊔ ℓ ⊔ e)) e
