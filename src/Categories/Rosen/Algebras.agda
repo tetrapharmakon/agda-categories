@@ -1,20 +1,12 @@
 {-# OPTIONS --without-K --safe --warning=noUserWarning --warning=noUselessPrivate #-}
 
 open import Level using (_⊔_)
-
-open import Data.Product using (_,_)
-
 open import Categories.Category using (Category)
+open import Categories.Category.Cocartesian using (BinaryCoproducts)
 open import Categories.Category.Monoidal using (Monoidal)
 open import Categories.Category.Monoidal.Closed using (Closed)
 open import Categories.Category.Monoidal.Symmetric using (Symmetric)
-open import Categories.Functor using (Functor; _∘F_)
 
-open import Categories.Category.Cocartesian using (BinaryCoproducts)
-open import Categories.Functor.Algebra using (F-Algebra; F-Algebra-Morphism)
-open import Categories.Category.Construction.F-Algebras using (F-Algebras)
-open import Categories.Category.Equivalence using (StrongEquivalence)
-open import Categories.NaturalTransformation.NaturalIsomorphism using (niHelper)
 module Categories.Rosen.Algebras
   {o ℓ e} {C : Category o ℓ e}
   (M : Monoidal C)
@@ -23,7 +15,7 @@ module Categories.Rosen.Algebras
   (BC : BinaryCoproducts C)
   where
 
-------------------------------------------------------------------------
+----------------------------------------------------------------------
 -- Incoherent (M,R)-Systems as Algebras
 --
 -- Fix an object A.
@@ -39,24 +31,26 @@ module Categories.Rosen.Algebras
 --
 -- The main result in this module is an explicit equivalence between iMR2ᴿ A
 -- and the category of algebras for X ↦ A + (A ⊗ X).
-------------------------------------------------------------------------
+----------------------------------------------------------------------
 
-private
-  module 𝒞 = Category C
+open Category C
 
-open 𝒞
-
+open import Data.Product using (_,_)
+open import Categories.Category.Construction.F-Algebras using (F-Algebras)
+open import Categories.Category.Equivalence using (StrongEquivalence)
+open import Categories.Functor using (Functor; _∘F_)
+open import Categories.Functor.Algebra using (F-Algebra; F-Algebra-Morphism)
 import Categories.Morphism.Reasoning as MR
+open import Categories.NaturalTransformation.NaturalIsomorphism using (niHelper)
+open import Categories.Rosen.Incoherent.Core Cl
+open import Categories.Rosen.Incoherent.Fibred Cl using (iMR2ᴿ; iMR2ᴿ₀; iMR2ᴿ⇒)
 
 open HomReasoning
 open MR C
-
 open Monoidal M using (_⊗-; -⊗_; unit; _⊗₀_; _⊗₁_)
 open BinaryCoproducts BC
 open Symmetric S hiding (_⊗-; -⊗_; unit; _⊗₀_; _⊗₁_) renaming (braided-iso to β)
 open Closed Cl using (adjoint; [_,_]₀; [_,_]₁; [_,-])
-open import Categories.Rosen.Incoherent.Core Cl
-open import Categories.Rosen.Incoherent.Fibred Cl using (iMR2ᴿ; iMR2ᴿ₀; iMR2ᴿ⇒)
 
 -- Endofunctor X ↦ A + (A ⊗ X) on C.
 _⊗[I+_] : {A : Obj} → Functor C C
