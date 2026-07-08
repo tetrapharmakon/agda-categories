@@ -124,7 +124,11 @@ pℕ = Thin
 -- lemma: 𝕄ℝ𝕊-down at level n is naturally ≃ to the identity. (WIP: has holes)
 lemma : ∀ {n : ℕ} → NaturalIsomorphism (𝕄ℝ𝕊-down {n} {n} ≤-refl) (idF {C = 𝕄ℝ𝕊ₒ n})
 lemma {zero} = niHelper (record 
-  { η = λ X → {! id  !} 
+  { η = λ X → record 
+    { f = record { l = id ; r = id ; eqElts = {!  !} } 
+    ; g = record { l = id ; r = id ; eq = Equiv.refl , λ {x} → Equiv.refl } 
+    ; commute = {!  !} , {!  !} 
+    } 
   ; η⁻¹ = {!  !} 
   ; commute = {!  !} 
   ; iso = {!  !} 

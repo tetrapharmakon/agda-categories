@@ -109,7 +109,7 @@ In this setting, V₁ and U₁ acquire left adjoints.
 - `yoneda-argument` — `Nat(Cod, [A,-]∘Cod)` is a singleton.
 - `unique-ϕ` — every such ϕ equals `const-ϕ A`.
 - `L` / `L⊣V₁` — left adjoint to V₁.
-- `L'` / `L'⊣U₁` — left adjoint to U₁ (WIP: hole in counit).
+- `L'` / `L'⊣U₁` — left adjoint to U₁.
 
 ### `ProElements.agda`
 Modified category of elements for a bifunctor `F : C^op × C → Sets`, specialised to `MRS-Profunctor`.

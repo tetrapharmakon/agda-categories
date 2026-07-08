@@ -166,7 +166,7 @@ L⊣V₁ = record
         , refl 
   }
 
--- L'⊣U₁: adjunction L' ⊣ U₁ (WIP: hole in counit).
+-- L'⊣U₁: adjunction L' ⊣ U₁
 L'⊣U₁ : L' ⊣ U₁
 L'⊣U₁ = record 
   { unit = ntHelper (record 
