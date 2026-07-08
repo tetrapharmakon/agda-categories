@@ -24,6 +24,7 @@ open import Categories.Category.Instance.Cats using (Cats)
 open import Categories.Functor using (Functor; _∘F_) renaming (id to idF)
 open import Categories.Functor.Profunctor.Tabulator using (tab₀;tab⇒)
 open import Categories.Morphism.Reasoning as MR
+import Relation.Binary.Reasoning.Setoid as SetoidR
 open import Categories.NaturalTransformation.NaturalIsomorphism using (NaturalIsomorphism;niHelper)
 open import Categories.Rosen.Core Cl
 open import Categories.Rosen.ProElements Cl {F = MRS-Profunctor}
@@ -33,6 +34,8 @@ import Reason
 open Reason C
 open HomReasoning
 open MR
+
+open Closed Cl using ([-,-]; [_,_]₀; [_,-]; [-,_]; [_,_]₁)
 
 -- MRS3: the 3rd level, IsoComma of ℝ (from ProElements) and V₁ (from Tabulator).
 MRS3 : Category (o ⊔ ℓ ⊔ e) (o ⊔ ℓ ⊔ e) e
@@ -122,18 +125,22 @@ pℕ = Thin
       }
 
 -- lemma: 𝕄ℝ𝕊-down at level n is naturally ≃ to the identity. (WIP: has holes)
-lemma : ∀ {n : ℕ} → NaturalIsomorphism (𝕄ℝ𝕊-down {n} {n} ≤-refl) (idF {C = 𝕄ℝ𝕊ₒ n})
-lemma {zero} = niHelper (record 
+lemma-id : ∀ {n : ℕ} → NaturalIsomorphism (𝕄ℝ𝕊-down {n} {n} ≤-refl) (idF {C = 𝕄ℝ𝕊ₒ n})
+lemma-id {zero} = niHelper (record 
   { η = λ X → record 
-    { f = record { l = id ; r = id ; eqElts = {!  !} } 
+    { f = record { l = id ; r = id ; eqElts = identityˡʳ , (λ {x} → elimˡ C (Functor.identity [-,-])) } 
     ; g = record { l = id ; r = id ; eq = Equiv.refl , λ {x} → Equiv.refl } 
     ; commute = {!  !} , {!  !} 
     } 
-  ; η⁻¹ = {!  !} 
-  ; commute = {!  !} 
+  ; η⁻¹ = λ X → record 
+    { f = record { l = id ; r = id ; eqElts = identityˡʳ , (λ {x} → elimˡ C (Functor.identity [-,-])) } 
+    ; g = record { l = id ; r = id ; eq = Equiv.refl , λ {x} → Equiv.refl } 
+    ; commute = {!  !} , {!  !} 
+    } 
+  ; commute = λ f → ({!  !} , {!  !}) , {!  !} 
   ; iso = {!  !} 
   }) where module M = Category (𝕄ℝ𝕊ₒ zero)
-lemma {suc n} = niHelper (record 
+lemma-id {suc n} = niHelper (record 
   { η = λ X → {!  !} 
   ; η⁻¹ = {!  !} 
   ; commute = {!  !} 
@@ -145,13 +152,7 @@ MRS-chain : Functor (Category.op pℕ) (Cats (o ⊔ ℓ ⊔ e) (o ⊔ ℓ ⊔ e)
 MRS-chain = record
   { F₀ = 𝕄ℝ𝕊ₒ
   ; F₁ = λ {n} {m} m≤n → 𝕄ℝ𝕊-down m≤n
-  ; identity = λ { {n} → niHelper 
-    (record 
-    { η = λ { X → {!  !} }
-    ; η⁻¹ = λ { X → {!  !} }
-    ; commute = {!  !} 
-    ; iso = {!  !} 
-    })}
+  ; identity = λ { {n} → lemma-id {n} } 
   ; homomorphism = niHelper 
     (record 
     { η = {!  !} 
@@ -161,8 +162,8 @@ MRS-chain = record
     })
   ; F-resp-≈ = λ f≈g → niHelper 
     (record 
-    { η = {!  !} 
-    ; η⁻¹ = {!  !} 
+    { η = λ X → {!  !} 
+    ; η⁻¹ = λ X → {!  !} 
     ; commute = {!  !} 
     ; iso = {!  !} 
     })
