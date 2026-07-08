@@ -94,6 +94,10 @@ MRS3 = IsoComma ℝ V₁
 Π-MRS : (n : ℕ) → Functor (𝕄ℝ𝕊ₒ (suc n)) (𝕄ℝ𝕊ₒ n)
 Π-MRS n = ICproj₂
 
+reduce : (k : ℕ) → Functor (𝕄ℝ𝕊ₒ k) (𝕄ℝ𝕊ₒ 0)
+reduce 0 = idF
+reduce (suc k) = reduce k ∘F Π-MRS k
+
 -- ℕ as a poset category.
 pℕ : Category 0ℓ 0ℓ 0ℓ
 pℕ = Thin
@@ -101,10 +105,6 @@ pℕ = Thin
 -- 𝕄ℝ𝕊-down: functor from level n down to level m when m ≤ n.
 𝕄ℝ𝕊-down : ∀ {n m} → m ≤ n → Functor (𝕄ℝ𝕊ₒ n) (𝕄ℝ𝕊ₒ m)
 𝕄ℝ𝕊-down {n} z≤n = reduce n
-  where
-    reduce : (k : ℕ) → Functor (𝕄ℝ𝕊ₒ k) (𝕄ℝ𝕊ₒ 0)
-    reduce 0 = idF
-    reduce (suc k) = reduce k ∘F Π-MRS k
 𝕄ℝ𝕊-down (s≤s {m} {n} m≤n) = go
   where
     F-down = 𝕄ℝ𝕊-down m≤n
@@ -124,21 +124,26 @@ pℕ = Thin
       ; F-resp-≈ = λ eq → ((eq .proj₁ .proj₁) , (eq .proj₁ .proj₂)) , F-down.F-resp-≈ (proj₂ eq)
       }
 
+
+private module M0 = Category (𝕄ℝ𝕊ₒ zero)
+private module ElMRS = Category ElMRS
+private module 𝕋MRS = Category 𝕋MRS
+
 -- lemma: 𝕄ℝ𝕊-down at level n is naturally ≃ to the identity. (WIP: has holes)
 lemma-id : ∀ {n : ℕ} → NaturalIsomorphism (𝕄ℝ𝕊-down {n} {n} ≤-refl) (idF {C = 𝕄ℝ𝕊ₒ n})
 lemma-id {zero} = niHelper (record 
   { η = λ X → record 
-    { f = record { l = id ; r = id ; eqElts = identityˡʳ , (λ {x} → elimˡ C (Functor.identity [-,-])) } 
-    ; g = record { l = id ; r = id ; eq = Equiv.refl , λ {x} → Equiv.refl } 
-    ; commute = {!  !} , {!  !} 
+    { f = ElMRS.id
+    ; g = 𝕋MRS.id
+    ; commute = trans identityˡ (sym identityʳ) , trans identityˡ (proj₂ (introʳ Arr.Arrow (Functor.identity ℝ)))
     } 
   ; η⁻¹ = λ X → record 
-    { f = record { l = id ; r = id ; eqElts = identityˡʳ , (λ {x} → elimˡ C (Functor.identity [-,-])) } 
-    ; g = record { l = id ; r = id ; eq = Equiv.refl , λ {x} → Equiv.refl } 
-    ; commute = {!  !} , {!  !} 
+    { f = ElMRS.id
+    ; g = 𝕋MRS.id
+    ; commute = trans identityˡ (sym identityʳ) , trans identityˡ (proj₂ (introʳ Arr.Arrow (Functor.identity ℝ))) 
     } 
-  ; commute = λ f → ({!  !} , {!  !}) , {!  !} 
-  ; iso = {!  !} 
+  ; commute = λ f → id-comm-sym (𝕄ℝ𝕊ₒ zero) {f = f}
+  ; iso = λ X → record { isoˡ = M.identity² {X} ; isoʳ = M.identity² {X} } 
   }) where module M = Category (𝕄ℝ𝕊ₒ zero)
 lemma-id {suc n} = niHelper (record 
   { η = λ X → {!  !} 
@@ -150,11 +155,11 @@ lemma-id {suc n} = niHelper (record
 -- lemma-homomorphism: 𝕄ℝ𝕊-down respects composition up to natural isomorphism.
 lemma-homomorphism : ∀ {n m k : ℕ} (m≤n : m ≤ n) (k≤m : k ≤ m) →
   NaturalIsomorphism (𝕄ℝ𝕊-down (≤-trans k≤m m≤n)) ((𝕄ℝ𝕊-down k≤m) ∘F (𝕄ℝ𝕊-down m≤n))
-lemma-homomorphism z≤n z≤n = niHelper (record
-  { η = λ X → {!  !}
-  ; η⁻¹ = λ X → {!  !}
-  ; commute = λ f → {!  !}
-  ; iso = λ X → {!  !}
+lemma-homomorphism {n = n} z≤n z≤n = niHelper (record
+  { η = λ X → M0.id
+  ; η⁻¹ = λ X → M0.id
+  ; commute = λ f → id-comm-sym (𝕄ℝ𝕊ₒ zero) {f = Functor.F₁ (reduce n) f}
+  ; iso = λ X → record { isoˡ = M0.identity² {Functor.F₀ (reduce n) X} ; isoʳ = M0.identity² {Functor.F₀ (reduce n) X} }
   })
 lemma-homomorphism (s≤s m≤n) z≤n = niHelper (record
   { η = λ X → {!  !}
@@ -171,11 +176,11 @@ lemma-homomorphism (s≤s m≤n) (s≤s k≤m) = niHelper (record
 
 -- lemma-Fresp: proof-irrelevance for 𝕄ℝ𝕊-down on thin morphisms.
 lemma-Fresp : ∀ {n m : ℕ} (p q : m ≤ n) → NaturalIsomorphism (𝕄ℝ𝕊-down p) (𝕄ℝ𝕊-down q)
-lemma-Fresp z≤n z≤n = niHelper (record
-  { η = λ X → {!  !}
-  ; η⁻¹ = λ X → {!  !}
-  ; commute = λ f → {!  !}
-  ; iso = λ X → {!  !}
+lemma-Fresp {n = n} z≤n z≤n = niHelper (record
+  { η = λ X → M0.id {Functor.F₀ (reduce n) X}
+  ; η⁻¹ = λ X → M0.id {Functor.F₀ (reduce n) X}
+  ; commute = λ f → id-comm-sym (𝕄ℝ𝕊ₒ zero) {f = Functor.F₁ (reduce n) f}
+  ; iso = λ X → record { isoˡ = M0.identity² ; isoʳ = M0.identity² }
   })
 lemma-Fresp (s≤s p) (s≤s q) = niHelper (record
   { η = λ X → {!  !}
