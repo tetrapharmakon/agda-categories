@@ -95,56 +95,20 @@ to {A} = record
         module ⊗A = Functor (-⊗ A)
         yoga : f.v ∘ ϕX# ∘ β.from ≈ ϕY# ∘ β.from ∘ (idA ⊗₁ f.v)
         yoga = begin
-            f.v ∘ ϕX# ∘ β.from                         ≈⟨ sym-assoc ⟩
-            (f.v ∘ ϕX#) ∘ β.from                       ≈⟨ (Equiv.sym (adjoint.Radjunct-comm′ {f = f.ξX.ϕ} {g = f.v})) ⟩∘⟨refl ⟩
+            f.v ∘ ϕX# ∘ β.from                                 ≈⟨ sym-assoc ○ (Equiv.sym (adjoint.Radjunct-comm′ {f = f.ξX.ϕ} {g = f.v})) ⟩∘⟨refl ⟩
             adjoint.Radjunct ([ id , f.v ]₁ ∘ f.ξX.ϕ) ∘ β.from ≈⟨ adjoint.Radjunct-resp-≈ f.eqϕ ⟩∘⟨refl ⟩
-            adjoint.Radjunct (f.ξY.ϕ ∘ f.v) ∘ β.from  ≈⟨ (begin
-              adjoint.Radjunct (f.ξY.ϕ ∘ f.v)
-                ≈⟨ refl⟩∘⟨ ⊗A.homomorphism ⟩
-              adjoint.counit.η _ ∘ (⊗A.F₁ f.ξY.ϕ ∘ ⊗A.F₁ f.v)
-                ≈⟨ sym-assoc ⟩
-              (adjoint.counit.η _ ∘ ⊗A.F₁ f.ξY.ϕ) ∘ ⊗A.F₁ f.v
-                ∎) ⟩∘⟨refl ⟩
-            (ϕY# ∘ (f.v ⊗₁ idA)) ∘ β.from              ≈⟨ assoc ⟩
-            ϕY# ∘ (f.v ⊗₁ idA) ∘ β.from                ≈⟨ refl⟩∘⟨ braiding.⇒.sym-commute {X = (A , f.X.B)} {Y = (A , f.Y.B)} (idA , f.v) ⟩
-            ϕY# ∘ β.from ∘ (idA ⊗₁ f.v)                ∎
+            adjoint.Radjunct (f.ξY.ϕ ∘ f.v) ∘ β.from           ≈⟨ (refl⟩∘⟨ ⊗A.homomorphism ○ sym-assoc) ⟩∘⟨refl ○ assoc ⟩
+            ϕY# ∘ (f.v ⊗₁ idA) ∘ β.from                        ≈⟨ refl⟩∘⟨ braiding.⇒.sym-commute {X = (A , f.X.B)} {Y = (A , f.Y.B)} (idA , f.v) ⟩
+            ϕY# ∘ β.from ∘ (idA ⊗₁ f.v)                        ∎
       in record
       { f = f.v
       ; commutes =
           let F₁v = idA +₁ (idA ⊗₁ f.v)
           in begin
-            f.v ∘ [ f.ξX.f , ϕX# ∘ β.from ]
-              ≈⟨ ∘-distribˡ-[] ⟩
-            [ f.v ∘ f.ξX.f , f.v ∘ (ϕX# ∘ β.from) ]
-              ≈⟨ +-unique
-                   (begin
-                     ([ f.ξY.f , ϕY# ∘ β.from ] ∘ F₁v) ∘ i₁
-                       ≈⟨ assoc ⟩
-                     [ f.ξY.f , ϕY# ∘ β.from ] ∘ (F₁v ∘ i₁)
-                       ≈⟨ refl⟩∘⟨ +₁∘i₁ ⟩
-                     [ f.ξY.f , ϕY# ∘ β.from ] ∘ (i₁ ∘ id)
-                       ≈⟨ refl⟩∘⟨ identityʳ ⟩
-                     [ f.ξY.f , ϕY# ∘ β.from ] ∘ i₁
-                       ≈⟨ inject₁ ⟩
-                     f.ξY.f
-                       ≈˘⟨ f.eqf ⟩
-                     f.v ∘ f.ξX.f
-                       ∎)
-                   (begin
-                     ([ f.ξY.f , ϕY# ∘ β.from ] ∘ F₁v) ∘ i₂
-                       ≈⟨ assoc ⟩
-                     [ f.ξY.f , ϕY# ∘ β.from ] ∘ (F₁v ∘ i₂)
-                       ≈⟨ refl⟩∘⟨ +₁∘i₂ ⟩
-                     [ f.ξY.f , ϕY# ∘ β.from ] ∘ (i₂ ∘ (idA ⊗₁ f.v))
-                       ≈⟨ sym-assoc ⟩
-                     ([ f.ξY.f , ϕY# ∘ β.from ] ∘ i₂) ∘ (idA ⊗₁ f.v)
-                       ≈⟨ inject₂ ⟩∘⟨refl ⟩
-                     (ϕY# ∘ β.from) ∘ (idA ⊗₁ f.v)
-                       ≈⟨ assoc ⟩
-                     ϕY# ∘ β.from ∘ (idA ⊗₁ f.v)
-                       ≈˘⟨ yoga ⟩
-                     f.v ∘ ϕX# ∘ β.from
-                       ∎)
+            f.v ∘ [ f.ξX.f , ϕX# ∘ β.from ]         ≈⟨ ∘-distribˡ-[] ⟩
+            [ f.v ∘ f.ξX.f , f.v ∘ (ϕX# ∘ β.from) ] ≈⟨ +-unique
+                   (assoc ○ refl⟩∘⟨ +₁∘i₁ ○ refl⟩∘⟨ identityʳ ○ inject₁ ○ (Equiv.sym f.eqf))
+                   (assoc ○ refl⟩∘⟨ +₁∘i₂ ○ sym-assoc ○ inject₂ ⟩∘⟨refl ○ assoc ○ Equiv.sym yoga)
               ⟩
             [ f.ξY.f , ϕY# ∘ β.from ] ∘ F₁v
               ∎
@@ -187,54 +151,20 @@ from {A} = record
       ; eqϕ =
           let module HomA = Functor ([ A ,-])
               F₁f = idA +₁ (idA ⊗₁ f')
-
               tensorEq : f' ∘ hx ≈ hy ∘ (f' ⊗₁ idA)
               tensorEq = begin
-                f' ∘ hx
-                  ≈⟨ Equiv.refl ⟩
-                f' ∘ (αx ∘ i₂ ∘ β.from)
-                  ≈⟨ sym-assoc ⟩
-                (f' ∘ αx) ∘ i₂ ∘ β.from
-                  ≈⟨ (f.commutes f) ⟩∘⟨refl ⟩
-                (αy ∘ F₁f) ∘ i₂ ∘ β.from
-                  ≈⟨ sym-assoc ⟩
-                ((αy ∘ F₁f) ∘ i₂) ∘ β.from
-                  ≈⟨ assoc ⟩∘⟨refl ⟩
-                (αy ∘ (F₁f ∘ i₂)) ∘ β.from
-                  ≈⟨ assoc ⟩
-                αy ∘ (F₁f ∘ i₂) ∘ β.from
-                  ≈⟨ refl⟩∘⟨ +₁∘i₂ ⟩∘⟨refl ⟩
-                αy ∘ (i₂ ∘ (idA ⊗₁ f')) ∘ β.from
-                  ≈⟨ sym-assoc ⟩
-                (αy ∘ (i₂ ∘ (idA ⊗₁ f'))) ∘ β.from
-                  ≈⟨ (Equiv.sym assoc) ⟩∘⟨refl ⟩
-                ((αy ∘ i₂) ∘ (idA ⊗₁ f')) ∘ β.from
-                  ≈⟨ assoc ⟩
-                (αy ∘ i₂) ∘ (idA ⊗₁ f') ∘ β.from
-                  ≈⟨ refl⟩∘⟨ braiding.⇒.sym-commute {X = (x.A , A)} {Y = (y.A , A)} (f' , idA) ⟩
-                (αy ∘ i₂) ∘ β.from ∘ (f' ⊗₁ idA)
-                  ≈⟨ Equiv.refl ⟩
-                (αy ∘ i₂) ∘ (β.from ∘ (f' ⊗₁ idA))
-                  ≈⟨ assoc ⟩
-                αy ∘ i₂ ∘ β.from ∘ (f' ⊗₁ idA)
-                  ≈⟨ refl⟩∘⟨ sym-assoc ⟩
-                αy ∘ (i₂ ∘ β.from) ∘ (f' ⊗₁ idA)
-                  ≈⟨ sym-assoc ⟩
-                (αy ∘ (i₂ ∘ β.from)) ∘ (f' ⊗₁ idA)
-                  ≈⟨ Equiv.refl ⟩
-                hy ∘ (f' ⊗₁ idA)
-                  ∎
+                f' ∘ hx                            ≈⟨ sym-assoc ○ (f.commutes f) ⟩∘⟨refl ⟩
+                (αy ∘ F₁f) ∘ i₂ ∘ β.from           ≈⟨ sym-assoc ○ assoc ⟩∘⟨refl ⟩
+                (αy ∘ (F₁f ∘ i₂)) ∘ β.from         ≈⟨ assoc ○ refl⟩∘⟨ +₁∘i₂ ⟩∘⟨refl ⟩
+                αy ∘ (i₂ ∘ (idA ⊗₁ f')) ∘ β.from   ≈⟨ sym-assoc ○ (Equiv.sym assoc) ⟩∘⟨refl ○ assoc ⟩
+                (αy ∘ i₂) ∘ (idA ⊗₁ f') ∘ β.from   ≈⟨ refl⟩∘⟨ braiding.⇒.sym-commute {X = (x.A , A)} {Y = (y.A , A)} (f' , idA) ○ assoc ○ refl⟩∘⟨ sym-assoc ○ sym-assoc ⟩
+                (αy ∘ (i₂ ∘ β.from)) ∘ (f' ⊗₁ idA) ∎
           in begin
-            [ id , f' ]₁ ∘ adjoint.Ladjunct hx
-              ≈⟨ sym-assoc ⟩
-            ([ id , f' ]₁ ∘ HomA.F₁ hx) ∘ adjoint.unit.η _
-              ≈⟨ (Equiv.sym HomA.homomorphism) ⟩∘⟨refl ⟩
-            HomA.F₁ (f' ∘ hx) ∘ adjoint.unit.η _
-              ≈⟨ (HomA.F-resp-≈ tensorEq) ⟩∘⟨refl ⟩
-            HomA.F₁ (hy ∘ (f' ⊗₁ idA)) ∘ adjoint.unit.η _
-              ≈⟨ adjoint.Ladjunct-comm′ {f = f'} {g = hy} ⟩
-            adjoint.Ladjunct hy ∘ f'
-              ∎
+            [ id , f' ]₁ ∘ adjoint.Ladjunct hx             ≈⟨ sym-assoc ⟩
+            ([ id , f' ]₁ ∘ HomA.F₁ hx) ∘ adjoint.unit.η _ ≈⟨ (Equiv.sym HomA.homomorphism) ⟩∘⟨refl ⟩
+            HomA.F₁ (f' ∘ hx) ∘ adjoint.unit.η _           ≈⟨ (HomA.F-resp-≈ tensorEq) ⟩∘⟨refl ⟩
+            HomA.F₁ (hy ∘ (f' ⊗₁ idA)) ∘ adjoint.unit.η _  ≈⟨ adjoint.Ladjunct-comm′ {f = f'} {g = hy} ⟩
+            adjoint.Ladjunct hy ∘ f' ∎
       }
   ; identity = Equiv.refl
   ; homomorphism = Equiv.refl
@@ -268,35 +198,21 @@ AlgA≣MRS^A {A} = record
                  βAB = β.from {X = A} {Y = B}
                  βBA = β.from {X = B} {Y = A}
                  h = α ∘ i₂ ∘ βBA
+                 hₐ = adjoint.Radjunct (adjoint.Ladjunct h)
 
-                 h≈ : adjoint.Radjunct (adjoint.Ladjunct h) ∘ βAB ≈ α ∘ i₂
-                 h≈ = begin
-                   adjoint.Radjunct (adjoint.Ladjunct h) ∘ βAB
-                     ≈⟨ ∘-resp-≈ˡ adjoint.RLadjunct≈id ⟩
-                   h ∘ βAB
-                     ≈⟨ assoc ⟩
-                   α ∘ ((i₂ ∘ βBA) ∘ βAB)
-                     ≈⟨ refl⟩∘⟨ assoc ⟩
-                   α ∘ (i₂ ∘ (βBA ∘ βAB))
-                     ≈⟨ refl⟩∘⟨ ∘-resp-≈ʳ (commutative {X = B} {Y = A}) ⟩
-                   α ∘ (i₂ ∘ id)
-                     ≈⟨ refl⟩∘⟨ identityʳ ⟩
-                   α ∘ i₂
-                     ∎
+                 h≈ : hₐ ∘ βAB ≈ α ∘ i₂
+                 h≈ = begin hₐ ∘ βAB ≈⟨ ∘-resp-≈ˡ adjoint.RLadjunct≈id ○ assoc ○ refl⟩∘⟨ assoc ⟩
+                            α ∘ (i₂ ∘ (βBA ∘ βAB))                      ≈⟨ refl⟩∘⟨ ∘-resp-≈ʳ (commutative {X = B} {Y = A}) ⟩
+                            α ∘ (i₂ ∘ id)                               ≈⟨ refl⟩∘⟨ identityʳ ⟩
+                            α ∘ i₂                                      ∎
 
-                 αFG≈α : [ α ∘ i₁ , adjoint.Radjunct (adjoint.Ladjunct h) ∘ βAB ] ≈ α
+                 αFG≈α : [ α ∘ i₁ , hₐ ∘ βAB ] ≈ α
                  αFG≈α = Equiv.trans ([]-cong₂ Equiv.refl h≈) (+-g-η {f = α})
-             in begin
-               id ∘ [ α ∘ i₁ , adjoint.Radjunct (adjoint.Ladjunct h) ∘ βAB ]
-                 ≈⟨ identityˡ ⟩
-               [ α ∘ i₁ , adjoint.Radjunct (adjoint.Ladjunct h) ∘ βAB ]
-                 ≈⟨ αFG≈α ⟩
-               α
-                 ≈˘⟨ identityʳ ⟩
-               α ∘ id
-                 ≈⟨ ∘-resp-≈ʳ (Equiv.sym (Functor.identity (_⊗[I+_] {A = A}))) ⟩
-               α ∘ Functor.F₁ (_⊗[I+_] {A = A}) id
-                 ∎
+             in begin id ∘ [ α ∘ i₁ , hₐ ∘ βAB ]          ≈⟨ identityˡ ⟩
+                      [ α ∘ i₁ , hₐ ∘ βAB ]               ≈⟨ αFG≈α ⟩
+                      α                                   ≈˘⟨ identityʳ ⟩
+                      α ∘ id                              ≈⟨ ∘-resp-≈ʳ (Equiv.sym (Functor.identity (_⊗[I+_] {A = A}))) ⟩
+                      α ∘ Functor.F₁ (_⊗[I+_] {A = A}) id ∎
          } 
       ; η⁻¹ = λ X → record 
          { f = id 
@@ -307,35 +223,21 @@ AlgA≣MRS^A {A} = record
                  βAB = β.from {X = A} {Y = B}
                  βBA = β.from {X = B} {Y = A}
                  h = α ∘ i₂ ∘ βBA
+                 hₐ = adjoint.Radjunct (adjoint.Ladjunct h)
 
-                 h≈ : adjoint.Radjunct (adjoint.Ladjunct h) ∘ βAB ≈ α ∘ i₂
-                 h≈ = begin
-                   adjoint.Radjunct (adjoint.Ladjunct h) ∘ βAB
-                     ≈⟨ ∘-resp-≈ˡ adjoint.RLadjunct≈id ⟩
-                   h ∘ βAB
-                     ≈⟨ assoc ⟩
-                   α ∘ ((i₂ ∘ βBA) ∘ βAB)
-                     ≈⟨ refl⟩∘⟨ assoc ⟩
-                   α ∘ (i₂ ∘ (βBA ∘ βAB))
-                     ≈⟨ refl⟩∘⟨ ∘-resp-≈ʳ (commutative {X = B} {Y = A}) ⟩
-                   α ∘ (i₂ ∘ id)
-                     ≈⟨ refl⟩∘⟨ identityʳ ⟩
-                   α ∘ i₂
-                     ∎
+                 h≈ : hₐ ∘ βAB ≈ α ∘ i₂
+                 h≈ = begin hₐ ∘ βAB               ≈⟨ ∘-resp-≈ˡ adjoint.RLadjunct≈id ○ assoc ○ refl⟩∘⟨ assoc ⟩
+                            α ∘ (i₂ ∘ (βBA ∘ βAB)) ≈⟨ refl⟩∘⟨ ∘-resp-≈ʳ (commutative {X = B} {Y = A}) ⟩
+                            α ∘ (i₂ ∘ id)          ≈⟨ refl⟩∘⟨ identityʳ ⟩
+                            α ∘ i₂                 ∎
 
-                 αFG≈α : [ α ∘ i₁ , adjoint.Radjunct (adjoint.Ladjunct h) ∘ βAB ] ≈ α
+                 αFG≈α : [ α ∘ i₁ , hₐ ∘ βAB ] ≈ α
                  αFG≈α = Equiv.trans ([]-cong₂ Equiv.refl h≈) (+-g-η {f = α})
-             in begin
-               id ∘ α
-                 ≈⟨ identityˡ ⟩
-               α
-                 ≈˘⟨ αFG≈α ⟩
-               [ α ∘ i₁ , adjoint.Radjunct (adjoint.Ladjunct h) ∘ βAB ]
-                 ≈˘⟨ identityʳ ⟩
-               [ α ∘ i₁ , adjoint.Radjunct (adjoint.Ladjunct h) ∘ βAB ] ∘ id
-                 ≈⟨ ∘-resp-≈ʳ (Equiv.sym (Functor.identity (_⊗[I+_] {A = A}))) ⟩
-               [ α ∘ i₁ , adjoint.Radjunct (adjoint.Ladjunct h) ∘ βAB ] ∘ Functor.F₁ (_⊗[I+_] {A = A}) id
-                 ∎
+             in begin id ∘ α                                                  ≈⟨ identityˡ ⟩
+                      α                                                       ≈˘⟨ αFG≈α ⟩
+                      [ α ∘ i₁ , hₐ ∘ βAB ]                                   ≈˘⟨ identityʳ ⟩
+                      [ α ∘ i₁ , hₐ ∘ βAB ] ∘ id                              ≈⟨ ∘-resp-≈ʳ (Equiv.sym (Functor.identity (_⊗[I+_] {A = A}))) ⟩
+                      [ α ∘ i₁ , hₐ ∘ βAB ] ∘ Functor.F₁ (_⊗[I+_] {A = A}) id ∎
          } 
       ; commute = λ f → Equiv.trans identityˡ (Equiv.sym identityʳ) 
       ; iso = λ X → record 
@@ -363,24 +265,18 @@ AlgA≣MRS^A {A} = record
                  ϕ′≈ϕ =
                    let step₁ : α ∘ i₂ ∘ βBA ≈ ϕ#
                        step₁ = begin
-                         α ∘ i₂ ∘ βBA              ≈⟨ sym-assoc ⟩
-                         (α ∘ i₂) ∘ βBA            ≈⟨ ∘-resp-≈ˡ inject₂ ⟩
-                         (ϕ# ∘ βAB) ∘ βBA          ≈⟨ assoc ⟩
-                         ϕ# ∘ (βAB ∘ βBA)          ≈⟨ ∘-resp-≈ʳ (commutative {X = A} {Y = B}) ⟩
-                         ϕ# ∘ id                   ≈⟨ identityʳ ⟩
-                         ϕ#                         ∎
+                         α ∘ i₂ ∘ βBA     ≈⟨ sym-assoc ⟩
+                         (α ∘ i₂) ∘ βBA   ≈⟨ ∘-resp-≈ˡ inject₂ ⟩
+                         (ϕ# ∘ βAB) ∘ βBA ≈⟨ assoc ⟩
+                         ϕ# ∘ (βAB ∘ βBA) ≈⟨ ∘-resp-≈ʳ (commutative {X = A} {Y = B}) ⟩
+                         ϕ# ∘ id          ≈⟨ identityʳ ⟩
+                         ϕ#               ∎
                    in Equiv.trans (adjoint.Ladjunct-resp-≈ step₁) adjoint.LRadjunct≈id
-             in begin
-               [ id , id ]₁ ∘ ϕ′
-                 ≈⟨ ∘-resp-≈ˡ (Functor.identity ([ A ,-])) ⟩
-               id ∘ ϕ′
-                 ≈⟨ identityˡ ⟩
-               ϕ′
-                 ≈⟨ ϕ′≈ϕ ⟩
-               ξ.ϕ
-                 ≈˘⟨ identityʳ ⟩
-               ξ.ϕ ∘ id
-                 ∎
+             in begin [ id , id ]₁ ∘ ϕ′ ≈⟨ ∘-resp-≈ˡ (Functor.identity ([ A ,-])) ⟩
+                      id ∘ ϕ′           ≈⟨ identityˡ ⟩
+                      ϕ′                ≈⟨ ϕ′≈ϕ ⟩
+                      ξ.ϕ               ≈˘⟨ identityʳ ⟩
+                      ξ.ϕ ∘ id          ∎
          } 
       ; η⁻¹ = λ X → record 
          { v = id 
