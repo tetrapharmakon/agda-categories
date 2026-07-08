@@ -297,24 +297,19 @@ AlgA≣MRS^A {A} = record
                  ϕ′≈ϕ =
                    let step₁ : α ∘ i₂ ∘ βBA ≈ ϕ#
                        step₁ = begin
-                         α ∘ i₂ ∘ βBA              ≈⟨ sym-assoc ⟩
-                         (α ∘ i₂) ∘ βBA            ≈⟨ ∘-resp-≈ˡ inject₂ ⟩
-                         (ϕ# ∘ βAB) ∘ βBA          ≈⟨ assoc ⟩
-                         ϕ# ∘ (βAB ∘ βBA)          ≈⟨ ∘-resp-≈ʳ (commutative {X = A} {Y = B}) ⟩
-                         ϕ# ∘ id                   ≈⟨ identityʳ ⟩
-                         ϕ#                         ∎
+                         α ∘ i₂ ∘ βBA     ≈⟨ sym-assoc ⟩
+                         (α ∘ i₂) ∘ βBA   ≈⟨ ∘-resp-≈ˡ inject₂ ⟩
+                         (ϕ# ∘ βAB) ∘ βBA ≈⟨ assoc ⟩
+                         ϕ# ∘ (βAB ∘ βBA) ≈⟨ ∘-resp-≈ʳ (commutative {X = A} {Y = B}) ⟩
+                         ϕ# ∘ id          ≈⟨ identityʳ ⟩
+                         ϕ#               ∎
                    in Equiv.trans (adjoint.Ladjunct-resp-≈ step₁) adjoint.LRadjunct≈id
              in begin
-               [ id , id ]₁ ∘ ξ.ϕ
-                 ≈⟨ ∘-resp-≈ˡ (Functor.identity ([ A ,-])) ⟩
-               id ∘ ξ.ϕ
-                 ≈⟨ identityˡ ⟩
-               ξ.ϕ
-                 ≈˘⟨ ϕ′≈ϕ ⟩
-               ϕ′
-                 ≈˘⟨ identityʳ ⟩
-               ϕ′ ∘ id
-                 ∎
+               [ id , id ]₁ ∘ ξ.ϕ  ≈⟨ ∘-resp-≈ˡ (Functor.identity ([ A ,-])) ⟩
+               id ∘ ξ.ϕ            ≈⟨ identityˡ ⟩
+               ξ.ϕ                 ≈˘⟨ ϕ′≈ϕ ⟩
+               ϕ′                  ≈˘⟨ identityʳ ⟩
+               ϕ′ ∘ id             ∎
          } 
       ; commute = λ f → Equiv.trans identityˡ (Equiv.sym identityʳ)
       ; iso = λ X → record 
