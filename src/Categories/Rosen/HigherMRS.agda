@@ -22,8 +22,11 @@ open import Categories.Category.Construction.IsoComma using (IsoComma;IsoCommaOb
 open import Categories.Category.Construction.Thin 0ℓ ≤-poset
 open import Categories.Category.Instance.Cats using (Cats)
 open import Categories.Functor using (Functor; _∘F_) renaming (id to idF)
+open import Categories.Functor.Properties using ([_]-resp-Iso)
 open import Categories.Functor.Profunctor.Tabulator using (tab₀;tab⇒)
 open import Categories.Morphism.Reasoning as MR
+open import Categories.Morphism as Morphism using (_≅_; Iso)
+open import Categories.Morphism.Properties as Morphismₚ using (Iso-∘; Iso-swap)
 import Relation.Binary.Reasoning.Setoid as SetoidR
 open import Categories.NaturalTransformation.NaturalIsomorphism using (NaturalIsomorphism;niHelper)
 open import Categories.Rosen.Core Cl
@@ -132,25 +135,36 @@ private module 𝕋MRS = Category 𝕋MRS
 -- lemma: 𝕄ℝ𝕊-down at level n is naturally ≃ to the identity. (WIP: has holes)
 lemma-id : ∀ {n : ℕ} → NaturalIsomorphism (𝕄ℝ𝕊-down {n} {n} ≤-refl) (idF {C = 𝕄ℝ𝕊ₒ n})
 lemma-id {zero} = niHelper (record 
-  { η = λ X → record 
-    { f = ElMRS.id
-    ; g = 𝕋MRS.id
-    ; commute = trans identityˡ (sym identityʳ) , trans identityˡ (proj₂ (introʳ Arr.Arrow (Functor.identity ℝ)))
-    } 
-  ; η⁻¹ = λ X → record 
-    { f = ElMRS.id
-    ; g = 𝕋MRS.id
-    ; commute = trans identityˡ (sym identityʳ) , trans identityˡ (proj₂ (introʳ Arr.Arrow (Functor.identity ℝ))) 
-    } 
+  { η = λ X → M0.id {X}
+  ; η⁻¹ = λ X → M0.id {X}
   ; commute = λ f → id-comm-sym (𝕄ℝ𝕊ₒ zero) {f = f}
-  ; iso = λ X → record { isoˡ = M.identity² {X} ; isoʳ = M.identity² {X} } 
-  }) where module M = Category (𝕄ℝ𝕊ₒ zero)
-lemma-id {suc n} = niHelper (record 
-  { η = λ X → {!  !} 
-  ; η⁻¹ = {!  !} 
-  ; commute = {!  !} 
-  ; iso = {!  !} 
+  ; iso = λ X → record { isoˡ = M0.identity² {X} ; isoʳ = M0.identity² {X} } 
   })
+lemma-id {suc n} = niHelper (record 
+  { η = λ X →
+      let module X = IsoCommaObj X in record
+        { f = ElMRS.id
+        ; g = IH.⇒.η X.b
+        ; commute = {!  !}
+        }
+  ; η⁻¹ = λ X →
+      let module X = IsoCommaObj X in record
+        { f = ElMRS.id
+        ; g = IH.⇐.η X.b
+        ; commute = {!  !}
+        }
+  ; commute = λ f →
+      let module f = IsoComma⇒ f
+      in (id-comm-sym ElMRS {f = f.f} , IH.⇒.commute f.g)
+  ; iso = λ X →
+      let module X = IsoCommaObj X
+      in record
+        { isoˡ = (ElMRS.identity² {X.a} , Morphism.Iso.isoˡ (IH.iso X.b))
+        ; isoʳ = (ElMRS.identity² {X.a} , Morphism.Iso.isoʳ (IH.iso X.b))
+        }
+  }) where
+  module IH = NaturalIsomorphism (lemma-id {n})
+  module Mn = Category (𝕄ℝ𝕊ₒ n)
 
 -- lemma-homomorphism: 𝕄ℝ𝕊-down respects composition up to natural isomorphism.
 lemma-homomorphism : ∀ {n m k : ℕ} (m≤n : m ≤ n) (k≤m : k ≤ m) →
