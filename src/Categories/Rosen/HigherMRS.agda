@@ -167,7 +167,7 @@ pℕ = Thin
             ArrC.id ArrC.∘ Functor.F₁ (V (suc m) ∘F go) f            ≈⟨ ArrC.identityˡ {f = Functor.F₁ (V (suc m) ∘F go) f} ⟩
             Functor.F₁ ((V m ∘F F-down) ∘F Π-MRS n) f                ≈˘⟨ ArrC.identityʳ {f = Functor.F₁ ((V m ∘F F-down) ∘F Π-MRS n) f} ⟩
             Functor.F₁ ((V m ∘F F-down) ∘F Π-MRS n) f ArrC.∘ ArrC.id ∎
-      ; iso = λ X → record { isoˡ = ArrC.identity² ; isoʳ = ArrC.identity² }
+      ; iso = λ X → record { isoˡ = identityˡ , identity² ; isoʳ = identityˡ , identity² }
       })
 
     down-compat : NaturalIsomorphism (V (suc m) ∘F go) (V (suc n))
