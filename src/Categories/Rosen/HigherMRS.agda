@@ -76,8 +76,8 @@ MRS3 = IsoComma ℝ V₁
 𝕄ℝ𝕊ₒ n = proj₁ (𝕄ℝ𝕊 n)
 
 -- 𝕄ℝ𝕊ₐ n: the functor from the n-th level to Arr.Arrow.
-𝕄ℝ𝕊ₐ : (n : ℕ) → Functor (𝕄ℝ𝕊ₒ n) Arr.Arrow
-𝕄ℝ𝕊ₐ n = proj₂ (𝕄ℝ𝕊 n)
+-- 𝕄ℝ𝕊ₐ : (n : ℕ) → Functor (𝕄ℝ𝕊ₒ n) Arr.Arrow
+-- 𝕄ℝ𝕊ₐ n = proj₂ (𝕄ℝ𝕊 n)
 
 -- Π-MRS n: projection from level (suc n) down to level n.
 Π-MRS : (n : ℕ) → Functor (𝕄ℝ𝕊ₒ (suc n)) (𝕄ℝ𝕊ₒ n)
@@ -147,9 +147,9 @@ pℕ = Thin
           ; g = F-down.F₁ f.g
           ; commute = begin
               Vₘ.F₁ (F-down.F₁ f.g) ArrC.∘ (down.⇐.η x.b ArrC.∘ ArrM._≅_.from x.iso) ≈⟨ ArrC.sym-assoc {f = ArrM._≅_.from x.iso} {g = down.⇐.η x.b} {h = Vₘ.F₁ (F-down.F₁ f.g)} ⟩
-              (Vₘ.F₁ (F-down.F₁ f.g) ArrC.∘ down.⇐.η x.b) ArrC.∘ ArrM._≅_.from x.iso ≈⟨ ArrC.∘-resp-≈ (ArrC.Equiv.sym (down.⇐.commute f.g)) ArrC.Equiv.refl ⟩
+              (Vₘ.F₁ (F-down.F₁ f.g) ArrC.∘ down.⇐.η x.b) ArrC.∘ ArrM._≅_.from x.iso ≈⟨ ArrC.∘-resp-≈ˡ (ArrC.Equiv.sym (down.⇐.commute f.g)) ⟩
               (down.⇐.η y.b ArrC.∘ Vₙ.F₁ f.g) ArrC.∘ ArrM._≅_.from x.iso             ≈⟨ ArrC.assoc {f = ArrM._≅_.from x.iso} {g = Vₙ.F₁ f.g} {h = down.⇐.η y.b} ⟩
-              down.⇐.η y.b ArrC.∘ (Vₙ.F₁ f.g ArrC.∘ ArrM._≅_.from x.iso)             ≈⟨ ArrC.∘-resp-≈ ArrC.Equiv.refl f.commute ⟩
+              down.⇐.η y.b ArrC.∘ (Vₙ.F₁ f.g ArrC.∘ ArrM._≅_.from x.iso)             ≈⟨ ArrC.∘-resp-≈ʳ f.commute ⟩
               down.⇐.η y.b ArrC.∘ (ArrM._≅_.from y.iso ArrC.∘ R.F₁ f.f)              ≈⟨ ArrC.sym-assoc {f = R.F₁ f.f} {g = ArrM._≅_.from y.iso} {h = down.⇐.η y.b} ⟩
               (down.⇐.η y.b ArrC.∘ ArrM._≅_.from y.iso) ArrC.∘ R.F₁ f.f              ∎
           } }
@@ -192,16 +192,31 @@ lemma-id {zero} = niHelper (record
   })
 lemma-id {suc n} = niHelper (record
   { η = λ X →
-      let module X = IsoCommaObj X in record
+      let module X = IsoCommaObj X 
+          module ArrM = BaseMorphism Arr.Arrow
+          MRSn = proj₂ (𝕄ℝ𝕊 n)
+          -- MRSm = proj₂ (𝕄ℝ𝕊 m)
+          module Vₙ = Functor MRSn
+          down = proj₂ (𝕄ℝ𝕊-down (≤-refl {n}))
+          F-down = proj₁ (𝕄ℝ𝕊-down (≤-refl {n}))
+          module F-down = Functor F-down
+          module down = NaturalIsomorphism down
+      in record
         { f = ElMRS.id
         ; g = IH.⇒.η X.b
-        ; commute = {!   !}
+        ; commute = let open ArrC.HomReasoning in 
+          begin Vₙ.F₁ (IH.⇒.η X.b) ArrC.∘ (down.⇐.η X.b ArrC.∘ ArrM._≅_.from X.iso) ≈⟨  {!   !} ⟩
+          {!   !} ≈⟨  {!   !} ⟩
+          ArrM._≅_.from X.iso ArrC.∘ {! ArrC.id  !} ∎
         }
   ; η⁻¹ = λ X →
       let module X = IsoCommaObj X in record
         { f = ElMRS.id
         ; g = IH.⇐.η X.b
-        ; commute = {!   !}
+        ; commute = let open ArrC.HomReasoning in
+          begin {!   !} ≈⟨  {!   !} ⟩
+          {!   !} ≈⟨  {!   !} ⟩
+          {!   !} ∎
         }
   ; commute = λ f →
       let module f = IsoComma⇒ f
