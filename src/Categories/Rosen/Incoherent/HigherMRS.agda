@@ -11,7 +11,7 @@ module Categories.Rosen.Incoherent.HigherMRS {o ℓ e} {C : Category o ℓ e} {M
 -- A —f→ B —ϕ→ [A,B] —ϕ₂→ [B,[A,B]] —ϕ₃→ [[A,B],[B,[A,B]]] —→ ...
 -- without the natural transformation condition of full MR2.
 
-open import Data.Product using (_,_; proj₁; proj₂; _×_)
+open import Data.Product using (Σ;_,_; proj₁; proj₂; _×_)
 
 open import Categories.Category.Construction.Arrow
 open import Categories.Category.Construction.IsoComma using (IsoComma;IsoCommaObj;IsoComma⇒;ICproj₁;ICproj₂)
@@ -32,7 +32,6 @@ open import Data.Nat.Properties using (≤-poset;≤-refl;≤-trans)
 open import Categories.Category.Construction.Thin 0ℓ ≤-poset
 open import Categories.Category.Instance.Cats using (Cats)
 
-open import Data.Product using (Σ;_,_;proj₁;proj₂)
 open import Categories.NaturalTransformation.NaturalIsomorphism as NI using (NaturalIsomorphism;niHelper; _ⓘˡ_; _ⓘʳ_)
 
 
@@ -247,13 +246,13 @@ lemma-homomorphism {n = n} z≤n z≤n = niHelper (record
   })
 lemma-homomorphism (s≤s m≤n) z≤n = niHelper (record
   { η = λ X → {!  !}
-  ; η⁻¹ = λ{!   !}X → {!  !}
+  ; η⁻¹ = λ X → {!  !}
   ; commute = λ f → {!  !}
   ; iso = λ X → {!  !}
   })
 lemma-homomorphism (s≤s m≤n) (s≤s k≤m) = niHelper (record
   { η = λ X → {!  !}
-  ; η⁻¹ = λ{!   !}X → {!  !}
+  ; η⁻¹ = λ X → {!  !}
   ; commute = λ f → {!  !}
   ; iso = λ X → {!  !}
   })
