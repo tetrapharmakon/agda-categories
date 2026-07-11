@@ -48,7 +48,7 @@ record twiMR2⇒ (X Y : iMR2₀) : Set (o ⊔ ℓ ⊔ e) where
     { l = id 
     ; r = id 
     ; eqf = trans identityˡ identityʳ 
-    ; eqϕ = {!   !} 
+    ; eqϕ = id-swap ○ Equiv.sym [-,-].identity ⟩∘⟨refl 
     }
   ; _∘_ = λ f g → 
     let module f = twiMR2⇒ f  
@@ -59,7 +59,7 @@ record twiMR2⇒ (X Y : iMR2₀) : Set (o ⊔ ℓ ⊔ e) where
       { l = g.l ∘ f.l 
       ; r = f.r ∘ g.r 
       ; eqf = assoc ○ refl⟩∘⟨ rw-3-1 g.eqf ○ f.eqf 
-      ; eqϕ = pullˡ C f.eqϕ ○ {!   !} }
+      ; eqϕ = pullˡ C f.eqϕ ○ pullʳ C g.eqϕ ○ pullˡ C (Equiv.sym [-,-].homomorphism) }
   ; assoc = sym-assoc , assoc
   ; sym-assoc = assoc , sym-assoc
   ; identityˡ = identityʳ , identityˡ
@@ -67,4 +67,13 @@ record twiMR2⇒ (X Y : iMR2₀) : Set (o ⊔ ℓ ⊔ e) where
   ; identity² = identityˡ , identity²
   ; equiv = record { refl = refl , refl ; sym = λ {x} {y} z → sym (z .proj₁) , sym (z .proj₂) ; trans = λ {i} {j} {k} z z₁ → trans (z .proj₁) (z₁ .proj₁) , trans (z .proj₂) (z₁ .proj₂) }
   ; ∘-resp-≈ = λ x x₁ → ∘-resp-≈ (x₁ .proj₁) (x .proj₁) , ∘-resp-≈ (x .proj₂) (x₁ .proj₂)
+  }
+
+ℝ : Functor τ'[iMR2] Arr.Arrow
+ℝ = record
+  { F₀ = λ x → let module x = iMR2₀ x in (record { dom = x.B ; cod = [ x.A , x.B ]₀ ; arr = iMR2.ϕ x.ξ })
+  ; F₁ = λ f → let module f = twiMR2⇒ f in mor⇒ (sym f.eqϕ)
+  ; identity = refl , [-,-].identity
+  ; homomorphism = refl , [-,-].homomorphism
+  ; F-resp-≈ = λ z → z .proj₂ , [-,-].F-resp-≈ z
   }
