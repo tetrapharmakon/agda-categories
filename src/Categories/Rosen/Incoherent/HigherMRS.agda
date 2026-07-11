@@ -239,8 +239,8 @@ lemma-id {suc n} = niHelper (record
         { f = ElMRS.id
         ; g = IH.⇒.η X.b
         ; commute = 
-            let open ArrC.HomReasoning 
-            in {! !}
+            let open HomReasoning 
+            in {!   !}
         }
   ; η⁻¹ = λ X →
       let module X = IsoCommaObj X in record
@@ -282,18 +282,18 @@ lemma-homomorphism {n = n} z≤n z≤n = niHelper (record
       ; isoʳ = M0.identity² {Functor.F₀ (reduce n) X}
       }
   })
-lemma-homomorphism (s≤s m≤n) z≤n = niHelper (record
+lemma-homomorphism {n = suc n'} {m = suc m'} (s≤s m≤n) z≤n = niHelper (record
   { η = λ X → {! !}
   ; η⁻¹ = λ X → {! !}
   ; commute = λ f → {! !}
   ; iso = λ X → {! !}
-  })
-lemma-homomorphism (s≤s m≤n) (s≤s k≤m) = niHelper (record
+  }) where module IH = NaturalIsomorphism (lemma-homomorphism {n'} {m'} m≤n z≤n)
+lemma-homomorphism {n = suc n'} {m = suc m'} {k = suc k'} (s≤s m≤n) (s≤s k≤m) = niHelper (record
   { η = λ X → {! !}
   ; η⁻¹ = λ X → {! !}
   ; commute = λ f → {! !}
   ; iso = λ X → {! !}
-  })
+  }) where module IH = NaturalIsomorphism (lemma-homomorphism {n'} {m'} {k'} m≤n k≤m)
 
 -- lemma-Fresp: proof-irrelevance for 𝕚𝕄ℝ𝕊-down on thin morphisms.
 lemma-Fresp : ∀ {n m : ℕ} (p q : m ≤ n) →
@@ -310,11 +310,11 @@ lemma-Fresp {n = n} z≤n z≤n = niHelper (record
       }
   })
 lemma-Fresp {n = suc n'} {m = suc m'} (s≤s p) (s≤s q) = niHelper (record
-  { η = λ X → {! !}
+  { η = λ X → {! IH.⇒.η (Functor.F₀ ? X) !}
   ; η⁻¹ = λ X → {! !}
   ; commute = λ f → {! !}
   ; iso = λ X → {! !}
-  })
+  }) where module IH = NaturalIsomorphism (lemma-Fresp {n'} {m'} p q)
 
 -- iMRS-chain: the chain … → 𝕚𝕄ℝ𝕊ₒ 2 → 𝕚𝕄ℝ𝕊ₒ 1 → 𝕚𝕄ℝ𝕊ₒ 0 as ℕ^op → Cats.
 iMRS-chain : Functor (Category.op pℕ) (Cats (o ⊔ ℓ ⊔ e) (o ⊔ ℓ ⊔ e) e)
