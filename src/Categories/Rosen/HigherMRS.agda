@@ -35,7 +35,6 @@ open import Categories.Rosen.Tabulator Cl using (V₁; 𝕋MRS)
 
 import Reason
 open Reason C
-open HomReasoning
 open MR
 
 open Closed Cl using ([-,-]; [_,_]₀; [_,-]; [-,_]; [_,_]₁)
@@ -58,32 +57,19 @@ MRS3 = IsoComma ℝ V₁
         let module x = IsoCommaObj x 
             module y = IsoCommaObj y 
             module f = IsoComma⇒ f
-        in mor⇒ {dom⇒ = tab⇒.l f.g} {cod⇒ = tab⇒.r f.g} 
-          (begin _ ≈⟨ sym-id-1 ○ assoc ⟩ 
-                 _ ≈⟨ proj₁ (tab⇒.eq f.g) ⟩ 
-                 _ ≈⟨ id-0 ⟩ 
-                 _ ∎)}
+        in mor⇒ {dom⇒ = tab⇒.l f.g} {cod⇒ = tab⇒.r f.g}
+          (let open Category.HomReasoning C in begin _ ≈⟨ sym-id-1 ○ assoc ⟩
+                  _ ≈⟨ proj₁ (tab⇒.eq f.g) ⟩
+                  _ ≈⟨ id-0 ⟩
+                  _ ∎)}
       ; identity = Equiv.refl , Equiv.refl
       ; homomorphism = Equiv.refl , Equiv.refl
       ; F-resp-≈ = λ {(_ , dat) → (dat .proj₁) , (dat .proj₂)}
       }
 𝕄ℝ𝕊 (suc n) 
-  = let MRSn = proj₂ (𝕄ℝ𝕊 n) 
-        module Vₙ = Functor MRSn
+  = let MRSn = proj₂ (𝕄ℝ𝕊 n)
     in IsoComma ℝ MRSn
-  , record
-      { F₀ = λ x → 
-        let module x = IsoCommaObj x
-        in Vₙ.F₀ x.b
-      ; F₁ = λ { {x} {y} f → 
-        let module x = IsoCommaObj x 
-            module y = IsoCommaObj y 
-            module f = IsoComma⇒ f
-        in Vₙ.F₁ f.g }
-      ; identity = Vₙ.identity
-      ; homomorphism = Vₙ.homomorphism
-      ; F-resp-≈ = λ f≈g → Vₙ.F-resp-≈ (proj₂ f≈g)
-      }
+  , (proj₂ (𝕄ℝ𝕊 n) ∘F ICproj₂)
 
 -- 𝕄ℝ𝕊ₒ n: the n-th level category.
 𝕄ℝ𝕊ₒ : (n : ℕ) → Category (o ⊔ ℓ ⊔ e) (o ⊔ ℓ ⊔ e) e
@@ -151,13 +137,41 @@ pℕ = Thin
         let module x = IsoCommaObj x
             module y = IsoCommaObj y
             module f = IsoComma⇒ f
-        in record { f = f.f ; g = F-down.F₁ f.g ; commute = {!  !} } }
+            MRSn = proj₂ (𝕄ℝ𝕊 n)
+            MRSm = proj₂ (𝕄ℝ𝕊 m)
+            module Vₙ = Functor MRSn
+            module Vₘ = Functor MRSm
+            module R = Functor ℝ
+        in let open ArrC.HomReasoning in record
+          { f = f.f
+          ; g = F-down.F₁ f.g
+          ; commute = begin
+              Vₘ.F₁ (F-down.F₁ f.g) ArrC.∘ (down.⇐.η x.b ArrC.∘ ArrM._≅_.from x.iso) ≈⟨ ArrC.sym-assoc {f = ArrM._≅_.from x.iso} {g = down.⇐.η x.b} {h = Vₘ.F₁ (F-down.F₁ f.g)} ⟩
+              (Vₘ.F₁ (F-down.F₁ f.g) ArrC.∘ down.⇐.η x.b) ArrC.∘ ArrM._≅_.from x.iso ≈⟨ ArrC.∘-resp-≈ (ArrC.Equiv.sym (down.⇐.commute f.g)) ArrC.Equiv.refl ⟩
+              (down.⇐.η y.b ArrC.∘ Vₙ.F₁ f.g) ArrC.∘ ArrM._≅_.from x.iso             ≈⟨ ArrC.assoc {f = ArrM._≅_.from x.iso} {g = Vₙ.F₁ f.g} {h = down.⇐.η y.b} ⟩
+              down.⇐.η y.b ArrC.∘ (Vₙ.F₁ f.g ArrC.∘ ArrM._≅_.from x.iso)             ≈⟨ ArrC.∘-resp-≈ ArrC.Equiv.refl f.commute ⟩
+              down.⇐.η y.b ArrC.∘ (ArrM._≅_.from y.iso ArrC.∘ R.F₁ f.f)              ≈⟨ ArrC.sym-assoc {f = R.F₁ f.f} {g = ArrM._≅_.from y.iso} {h = down.⇐.η y.b} ⟩
+              (down.⇐.η y.b ArrC.∘ ArrM._≅_.from y.iso) ArrC.∘ R.F₁ f.f              ∎
+          } }
       ; identity = (refl , refl) , F-down.identity
       ; homomorphism = (refl , refl) , F-down.homomorphism
       ; F-resp-≈ = λ eq → ((eq .proj₁ .proj₁) , (eq .proj₁ .proj₂)) , F-down.F-resp-≈ (proj₂ eq)
       }
+    go-proj : NaturalIsomorphism (V (suc m) ∘F go) ((V m ∘F F-down) ∘F Π-MRS n)
+    go-proj = niHelper (record
+      { η = λ X → ArrC.id
+      ; η⁻¹ = λ X → ArrC.id
+      ; commute = λ f →
+          let open ArrC.HomReasoning in
+          begin
+            ArrC.id ArrC.∘ Functor.F₁ (V (suc m) ∘F go) f            ≈⟨ ArrC.identityˡ {f = Functor.F₁ (V (suc m) ∘F go) f} ⟩
+            Functor.F₁ ((V m ∘F F-down) ∘F Π-MRS n) f                ≈˘⟨ ArrC.identityʳ {f = Functor.F₁ ((V m ∘F F-down) ∘F Π-MRS n) f} ⟩
+            Functor.F₁ ((V m ∘F F-down) ∘F Π-MRS n) f ArrC.∘ ArrC.id ∎
+      ; iso = λ X → record { isoˡ = ArrC.identity² ; isoʳ = ArrC.identity² }
+      })
+
     down-compat : NaturalIsomorphism (V (suc m) ∘F go) (V (suc n))
-    down-compat = NI.trans {!  proj₂ down !} (reduce-compat (suc n)) -- proj₂ down
+    down-compat = NI.trans go-proj ((proj₂ down) ⓘʳ Π-MRS n)
 
 downF : ∀ {n m} → m ≤ n → Functor (𝕄ℝ𝕊ₒ n) (𝕄ℝ𝕊ₒ m)
 downF p = proj₁ (𝕄ℝ𝕊-down p)
@@ -176,7 +190,7 @@ lemma-id {zero} = niHelper (record
   ; commute = λ f → id-comm-sym (𝕄ℝ𝕊ₒ zero) {f = f}
   ; iso = λ X → record { isoˡ = M0.identity² {X} ; isoʳ = M0.identity² {X} } 
   })
-lemma-id {suc n} = niHelper (record 
+lemma-id {suc n} = niHelper (record
   { η = λ X →
       let module X = IsoCommaObj X in record
         { f = ElMRS.id
@@ -187,7 +201,7 @@ lemma-id {suc n} = niHelper (record
       let module X = IsoCommaObj X in record
         { f = ElMRS.id
         ; g = IH.⇐.η X.b
-        ; commute = {!  !} , {!  !} -- refl , refl
+        ; commute = {!   !}
         }
   ; commute = λ f →
       let module f = IsoComma⇒ f
