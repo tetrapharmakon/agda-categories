@@ -9,14 +9,16 @@ module Categories.Rosen.Incoherent.HigherMRS
   {o ℓ e} {C : Category o ℓ e} {M : Monoidal C} (Cl : Closed M)
   where
 
-open import Data.Nat using (ℕ; zero; suc; _≤_; z≤n; s≤s)
-open import Data.Nat.Properties using (≤-poset; ≤-refl; ≤-trans)
+open import Data.Nat using (ℕ; zero; suc)
+open import Data.Nat.Properties using (≤-poset)
 open import Data.Product using (Σ; _,_; proj₁; proj₂)
+open import Relation.Binary.PropositionalEquality using (_≡_; isEquivalence; subst; sym; Equiv) renaming (refl to ≡-refl)
+open import Relation.Binary using (Antisymmetric)
 
 open import Categories.Category.Construction.Arrow
 open import Categories.Category.Construction.IsoComma
   using (IsoComma; IsoCommaObj; IsoComma⇒; ICproj₁; ICproj₂)
-open import Categories.Category.Construction.Thin 0ℓ ≤-poset
+open import Categories.Category.Construction.Thin 
 open import Categories.Category.Instance.Cats using (Cats)
 open import Categories.Functor using (Functor; _∘F_)
   renaming (id to idF)
@@ -49,7 +51,20 @@ iMRS3 = IsoComma ℝ [_]f
 -- 𝕚𝕄ℝ𝕊 n: the n-th level category together with a functor to Arr.Arrow.
 𝕚𝕄ℝ𝕊 : (n : ℕ) → Σ (Category (o ⊔ ℓ ⊔ e) (o ⊔ ℓ ⊔ e) e)
   (λ x → Functor x Arr.Arrow)
-𝕚𝕄ℝ𝕊 zero = iMRS3 , {! !}
+𝕚𝕄ℝ𝕊 zero = iMRS3 , record
+  { F₀ = λ x → let module x = IsoCommaObj x in record { arr = iMR2.ϕ (iMR2₀.ξ x.a) }
+  ; F₁ = λ { {A} {B} f → 
+    let module A = IsoCommaObj A
+        module B = IsoCommaObj B
+        module f = IsoComma⇒ f 
+        ℓ = twiMR2⇒.l f.f
+        r = twiMR2⇒.r f.f
+        equ = Equiv.sym (twiMR2⇒.eqϕ f.f)
+    in mor⇒ {dom⇒ = r} {cod⇒ = [ ℓ , r ]₁} equ }
+  ; identity = refl , [-,-].identity
+  ; homomorphism = refl , [-,-].homomorphism
+  ; F-resp-≈ = λ z → z .proj₁ .proj₂ , [-,-].F-resp-≈ (z .proj₁)
+  }
 𝕚𝕄ℝ𝕊 (suc n)
   = let MRSn = proj₂ (𝕚𝕄ℝ𝕊 n)
     in IsoComma ℝ MRSn
@@ -97,10 +112,45 @@ reduce-compat (suc k) =
   NI.trans (NI.sym-associator (Π-MRS k) (reduce k) (V 0))
     (NI.trans ((reduce-compat k) ⓘʳ Π-MRS k) (VΠ k))
 
+open import Relation.Binary.Core using (Rel)
+
+data _≤_ : Rel ℕ 0ℓ where
+  ≤-refl  : ∀ {n} → n ≤ n
+  ≤-trans : ∀ {m n k} (m≤n : m ≤ n) (n≤k : n ≤ k) → m ≤ k
+  ≤+1     : ∀ {n} → n ≤ suc n
+
+antisym : Relation.Binary.Antisymmetric _≡_ _≤_
+antisym ≤-refl y = ≡-refl
+antisym (≤-trans x x₁) y = 
+  let m = antisym x (≤-trans x₁ y) in 
+  let o = antisym y (subst (_≤ _) {!  Equiv.sym m !} x₁) in 
+   {!     !}
+antisym ≤+1 (≤-trans y y₁) = {!   !}
+
+open import Relation.Binary using (Poset)
+
+prufa : Poset 0ℓ 0ℓ 0ℓ
+prufa = record 
+  { Carrier = ℕ 
+  ; _≈_ = _≡_ 
+  ; _≤_ = _≤_ 
+  ; isPartialOrder = record 
+    { isPreorder = record 
+      { isEquivalence = isEquivalence
+      ; reflexive = λ {  ≡-refl → ≤-refl }
+      ; trans = ≤-trans 
+      } 
+    ; antisym = antisym 
+    } 
+  }
+
 -- ℕ as a poset category.
 pℕ : Category 0ℓ 0ℓ 0ℓ
-pℕ = Thin
+pℕ = Thin 0ℓ {!   !}
 
+
+
+{-
 -- 𝕚𝕄ℝ𝕊-down: a downward functor together with compatibility against V.
 𝕚𝕄ℝ𝕊-down : ∀ {n m} → m ≤ n →
   Σ (Functor (𝕚𝕄ℝ𝕊ₒ n) (𝕚𝕄ℝ𝕊ₒ m))
@@ -211,7 +261,7 @@ down-compat p = proj₂ (𝕚𝕄ℝ𝕊-down p)
 
 private module ElMRS = Category τ'[iMR2]
 private module 𝕋MRS = Category 𝕋MRS
-
+ 
 -- lemma: the downward functor at level n is naturally ≃ to the
 -- identity.
 lemma-id : ∀ {n : ℕ} →
@@ -239,8 +289,20 @@ lemma-id {suc n} = niHelper (record
         { f = ElMRS.id
         ; g = IH.⇒.η X.b
         ; commute = 
-            let open HomReasoning 
-            in {!   !}
+            let open ArrC.HomReasoning
+                lamma : Vₙ.F₁ (IH.⇒.η X.b) ArrC.∘ (down'.⇐.η X.b) ArrC.≈ ArrC.id
+                lamma = let open ArrC
+                            module ID = NaturalIsomorphism (lemma-id {n})
+                        in {!   !} , {!   !}
+          in begin {!   !} 
+                 ≈⟨ ArrC.sym-assoc ⟩
+                   {!   !} 
+                 ≈⟨ lamma ⟩∘⟨refl ⟩
+                  {!   !} 
+                 ≈⟨ ArrMR.id-comm-sym ⟩
+                  {!   !} 
+                 ≈˘⟨ (refl⟩∘⟨ Functor.identity ℝ) ⟩
+                  {!   !} ∎
         }
   ; η⁻¹ = λ X →
       let module X = IsoCommaObj X in record
@@ -283,7 +345,7 @@ lemma-homomorphism {n = n} z≤n z≤n = niHelper (record
       }
   })
 lemma-homomorphism {n = suc n'} {m = suc m'} (s≤s m≤n) z≤n = niHelper (record
-  { η = λ X → {! !}
+  { η = λ X → {!  !}
   ; η⁻¹ = λ X → {! !}
   ; commute = λ f → {! !}
   ; iso = λ X → {! !}
@@ -338,3 +400,4 @@ iMRS∞ = iMRS-Limit.apex
 iMRS∞-proj = iMRS-Limit.proj
 -- iMRS∞-commute: universal property of the limit.
 iMRS∞-commute = iMRS-Limit.limit-commute
+-}

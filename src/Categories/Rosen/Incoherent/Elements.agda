@@ -38,7 +38,7 @@ record twiMR2⇒ (X Y : iMR2₀) : Set (o ⊔ ℓ ⊔ e) where
     eqf : r ∘ ξX.f ∘ l ≈ ξY.f
     eqϕ : ξY.ϕ ∘ r ≈ [ l , r ]₁ ∘ ξX.ϕ
 
--- τ'[iMR2]: total category of incoherent (M,R)-systems.
+-- τ'[iMR2]: twisted category of incoherent (M,R)-systems.
 τ'[iMR2] : Category (o ⊔ ℓ) (o ⊔ ℓ ⊔ e) e 
 τ'[iMR2] = record
   { Obj = iMR2₀
