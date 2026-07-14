@@ -156,8 +156,6 @@ prufa = record
 pℕ : Category 0ℓ 0ℓ 0ℓ
 pℕ = Thin 0ℓ prufa
 
-
-
 -- 𝕚𝕄ℝ𝕊-F/η: a downward functor together with compatibility against V.
 𝕚𝕄ℝ𝕊-F : ∀ {n m} → m ≤ n → Functor (𝕚𝕄ℝ𝕊ₒ n) (𝕚𝕄ℝ𝕊ₒ m)
 𝕚𝕄ℝ𝕊-F {n} {m} ≤-refl = idF
@@ -203,7 +201,7 @@ lemma-id′ {n} ≤-refl = let module 𝕄 = Category (𝕚𝕄ℝ𝕊ₒ n) in 
   ; iso = λ X → record
       { isoˡ = 𝕄.identity² {X}
       ; isoʳ = 𝕄.identity² {X}
-      } }) -- ok
+      } })
 lemma-id′ {n} (≤-trans ref ref₁) with antisym ref ref₁
 lemma-id′ {n} (≤-trans ≤-refl ≤-refl) | ≡-refl = NI.unitor²
 lemma-id′ {n} (≤-trans ≤-refl (≤-trans ref₁ ref₂)) | ≡-refl = lemma-id′ {n} (≤-trans ref₁ ref₂) ⓘᵥ NI.unitorˡ
@@ -250,41 +248,6 @@ lemma-Fresp {n} {m} ≤+1 q = {!   !}
     -- ; commute = λ f → {!   !} 
     -- ; iso = λ X → {!   !} 
     -- }) 
-
-{-
-lemma-Fresp {n} (≤-trans p p') q = niHelper (record 
-  { η = {!   !} 
-  ; η⁻¹ = {!   !} 
-  ; commute = {!   !} 
-  ; iso = {!   !} 
-  })
-lemma-Fresp {n} ≤+1 q = niHelper (record 
-  { η = {!   !} 
-  ; η⁻¹ = {!   !} 
-  ; commute = {!   !} 
-  ; iso = {!   !} 
-  })
--}
-
-{-
-lemma-Fresp {n = n} z≤n z≤n = niHelper (record
-  { η = λ X → M0.id {Functor.F₀ (reduce n) X}
-  ; η⁻¹ = λ X → M0.id {Functor.F₀ (reduce n) X}
-  ; commute = λ f →
-      id-comm-sym (𝕚𝕄ℝ𝕊ₒ zero)
-        {f = Functor.F₁ (reduce n) f}
-  ; iso = λ X → record
-      { isoˡ = M0.identity² {Functor.F₀ (reduce n) X}
-      ; isoʳ = M0.identity² {Functor.F₀ (reduce n) X}
-      }
-  })
-lemma-Fresp {n = suc n'} {m = suc m'} (s≤s p) (s≤s q) = niHelper (record
-  { η = λ X → {! IH.⇒.η (Functor.F₀ ? X) !}
-  ; η⁻¹ = λ X → {! !}
-  ; commute = λ f → {! !}
-  ; iso = λ X → {! !}
-  }) where module IH = NaturalIsomorphism (lemma-Fresp {n'} {m'} p q)
--}
 
 -- iMRS-chain: the chain … → 𝕚𝕄ℝ𝕊ₒ 2 → 𝕚𝕄ℝ𝕊ₒ 1 → 𝕚𝕄ℝ𝕊ₒ 0 as ℕ^op → Cats.
 iMRS-chain : Functor (Category.op pℕ) (Cats (o ⊔ ℓ ⊔ e) (o ⊔ ℓ ⊔ e) e)
