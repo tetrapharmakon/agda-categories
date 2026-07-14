@@ -1,4 +1,4 @@
-{-# OPTIONS --without-K --safe --warning=noUserWarning --warning=noUselessPrivate #-}
+{-# OPTIONS --safe --warning=noUserWarning --warning=noUselessPrivate #-}
 
 open import Level using (0ℓ; _⊔_)
 open import Categories.Category using (Category)
@@ -12,7 +12,8 @@ module Categories.Rosen.Incoherent.HigherMRS
 open import Data.Nat using (ℕ; zero; suc)
 open import Data.Nat.Properties using (≤-poset)
 open import Data.Product using (Σ; _,_; proj₁; proj₂)
-open import Relation.Binary.PropositionalEquality using (_≡_; isEquivalence; subst) renaming (refl to ≡-refl; sym to ≡-sym)
+open import Data.Empty using (⊥; ⊥-elim)
+open import Relation.Binary.PropositionalEquality using (_≡_; isEquivalence; subst; cong) renaming (refl to ≡-refl; sym to ≡-sym)
 open import Relation.Binary using (Antisymmetric)
 
 open import Categories.Category.Construction.Arrow
@@ -120,14 +121,20 @@ data _≤_ : Rel ℕ 0ℓ where
   ≤-trans : ∀ {m n k} (m≤n : m ≤ n) (n≤k : n ≤ k) → m ≤ k
   ≤+1     : ∀ {n} → n ≤ suc n
 
+≤-suc-inj : ∀ {a b} → suc a ≤ suc b → a ≤ b
+≤-suc-inj ≤-refl = ≤-refl
+≤-suc-inj {a} {b} (≤-trans p q) = ≤-trans (≤-suc-inj {!   !}) (≤-suc-inj {!   !})
+≤-suc-inj ≤+1 = ≤+1
+
+¬suc≤ : ∀ {m} → suc m ≤ m → ⊥
+¬suc≤ {zero} = {!   !} -- ()
+¬suc≤ {suc m} p = ¬suc≤ {m} (≤-suc-inj p)
+
 antisym : Relation.Binary.Antisymmetric _≡_ _≤_
 antisym ≤-refl y = ≡-refl
-antisym (≤-trans i≤n n≤j) j≤i = {!   !} 
-  -- let m = antisym i≤n (≤-trans n≤j j≤i) in 
-  -- let o = antisym j≤i (subst (_≤ _) (≡-sym m) n≤j) in 
-  --  ≡-sym o
-antisym ≤+1 (≤-trans i+1≤n n≤i) = {!   !}
-
+antisym (≤-trans i≤j j≤k) k≤i with antisym i≤j (≤-trans j≤k k≤i)
+... | ≡-refl = antisym j≤k k≤i
+antisym ≤+1 (≤-trans p q) = ⊥-elim (¬suc≤ (≤-trans p q))
 open import Relation.Binary using (Poset)
 
 prufa : Poset 0ℓ 0ℓ 0ℓ
@@ -141,7 +148,7 @@ prufa = record
       ; reflexive = λ {  ≡-refl → ≤-refl }
       ; trans = ≤-trans 
       } 
-    ; antisym = antisym 
+    ; antisym = {!   !} 
     } 
   }
 
@@ -187,6 +194,23 @@ lemma-id {n} = let module 𝕄 = Category (𝕚𝕄ℝ𝕊ₒ n) in niHelper (re
       }
   })
 
+lemma-id′ : ∀ {n : ℕ} (ref : n ≤ n) →
+  NaturalIsomorphism (𝕚𝕄ℝ𝕊-F {n} {n} ref) (idF {C = 𝕚𝕄ℝ𝕊ₒ n})
+lemma-id′ {n} ≤-refl = let module 𝕄 = Category (𝕚𝕄ℝ𝕊ₒ n) in  niHelper (record 
+  { η = λ X → 𝕄.id {A = X} 
+  ; η⁻¹ = λ X → 𝕄.id {A = X} 
+  ; commute = λ f → id-comm-sym (𝕚𝕄ℝ𝕊ₒ n) {f = f} 
+  ; iso = λ X → record
+      { isoˡ = 𝕄.identity² {X}
+      ; isoʳ = 𝕄.identity² {X}
+      } }) -- ok
+lemma-id′ {n} (≤-trans ref ref₁) with antisym ref ref₁
+lemma-id′ {n} (≤-trans ≤-refl ≤-refl) | ≡-refl = NI.unitor²
+lemma-id′ {n} (≤-trans ≤-refl (≤-trans ref₁ ref₂)) | ≡-refl = lemma-id′ {n} (≤-trans ref₁ ref₂) ⓘᵥ NI.unitorˡ
+lemma-id′ {n} (≤-trans (≤-trans ref ref₂) ref₁) | ≡-refl =
+  let m = lemma-id′ (≤-trans ref (≤-trans ref₂ ref₁)) in
+  m ⓘᵥ NI.associator (𝕚𝕄ℝ𝕊-F ref₁) (𝕚𝕄ℝ𝕊-F ref₂) (𝕚𝕄ℝ𝕊-F ref)
+
 -- lemma-homomorphism: 𝕚𝕄ℝ𝕊-down respects composition up to natural
 -- isomorphism.
 lemma-homomorphism : ∀ {n m k : ℕ} (m≤n : m ≤ n) (k≤m : k ≤ m) →
@@ -194,10 +218,11 @@ lemma-homomorphism : ∀ {n m k : ℕ} (m≤n : m ≤ n) (k≤m : k ≤ m) →
     ((𝕚𝕄ℝ𝕊-F k≤m) ∘F (𝕚𝕄ℝ𝕊-F m≤n))
 lemma-homomorphism {n} {m} {k} m≤n k≤m = 
   let module 𝕄 = Category (𝕚𝕄ℝ𝕊ₒ k) 
+      F = 𝕚𝕄ℝ𝕊-F (≤-trans k≤m m≤n)
   in niHelper (record 
     { η = λ X → 𝕄.id
     ; η⁻¹ = λ X → 𝕄.id
-    ; commute = λ f → id-comm-sym (𝕚𝕄ℝ𝕊ₒ k) 
+    ; commute = λ f → id-comm-sym (𝕚𝕄ℝ𝕊ₒ k) {f = Functor.F₁ F f}
     ; iso = λ X → record
       { isoˡ = 𝕄.identity²
       ; isoʳ = 𝕄.identity²
@@ -207,14 +232,24 @@ lemma-homomorphism {n} {m} {k} m≤n k≤m =
 -- lemma-Fresp: proof-irrelevance for 𝕚𝕄ℝ𝕊-down on thin morphisms.
 lemma-Fresp : ∀ {n m : ℕ} (p q : m ≤ n) →
   NaturalIsomorphism (𝕚𝕄ℝ𝕊-F p) (𝕚𝕄ℝ𝕊-F q)
-lemma-Fresp {n} {m} p q = 
-  let module 𝕄 = Category (𝕚𝕄ℝ𝕊ₒ m) 
+lemma-Fresp {n} {m} ≤-refl q = let module 𝕄 = Category (𝕚𝕄ℝ𝕊ₒ n) 
   in niHelper (record 
-    { η = λ X → {!   !} -- Category.id (𝕚𝕄ℝ𝕊ₒ m)
-    ; η⁻¹ = λ X → {!   !} 
-    ; commute = λ f → {!   !} 
-    ; iso = λ X → {!   !} 
-    }) 
+    { η = λ X → {!   !} -- Category.id (𝕚𝕄ℝ𝕊ₒ n)
+    ; η⁻¹ = {!   !} 
+    ; commute = {!   !} 
+    ; iso = {!   !} 
+    })
+lemma-Fresp {n} {m} (≤-trans p p') ≤-refl = {!   !} -- absurd
+lemma-Fresp {n} {m} (≤-trans p p') (≤-trans q q') = {!   !}
+lemma-Fresp {n} {m} (≤-trans p p') ≤+1 = {!   !}
+lemma-Fresp {n} {m} ≤+1 q = {!   !} 
+  -- let module 𝕄 = Category (𝕚𝕄ℝ𝕊ₒ m) 
+  -- in {!   !} -- niHelper (record 
+    -- { η = λ X → {!   !} -- Category.id (𝕚𝕄ℝ𝕊ₒ m)
+    -- ; η⁻¹ = λ X → {!   !} 
+    -- ; commute = λ f → {!   !} 
+    -- ; iso = λ X → {!   !} 
+    -- }) 
 
 {-
 lemma-Fresp {n} (≤-trans p p') q = niHelper (record 
