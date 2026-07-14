@@ -9,17 +9,18 @@ module Categories.Rosen.Incoherent.HigherMRS
   {o ℓ e} {C : Category o ℓ e} {M : Monoidal C} (Cl : Closed M)
   where
 
-open import Data.Nat using (ℕ; zero; suc)
-open import Data.Nat.Properties using (≤-poset)
+open import Data.Nat using (ℕ; zero; suc; _≟_; _≤_; z≤n; s≤s)
+open import Data.Nat.Properties using (≤-poset; ≤-refl; ≤-trans; n≤1+n)
+open import Data.Sum using (_⊎_; inj₁; inj₂)
 open import Data.Product using (Σ; _,_; proj₁; proj₂)
-open import Data.Empty using (⊥; ⊥-elim)
-open import Relation.Binary.PropositionalEquality using (_≡_; isEquivalence; subst; cong) renaming (refl to ≡-refl; sym to ≡-sym)
+open import Relation.Binary.PropositionalEquality using (_≡_; isEquivalence; subst) renaming (refl to ≡-refl; sym to ≡-sym)
 open import Relation.Binary using (Antisymmetric)
+open import Relation.Nullary using (yes; no)
 
 open import Categories.Category.Construction.Arrow
 open import Categories.Category.Construction.IsoComma
   using (IsoComma; IsoCommaObj; IsoComma⇒; ICproj₁; ICproj₂)
-open import Categories.Category.Construction.Thin 
+open import Categories.Category.Construction.Thin
 open import Categories.Category.Instance.Cats using (Cats)
 open import Categories.Functor using (Functor; _∘F_)
   renaming (id to idF)
@@ -54,10 +55,10 @@ iMRS3 = IsoComma ℝ [_]f
   (λ x → Functor x Arr.Arrow)
 𝕚𝕄ℝ𝕊 zero = iMRS3 , record
   { F₀ = λ x → let module x = IsoCommaObj x in record { arr = iMR2.ϕ (iMR2₀.ξ x.a) }
-  ; F₁ = λ { {A} {B} f → 
+  ; F₁ = λ { {A} {B} f →
     let module A = IsoCommaObj A
         module B = IsoCommaObj B
-        module f = IsoComma⇒ f 
+        module f = IsoComma⇒ f
         ℓ = twiMR2⇒.l f.f
         r = twiMR2⇒.r f.f
         equ = Equiv.sym (twiMR2⇒.eqϕ f.f)
@@ -116,85 +117,103 @@ reduce-compat (suc k) =
 
 open import Relation.Binary.Core using (Rel)
 
-data _≤_ : Rel ℕ 0ℓ where
-  ≤-refl  : ∀ {n} → n ≤ n
-  ≤-trans : ∀ {m n k} (m≤n : m ≤ n) (n≤k : n ≤ k) → m ≤ k
-  ≤+1     : ∀ {n} → n ≤ suc n
+data _≤′_ : Rel ℕ 0ℓ where
+  ≤′-refl  : ∀ {n} → n ≤′ n
+  ≤′-trans : ∀ {m n k} (m≤′n : m ≤′ n) (n≤′k : n ≤′ k) → m ≤′ k
+  ≤′+1     : ∀ {n} → n ≤′ suc n
 
-≤-suc-inj : ∀ {a b} → suc a ≤ suc b → a ≤ b
-≤-suc-inj ≤-refl = ≤-refl
-≤-suc-inj {a} {b} (≤-trans p q) = ≤-trans (≤-suc-inj {!   !}) (≤-suc-inj {!   !})
-≤-suc-inj ≤+1 = ≤+1
+≤′to≤ : ∀ {m n} → m ≤′ n → m ≤ n
+≤′to≤ ≤′-refl        = ≤-refl
+≤′to≤ (≤′-trans p q) = ≤-trans (≤′to≤ p) (≤′to≤ q)
+≤′to≤ ≤′+1           = n≤1+n _
 
-¬suc≤ : ∀ {m} → suc m ≤ m → ⊥
-¬suc≤ {zero} = {!   !} -- ()
-¬suc≤ {suc m} p = ¬suc≤ {m} (≤-suc-inj p)
+lemma : ∀ {n} → 0 ≤′ n
+lemma {n = zero} = ≤′-refl
+lemma {n = suc n} = ≤′-trans lemma ≤′+1
 
-antisym : Relation.Binary.Antisymmetric _≡_ _≤_
-antisym ≤-refl y = ≡-refl
-antisym (≤-trans i≤j j≤k) k≤i with antisym i≤j (≤-trans j≤k k≤i)
-... | ≡-refl = antisym j≤k k≤i
-antisym ≤+1 (≤-trans p q) = ⊥-elim (¬suc≤ (≤-trans p q))
+lemma-2 : ∀ {m n} → m ≤′ n → suc m ≤′ suc n
+lemma-2 ≤′-refl = ≤′-refl
+lemma-2 (≤′-trans e e₁) = ≤′-trans (lemma-2 e) (lemma-2 e₁)
+lemma-2 ≤′+1 = ≤′+1
+
+≤to≤′ : ∀ {m n} → m ≤ n  → m ≤′ n
+≤to≤′ z≤n = lemma
+≤to≤′ (s≤s a) = lemma-2 (≤to≤′ a)
+
 open import Relation.Binary using (Poset)
 
+module P = Poset ≤-poset
+
+≤′-antisym : Relation.Binary.Antisymmetric _≡_ _≤′_
+≤′-antisym a b = P.antisym (≤′to≤ a) (≤′to≤ b)
+
 prufa : Poset 0ℓ 0ℓ 0ℓ
-prufa = record 
-  { Carrier = ℕ 
-  ; _≈_ = _≡_ 
-  ; _≤_ = _≤_ 
-  ; isPartialOrder = record 
-    { isPreorder = record 
+prufa = record
+  { Carrier = ℕ
+  ; _≈_ = _≡_
+  ; _≤_ = _≤′_
+  ; isPartialOrder = record
+    { isPreorder = record
       { isEquivalence = isEquivalence
-      ; reflexive = λ {  ≡-refl → ≤-refl }
-      ; trans = ≤-trans 
-      } 
-    ; antisym = {!   !} 
-    } 
+      ; reflexive = λ {  ≡-refl → ≤′-refl }
+      ; trans = ≤′-trans
+      }
+    ; antisym = ≤′-antisym
+    }
   }
 
 -- ℕ as a poset category.
 pℕ : Category 0ℓ 0ℓ 0ℓ
 pℕ = Thin 0ℓ prufa
 
--- 𝕚𝕄ℝ𝕊-F/η: a downward functor together with compatibility against V.
-𝕚𝕄ℝ𝕊-F : ∀ {n m} → m ≤ n → Functor (𝕚𝕄ℝ𝕊ₒ n) (𝕚𝕄ℝ𝕊ₒ m)
-𝕚𝕄ℝ𝕊-F {n} {m} ≤-refl = idF
-𝕚𝕄ℝ𝕊-F {n} {m} (≤-trans {m} {x} {n} m≤x x≤n) = 
-    let dis = 𝕚𝕄ℝ𝕊-F {x} {m} m≤x
-        dat = 𝕚𝕄ℝ𝕊-F {n} {x} x≤n
-    in dis ∘F dat
-𝕚𝕄ℝ𝕊-F {suc n} {n} ≤+1 = Π-MRS n
 
-𝕚𝕄ℝ𝕊-η : ∀ {n m} → (m≤n : m ≤ n) → NaturalIsomorphism (V m ∘F (𝕚𝕄ℝ𝕊-F m≤n)) (V n)
-𝕚𝕄ℝ𝕊-η {n} {m} ≤-refl = NI.unitorʳ
-𝕚𝕄ℝ𝕊-η {n} {m} (≤-trans {m} {x} {n} m≤x x≤n) = 
-  let θ   = 𝕚𝕄ℝ𝕊-η {x} {m} m≤x 
-      θ'  = 𝕚𝕄ℝ𝕊-η {n} {x} x≤n
-      dis = 𝕚𝕄ℝ𝕊-F {x} {m} m≤x
-      dat = 𝕚𝕄ℝ𝕊-F {n} {x} x≤n
+
+-- 𝕚𝕄ℝ𝕊-F/η: a downward functor together with compatibility against V.
+𝕚𝕄ℝ𝕊-F : ∀ {n m} → m ≤′ n → Functor (𝕚𝕄ℝ𝕊ₒ n) (𝕚𝕄ℝ𝕊ₒ m)
+𝕚𝕄ℝ𝕊-F {n} {m} ≤′-refl = idF
+𝕚𝕄ℝ𝕊-F {n} {m} (≤′-trans {m} {x} {n} m≤′x x≤′n) = 𝕚𝕄ℝ𝕊-F {x} {m} m≤′x ∘F 𝕚𝕄ℝ𝕊-F {n} {x} x≤′n
+𝕚𝕄ℝ𝕊-F {suc n} {n} ≤′+1 = Π-MRS n
+
+𝕚𝕄ℝ𝕊-η : ∀ {n m} → (m≤′n : m ≤′ n) → NaturalIsomorphism (V m ∘F (𝕚𝕄ℝ𝕊-F m≤′n)) (V n)
+𝕚𝕄ℝ𝕊-η {n} {m} ≤′-refl = NI.unitorʳ
+𝕚𝕄ℝ𝕊-η {n} {m} (≤′-trans {m} {x} {n} m≤′x x≤′n) =
+  let θ   = 𝕚𝕄ℝ𝕊-η {x} {m} m≤′x
+      θ'  = 𝕚𝕄ℝ𝕊-η {n} {x} x≤′n
+      dis = 𝕚𝕄ℝ𝕊-F {x} {m} m≤′x
+      dat = 𝕚𝕄ℝ𝕊-F {n} {x} x≤′n
   in θ' ⓘᵥ (θ ⓘʳ dat) ⓘᵥ NI.sym-associator dat dis (V m)
-𝕚𝕄ℝ𝕊-η {suc n} {n} ≤+1 = VΠ n
+𝕚𝕄ℝ𝕊-η {suc n} {n} ≤′+1 = VΠ n
 
 private module ElMRS = Category τ'[iMR2]
 private module 𝕋MRS = Category 𝕋MRS
- 
+
 -- lemma: the downward functor at level n is naturally ≃ to the
 -- identity.
 lemma-id : ∀ {n : ℕ} →
-  NaturalIsomorphism (𝕚𝕄ℝ𝕊-F {n} {n} ≤-refl) (idF {C = 𝕚𝕄ℝ𝕊ₒ n})
-lemma-id {n} = let module 𝕄 = Category (𝕚𝕄ℝ𝕊ₒ n) in niHelper (record 
-  { η = λ X → 𝕄.id {X} 
-  ; η⁻¹ = λ X → 𝕄.id {X} 
-  ; commute = λ f → id-comm-sym (𝕚𝕄ℝ𝕊ₒ n) {f = f} 
+  NaturalIsomorphism (𝕚𝕄ℝ𝕊-F {n} {n} ≤′-refl) (idF {C = 𝕚𝕄ℝ𝕊ₒ n})
+lemma-id {zero} = niHelper (record
+  { η = λ X → M0.id {X}
+  ; η⁻¹ = λ X → M0.id {X}
+  ; commute = λ f → id-comm-sym (𝕚𝕄ℝ𝕊ₒ zero) {f = f}
   ; iso = λ X → record
-      { isoˡ = 𝕄.identity² {X}
-      ; isoʳ = 𝕄.identity² {X}
+      { isoˡ = M0.identity² {X}
+      ; isoʳ = M0.identity² {X}
       }
   })
+lemma-id {suc n} = niHelper (record
+  { η = λ X → Mn+1.id {A = X}
+  ; η⁻¹ = λ X → Mn+1.id {A = X}
+  ; commute = λ f → id-comm-sym (𝕚𝕄ℝ𝕊ₒ (suc n)) {f = f}
+  ; iso = λ X → record
+      { isoˡ = Mn+1.identity² {X}
+      ; isoʳ = Mn+1.identity² {X}
+      }
+  }) where module Mn+1 = Category (𝕚𝕄ℝ𝕊ₒ (suc n))
 
-lemma-id′ : ∀ {n : ℕ} (ref : n ≤ n) →
+
+lemma-id′ : ∀ {n : ℕ} (ref : n ≤′ n) →
   NaturalIsomorphism (𝕚𝕄ℝ𝕊-F {n} {n} ref) (idF {C = 𝕚𝕄ℝ𝕊ₒ n})
-lemma-id′ {n} ≤-refl = let module 𝕄 = Category (𝕚𝕄ℝ𝕊ₒ n) in  niHelper (record 
+lemma-id′ {n} ≤′-refl = let module 𝕄 = Category (𝕚𝕄ℝ𝕊ₒ n) in  niHelper (record 
   { η = λ X → 𝕄.id {A = X} 
   ; η⁻¹ = λ X → 𝕄.id {A = X} 
   ; commute = λ f → id-comm-sym (𝕚𝕄ℝ𝕊ₒ n) {f = f} 
@@ -202,58 +221,72 @@ lemma-id′ {n} ≤-refl = let module 𝕄 = Category (𝕚𝕄ℝ𝕊ₒ n) in 
       { isoˡ = 𝕄.identity² {X}
       ; isoʳ = 𝕄.identity² {X}
       } })
-lemma-id′ {n} (≤-trans ref ref₁) with antisym ref ref₁
-lemma-id′ {n} (≤-trans ≤-refl ≤-refl) | ≡-refl = NI.unitor²
-lemma-id′ {n} (≤-trans ≤-refl (≤-trans ref₁ ref₂)) | ≡-refl = lemma-id′ {n} (≤-trans ref₁ ref₂) ⓘᵥ NI.unitorˡ
-lemma-id′ {n} (≤-trans (≤-trans ref ref₂) ref₁) | ≡-refl =
-  let m = lemma-id′ (≤-trans ref (≤-trans ref₂ ref₁)) in
+lemma-id′ {n} (≤′-trans ref ref₁) with ≤′-antisym ref ref₁
+lemma-id′ {n} (≤′-trans ≤′-refl ≤′-refl) | ≡-refl = NI.unitor²
+lemma-id′ {n} (≤′-trans ≤′-refl (≤′-trans ref₁ ref₂)) | ≡-refl = 
+  lemma-id′ {n} (≤′-trans ref₁ ref₂) ⓘᵥ NI.unitorˡ
+lemma-id′ {n} (≤′-trans (≤′-trans ref ref₂) ref₁) | ≡-refl =
+  let m = lemma-id′ (≤′-trans ref (≤′-trans ref₂ ref₁)) in
   m ⓘᵥ NI.associator (𝕚𝕄ℝ𝕊-F ref₁) (𝕚𝕄ℝ𝕊-F ref₂) (𝕚𝕄ℝ𝕊-F ref)
+
+
+
 
 -- lemma-homomorphism: 𝕚𝕄ℝ𝕊-down respects composition up to natural
 -- isomorphism.
-lemma-homomorphism : ∀ {n m k : ℕ} (m≤n : m ≤ n) (k≤m : k ≤ m) →
-  NaturalIsomorphism (𝕚𝕄ℝ𝕊-F (≤-trans k≤m m≤n))
-    ((𝕚𝕄ℝ𝕊-F k≤m) ∘F (𝕚𝕄ℝ𝕊-F m≤n))
-lemma-homomorphism {n} {m} {k} m≤n k≤m = 
-  let module 𝕄 = Category (𝕚𝕄ℝ𝕊ₒ k) 
-      F = 𝕚𝕄ℝ𝕊-F (≤-trans k≤m m≤n)
-  in niHelper (record 
-    { η = λ X → 𝕄.id
-    ; η⁻¹ = λ X → 𝕄.id
-    ; commute = λ f → id-comm-sym (𝕚𝕄ℝ𝕊ₒ k) {f = Functor.F₁ F f}
-    ; iso = λ X → record
-      { isoˡ = 𝕄.identity²
-      ; isoʳ = 𝕄.identity²
-      }
-    })
+lemma-homomorphism : ∀ {n m k : ℕ} (m≤′n : m ≤′ n) (k≤′m : k ≤′ m) →
+  NaturalIsomorphism (𝕚𝕄ℝ𝕊-F (≤′-trans k≤′m m≤′n))
+    ((𝕚𝕄ℝ𝕊-F k≤′m) ∘F (𝕚𝕄ℝ𝕊-F m≤′n))
+lemma-homomorphism {n} {m} {k} m≤′n k≤′m = niHelper {!   !} 
+  where module Mn = Category (𝕚𝕄ℝ𝕊ₒ n)
+
+one-step : ∀ {n₁ m : ℕ}
+   (p : n₁ ≤ suc m)
+   (q : m ≤ n₁)
+   → n₁ ≡ m ⊎ n₁ ≡ suc m
+one-step z≤n z≤n = inj₁ ≡-refl
+one-step (s≤s z≤n) z≤n = inj₂ ≡-refl
+one-step (s≤s p) (s≤s q) with one-step p q
+... | inj₁ ≡-refl = inj₁ ≡-refl
+... | inj₂ ≡-refl = inj₂ ≡-refl
+
+one-step′ : ∀ {n₁ m : ℕ}
+   (p : n₁ ≤′ suc m)
+   (q : m ≤′ n₁)
+   → n₁ ≡ m ⊎ n₁ ≡ suc m
+one-step′ p q = one-step (≤′to≤ p) (≤′to≤ q)
+
+lemma-Fresp-≤′+1 : ∀ {m : ℕ} (p : m ≤′ suc m) →
+  NaturalIsomorphism (𝕚𝕄ℝ𝕊-F {m = m} ≤′+1) (𝕚𝕄ℝ𝕊-F {m = m}  p)
+lemma-Fresp-≤′+1 (≤′-trans q p₁) with one-step′ p₁ q
+... | inj₁ ≡-refl = {!  lemma-Fresp-≤′+1 p₁ !} -- usare questo + lemma-id′ qui
+... | inj₂ ≡-refl = {! lemma-Fresp-≤′+1 q   !} -- usare questo + lemma-id′ qui
+lemma-Fresp-≤′+1 ≤′+1 = {!   !} -- ok
 
 -- lemma-Fresp: proof-irrelevance for 𝕚𝕄ℝ𝕊-down on thin morphisms.
-lemma-Fresp : ∀ {n m : ℕ} (p q : m ≤ n) →
+lemma-Fresp : ∀ {n m : ℕ} (p q : m ≤′ n) →
   NaturalIsomorphism (𝕚𝕄ℝ𝕊-F p) (𝕚𝕄ℝ𝕊-F q)
-lemma-Fresp {n} {m} ≤-refl q = let module 𝕄 = Category (𝕚𝕄ℝ𝕊ₒ n) 
-  in niHelper (record 
-    { η = λ X → {!   !} -- Category.id (𝕚𝕄ℝ𝕊ₒ n)
-    ; η⁻¹ = {!   !} 
-    ; commute = {!   !} 
-    ; iso = {!   !} 
-    })
-lemma-Fresp {n} {m} (≤-trans p p') ≤-refl = {!   !} -- absurd
-lemma-Fresp {n} {m} (≤-trans p p') (≤-trans q q') = {!   !}
-lemma-Fresp {n} {m} (≤-trans p p') ≤+1 = {!   !}
-lemma-Fresp {n} {m} ≤+1 q = {!   !} 
-  -- let module 𝕄 = Category (𝕚𝕄ℝ𝕊ₒ m) 
-  -- in {!   !} -- niHelper (record 
-    -- { η = λ X → {!   !} -- Category.id (𝕚𝕄ℝ𝕊ₒ m)
-    -- ; η⁻¹ = λ X → {!   !} 
-    -- ; commute = λ f → {!   !} 
-    -- ; iso = λ X → {!   !} 
-    -- }) 
+lemma-Fresp {n} ≤′-refl ≤′-refl = {!   !} -- ok
+lemma-Fresp {n} ≤′-refl (≤′-trans n≤′n n≤′n₁) with ≤′-antisym n≤′n n≤′n₁
+... | ≡-refl = {!   !} -- usare lemma-id′ qui
+lemma-Fresp {n} (≤′-trans p p₁) ≤′-refl with ≤′-antisym p p₁
+... | ≡-refl = {!   !} -- usare lemma-id′ qui
+lemma-Fresp {n} (≤′-trans p p₁) (≤′-trans q q₁) = {!   !} -- usare ipotesi induttiva qui
+lemma-Fresp {n} (≤′-trans p p₁) ≤′+1 with one-step′ p₁ p
+... | inj₁ ≡-refl = {!  lemma-Fresp-≤′+1 p₁ !} -- usare questo + lemma-id′ qui
+... | inj₂ ≡-refl = {!  lemma-Fresp-≤′+1 p !} -- usare questo + lemma-id′ qui
+lemma-Fresp {n} ≤′+1 (≤′-trans q q₁) with one-step′ q₁ q
+... | inj₁ ≡-refl = {! lemma-Fresp-≤′+1 q₁  !}  -- usare questo + lemma-id′ qui
+... | inj₂ ≡-refl = {!  lemma-Fresp-≤′+1 q  !}  -- usare questo + lemma-id′ qui
+lemma-Fresp {n} ≤′+1 ≤′+1 = {!   !} -- ok
+
+
 
 -- iMRS-chain: the chain … → 𝕚𝕄ℝ𝕊ₒ 2 → 𝕚𝕄ℝ𝕊ₒ 1 → 𝕚𝕄ℝ𝕊ₒ 0 as ℕ^op → Cats.
 iMRS-chain : Functor (Category.op pℕ) (Cats (o ⊔ ℓ ⊔ e) (o ⊔ ℓ ⊔ e) e)
 iMRS-chain = record
   { F₀ = 𝕚𝕄ℝ𝕊ₒ
-  ; F₁ = λ {n} {m} m≤n → 𝕚𝕄ℝ𝕊-F m≤n
+  ; F₁ = λ {n} {m} m≤′n → 𝕚𝕄ℝ𝕊-F m≤′n
   ; identity = λ { {n} → lemma-id {n} }
   ; homomorphism = λ { {n} {m} {k} {f} {g} → lemma-homomorphism f g }
   ; F-resp-≈ = λ { {n} {m} {f} {g} _ → lemma-Fresp f g }
