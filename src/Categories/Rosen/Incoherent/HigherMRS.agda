@@ -78,6 +78,7 @@ iMRS3 = IsoComma ℝ [_]f
 Π-MRS : (n : ℕ) → Functor (𝕚𝕄ℝ𝕊ₒ (suc n)) (𝕚𝕄ℝ𝕊ₒ n)
 Π-MRS n = ICproj₂
 
+module MRc {n} = Category (𝕚𝕄ℝ𝕊ₒ n)
 private module M0   = Category (𝕚𝕄ℝ𝕊ₒ zero)
 private module ArrC = Category Arr.Arrow
 private module ArrMR = MR Arr.Arrow
@@ -150,124 +151,24 @@ pℕ = Thin 0ℓ prufa
 
 
 
--- 𝕚𝕄ℝ𝕊-down: a downward functor together with compatibility against V.
-𝕚𝕄ℝ𝕊-down : ∀ {n m} → m ≤ n →
-  Σ (Functor (𝕚𝕄ℝ𝕊ₒ n) (𝕚𝕄ℝ𝕊ₒ m))
-    (λ F-down → NaturalIsomorphism (V m ∘F F-down) (V n))
-𝕚𝕄ℝ𝕊-down {n} {m} ≤-refl = idF , NI.unitorʳ
-𝕚𝕄ℝ𝕊-down {n} {m} (≤-trans {m} {x} {n} m≤x x≤n) = 
-  let dis = proj₁ (𝕚𝕄ℝ𝕊-down {x} {m} m≤x) 
-      dat = proj₁ (𝕚𝕄ℝ𝕊-down {n} {x} x≤n)
-      θ   = proj₂ (𝕚𝕄ℝ𝕊-down {x} {m} m≤x) 
-      θ'  = proj₂ (𝕚𝕄ℝ𝕊-down {n} {x} x≤n)
-  in dis ∘F dat , θ' ⓘᵥ (θ ⓘʳ dat) ⓘᵥ NI.sym-associator dat dis (V m)
-𝕚𝕄ℝ𝕊-down {n} {m} ≤+1 = {!   !} , {!   !}
+-- 𝕚𝕄ℝ𝕊-F/η: a downward functor together with compatibility against V.
+𝕚𝕄ℝ𝕊-F : ∀ {n m} → m ≤ n → Functor (𝕚𝕄ℝ𝕊ₒ n) (𝕚𝕄ℝ𝕊ₒ m)
+𝕚𝕄ℝ𝕊-F {n} {m} ≤-refl = idF
+𝕚𝕄ℝ𝕊-F {n} {m} (≤-trans {m} {x} {n} m≤x x≤n) = 
+    let dis = 𝕚𝕄ℝ𝕊-F {x} {m} m≤x
+        dat = 𝕚𝕄ℝ𝕊-F {n} {x} x≤n
+    in dis ∘F dat
+𝕚𝕄ℝ𝕊-F {suc n} {n} ≤+1 = Π-MRS n
 
-{-
-𝕚𝕄ℝ𝕊-down {n} z≤n = reduce n , reduce-compat n
-𝕚𝕄ℝ𝕊-down (s≤s {m} {n} m≤n) = go , down-compat
-  where
-    down = 𝕚𝕄ℝ𝕊-down m≤n
-    F-down = proj₁ down
-    module F-down = Functor F-down
-    module down = NaturalIsomorphism (proj₂ down)
-    module ArrM = BaseMorphism Arr.Arrow
-
-    go : Functor (𝕚𝕄ℝ𝕊ₒ (suc n)) (𝕚𝕄ℝ𝕊ₒ (suc m))
-    go = record
-      { F₀ = λ x →
-          let module x = IsoCommaObj x
-              iso' = record
-                { from = down.⇒.η x.b
-                ; to   = down.⇐.η x.b
-                ; iso  = down.iso x.b
-                }
-          in record
-            { a = x.a
-            ; b = F-down.F₀ x.b
-            ; iso = ArrM.≅.trans x.iso (ArrM.≅.sym iso')
-            }
-      ; F₁ = λ { {x} {y} f →
-          let module x = IsoCommaObj x
-              module y = IsoCommaObj y
-              module f = IsoComma⇒ f
-              MRSn = proj₂ (𝕚𝕄ℝ𝕊 n)
-              MRSm = proj₂ (𝕚𝕄ℝ𝕊 m)
-              module Vₙ = Functor MRSn
-              module Vₘ = Functor MRSm
-              module R  = Functor ℝ
-          in let open ArrC.HomReasoning in record
-            { f = f.f
-            ; g = F-down.F₁ f.g
-            ; commute = begin
-                Vₘ.F₁ (F-down.F₁ f.g)
-                  ArrC.∘ (down.⇐.η x.b ArrC.∘ ArrM._≅_.from x.iso)
-                  ≈⟨ ArrC.sym-assoc
-                       {f = ArrM._≅_.from x.iso}
-                       {g = down.⇐.η x.b}
-                       {h = Vₘ.F₁ (F-down.F₁ f.g)} ⟩
-                (Vₘ.F₁ (F-down.F₁ f.g) ArrC.∘ down.⇐.η x.b)
-                  ArrC.∘ ArrM._≅_.from x.iso
-                  ≈⟨ ArrC.∘-resp-≈ˡ
-                       (ArrC.Equiv.sym (down.⇐.commute f.g)) ⟩
-                (down.⇐.η y.b ArrC.∘ Vₙ.F₁ f.g)
-                  ArrC.∘ ArrM._≅_.from x.iso
-                  ≈⟨ ArrC.assoc
-                       {f = ArrM._≅_.from x.iso}
-                       {g = Vₙ.F₁ f.g}
-                       {h = down.⇐.η y.b} ⟩
-                down.⇐.η y.b
-                  ArrC.∘ (Vₙ.F₁ f.g ArrC.∘ ArrM._≅_.from x.iso)
-                  ≈⟨ ArrC.∘-resp-≈ʳ f.commute ⟩
-                down.⇐.η y.b
-                  ArrC.∘ (ArrM._≅_.from y.iso ArrC.∘ R.F₁ f.f)
-                  ≈⟨ ArrC.sym-assoc
-                       {f = R.F₁ f.f}
-                       {g = ArrM._≅_.from y.iso}
-                       {h = down.⇐.η y.b} ⟩
-                (down.⇐.η y.b ArrC.∘ ArrM._≅_.from y.iso)
-                  ArrC.∘ R.F₁ f.f ∎
-            }
-        }
-      ; identity = (refl , refl) , F-down.identity
-      ; homomorphism = (refl , refl) , F-down.homomorphism
-      ; F-resp-≈ = λ eq →
-          ((eq .proj₁ .proj₁) , (eq .proj₁ .proj₂))
-            , F-down.F-resp-≈ (proj₂ eq)
-      }
-
-    go-proj : NaturalIsomorphism (V (suc m) ∘F go)
-      ((V m ∘F F-down) ∘F Π-MRS n)
-    go-proj = niHelper (record
-      { η = λ X → ArrC.id
-      ; η⁻¹ = λ X → ArrC.id
-      ; commute = λ f →
-          let open ArrC.HomReasoning in
-          begin
-            ArrC.id ArrC.∘ Functor.F₁ (V (suc m) ∘F go) f
-              ≈⟨ ArrC.identityˡ
-                   {f = Functor.F₁ (V (suc m) ∘F go) f} ⟩
-            Functor.F₁ ((V m ∘F F-down) ∘F Π-MRS n) f
-              ≈˘⟨ ArrC.identityʳ
-                    {f = Functor.F₁ ((V m ∘F F-down) ∘F Π-MRS n) f} ⟩
-            Functor.F₁ ((V m ∘F F-down) ∘F Π-MRS n) f
-              ArrC.∘ ArrC.id ∎
-      ; iso = λ X → record
-          { isoˡ = identityˡ , identity²
-          ; isoʳ = identityˡ , identity²
-          }
-      })
-
-    down-compat : NaturalIsomorphism (V (suc m) ∘F go) (V (suc n))
-    down-compat = NI.trans go-proj ((proj₂ down) ⓘʳ Π-MRS n)
--}
-
-downF : ∀ {n m} → m ≤ n → Functor (𝕚𝕄ℝ𝕊ₒ n) (𝕚𝕄ℝ𝕊ₒ m)
-downF p = proj₁ (𝕚𝕄ℝ𝕊-down p)
-
-down-compat : ∀ {n m} (p : m ≤ n) →
-  NaturalIsomorphism (V m ∘F downF p) (V n)
-down-compat p = proj₂ (𝕚𝕄ℝ𝕊-down p)
+𝕚𝕄ℝ𝕊-η : ∀ {n m} → (m≤n : m ≤ n) → NaturalIsomorphism (V m ∘F (𝕚𝕄ℝ𝕊-F m≤n)) (V n)
+𝕚𝕄ℝ𝕊-η {n} {m} ≤-refl = NI.unitorʳ
+𝕚𝕄ℝ𝕊-η {n} {m} (≤-trans {m} {x} {n} m≤x x≤n) = 
+  let θ   = 𝕚𝕄ℝ𝕊-η {x} {m} m≤x 
+      θ'  = 𝕚𝕄ℝ𝕊-η {n} {x} x≤n
+      dis = 𝕚𝕄ℝ𝕊-F {x} {m} m≤x
+      dat = 𝕚𝕄ℝ𝕊-F {n} {x} x≤n
+  in θ' ⓘᵥ (θ ⓘʳ dat) ⓘᵥ NI.sym-associator dat dis (V m)
+𝕚𝕄ℝ𝕊-η {suc n} {n} ≤+1 = VΠ n
 
 private module ElMRS = Category τ'[iMR2]
 private module 𝕋MRS = Category 𝕋MRS
@@ -275,78 +176,41 @@ private module 𝕋MRS = Category 𝕋MRS
 -- lemma: the downward functor at level n is naturally ≃ to the
 -- identity.
 lemma-id : ∀ {n : ℕ} →
-  NaturalIsomorphism (downF {n} {n} ≤-refl) (idF {C = 𝕚𝕄ℝ𝕊ₒ n})
-lemma-id {n} = {!   !}
-
-{-
-lemma-id {zero} = niHelper (record
-  { η = λ X → M0.id {X}
-  ; η⁻¹ = λ X → M0.id {X}
-  ; commute = λ f → id-comm-sym (𝕚𝕄ℝ𝕊ₒ zero) {f = f}
+  NaturalIsomorphism (𝕚𝕄ℝ𝕊-F {n} {n} ≤-refl) (idF {C = 𝕚𝕄ℝ𝕊ₒ n})
+lemma-id {zero} = niHelper (record 
+  { η = λ X → M0.id {X} 
+  ; η⁻¹ = λ X → M0.id {X} 
+  ; commute = λ f → id-comm-sym (𝕚𝕄ℝ𝕊ₒ zero) {f = f} 
   ; iso = λ X → record
       { isoˡ = M0.identity² {X}
       ; isoʳ = M0.identity² {X}
       }
   })
-lemma-id {suc n} = niHelper (record
-  { η = λ X →
-      let module X = IsoCommaObj X
-          module ArrM = BaseMorphism Arr.Arrow
-          MRSn = proj₂ (𝕚𝕄ℝ𝕊 n)
-          module Vₙ = Functor MRSn
-          down' = proj₂ (𝕚𝕄ℝ𝕊-down (≤-refl {n}))
-          F-down' = proj₁ (𝕚𝕄ℝ𝕊-down (≤-refl {n}))
-          module F-down' = Functor F-down'
-          module down' = NaturalIsomorphism down'
-      in record
-        { f = ElMRS.id
-        ; g = IH.⇒.η X.b
-        ; commute = 
-            let open ArrC.HomReasoning
-                lamma : Vₙ.F₁ (IH.⇒.η X.b) ArrC.∘ (down'.⇐.η X.b) ArrC.≈ ArrC.id
-                lamma = let open ArrC
-                            module ID = NaturalIsomorphism (lemma-id {n})
-                        in {!   !} , {!   !}
-          in begin {!   !} 
-                 ≈⟨ ArrC.sym-assoc ⟩
-                   {!   !} 
-                 ≈⟨ lamma ⟩∘⟨refl ⟩
-                  {!   !} 
-                 ≈⟨ ArrMR.id-comm-sym ⟩
-                  {!   !} 
-                 ≈˘⟨ (refl⟩∘⟨ Functor.identity ℝ) ⟩
-                  {!   !} ∎
-        }
-  ; η⁻¹ = λ X →
-      let module X = IsoCommaObj X in record
-        { f = ElMRS.id
-        ; g = IH.⇐.η X.b
-        ; commute = 
-            let open ArrC.HomReasoning 
-            in {! !}
-        }
-  ; commute = λ f →
-      let module f = IsoComma⇒ f
-      in (id-comm-sym τ'[iMR2] {f = f.f} , IH.⇒.commute f.g)
-  ; iso = λ X →
-      let module X = IsoCommaObj X
-      in record
-        { isoˡ =
-            (ElMRS.identity² {X.a} , BaseMorphism.Iso.isoˡ (IH.iso X.b))
-        ; isoʳ =
-            (ElMRS.identity² {X.a} , BaseMorphism.Iso.isoʳ (IH.iso X.b))
-        }
-  })
-  where
-    module IH = NaturalIsomorphism (lemma-id {n})
-    module Mn = Category (𝕚𝕄ℝ𝕊ₒ n)
--}
+lemma-id {suc n} = niHelper (record 
+  { η = λ X → Mn+1.id {A = X}
+  ; η⁻¹ = λ X → Mn+1.id {A = X}
+  ; commute = λ f → id-comm-sym (𝕚𝕄ℝ𝕊ₒ (suc n)) {f = f} 
+  ; iso = λ X → record
+      { isoˡ = Mn+1.identity² {X}
+      ; isoʳ = Mn+1.identity² {X}
+      }
+  }) where module Mn+1 = Category (𝕚𝕄ℝ𝕊ₒ (suc n))
+
+
 -- lemma-homomorphism: 𝕚𝕄ℝ𝕊-down respects composition up to natural
 -- isomorphism.
 lemma-homomorphism : ∀ {n m k : ℕ} (m≤n : m ≤ n) (k≤m : k ≤ m) →
-  NaturalIsomorphism (downF (≤-trans k≤m m≤n))
-    ((downF k≤m) ∘F (downF m≤n))
-lemma-homomorphism {n} {m} {k} p q = {!   !}
+  NaturalIsomorphism (𝕚𝕄ℝ𝕊-F (≤-trans k≤m m≤n))
+    ((𝕚𝕄ℝ𝕊-F k≤m) ∘F (𝕚𝕄ℝ𝕊-F m≤n))
+lemma-homomorphism {n} {m} {zero} m≤n k≤m = {!   !}
+lemma-homomorphism {n} {m} {suc k} m≤n k≤m = {!   !}
+  
+  -- niHelper (record 
+  -- { η = λ X → {!    !} 
+  -- ; η⁻¹ = λ X → {!   !} 
+  -- ; commute = λ f → {!   !} 
+  -- ; iso = λ X → {!   !} 
+  -- }) where module Mn = Category (𝕚𝕄ℝ𝕊ₒ n)
 
 {-
 lemma-homomorphism {n = n} z≤n z≤n = niHelper (record
@@ -375,8 +239,27 @@ lemma-homomorphism {n = suc n'} {m = suc m'} {k = suc k'} (s≤s m≤n) (s≤s k
 -}
 -- lemma-Fresp: proof-irrelevance for 𝕚𝕄ℝ𝕊-down on thin morphisms.
 lemma-Fresp : ∀ {n m : ℕ} (p q : m ≤ n) →
-  NaturalIsomorphism (downF p) (downF q)
-lemma-Fresp {n} p q = {!   !}
+  NaturalIsomorphism (𝕚𝕄ℝ𝕊-F p) (𝕚𝕄ℝ𝕊-F q)
+lemma-Fresp {n} ≤-refl n≤n =
+  niHelper (record 
+    { η = λ X → let module Mn = Category (𝕚𝕄ℝ𝕊ₒ n) in {!   !}
+    ; η⁻¹ = λ X → {!   !} 
+    ; commute = λ f → {!   !} 
+    ; iso = λ X → {!   !} 
+    }) 
+
+lemma-Fresp {n} (≤-trans p p') q = niHelper (record 
+  { η = {!   !} 
+  ; η⁻¹ = {!   !} 
+  ; commute = {!   !} 
+  ; iso = {!   !} 
+  })
+lemma-Fresp {n} ≤+1 q = niHelper (record 
+  { η = {!   !} 
+  ; η⁻¹ = {!   !} 
+  ; commute = {!   !} 
+  ; iso = {!   !} 
+  })
 {-
 lemma-Fresp {n = n} z≤n z≤n = niHelper (record
   { η = λ X → M0.id {Functor.F₀ (reduce n) X}
@@ -401,7 +284,7 @@ lemma-Fresp {n = suc n'} {m = suc m'} (s≤s p) (s≤s q) = niHelper (record
 iMRS-chain : Functor (Category.op pℕ) (Cats (o ⊔ ℓ ⊔ e) (o ⊔ ℓ ⊔ e) e)
 iMRS-chain = record
   { F₀ = 𝕚𝕄ℝ𝕊ₒ
-  ; F₁ = λ {n} {m} m≤n → downF m≤n
+  ; F₁ = λ {n} {m} m≤n → 𝕚𝕄ℝ𝕊-F m≤n
   ; identity = λ { {n} → lemma-id {n} }
   ; homomorphism = λ { {n} {m} {k} {f} {g} → lemma-homomorphism f g }
   ; F-resp-≈ = λ { {n} {m} {f} {g} _ → lemma-Fresp f g }
