@@ -226,18 +226,18 @@ lemma-id' {n} (≤'-trans ≤'-refl ≤'-refl) | ≡-refl = NI.unitor²
 lemma-id' {n} (≤'-trans ≤'-refl (≤'-trans ref₁ ref₂)) | ≡-refl = 
   lemma-id' {n} (≤'-trans ref₁ ref₂) ⓘᵥ NI.unitorˡ
 lemma-id' {n} (≤'-trans (≤'-trans ref ref₂) ref₁) | ≡-refl =
-  let m = lemma-id' (≤'-trans ref (≤'-trans ref₂ ref₁)) in
-  m ⓘᵥ NI.associator (𝕚𝕄ℝ𝕊-F ref₁) (𝕚𝕄ℝ𝕊-F ref₂) (𝕚𝕄ℝ𝕊-F ref)
-
-
-
+  let G = 𝕚𝕄ℝ𝕊-F (≤'-trans ref ref₂)
+      H = 𝕚𝕄ℝ𝕊-F ref₁
+      isoG = lemma-id' (≤'-trans ref ref₂)
+      isoH = lemma-id' ref₁
+  in isoH ⓘᵥ NI.unitorˡ ⓘᵥ (isoG ⓘʳ H)
 
 -- lemma-homomorphism: 𝕚𝕄ℝ𝕊-down respects composition up to natural
 -- isomorphism.
 lemma-homomorphism : ∀ {n m k : ℕ} (m≤'n : m ≤' n) (k≤'m : k ≤' m) →
   NaturalIsomorphism (𝕚𝕄ℝ𝕊-F (≤'-trans k≤'m m≤'n))
     ((𝕚𝕄ℝ𝕊-F k≤'m) ∘F (𝕚𝕄ℝ𝕊-F m≤'n))
-lemma-homomorphism {n} {m} {k} m≤'n k≤'m = NI.refl {F = 𝕚𝕄ℝ𝕊-F (≤'-trans k≤'m m≤'n)}
+lemma-homomorphism {n} {m} {k} m≤'n k≤'m = NI.refl
 
 one-step : ∀ {n₁ m : ℕ}
    (p : n₁ ≤ suc m)
