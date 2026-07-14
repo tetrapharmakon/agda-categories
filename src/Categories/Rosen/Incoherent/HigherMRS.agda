@@ -166,8 +166,6 @@ prufa = record
 pℕ : Category 0ℓ 0ℓ 0ℓ
 pℕ = Thin 0ℓ prufa
 
-
-
 -- 𝕚𝕄ℝ𝕊-F/η: a downward functor together with compatibility against V.
 𝕚𝕄ℝ𝕊-F : ∀ {n m} → m ≤' n → Functor (𝕚𝕄ℝ𝕊ₒ n) (𝕚𝕄ℝ𝕊ₒ m)
 𝕚𝕄ℝ𝕊-F {n} {m} ≤'-refl = idF
@@ -191,36 +189,11 @@ private module 𝕋MRS = Category 𝕋MRS
 -- identity.
 lemma-id : ∀ {n : ℕ} →
   NaturalIsomorphism (𝕚𝕄ℝ𝕊-F {n} {n} ≤'-refl) (idF {C = 𝕚𝕄ℝ𝕊ₒ n})
-lemma-id {zero} = niHelper (record
-  { η = λ X → M0.id {X}
-  ; η⁻¹ = λ X → M0.id {X}
-  ; commute = λ f → id-comm-sym (𝕚𝕄ℝ𝕊ₒ zero) {f = f}
-  ; iso = λ X → record
-      { isoˡ = M0.identity² {X}
-      ; isoʳ = M0.identity² {X}
-      }
-  })
-lemma-id {suc n} = niHelper (record
-  { η = λ X → Mn+1.id {A = X}
-  ; η⁻¹ = λ X → Mn+1.id {A = X}
-  ; commute = λ f → id-comm-sym (𝕚𝕄ℝ𝕊ₒ (suc n)) {f = f}
-  ; iso = λ X → record
-      { isoˡ = Mn+1.identity² {X}
-      ; isoʳ = Mn+1.identity² {X}
-      }
-  }) where module Mn+1 = Category (𝕚𝕄ℝ𝕊ₒ (suc n))
-
+lemma-id {n} = NI.refl
 
 lemma-id' : ∀ {n : ℕ} (ref : n ≤' n) →
   NaturalIsomorphism (𝕚𝕄ℝ𝕊-F {n} {n} ref) (idF {C = 𝕚𝕄ℝ𝕊ₒ n})
-lemma-id' {n} ≤'-refl = let module 𝕄 = Category (𝕚𝕄ℝ𝕊ₒ n) in  niHelper (record 
-  { η = λ X → 𝕄.id {A = X} 
-  ; η⁻¹ = λ X → 𝕄.id {A = X} 
-  ; commute = λ f → id-comm-sym (𝕚𝕄ℝ𝕊ₒ n) {f = f} 
-  ; iso = λ X → record
-      { isoˡ = 𝕄.identity² {X}
-      ; isoʳ = 𝕄.identity² {X}
-      } })
+lemma-id' {n} ≤'-refl = NI.refl
 lemma-id' {n} (≤'-trans ref ref₁) with ≤'-antisym ref ref₁
 lemma-id' {n} (≤'-trans ≤'-refl ≤'-refl) | ≡-refl = NI.unitor²
 lemma-id' {n} (≤'-trans ≤'-refl (≤'-trans ref₁ ref₂)) | ≡-refl = 
@@ -258,34 +231,37 @@ one-step' p q = one-step (≤'to≤ p) (≤'to≤ q)
 lemma-Fresp-≤'+1 : ∀ {m : ℕ} (p : m ≤' suc m) →
   NaturalIsomorphism (𝕚𝕄ℝ𝕊-F {m = m} ≤'+1) (𝕚𝕄ℝ𝕊-F {m = m}  p)
 lemma-Fresp-≤'+1 (≤'-trans q p₁) with one-step' p₁ q
-... | inj₁ ≡-refl = {!  lemma-Fresp-≤'+1 p₁ !} -- usare questo + lemma-id' qui
-... | inj₂ ≡-refl = {! lemma-Fresp-≤'+1 q   !} -- usare questo + lemma-id' qui
+... | inj₁ ≡-refl =
+  let P₁ = 𝕚𝕄ℝ𝕊-F p₁
+  in NI.sym ((lemma-id' q) ⓘʳ P₁) ⓘᵥ (NI.sym (NI.unitorˡ {F = P₁}) ⓘᵥ lemma-Fresp-≤'+1 p₁)
+... | inj₂ ≡-refl =
+  let Q = 𝕚𝕄ℝ𝕊-F q
+  in NI.sym (Q ⓘˡ (lemma-id' p₁)) ⓘᵥ (NI.sym (NI.unitorʳ {F = Q}) ⓘᵥ lemma-Fresp-≤'+1 q)
 lemma-Fresp-≤'+1 ≤'+1 = NI.refl
 
 -- lemma-Fresp: proof-irrelevance for 𝕚𝕄ℝ𝕊-down on thin morphisms.
 lemma-Fresp : ∀ {n m : ℕ} (p q : m ≤' n) →
   NaturalIsomorphism (𝕚𝕄ℝ𝕊-F p) (𝕚𝕄ℝ𝕊-F q)
-lemma-Fresp {n} ≤'-refl ≤'-refl = 
-  let module 𝕄 = Category (𝕚𝕄ℝ𝕊ₒ n) 
-  in niHelper (record 
-    { η = λ X → 𝕄.id {A = X} 
-    ; η⁻¹ = λ X → 𝕄.id {A = X}
-    ; commute = λ f → id-comm-sym (𝕚𝕄ℝ𝕊ₒ n) {f = f} 
-    ; iso = λ X → record
-      { isoˡ = 𝕄.identity² {X}
-      ; isoʳ = 𝕄.identity² {X}
-      } })
+lemma-Fresp {n} ≤'-refl ≤'-refl = NI.refl
 lemma-Fresp {n} ≤'-refl (≤'-trans n≤'n n≤'n₁) with ≤'-antisym n≤'n n≤'n₁
-... | ≡-refl = lemma-id' ≤'-refl -- usare lemma-id' qui
+... | ≡-refl = NI.sym (lemma-id' (≤'-trans n≤'n n≤'n₁))
 lemma-Fresp {n} (≤'-trans p p₁) ≤'-refl with ≤'-antisym p p₁
-... | ≡-refl = {!   !} -- usare lemma-id' qui
+... | ≡-refl = lemma-id' (≤'-trans p p₁)
 lemma-Fresp {n} (≤'-trans p p₁) (≤'-trans q q₁) = {!   !} -- usare ipotesi induttiva qui
 lemma-Fresp {n} (≤'-trans p p₁) ≤'+1 with one-step' p₁ p
-... | inj₁ ≡-refl = {!  lemma-Fresp-≤'+1 p₁ !} -- usare questo + lemma-id' qui
-... | inj₂ ≡-refl = {!  lemma-Fresp-≤'+1 p !} -- usare questo + lemma-id' qui
+... | inj₁ ≡-refl =
+  let P₁ = 𝕚𝕄ℝ𝕊-F p₁
+  in NI.sym (lemma-Fresp-≤'+1 p₁) ⓘᵥ (NI.unitorˡ {F = P₁} ⓘᵥ ((lemma-id' p) ⓘʳ P₁))
+... | inj₂ ≡-refl =
+  let P = 𝕚𝕄ℝ𝕊-F p
+  in NI.sym (lemma-Fresp-≤'+1 p) ⓘᵥ (NI.unitorʳ {F = P} ⓘᵥ (P ⓘˡ (lemma-id' p₁)))
 lemma-Fresp {n} ≤'+1 (≤'-trans q q₁) with one-step' q₁ q
-... | inj₁ ≡-refl = {! lemma-Fresp-≤'+1 q₁  !}  -- usare questo + lemma-id' qui
-... | inj₂ ≡-refl = {!  lemma-Fresp-≤'+1 q  !}  -- usare questo + lemma-id' qui
+... | inj₁ ≡-refl =
+  let Q₁ = 𝕚𝕄ℝ𝕊-F q₁
+  in NI.sym ((lemma-id' q) ⓘʳ Q₁) ⓘᵥ (NI.sym (NI.unitorˡ {F = Q₁}) ⓘᵥ lemma-Fresp-≤'+1 q₁)
+... | inj₂ ≡-refl =
+  let Q = 𝕚𝕄ℝ𝕊-F q
+  in NI.sym (Q ⓘˡ (lemma-id' q₁)) ⓘᵥ (NI.sym (NI.unitorʳ {F = Q}) ⓘᵥ lemma-Fresp-≤'+1 q)
 lemma-Fresp {n} ≤'+1 ≤'+1 = NI.refl
 
 
