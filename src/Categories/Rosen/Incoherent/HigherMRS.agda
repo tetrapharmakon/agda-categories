@@ -268,7 +268,7 @@ lemma-Fresp : ∀ {n m : ℕ} (p q : m ≤′ n) →
   NaturalIsomorphism (𝕚𝕄ℝ𝕊-F p) (𝕚𝕄ℝ𝕊-F q)
 lemma-Fresp {n} ≤′-refl ≤′-refl = {!   !} -- ok
 lemma-Fresp {n} ≤′-refl (≤′-trans n≤′n n≤′n₁) with ≤′-antisym n≤′n n≤′n₁
-... | ≡-refl = {!   !} -- usare lemma-id′ qui
+... | ≡-refl = lemma-id′ ≤′-refl -- usare lemma-id′ qui
 lemma-Fresp {n} (≤′-trans p p₁) ≤′-refl with ≤′-antisym p p₁
 ... | ≡-refl = {!   !} -- usare lemma-id′ qui
 lemma-Fresp {n} (≤′-trans p p₁) (≤′-trans q q₁) = {!   !} -- usare ipotesi induttiva qui
