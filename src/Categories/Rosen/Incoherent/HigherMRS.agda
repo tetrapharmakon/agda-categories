@@ -12,7 +12,7 @@ module Categories.Rosen.Incoherent.HigherMRS
 open import Data.Nat using (ℕ; zero; suc)
 open import Data.Nat.Properties using (≤-poset)
 open import Data.Product using (Σ; _,_; proj₁; proj₂)
-open import Relation.Binary.PropositionalEquality using (_≡_; isEquivalence; subst; sym; Equiv) renaming (refl to ≡-refl)
+open import Relation.Binary.PropositionalEquality using (_≡_; isEquivalence; subst) renaming (refl to ≡-refl; sym to ≡-sym)
 open import Relation.Binary using (Antisymmetric)
 
 open import Categories.Category.Construction.Arrow
@@ -28,7 +28,7 @@ open import Categories.Functor.Profunctor.Tabulator using (tab₀; tab⇒)
 open import Categories.Morphism as BaseMorphism using (_≅_; Iso)
 open import Categories.Morphism.Reasoning as MR
 open import Categories.NaturalTransformation.NaturalIsomorphism as NI
-  using (NaturalIsomorphism; niHelper; _ⓘˡ_; _ⓘʳ_)
+  using (NaturalIsomorphism; niHelper; _ⓘˡ_; _ⓘʳ_;_ⓘᵥ_)
 
 open import Categories.Rosen.Incoherent.Core Cl
 open import Categories.Rosen.Incoherent.Elements Cl
@@ -121,11 +121,11 @@ data _≤_ : Rel ℕ 0ℓ where
 
 antisym : Relation.Binary.Antisymmetric _≡_ _≤_
 antisym ≤-refl y = ≡-refl
-antisym (≤-trans x x₁) y = 
-  let m = antisym x (≤-trans x₁ y) in 
-  let o = antisym y (subst (_≤ _) {!  Equiv.sym m !} x₁) in 
-   {!     !}
-antisym ≤+1 (≤-trans y y₁) = {!   !}
+antisym (≤-trans i≤n n≤j) j≤i = {!   !} 
+  -- let m = antisym i≤n (≤-trans n≤j j≤i) in 
+  -- let o = antisym j≤i (subst (_≤ _) (≡-sym m) n≤j) in 
+  --  ≡-sym o
+antisym ≤+1 (≤-trans i+1≤n n≤i) = {!   !}
 
 open import Relation.Binary using (Poset)
 
@@ -146,15 +146,24 @@ prufa = record
 
 -- ℕ as a poset category.
 pℕ : Category 0ℓ 0ℓ 0ℓ
-pℕ = Thin 0ℓ {!   !}
+pℕ = Thin 0ℓ prufa
 
 
 
-{-
 -- 𝕚𝕄ℝ𝕊-down: a downward functor together with compatibility against V.
 𝕚𝕄ℝ𝕊-down : ∀ {n m} → m ≤ n →
   Σ (Functor (𝕚𝕄ℝ𝕊ₒ n) (𝕚𝕄ℝ𝕊ₒ m))
     (λ F-down → NaturalIsomorphism (V m ∘F F-down) (V n))
+𝕚𝕄ℝ𝕊-down {n} {m} ≤-refl = idF , NI.unitorʳ
+𝕚𝕄ℝ𝕊-down {n} {m} (≤-trans {m} {x} {n} m≤x x≤n) = 
+  let dis = proj₁ (𝕚𝕄ℝ𝕊-down {x} {m} m≤x) 
+      dat = proj₁ (𝕚𝕄ℝ𝕊-down {n} {x} x≤n)
+      θ   = proj₂ (𝕚𝕄ℝ𝕊-down {x} {m} m≤x) 
+      θ'  = proj₂ (𝕚𝕄ℝ𝕊-down {n} {x} x≤n)
+  in dis ∘F dat , θ' ⓘᵥ (θ ⓘʳ dat) ⓘᵥ NI.sym-associator dat dis (V m)
+𝕚𝕄ℝ𝕊-down {n} {m} ≤+1 = {!   !} , {!   !}
+
+{-
 𝕚𝕄ℝ𝕊-down {n} z≤n = reduce n , reduce-compat n
 𝕚𝕄ℝ𝕊-down (s≤s {m} {n} m≤n) = go , down-compat
   where
@@ -251,6 +260,7 @@ pℕ = Thin 0ℓ {!   !}
 
     down-compat : NaturalIsomorphism (V (suc m) ∘F go) (V (suc n))
     down-compat = NI.trans go-proj ((proj₂ down) ⓘʳ Π-MRS n)
+-}
 
 downF : ∀ {n m} → m ≤ n → Functor (𝕚𝕄ℝ𝕊ₒ n) (𝕚𝕄ℝ𝕊ₒ m)
 downF p = proj₁ (𝕚𝕄ℝ𝕊-down p)
@@ -266,6 +276,9 @@ private module 𝕋MRS = Category 𝕋MRS
 -- identity.
 lemma-id : ∀ {n : ℕ} →
   NaturalIsomorphism (downF {n} {n} ≤-refl) (idF {C = 𝕚𝕄ℝ𝕊ₒ n})
+lemma-id {n} = {!   !}
+
+{-
 lemma-id {zero} = niHelper (record
   { η = λ X → M0.id {X}
   ; η⁻¹ = λ X → M0.id {X}
@@ -327,12 +340,15 @@ lemma-id {suc n} = niHelper (record
   where
     module IH = NaturalIsomorphism (lemma-id {n})
     module Mn = Category (𝕚𝕄ℝ𝕊ₒ n)
-
+-}
 -- lemma-homomorphism: 𝕚𝕄ℝ𝕊-down respects composition up to natural
 -- isomorphism.
 lemma-homomorphism : ∀ {n m k : ℕ} (m≤n : m ≤ n) (k≤m : k ≤ m) →
   NaturalIsomorphism (downF (≤-trans k≤m m≤n))
     ((downF k≤m) ∘F (downF m≤n))
+lemma-homomorphism {n} {m} {k} p q = {!   !}
+
+{-
 lemma-homomorphism {n = n} z≤n z≤n = niHelper (record
   { η = λ X → M0.id
   ; η⁻¹ = λ X → M0.id
@@ -356,10 +372,12 @@ lemma-homomorphism {n = suc n'} {m = suc m'} {k = suc k'} (s≤s m≤n) (s≤s k
   ; commute = λ f → {! !}
   ; iso = λ X → {! !}
   }) where module IH = NaturalIsomorphism (lemma-homomorphism {n'} {m'} {k'} m≤n k≤m)
-
+-}
 -- lemma-Fresp: proof-irrelevance for 𝕚𝕄ℝ𝕊-down on thin morphisms.
 lemma-Fresp : ∀ {n m : ℕ} (p q : m ≤ n) →
   NaturalIsomorphism (downF p) (downF q)
+lemma-Fresp {n} p q = {!   !}
+{-
 lemma-Fresp {n = n} z≤n z≤n = niHelper (record
   { η = λ X → M0.id {Functor.F₀ (reduce n) X}
   ; η⁻¹ = λ X → M0.id {Functor.F₀ (reduce n) X}
@@ -377,6 +395,7 @@ lemma-Fresp {n = suc n'} {m = suc m'} (s≤s p) (s≤s q) = niHelper (record
   ; commute = λ f → {! !}
   ; iso = λ X → {! !}
   }) where module IH = NaturalIsomorphism (lemma-Fresp {n'} {m'} p q)
+-}
 
 -- iMRS-chain: the chain … → 𝕚𝕄ℝ𝕊ₒ 2 → 𝕚𝕄ℝ𝕊ₒ 1 → 𝕚𝕄ℝ𝕊ₒ 0 as ℕ^op → Cats.
 iMRS-chain : Functor (Category.op pℕ) (Cats (o ⊔ ℓ ⊔ e) (o ⊔ ℓ ⊔ e) e)
@@ -400,4 +419,3 @@ iMRS∞ = iMRS-Limit.apex
 iMRS∞-proj = iMRS-Limit.proj
 -- iMRS∞-commute: universal property of the limit.
 iMRS∞-commute = iMRS-Limit.limit-commute
--}
