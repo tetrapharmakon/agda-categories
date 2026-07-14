@@ -204,42 +204,19 @@ lemma-homomorphism {n} {m} {k} m≤n k≤m =
       }
     })
 
-{-
-lemma-homomorphism {n = n} z≤n z≤n = niHelper (record
-  { η = λ X → M0.id
-  ; η⁻¹ = λ X → M0.id
-  ; commute = λ f →
-      id-comm-sym (𝕚𝕄ℝ𝕊ₒ zero)
-        {f = Functor.F₁ (reduce n) f}
-  ; iso = λ X → record
-      { isoˡ = M0.identity² {Functor.F₀ (reduce n) X}
-      ; isoʳ = M0.identity² {Functor.F₀ (reduce n) X}
-      }
-  })
-lemma-homomorphism {n = suc n'} {m = suc m'} (s≤s m≤n) z≤n = niHelper (record
-  { η = λ X → {!  !}
-  ; η⁻¹ = λ X → {! !}
-  ; commute = λ f → {! !}
-  ; iso = λ X → {! !}
-  }) where module IH = NaturalIsomorphism (lemma-homomorphism {n'} {m'} m≤n z≤n)
-lemma-homomorphism {n = suc n'} {m = suc m'} {k = suc k'} (s≤s m≤n) (s≤s k≤m) = niHelper (record
-  { η = λ X → {! !}
-  ; η⁻¹ = λ X → {! !}
-  ; commute = λ f → {! !}
-  ; iso = λ X → {! !}
-  }) where module IH = NaturalIsomorphism (lemma-homomorphism {n'} {m'} {k'} m≤n k≤m)
--}
 -- lemma-Fresp: proof-irrelevance for 𝕚𝕄ℝ𝕊-down on thin morphisms.
 lemma-Fresp : ∀ {n m : ℕ} (p q : m ≤ n) →
   NaturalIsomorphism (𝕚𝕄ℝ𝕊-F p) (𝕚𝕄ℝ𝕊-F q)
-lemma-Fresp {n} ≤-refl n≤n =
-  niHelper (record 
-    { η = λ X → let module Mn = Category (𝕚𝕄ℝ𝕊ₒ n) in {!   !}
+lemma-Fresp {n} {m} p q = 
+  let module 𝕄 = Category (𝕚𝕄ℝ𝕊ₒ m) 
+  in niHelper (record 
+    { η = λ X → {!   !} -- Category.id (𝕚𝕄ℝ𝕊ₒ m)
     ; η⁻¹ = λ X → {!   !} 
     ; commute = λ f → {!   !} 
     ; iso = λ X → {!   !} 
     }) 
 
+{-
 lemma-Fresp {n} (≤-trans p p') q = niHelper (record 
   { η = {!   !} 
   ; η⁻¹ = {!   !} 
@@ -252,6 +229,8 @@ lemma-Fresp {n} ≤+1 q = niHelper (record
   ; commute = {!   !} 
   ; iso = {!   !} 
   })
+-}
+
 {-
 lemma-Fresp {n = n} z≤n z≤n = niHelper (record
   { η = λ X → M0.id {Functor.F₀ (reduce n) X}
