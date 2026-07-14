@@ -177,37 +177,32 @@ private module 𝕋MRS = Category 𝕋MRS
 -- identity.
 lemma-id : ∀ {n : ℕ} →
   NaturalIsomorphism (𝕚𝕄ℝ𝕊-F {n} {n} ≤-refl) (idF {C = 𝕚𝕄ℝ𝕊ₒ n})
-lemma-id {zero} = niHelper (record 
-  { η = λ X → M0.id {X} 
-  ; η⁻¹ = λ X → M0.id {X} 
-  ; commute = λ f → id-comm-sym (𝕚𝕄ℝ𝕊ₒ zero) {f = f} 
+lemma-id {n} = let module 𝕄 = Category (𝕚𝕄ℝ𝕊ₒ n) in niHelper (record 
+  { η = λ X → 𝕄.id {X} 
+  ; η⁻¹ = λ X → 𝕄.id {X} 
+  ; commute = λ f → id-comm-sym (𝕚𝕄ℝ𝕊ₒ n) {f = f} 
   ; iso = λ X → record
-      { isoˡ = M0.identity² {X}
-      ; isoʳ = M0.identity² {X}
+      { isoˡ = 𝕄.identity² {X}
+      ; isoʳ = 𝕄.identity² {X}
       }
   })
-lemma-id {suc n} = niHelper (record 
-  { η = λ X → Mn+1.id {A = X}
-  ; η⁻¹ = λ X → Mn+1.id {A = X}
-  ; commute = λ f → id-comm-sym (𝕚𝕄ℝ𝕊ₒ (suc n)) {f = f} 
-  ; iso = λ X → record
-      { isoˡ = Mn+1.identity² {X}
-      ; isoʳ = Mn+1.identity² {X}
-      }
-  }) where module Mn+1 = Category (𝕚𝕄ℝ𝕊ₒ (suc n))
-
 
 -- lemma-homomorphism: 𝕚𝕄ℝ𝕊-down respects composition up to natural
 -- isomorphism.
 lemma-homomorphism : ∀ {n m k : ℕ} (m≤n : m ≤ n) (k≤m : k ≤ m) →
   NaturalIsomorphism (𝕚𝕄ℝ𝕊-F (≤-trans k≤m m≤n))
     ((𝕚𝕄ℝ𝕊-F k≤m) ∘F (𝕚𝕄ℝ𝕊-F m≤n))
-lemma-homomorphism {n} {m} {k} m≤n k≤m = niHelper (record 
-  { η = λ X → {!    !} 
-  ; η⁻¹ = λ X → {!   !} 
-  ; commute = λ f → {!   !} 
-  ; iso = λ X → {!   !} 
-  }) where module Mn = Category (𝕚𝕄ℝ𝕊ₒ n)
+lemma-homomorphism {n} {m} {k} m≤n k≤m = 
+  let module 𝕄 = Category (𝕚𝕄ℝ𝕊ₒ k) 
+  in niHelper (record 
+    { η = λ X → 𝕄.id
+    ; η⁻¹ = λ X → 𝕄.id
+    ; commute = λ f → id-comm-sym (𝕚𝕄ℝ𝕊ₒ k) 
+    ; iso = λ X → record
+      { isoˡ = 𝕄.identity²
+      ; isoʳ = 𝕄.identity²
+      }
+    })
 
 {-
 lemma-homomorphism {n = n} z≤n z≤n = niHelper (record
