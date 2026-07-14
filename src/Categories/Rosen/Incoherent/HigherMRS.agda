@@ -202,15 +202,12 @@ lemma-id {suc n} = niHelper (record
 lemma-homomorphism : ∀ {n m k : ℕ} (m≤n : m ≤ n) (k≤m : k ≤ m) →
   NaturalIsomorphism (𝕚𝕄ℝ𝕊-F (≤-trans k≤m m≤n))
     ((𝕚𝕄ℝ𝕊-F k≤m) ∘F (𝕚𝕄ℝ𝕊-F m≤n))
-lemma-homomorphism {n} {m} {zero} m≤n k≤m = {!   !}
-lemma-homomorphism {n} {m} {suc k} m≤n k≤m = {!   !}
-  
-  -- niHelper (record 
-  -- { η = λ X → {!    !} 
-  -- ; η⁻¹ = λ X → {!   !} 
-  -- ; commute = λ f → {!   !} 
-  -- ; iso = λ X → {!   !} 
-  -- }) where module Mn = Category (𝕚𝕄ℝ𝕊ₒ n)
+lemma-homomorphism {n} {m} {k} m≤n k≤m = niHelper (record 
+  { η = λ X → {!    !} 
+  ; η⁻¹ = λ X → {!   !} 
+  ; commute = λ f → {!   !} 
+  ; iso = λ X → {!   !} 
+  }) where module Mn = Category (𝕚𝕄ℝ𝕊ₒ n)
 
 {-
 lemma-homomorphism {n = n} z≤n z≤n = niHelper (record
