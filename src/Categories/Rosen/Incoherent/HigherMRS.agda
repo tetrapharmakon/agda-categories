@@ -9,8 +9,8 @@ module Categories.Rosen.Incoherent.HigherMRS
   {o ℓ e} {C : Category o ℓ e} {M : Monoidal C} (Cl : Closed M)
   where
 
-open import Data.Nat using (ℕ; zero; suc; _≟_; _≤_; z≤n; s≤s)
-open import Data.Nat.Properties using (≤-poset; ≤-refl; ≤-trans; n≤1+n)
+open import Data.Nat using (ℕ; zero; suc; _≟_; _≤_; _≤?_; z≤n; s≤s)
+open import Data.Nat.Properties using (≤-poset; ≤-refl; ≤-trans; n≤1+n; ≰⇒≥)
 open import Data.Sum using (_⊎_; inj₁; inj₂)
 open import Data.Product using (Σ; _,_; proj₁; proj₂)
 open import Relation.Binary.PropositionalEquality using (_≡_; isEquivalence; subst) renaming (refl to ≡-refl; sym to ≡-sym)
@@ -247,7 +247,10 @@ lemma-Fresp {n} ≤'-refl (≤'-trans n≤'n n≤'n₁) with ≤'-antisym n≤'n
 ... | ≡-refl = NI.sym (lemma-id' (≤'-trans n≤'n n≤'n₁))
 lemma-Fresp {n} (≤'-trans p p₁) ≤'-refl with ≤'-antisym p p₁
 ... | ≡-refl = lemma-id' (≤'-trans p p₁)
-lemma-Fresp {n} (≤'-trans p p₁) (≤'-trans q q₁) = {!   !} -- usare ipotesi induttiva qui
+lemma-Fresp {n} (≤'-trans {m} {k} {n} p p₁) (≤'-trans {m} {k'} {n} q q₁) = 
+  let dis = lemma-Fresp p {!  !} -- q? 
+      dat = lemma-Fresp p₁ {!   !}  -- q₁?
+  in {!  Category.∘-resp-≈ !} -- usare ipotesi induttiva qui + ∘-resp-≈ ?
 lemma-Fresp {n} (≤'-trans p p₁) ≤'+1 with one-step' p₁ p
 ... | inj₁ ≡-refl =
   let P₁ = 𝕚𝕄ℝ𝕊-F p₁
