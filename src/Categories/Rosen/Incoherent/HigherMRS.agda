@@ -30,7 +30,7 @@ open import Categories.Functor.Profunctor.Tabulator using (tab₀; tab⇒)
 open import Categories.Morphism as BaseMorphism using (_≅_; Iso)
 open import Categories.Morphism.Reasoning as MR
 open import Categories.NaturalTransformation.NaturalIsomorphism as NI
-  using (NaturalIsomorphism; niHelper; _ⓘˡ_; _ⓘʳ_;_ⓘᵥ_)
+  using (NaturalIsomorphism; niHelper; _ⓘˡ_; _ⓘʳ_; _ⓘₕ_; _ⓘᵥ_)
 
 open import Categories.Rosen.Incoherent.Core Cl
 open import Categories.Rosen.Incoherent.Elements Cl
@@ -247,10 +247,14 @@ lemma-Fresp {n} ≤'-refl (≤'-trans n≤'n n≤'n₁) with ≤'-antisym n≤'n
 ... | ≡-refl = NI.sym (lemma-id' (≤'-trans n≤'n n≤'n₁))
 lemma-Fresp {n} (≤'-trans p p₁) ≤'-refl with ≤'-antisym p p₁
 ... | ≡-refl = lemma-id' (≤'-trans p p₁)
-lemma-Fresp {n} (≤'-trans {m} {k} {n} p p₁) (≤'-trans {m} {k'} {n} q q₁) = 
-  let dis = lemma-Fresp p {!  !} -- q? 
-      dat = lemma-Fresp p₁ {!   !}  -- q₁?
-  in {!  Category.∘-resp-≈ !} -- usare ipotesi induttiva qui + ∘-resp-≈ ?
+lemma-Fresp {n} (≤'-trans p p₁) (≤'-trans q q₁) with p₁ | q₁
+... | ≤'-refl   | ≤'-refl   = (lemma-Fresp p q) ⓘₕ NI.refl
+... | ≤'-refl   | _         = ((𝕚𝕄ℝ𝕊-F q ⓘˡ lemma-Fresp q₁ {! w, but it's not in scope  !})) ⓘᵥ lemma-Fresp p (≤'-trans q q₁) ⓘᵥ NI.unitorʳ -- lemma-Fresp p (≤'-trans q q₁)
+... | _         | ≤'-refl   = NI.sym (NI.unitorʳ) ⓘᵥ NI.sym (lemma-Fresp q (≤'-trans p p₁)) ⓘᵥ (𝕚𝕄ℝ𝕊-F p ⓘˡ lemma-Fresp {! w, again, but it's not in scope  !} p₁) -- NI.sym (lemma-Fresp q (≤'-trans p p₁))
+... | ≤'+1      | ≤'+1      = (lemma-Fresp p q) ⓘₕ NI.refl
+... | ≤'+1      | ≤'-trans q₁a q₁b = {!   !}
+... | ≤'-trans p₁a p₁b | ≤'+1       = {!   !}
+... | ≤'-trans p₁a p₁b | ≤'-trans q₁a q₁b = {!   !}
 lemma-Fresp {n} (≤'-trans p p₁) ≤'+1 with one-step' p₁ p
 ... | inj₁ ≡-refl =
   let P₁ = 𝕚𝕄ℝ𝕊-F p₁
