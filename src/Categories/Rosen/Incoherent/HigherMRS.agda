@@ -249,8 +249,8 @@ lemma-Fresp {n} (≤'-trans p p₁) ≤'-refl with ≤'-antisym p p₁
 ... | ≡-refl = lemma-id' (≤'-trans p p₁)
 lemma-Fresp {n} (≤'-trans p p₁) (≤'-trans q q₁) with p₁ | q₁
 ... | ≤'-refl   | ≤'-refl   = (lemma-Fresp p q) ⓘₕ NI.refl
-... | ≤'-refl   | _         = ((𝕚𝕄ℝ𝕊-F q ⓘˡ lemma-Fresp q₁ {! w, but it's not in scope  !})) ⓘᵥ lemma-Fresp p (≤'-trans q q₁) ⓘᵥ NI.unitorʳ -- lemma-Fresp p (≤'-trans q q₁)
-... | _         | ≤'-refl   = NI.sym (NI.unitorʳ) ⓘᵥ NI.sym (lemma-Fresp q (≤'-trans p p₁)) ⓘᵥ (𝕚𝕄ℝ𝕊-F p ⓘˡ lemma-Fresp {! w, again, but it's not in scope  !} p₁) -- NI.sym (lemma-Fresp q (≤'-trans p p₁))
+... | ≤'-refl   | w         = (lemma-Fresp p (≤'-trans q w)) ⓘᵥ NI.unitorʳ {F = 𝕚𝕄ℝ𝕊-F p}
+... | w         | ≤'-refl   = NI.sym ((lemma-Fresp q (≤'-trans p w)) ⓘᵥ NI.unitorʳ {F = 𝕚𝕄ℝ𝕊-F q})
 ... | ≤'+1      | ≤'+1      = (lemma-Fresp p q) ⓘₕ NI.refl
 ... | ≤'+1      | ≤'-trans q₁a q₁b = {!   !}
 ... | ≤'-trans p₁a p₁b | ≤'+1       = {!   !}
