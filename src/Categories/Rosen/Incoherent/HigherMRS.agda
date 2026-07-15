@@ -95,17 +95,17 @@ reduce (suc k) = reduce k ∘F Π-MRS k
 VΠ : (k : ℕ) → NaturalIsomorphism (V k ∘F Π-MRS k) (V (suc k))
 VΠ k = niHelper (record
   { η = λ X → ArrC.id
-      {Functor.F₀ (V k) (Functor.F₀ (Π-MRS k) X)}
+      {Functor.F₀ (V k ∘F Π-MRS k) X}
   ; η⁻¹ = λ X → ArrC.id
-      {Functor.F₀ (V k) (Functor.F₀ (Π-MRS k) X)}
+      {Functor.F₀ (V k ∘F Π-MRS k) X}
   ; commute = λ f →
       ArrMR.id-comm-sym
         {f = Functor.F₁ (V k ∘F Π-MRS k) f}
   ; iso = λ X → record
       { isoˡ = ArrC.identity²
-          {Functor.F₀ (V k) (Functor.F₀ (Π-MRS k) X)}
+          {Functor.F₀ (V k ∘F Π-MRS k) X}
       ; isoʳ = ArrC.identity²
-          {Functor.F₀ (V k) (Functor.F₀ (Π-MRS k) X)}
+          {Functor.F₀ (V k ∘F Π-MRS k) X}
       }
   })
 
