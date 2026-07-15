@@ -247,10 +247,11 @@ lemma-Fresp {n} ≤'-refl (≤'-trans n≤'n n≤'n₁) with ≤'-antisym n≤'n
 ... | ≡-refl = NI.sym (lemma-id' (≤'-trans n≤'n n≤'n₁))
 lemma-Fresp {n} (≤'-trans p p₁) ≤'-refl with ≤'-antisym p p₁
 ... | ≡-refl = lemma-id' (≤'-trans p p₁)
+lemma-Fresp {n} (≤'-trans p ≤'-refl) (≤'-trans q q₁) =
+  (lemma-Fresp p (≤'-trans q q₁)) ⓘᵥ NI.unitorʳ {F = 𝕚𝕄ℝ𝕊-F p}
+lemma-Fresp {n} (≤'-trans p p₁) (≤'-trans q ≤'-refl) =
+  NI.sym (NI.unitorʳ {F = 𝕚𝕄ℝ𝕊-F q}) ⓘᵥ (lemma-Fresp (≤'-trans p p₁) q)
 lemma-Fresp {n} (≤'-trans p p₁) (≤'-trans q q₁) with p₁ | q₁
-... | ≤'-refl   | ≤'-refl   = (lemma-Fresp p q) ⓘₕ NI.refl
-... | ≤'-refl   | w         = (lemma-Fresp p (≤'-trans q w)) ⓘᵥ NI.unitorʳ {F = 𝕚𝕄ℝ𝕊-F p}
-... | w         | ≤'-refl   = NI.sym ((lemma-Fresp q (≤'-trans p w)) ⓘᵥ NI.unitorʳ {F = 𝕚𝕄ℝ𝕊-F q})
 ... | ≤'+1      | ≤'+1      = (lemma-Fresp p q) ⓘₕ NI.refl
 ... | ≤'+1      | ≤'-trans q₁a q₁b = {!   !}
 ... | ≤'-trans p₁a p₁b | ≤'+1       = {!   !}
