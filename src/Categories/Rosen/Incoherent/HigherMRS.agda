@@ -198,20 +198,6 @@ pℕ′ = Thin 0ℓ ≤-poset
 pℕ′≤ : Category 0ℓ 0ℓ 0ℓ
 pℕ′≤ = Thin 0ℓ ≤≤-poset
 
-{-
-miao :  ∀ {n₁ m₁ : ℕ}
-     → Functor (proj₁ (𝕚𝕄ℝ𝕊 n₁)) (proj₁ (𝕚𝕄ℝ𝕊 m₁))
-     → Functor (IsoComma ℝ (proj₂ (𝕚𝕄ℝ𝕊 n₁))) (IsoComma ℝ (proj₂ (𝕚𝕄ℝ𝕊 m₁)))
-miao F = record
-  { F₀ = λ { (record { a = a ; b = b ; iso = iso }) → record { iso → ? } } }
-  ; F₁ = {!   !}
-  ; identity = {!   !}
-  ; homomorphism = {!   !}
-  ; F-resp-≈ = {!   !}
-  }
-  where module F = Functor F
--}
-
 -- 𝕚𝕄ℝ𝕊-F/η: a downward functor together with compatibility against V.
 𝕚𝕄ℝ𝕊-F : ∀ {n m} → m ≤≤ n → Functor (𝕚𝕄ℝ𝕊ₒ n) (𝕚𝕄ℝ𝕊ₒ m)
 𝕚𝕄ℝ𝕊-F {n} {m} (zero , ≡-refl) = idF --idF
@@ -219,24 +205,22 @@ miao F = record
 
 proof-irrelevance : ∀ {n} {m} (z : ℕ) (q1 q2 : z + m ≡ n) →
   NaturalIsomorphism (𝕚𝕄ℝ𝕊-F {n = n} (z , q1)) (𝕚𝕄ℝ𝕊-F (z , q2))
-proof-irrelevance zero ≡-refl ≡-refl = NI.refl
-proof-irrelevance (suc z) ≡-refl ≡-refl = NI.refl
+proof-irrelevance {n} {m} z q1 q2 with q1 | q2
+... | ≡-refl | ≡-refl = NI.refl
+
+η-canon : (z m : ℕ) → NaturalIsomorphism (V m ∘F 𝕚𝕄ℝ𝕊-F {n = z + m} (z , ≡-refl)) (V (z + m))
+η-canon zero m = NI.unitorʳ
+η-canon (suc w) m =
+  NI.trans
+    (NI.sym-associator (Π-MRS (w + m)) (𝕚𝕄ℝ𝕊-F {n = w + m} (w , ≡-refl)) (V m))
+    (NI.trans (η-canon w m ⓘʳ Π-MRS (w + m)) (VΠ (w + m)))
 
 𝕚𝕄ℝ𝕊-η : ∀ {n m} → (m≤′n : m ≤≤ n) → NaturalIsomorphism (V m ∘F (𝕚𝕄ℝ𝕊-F m≤′n)) (V n)
-𝕚𝕄ℝ𝕊-η {n} {m} ee = {!   !}
-
--- ≤′-refl = NI.unitorʳ
--- 𝕚𝕄ℝ𝕊-η {n} {m} (≤′-trans {m} {x} {n} m≤′x x≤′n) =
---   let θ   = 𝕚𝕄ℝ𝕊-η {x} {m} m≤′x
---       θ'  = 𝕚𝕄ℝ𝕊-η {n} {x} x≤′n
---       dis = 𝕚𝕄ℝ𝕊-F {x} {m} m≤′x
---       dat = 𝕚𝕄ℝ𝕊-F {n} {x} x≤′n
---   in θ' ⓘᵥ (θ ⓘʳ dat) ⓘᵥ NI.sym-associator dat dis (V m)
--- 𝕚𝕄ℝ𝕊-η {suc n} {n} ≤′+1 = VΠ n
+𝕚𝕄ℝ𝕊-η {n} {m} (k , k+m≡n) with k+m≡n
+... | ≡-refl = η-canon k m
 
 private module ElMRS = Category τ'[iMR2]
 private module 𝕋MRS = Category 𝕋MRS
-
 
 trueFact : ∀ {i j k}
       → ∀ (n m : ℕ)
@@ -245,8 +229,10 @@ trueFact : ∀ {i j k}
       → (p″ : m + j ≡ i)
       → NaturalIsomorphism (𝕚𝕄ℝ𝕊-F {n = i} {m = k} (n + m , p))
                            (𝕚𝕄ℝ𝕊-F {n = j} {m = k} (n , p′) ∘F 𝕚𝕄ℝ𝕊-F {n = i} {m = j} (m , p″))
-trueFact zero m ≡-refl ≡-refl ≡-refl = {!   !} -- unitore qui
-trueFact (suc n) m ≡-refl ≡-refl zz = {!   !}
+trueFact zero m ≡-refl ≡-refl ≡-refl = NI.sym NI.unitorˡ
+trueFact {k = k} (suc n) m ≡-refl ≡-refl zz = {!   !} -- {!   !} ⓘᵥ ((trueFact n m ≡-refl ≡-refl {!   !}) ⓘʳ Π-MRS (n + m + k)) ⓘᵥ {!   !}
+  where furbo : ∀ {n m k} → m + (n + k) ≡ n + m + k
+        furbo {n} {m} {k} rewrite +-comm n m = ≡-sym (+-assoc m n k)
 
 final : ∀ {i j k}
       → (g : i ≤≤ j)
