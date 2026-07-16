@@ -10,12 +10,13 @@ module Categories.Rosen.Incoherent.HigherMRS
   where
 
 open import Data.Nat using (ℕ; zero; suc; _≟_; _≤_; z≤n; s≤s; _+_)
-open import Data.Nat.Properties using (≤-poset; ≤-refl; ≤-trans; n≤1+n; m≤n⇒m≤1+n; +-cancelʳ-≡; +-assoc; +-comm; m≤n+m)
+open import Data.Nat.Properties using (≤-poset; ≤-refl; ≤-trans; n≤1+n)
 open import Data.Sum using (_⊎_; inj₁; inj₂)
-open import Data.Product using (Σ; _,_; proj₁; proj₂)
-open import Relation.Binary.PropositionalEquality using (_≡_; isEquivalence; subst; cong) renaming (refl to ≡-refl; sym to ≡-sym; trans to ≡-trans)
+open import Data.Product using (Σ; _,_; proj₁; proj₂; ∃; ∃-syntax; Σ-syntax)
+open import Relation.Binary.PropositionalEquality using (_≡_; isEquivalence; subst) renaming (refl to ≡-refl; sym to ≡-sym)
 open import Relation.Binary using (Antisymmetric)
-open import Relation.Nullary using (yes; no)
+open import Relation.Nullary using (yes; no; ¬_)
+open import Data.Empty using (⊥-elim)
 
 open import Categories.Category.Construction.Arrow
 open import Categories.Category.Construction.IsoComma
@@ -24,7 +25,6 @@ open import Categories.Category.Construction.Thin
 open import Categories.Category.Instance.Cats using (Cats)
 open import Categories.Functor using (Functor; _∘F_)
   renaming (id to idF)
-open import Data.Product using (∃; ∃-syntax)
 open import Categories.Functor.Bifunctor using (appˡ; appʳ)
 open import Categories.Functor.Bifunctor.Properties using ([_]-commute)
 open import Categories.Functor.Profunctor.Tabulator using (tab₀; tab⇒)
@@ -123,32 +123,86 @@ data _≤′_ : Rel ℕ 0ℓ where
   ≤′-trans : ∀ {m n k} (m≤′n : m ≤′ n) (n≤′k : n ≤′ k) → m ≤′ k
   ≤′+1     : ∀ {n} → n ≤′ suc n
 
-_≤≤_ : Rel ℕ 0ℓ
-n ≤≤ m = ∃[ k ] k + n ≡ m
+data _≈′_ : ∀ {n m} → (p q : n ≤′ m) → Set 0ℓ where
+  ≈-assoc : ∀ {n m k l}
+            (p : n ≤′ m) (q : m ≤′ k) (r : k ≤′ l)
+        → ≤′-trans p (≤′-trans q r)
+        ≈′ ≤′-trans (≤′-trans p q) r
+  id-l : ∀ {n m}
+        {p : n ≤′ m}
+        → ≤′-trans ≤′-refl p ≈′ p
+  id-r : ∀ {n m}
+        {p : n ≤′ m}
+        → ≤′-trans p ≤′-refl ≈′ p
+  refe : ∀ {n m} {p : n ≤′ m}
+      → p ≈′ p
+  trans-cong :
+    ∀ {n m k} {p q : n ≤′ m} {r s : m ≤′ k}
+    → p ≈′ q
+    → r ≈′ s
+    → ≤′-trans p r ≈′ ≤′-trans q s
+  transs :
+    ∀ {n m} {p q r : n ≤′ m}
+    → p ≈′ q
+    → q ≈′ r
+    → p ≈′ r
+  symm :
+    ∀ {n m} {p q : n ≤′ m}
+    → p ≈′ q
+    → q ≈′ p
 
-≤≤to≤ : ∀ {m n} → m ≤≤ n → m ≤ n
-≤≤to≤ {m} {n} (k , p) = subst (λ x → m ≤ x) p (m≤n+m m k)
+data _≤2_ : Rel ℕ 0ℓ where
+  ≤2-refl  : ∀ {n} → n ≤2 n
+  ≤2-inc   : ∀ {m n} (m≤′n : m ≤2 n)
+           → m ≤2 suc n
 
-letrans : ∀ {i j k} → i ≤≤ j → j ≤≤ k → i ≤≤ k
-letrans {i = i} {j = j} {k = k} (n , ≡-refl) (m , ≡-refl) = n + m , ≡-trans (cong (_+ i) (+-comm n m)) (+-assoc m n i)
+concat : ∀ {i j k} → i ≤2 j → j ≤2 k → i ≤2 k
+concat a ≤2-refl = a
+concat a (≤2-inc b) = ≤2-inc (concat a b)
+
+convert : ∀ {m n} → m ≤′ n → m ≤2 n
+convert ≤′-refl = ≤2-refl
+convert (≤′-trans r q) = concat (convert r) (convert q)
+convert ≤′+1 = ≤2-inc ≤2-refl
+
+reconvert : ∀ {m n} → m ≤2 n → m ≤′ n
+reconvert ≤2-refl = ≤′-refl
+reconvert (≤2-inc a) = ≤′-trans (reconvert a) ≤′+1
+
+reconv-concat : ∀ {i j k} (a : i ≤2 j) (b : j ≤2 k) → reconvert (concat a b) ≈′ ≤′-trans (reconvert a) (reconvert b)
+reconv-concat a ≤2-refl = symm id-r
+reconv-concat a (≤2-inc b) = transs (trans-cong (reconv-concat a b) refe) (symm (≈-assoc (reconvert a) (reconvert b) ≤′+1))
+
+reccon : ∀ {m n} (a : m ≤′ n) → reconvert (convert a) ≈′ a
+reccon ≤′-refl = refe
+reccon (≤′-trans a a₁) = transs (reconv-concat (convert a) (convert a₁)) (trans-cong (reccon a) (reccon a₁))
+reccon ≤′+1 = id-l
+
+mangh : ∀ {i j} → suc i ≤2 j → i ≤2 j
+mangh ≤2-refl = ≤2-inc ≤2-refl
+mangh (≤2-inc r) = ≤2-inc (mangh r)
+
+inv : ∀ {i j} → suc i ≤2 suc j → i ≤2 j
+inv ≤2-refl = ≤2-refl
+inv (≤2-inc r) = mangh r
+
+impossibl : ∀ {n} → ¬ (suc n ≤2 n)
+impossibl {zero} ()
+impossibl {suc n} r = impossibl {n = n} (inv r)
+
+contractible-one-steeep : ∀ {m n} {a b : m ≤2 n} → reconvert a ≈′ reconvert b
+contractible-one-steeep {a = ≤2-refl} {b = ≤2-refl} = refe
+contractible-one-steeep {a = ≤2-refl} {b = ≤2-inc b} = ⊥-elim (impossibl b)
+contractible-one-steeep {a = ≤2-inc a} {b = ≤2-refl} = ⊥-elim (impossibl a)
+contractible-one-steeep {a = ≤2-inc a} {b = ≤2-inc b} = trans-cong contractible-one-steeep refe
+
+truecontractible : ∀ {n m} → (p q : n ≤′ m) → p ≈′ q
+truecontractible p q = transs (symm (reccon p)) (transs contractible-one-steeep (reccon q))
 
 ≤′to≤ : ∀ {m n} → m ≤′ n → m ≤ n
 ≤′to≤ ≤′-refl        = ≤-refl
 ≤′to≤ (≤′-trans p q) = ≤-trans (≤′to≤ p) (≤′to≤ q)
 ≤′to≤ ≤′+1           = n≤1+n _
-
-lemma : ∀ {n} → 0 ≤′ n
-lemma {n = zero} = ≤′-refl
-lemma {n = suc n} = ≤′-trans lemma ≤′+1
-
-lemma-2 : ∀ {m n} → m ≤′ n → suc m ≤′ suc n
-lemma-2 ≤′-refl = ≤′-refl
-lemma-2 (≤′-trans e e₁) = ≤′-trans (lemma-2 e) (lemma-2 e₁)
-lemma-2 ≤′+1 = ≤′+1
-
-≤to≤′ : ∀ {m n} → m ≤ n → m ≤′ n
-≤to≤′ z≤n = lemma
-≤to≤′ (s≤s a) = lemma-2 (≤to≤′ a)
 
 open import Relation.Binary using (Poset)
 
@@ -172,84 +226,58 @@ prufa = record
     }
   }
 
-≤≤-poset : Poset 0ℓ 0ℓ 0ℓ
-≤≤-poset = record
-  { Carrier = ℕ
-  ; _≈_ = _≡_
-  ; _≤_ = _≤≤_
-  ; isPartialOrder = record
-    { isPreorder = record
-      { isEquivalence = isEquivalence
-      ; reflexive = λ { ≡-refl → 0 , ≡-refl }
-      ; trans = λ a b → letrans a b
-      }
-    ; antisym = λ a b → P.antisym (≤≤to≤ a) (≤≤to≤ b)
-    }
-  }
-
-
 -- ℕ as a poset category.
 pℕ : Category 0ℓ 0ℓ 0ℓ
 pℕ = Thin 0ℓ prufa
 
-pℕ′ : Category 0ℓ 0ℓ 0ℓ
-pℕ′ = Thin 0ℓ ≤-poset
-
-pℕ′≤ : Category 0ℓ 0ℓ 0ℓ
-pℕ′≤ = Thin 0ℓ ≤≤-poset
-
 -- 𝕚𝕄ℝ𝕊-F/η: a downward functor together with compatibility against V.
-𝕚𝕄ℝ𝕊-F : ∀ {n m} → m ≤≤ n → Functor (𝕚𝕄ℝ𝕊ₒ n) (𝕚𝕄ℝ𝕊ₒ m)
-𝕚𝕄ℝ𝕊-F {n} {m} (zero , ≡-refl) = idF --idF
-𝕚𝕄ℝ𝕊-F {n} {m} (suc w , ≡-refl) = 𝕚𝕄ℝ𝕊-F {n = w + m} (w , ≡-refl) ∘F Π-MRS (w + m)
+𝕚𝕄ℝ𝕊-F : ∀ {n m} → m ≤′ n → Functor (𝕚𝕄ℝ𝕊ₒ n) (𝕚𝕄ℝ𝕊ₒ m)
+𝕚𝕄ℝ𝕊-F {n} {m} ≤′-refl = idF
+𝕚𝕄ℝ𝕊-F {n} {m} (≤′-trans {m} {x} {n} m≤′x x≤′n) = 𝕚𝕄ℝ𝕊-F {x} {m} m≤′x ∘F 𝕚𝕄ℝ𝕊-F {n} {x} x≤′n
+𝕚𝕄ℝ𝕊-F {suc n} {n} ≤′+1 = Π-MRS n
 
-proof-irrelevance : ∀ {n} {m} (z : ℕ) (q1 q2 : z + m ≡ n) →
-  NaturalIsomorphism (𝕚𝕄ℝ𝕊-F {n = n} (z , q1)) (𝕚𝕄ℝ𝕊-F (z , q2))
-proof-irrelevance {n} {m} z q1 q2 with q1 | q2
-... | ≡-refl | ≡-refl = NI.refl
-
-η-canon : (z m : ℕ) → NaturalIsomorphism (V m ∘F 𝕚𝕄ℝ𝕊-F {n = z + m} (z , ≡-refl)) (V (z + m))
-η-canon zero m = NI.unitorʳ
-η-canon (suc w) m =
-  NI.trans
-    (NI.sym-associator (Π-MRS (w + m)) (𝕚𝕄ℝ𝕊-F {n = w + m} (w , ≡-refl)) (V m))
-    (NI.trans (η-canon w m ⓘʳ Π-MRS (w + m)) (VΠ (w + m)))
-
-𝕚𝕄ℝ𝕊-η : ∀ {n m} → (m≤′n : m ≤≤ n) → NaturalIsomorphism (V m ∘F (𝕚𝕄ℝ𝕊-F m≤′n)) (V n)
-𝕚𝕄ℝ𝕊-η {n} {m} (k , k+m≡n) with k+m≡n
-... | ≡-refl = η-canon k m
+𝕚𝕄ℝ𝕊-η : ∀ {n m} → (m≤′n : m ≤′ n) → NaturalIsomorphism (V m ∘F (𝕚𝕄ℝ𝕊-F m≤′n)) (V n)
+𝕚𝕄ℝ𝕊-η {n} {m} ≤′-refl = NI.unitorʳ
+𝕚𝕄ℝ𝕊-η {n} {m} (≤′-trans {m} {x} {n} m≤′x x≤′n) =
+  let θ   = 𝕚𝕄ℝ𝕊-η {x} {m} m≤′x
+      θ'  = 𝕚𝕄ℝ𝕊-η {n} {x} x≤′n
+      dis = 𝕚𝕄ℝ𝕊-F {x} {m} m≤′x
+      dat = 𝕚𝕄ℝ𝕊-F {n} {x} x≤′n
+  in θ' ⓘᵥ (θ ⓘʳ dat) ⓘᵥ NI.sym-associator dat dis (V m)
+𝕚𝕄ℝ𝕊-η {suc n} {n} ≤′+1 = VΠ n
 
 private module ElMRS = Category τ'[iMR2]
 private module 𝕋MRS = Category 𝕋MRS
 
-trueFact : ∀ {i j k}
-      → ∀ (n m : ℕ)
-      → (p : n + m + k ≡ i)
-      → (p′ : n + k ≡ j)
-      → (p″ : m + j ≡ i)
-      → NaturalIsomorphism (𝕚𝕄ℝ𝕊-F {n = i} {m = k} (n + m , p))
-                           (𝕚𝕄ℝ𝕊-F {n = j} {m = k} (n , p′) ∘F 𝕚𝕄ℝ𝕊-F {n = i} {m = j} (m , p″))
-trueFact zero m ≡-refl ≡-refl ≡-refl = NI.sym NI.unitorˡ
-trueFact {k = k} (suc n) m ≡-refl ≡-refl zz = {!   !} -- {!   !} ⓘᵥ ((trueFact n m ≡-refl ≡-refl {!   !}) ⓘʳ Π-MRS (n + m + k)) ⓘᵥ {!   !}
-  where furbo : ∀ {n m k} → m + (n + k) ≡ n + m + k
-        furbo {n} {m} {k} rewrite +-comm n m = ≡-sym (+-assoc m n k)
+lemma-id : ∀ {n : ℕ} →
+  NaturalIsomorphism (𝕚𝕄ℝ𝕊-F {n} {n} ≤′-refl) (idF {C = 𝕚𝕄ℝ𝕊ₒ n})
+lemma-id {n} = NI.refl
 
-final : ∀ {i j k}
-      → (g : i ≤≤ j)
-      → (f : j ≤≤ k)
-      → NaturalIsomorphism (𝕚𝕄ℝ𝕊-F (letrans g f)) (𝕚𝕄ℝ𝕊-F g ∘F 𝕚𝕄ℝ𝕊-F f)
-final (n , ≡-refl) (zero , ≡-refl) = {!   !}
-final (n , ≡-refl) (suc j , ≡-refl) = {!   !}
+-- lemma-homomorphism: 𝕚𝕄ℝ𝕊-down respects composition up to natural
+-- isomorphism.
+lemma-homomorphism : ∀ {n m k : ℕ} (m≤′n : m ≤′ n) (k≤′m : k ≤′ m) →
+  NaturalIsomorphism (𝕚𝕄ℝ𝕊-F (≤′-trans k≤′m m≤′n))
+    ((𝕚𝕄ℝ𝕊-F k≤′m) ∘F (𝕚𝕄ℝ𝕊-F m≤′n))
+lemma-homomorphism {n} {m} {k} m≤′n k≤′m = NI.refl where module Mn = Category (𝕚𝕄ℝ𝕊ₒ n)
 
+lemma-Frespa : ∀ {n m : ℕ} {p q : m ≤′ n} (e : p ≈′ q) →
+  NaturalIsomorphism (𝕚𝕄ℝ𝕊-F p) (𝕚𝕄ℝ𝕊-F q)
+lemma-Frespa (≈-assoc p q r) = NI.sym (NI.associator (𝕚𝕄ℝ𝕊-F r) (𝕚𝕄ℝ𝕊-F q) (𝕚𝕄ℝ𝕊-F p))
+lemma-Frespa id-l = NI.unitorˡ
+lemma-Frespa id-r = NI.unitorʳ
+lemma-Frespa refe = NI.refl
+lemma-Frespa (trans-cong e e₁) = let a = lemma-Frespa e; b = lemma-Frespa e₁ in a NI.ⓘₕ b
+lemma-Frespa (transs e e₁) = let a = lemma-Frespa e; b = lemma-Frespa e₁ in NI.trans a b
+lemma-Frespa (symm p) = NI.sym (lemma-Frespa p)
 
 -- iMRS-chain: the chain … → 𝕚𝕄ℝ𝕊ₒ 2 → 𝕚𝕄ℝ𝕊ₒ 1 → 𝕚𝕄ℝ𝕊ₒ 0 as ℕ^op → Cats.
-iMRS-chain : Functor (Category.op pℕ′≤) (Cats (o ⊔ ℓ ⊔ e) (o ⊔ ℓ ⊔ e) e)
+iMRS-chain : Functor (Category.op pℕ) (Cats (o ⊔ ℓ ⊔ e) (o ⊔ ℓ ⊔ e) e)
 iMRS-chain = record
-  { F₀ = 𝕚𝕄ℝ𝕊ₒ -- 𝕚𝕄ℝ𝕊ₒ
+  { F₀ = 𝕚𝕄ℝ𝕊ₒ
   ; F₁ = λ {n} {m} m≤′n → 𝕚𝕄ℝ𝕊-F m≤′n
-  ; identity = λ { {n} → NI.refl } --lemma-id {n} }
-  ; homomorphism = λ { {n} {m} {k} {f} {g} → {!   !} }
-  ; F-resp-≈ = λ { {n} {m} {z1 , q1} {z2 , q2} _ → {!   !} }
+  ; identity = λ { {n} → lemma-id {n} }
+  ; homomorphism = λ { {n} {m} {k} {f} {g} → lemma-homomorphism f g }
+  ; F-resp-≈ = λ { {n} {m} {f} {g} _ → lemma-Frespa (truecontractible f g) }
   }
 
 -- Needs MRS-chain as a parameter, so it stays here rather than at the
