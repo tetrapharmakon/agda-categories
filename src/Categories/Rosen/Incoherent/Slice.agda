@@ -6,6 +6,7 @@ open import Categories.Category using (Category)
 open import Categories.Category.Monoidal using (Monoidal)
 open import Categories.Category.Monoidal.Closed using (Closed)
 open import Categories.Category.Monoidal.Symmetric using (Symmetric)
+open import Categories.Category.BinaryProducts using (BinaryProducts)
 
 module Categories.Rosen.Incoherent.Slice
   {o ℓ e} {C : Category o ℓ e}
@@ -15,7 +16,6 @@ module Categories.Rosen.Incoherent.Slice
   (BC : BinaryProducts C)
   where
 
-open import Categories.Category.BinaryProducts using (BinaryProducts)
 ----------------------------------------------------------------------
 -- Incoherent (M,R)-Systems as Algebras
 --
@@ -32,7 +32,7 @@ open import Categories.NaturalTransformation.NaturalIsomorphism using (niHelper)
 open import Categories.Rosen.Incoherent.Core Cl
 open import Categories.Rosen.Incoherent.Displayed Cl using (iMR2ᴸ; iMR2ᴸ₀; iMR2ᴸ⇒)
 
-open import Categories.Category.Slice using (Slice)
+import Categories.Category.Slice as Sl
 
 
 open HomReasoning
@@ -40,22 +40,23 @@ open MR C
 open Monoidal M using (_⊗-; -⊗_; unit; _⊗₀_; _⊗₁_)
 open BinaryProducts BC
 
-
-I+ : Functor C C 
-I+ = -+ unit 
-
 open Symmetric S hiding (_⊗-; -⊗_; unit; _⊗₀_; _⊗₁_) renaming (braided-iso to β)
 open Closed Cl using (adjoint; [_,_]₀; [_,_]₁; [_,-])
 
 slice : {B : Obj} → Category (o ⊔ ℓ) (ℓ ⊔ e) e
-slice {B} = Slice ([ unit , B ]₀ × [ B , B ]₀)
-
-
+slice {B} = Sl.Slice C ([ unit , B ]₀ × [ B , B ]₀)
 
 to : {B : Obj} → Functor (iMR2ᴸ B) (slice {B})
 to {B} = record
-  { F₀ = λ x → let module x = iMR2ᴸ₀ x in {!  iMR2.ϕ x.ξ !}
-  ; F₁ = {!   !}
+  { F₀ = λ x → let module x = iMR2ᴸ₀ x in Sl.sliceobj {Y = x.A} ⟨ adjoint.Ladjunct (iMR2.f x.ξ ∘ unitorˡ.from {X = x.A} ∘ β.from) , adjoint.Ladjunct (adjoint.Radjunct (iMR2.ϕ x.ξ) ∘ β.from) ⟩ -- ugly but works
+  ; F₁ = λ { {X} {Y} f → 
+    let module X = iMR2ᴸ₀
+        module Y = iMR2ᴸ₀ Y
+        module f = iMR2ᴸ⇒ f 
+    in Sl.slicearr {h = f.u} 
+    (begin {!   !} ≈⟨ ⟨⟩∘ ⟩ 
+           {!   !} ≈⟨ ⟨⟩-cong₂ ? ? ⟩ 
+           {!   !} ∎)}
   ; identity = {!   !}
   ; homomorphism = {!   !}
   ; F-resp-≈ = {!   !}
