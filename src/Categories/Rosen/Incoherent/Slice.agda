@@ -55,7 +55,7 @@ to {B} = record
         module f = iMR2ᴸ⇒ f 
     in Sl.slicearr {h = f.u} 
     (begin {!   !} ≈⟨ ⟨⟩∘ ⟩ 
-           {!   !} ≈⟨ ⟨⟩-cong₂ ? ? ⟩ 
+           {!   !} ≈⟨ ⟨⟩-cong₂ {!   !} {!   !} ⟩ 
            {!   !} ∎)}
   ; identity = {!   !}
   ; homomorphism = {!   !}
