@@ -119,8 +119,21 @@ comp = record
   ; F₁ = λ S → let module S = iMRSᴵᴵ⇒ S in record 
     { l = S.h.l 
     ; r = S.k.r 
-    ; eqf = begin {!   !} ≈⟨ {!   !} ⟩ {!   !} ∎ -- chatty 
-    ; eqϕ = begin {!   !} ≈⟨ {!   !} ⟩ {!   !} ∎ -- chatty 
+    ; eqf = begin
+        S.k.r ∘ (S.k.ξX.f ∘ S.h.ξX.f) ≈⟨ sym-assoc ○ S.k.eqf ⟩∘⟨refl ⟩
+        (S.k.ξY.f ∘ S.k.l) ∘ S.h.ξX.f ≈⟨ assoc ○ refl⟩∘⟨ (Equiv.sym S.hᵣ≈kₗ ⟩∘⟨refl) ⟩
+        S.k.ξY.f ∘ (S.h.r ∘ S.h.ξX.f) ≈⟨ refl⟩∘⟨ S.h.eqf ○ sym-assoc ⟩
+        (S.k.ξY.f ∘ S.h.ξY.f) ∘ S.h.l ∎
+    ; eqϕ = let module HomR {A} = Functor (appʳ [-,-] A)
+                module HomL {A} = Functor (appˡ [-,-] A)
+            in begin
+        [ S.h.l , id ]₁ ∘ ([ S.h.ξY.f , id ]₁ ∘ S.k.ξY.ϕ) ∘ S.k.r  ≈⟨ refl⟩∘⟨ assoc ○ sym-assoc ○ (Equiv.sym HomR.homomorphism) ⟩∘⟨refl ⟩
+        [ S.h.ξY.f ∘ S.h.l , id ]₁ ∘ S.k.ξY.ϕ ∘ S.k.r              ≈⟨ HomR.F-resp-≈ (Equiv.sym S.h.eqf) ⟩∘⟨refl ⟩
+        [ S.h.r ∘ S.h.ξX.f , id ]₁ ∘ S.k.ξY.ϕ ∘ S.k.r              ≈⟨ HomR.homomorphism ⟩∘⟨refl ○ assoc ⟩
+        [ S.h.ξX.f , id ]₁ ∘ [ S.h.r , id ]₁ ∘ S.k.ξY.ϕ ∘ S.k.r    ≈⟨ refl⟩∘⟨ (HomR.F-resp-≈ S.hᵣ≈kₗ ⟩∘⟨refl) ⟩
+        [ S.h.ξX.f , id ]₁ ∘ [ S.k.l , id ]₁ ∘ S.k.ξY.ϕ ∘ S.k.r    ≈⟨ refl⟩∘⟨ S.k.eqϕ ○ sym-assoc ⟩
+        ([ S.h.ξX.f , id ]₁ ∘ [ id , S.k.r ]₁) ∘ S.k.ξX.ϕ          ≈⟨ (Equiv.sym [ [-,-] ]-commute) ⟩∘⟨refl ○ assoc ⟩
+        [ id , S.k.r ]₁ ∘ [ S.h.ξX.f , id ]₁ ∘ S.k.ξX.ϕ            ∎
     }
   ; identity = refl , refl
   ; homomorphism = refl , refl
