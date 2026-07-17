@@ -87,10 +87,12 @@ private
 MRSreindex : (u : A ⇒ A') → Functor (iMR2ᴿ A') (iMR2ᴿ A)
 MRSreindex {A} {A'} u = record
   { F₀ = λ { x → 
-    let module x = iMR2ᴿ₀ x 
+    let module x = iMR2ᴿ₀ x
+        f =  iMR2.f x.ξ
+        ϕ = iMR2.ϕ x.ξ
     in record 
     { B = x.B
-    ; ξ = ⟪ iMR2.f x.ξ ∘ u , [ u , id ]₁ ∘ iMR2.ϕ x.ξ ⟫ 
+    ; ξ = ⟪ f ∘ u , [ u , id ]₁ ∘ ϕ ⟫ 
     }}
   ; F₁ = λ { {x} {y} f → 
       let module x   = iMR2ᴿ₀ x
@@ -111,3 +113,8 @@ MRSreindex {A} {A'} u = record
   ; homomorphism = λ {X} {Y} {Z} {f} {g} → refl
   ; F-resp-≈ = λ x → x
   }
+
+  {-
+  ⟪ f , ϕ ⟫ → ⟪ g , \Psi ⟫
+  
+   -}
