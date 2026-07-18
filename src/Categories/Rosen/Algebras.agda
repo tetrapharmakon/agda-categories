@@ -100,12 +100,9 @@ to {A} = record
           let F₁v = idA +₁ (idA ⊗₁ f.v)
           in begin
             f.v ∘ [ f.ξX.f , ϕX# ∘ β.from ]         ≈⟨ ∘-distribˡ-[] ⟩
-            [ f.v ∘ f.ξX.f , f.v ∘ (ϕX# ∘ β.from) ] ≈⟨ +-unique
-                   (assoc ○ refl⟩∘⟨ +₁∘i₁ ○ refl⟩∘⟨ identityʳ ○ inject₁ ○ (Equiv.sym f.eqf))
-                   (assoc ○ refl⟩∘⟨ +₁∘i₂ ○ sym-assoc ○ inject₂ ⟩∘⟨refl ○ assoc ○ Equiv.sym yoga)
-              ⟩
-            [ f.ξY.f , ϕY# ∘ β.from ] ∘ F₁v
-              ∎
+            [ f.v ∘ f.ξX.f , f.v ∘ (ϕX# ∘ β.from) ] ≈⟨ +-unique (assoc ○ refl⟩∘⟨ +₁∘i₁ ○ refl⟩∘⟨ identityʳ ○ inject₁ ○ (Equiv.sym f.eqf))
+                                                                (assoc ○ refl⟩∘⟨ +₁∘i₂ ○ sym-assoc ○ inject₂ ⟩∘⟨refl ○ assoc ○ Equiv.sym yoga) ⟩
+            [ f.ξY.f , ϕY# ∘ β.from ] ∘ F₁v         ∎
       }
   ; identity = Equiv.refl
   ; homomorphism = Equiv.refl
