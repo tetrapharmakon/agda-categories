@@ -15,17 +15,17 @@ open import Relation.Binary.Bundles using (Setoid)
 
 open import Categories.Category.Construction.Arrow
 open import Categories.Category.Instance.Setoids using (Setoids)
-open import Categories.Functor using (Functor; _∘F_)
+open import Categories.Functor using (Functor; _∘F_) renaming (id to idF)
 open import Categories.Functor.Bifunctor using (Bifunctor; appˡ; appʳ)
 open import Categories.Functor.Bifunctor.Properties using ([_]-commute)
 open import Categories.Morphism.Reasoning as MR
-open import Categories.NaturalTransformation using (NaturalTransformation; _∘ᵥ_; _∘ₕ_; _∘ˡ_; _∘ʳ_) renaming (id to idN)
+open import Categories.NaturalTransformation using (NaturalTransformation;ntHelper; _∘ᵥ_; _∘ₕ_; _∘ˡ_; _∘ʳ_) renaming (id to idN)
 open import Categories.NaturalTransformation.Equivalence using (_≃_)
 
 import Reason
 open Reason C
 
-open Closed Cl using ([-,-]; [_,_]₀; [_,-]; [-,_]; [_,_]₁)
+open Closed Cl using (adjoint; unitorˡ;unitorʳ-commute-to; unitorʳ-commute-from;unitorʳ; [-,-]; unit; [_,_]₀; [_,-]; [-,_]; [_,_]₁)
 
 module Arr = Categories.Category.Construction.Arrow C
 
@@ -115,7 +115,7 @@ open MR
 module Naturalities {A B X Y} (ξ : MR2 A B) (u : X ⇒ Y) where
   open MR2
 
-  Φid_ : (X : Obj) → X ⇒ [ A , X ]₀
+  Φid : (X : Obj) → X ⇒ [ A , X ]₀
   Φid X = Φη ξ (record { arr = id {A = X}})
 
   Φᵤ : Y ⇒ [ A , Y ]₀
@@ -146,6 +146,34 @@ module Naturalities {A B X Y} (ξ : MR2 A B) (u : X ⇒ Y) where
   -}
   nat-1⇒1 : Φid Y ∘ u ≈ [ id , u ]₁ ∘ Φid X
   nat-1⇒1 = Φcommute ξ (1⇒1 u)
+
+open Naturalities
+
+NICod⇒NIid : ∀ {A B} (ξ : MR2 A B) → NaturalTransformation idF ([_,-] A)
+NICod⇒NIid ξ = let module ξ = MR2 ξ in ntHelper (record 
+  { η = λ X → Naturalities.Φid ξ ξ.f X 
+  ; commute = λ f → nat-1⇒1 ξ f 
+  })
+
+NIid⇒NICod : ∀ {A B} → (f : A ⇒ B) (φ : NaturalTransformation idF ([_,-] A)) → MR2 A B
+NIid⇒NICod f φ = ⟪ f , ntHelper (record 
+  { η = λ X → 
+    let module X = Morphism X 
+        module φ = NaturalTransformation φ
+    in φ.η X.cod 
+  ; commute = λ { {X} {Y} h → NaturalTransformation.commute φ (Morphism⇒.cod⇒ h) }
+  }) ⟫
+
+
+open import Categories.NaturalTransformation.NaturalIsomorphism as NI using (NaturalIsomorphism;niHelper; _ⓘˡ_; _ⓘʳ_)
+
+fattoide : NaturalIsomorphism ([_,-] unit) idF
+fattoide = niHelper (record 
+  { η = λ X → adjoint.counit.η X ∘ unitorʳ.to
+  ; η⁻¹ = λ X → adjoint.Ladjunct unitorʳ.from 
+  ; commute = λ f → assoc ○ refl⟩∘⟨ unitorʳ-commute-to ○ pullˡ C (adjoint.counit.commute f) ○ assoc
+  ; iso = λ X → record { isoˡ = sym-assoc ○ (adjoint.counit.sym-commute _) ⟩∘⟨refl ○ assoc ○ {!   !} ; isoʳ = assoc ○ refl⟩∘⟨ unitorʳ-commute-to ○ {!  !} } 
+  })
 
 -- Type of the desired profunctor C.op × C → Sets
 -- sending (A , B) ↦ MR2 A B.
