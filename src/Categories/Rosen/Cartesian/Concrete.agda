@@ -1,4 +1,4 @@
-{-# OPTIONS --without-K --warning=noUserWarning --warning=noUselessPrivate #-}
+{-# OPTIONS --without-K --warning=noUserWarning --warning=noUselessPrivate --warning=noUnsupportedIndexedMatch #-}
 
 open import Level
 open import Categories.Category using (Category)
