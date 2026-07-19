@@ -25,7 +25,7 @@ open import Categories.NaturalTransformation.Equivalence using (_≃_)
 import Reason
 open Reason C
 
-open Closed Cl using (adjoint; unitorˡ;unitorʳ-commute-to; unitorʳ-commute-from;unitorʳ; [-,-]; unit; [_,_]₀; [_,-]; [-,_]; [_,_]₁)
+open Closed Cl using (adjoint; unitorˡ;unitorʳ-commute-to; unitorʳ-commute-from;unitorʳ; [-,-]; unit; [_,_]₀; [_,-]; [-,_]; [_,_]₁; _⊗₁_)
 
 module Arr = Categories.Category.Construction.Arrow C
 
@@ -172,7 +172,34 @@ fattoide = niHelper (record
   { η = λ X → adjoint.counit.η X ∘ unitorʳ.to
   ; η⁻¹ = λ X → adjoint.Ladjunct unitorʳ.from 
   ; commute = λ f → assoc ○ refl⟩∘⟨ unitorʳ-commute-to ○ pullˡ C (adjoint.counit.commute f) ○ assoc
-  ; iso = λ X → record { isoˡ = sym-assoc ○ (adjoint.counit.sym-commute _) ⟩∘⟨refl ○ assoc ○ {!   !} ; isoʳ = assoc ○ refl⟩∘⟨ unitorʳ-commute-to ○ {!  !} } 
+  ; iso = λ X → record 
+    { isoˡ = begin 
+      adjoint.Ladjunct unitorʳ.from ∘ (adjoint.counit.η X ∘ unitorʳ.to)
+        ≈⟨ pullʳ C ((adjoint.unit.commute _)) ⟩
+      [ id , unitorʳ.from ]₁ ∘ adjoint.Ladjunct ((adjoint.counit.η X ∘ unitorʳ.to) ⊗₁ id)
+        ≈˘⟨ pushˡ C [-,-].homomorphism ⟩ -- pushˡ ([-,-].homomorphism) ⟩
+      {!   !} 
+        ≈⟨ {!   !} ⟩ 
+      adjoint.Ladjunct (unitorʳ.from ∘ ((adjoint.counit.η X ∘ unitorʳ.to) ⊗₁ id))
+        ≈⟨ ([-,-].F-resp-≈ (Equiv.refl , unitorʳ-commute-from)) ⟩∘⟨refl ⟩
+      adjoint.Ladjunct ((adjoint.counit.η X ∘ unitorʳ.to) ∘ unitorʳ.from)
+        ≈⟨ ([-,-].F-resp-≈ (Equiv.refl , cancelʳ C unitorʳ.isoˡ)) ⟩∘⟨refl ⟩
+      adjoint.Ladjunct (adjoint.counit.η X)
+        ≈⟨ adjoint.zag ⟩
+      id
+      ∎
+    ; isoʳ = begin 
+      (adjoint.counit.η X ∘ unitorʳ.to) ∘ adjoint.Ladjunct unitorʳ.from
+        ≈⟨ pullʳ C unitorʳ-commute-to ⟩
+      adjoint.counit.η X ∘ ((adjoint.Ladjunct unitorʳ.from ⊗₁ id) ∘ unitorʳ.to)
+        ≈⟨ sym-assoc ⟩
+      (adjoint.counit.η X ∘ (adjoint.Ladjunct unitorʳ.from ⊗₁ id)) ∘ unitorʳ.to
+        ≈⟨ adjoint.RLadjunct≈id {f = unitorʳ.from} ⟩∘⟨refl ⟩
+      unitorʳ.from ∘ unitorʳ.to
+        ≈⟨ unitorʳ.isoʳ ⟩
+      id
+      ∎
+    } 
   })
 
 -- Type of the desired profunctor C.op × C → Sets
