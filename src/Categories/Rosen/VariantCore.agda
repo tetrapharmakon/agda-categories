@@ -132,8 +132,8 @@ module Naturalities {A B X Y} (ξ : MR2 A B) (u : X ⇒ Y) where
   Φid : (X Y : Obj) → Y ⇒ [ X , Y ]₀
   Φid X Y = Φη ξ (record { arr = id {X} } , record { arr = id {Y} })
 
-  Φ₁ᵤ : Y ⇒ [ A , Y ]₀
-  Φ₁ᵤ = Φη ξ (record { arr = id {A} } , record { arr = u })
+  -- Φ₁ᵤ : Y ⇒ [ A , Y ]₀
+  -- Φ₁ᵤ = Φη ξ (record { arr = id {A} } , record { arr = u })
   
   ΦYᵤ : Y ⇒ [ Y , Y ]₀
   ΦYᵤ = Φη ξ (record { arr = id {Y} } , record { arr = u })
