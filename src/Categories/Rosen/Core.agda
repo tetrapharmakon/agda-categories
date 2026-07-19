@@ -172,33 +172,24 @@ fattoide = niHelper (record
   { η = λ X → adjoint.counit.η X ∘ unitorʳ.to
   ; η⁻¹ = λ X → adjoint.Ladjunct unitorʳ.from 
   ; commute = λ f → assoc ○ refl⟩∘⟨ unitorʳ-commute-to ○ pullˡ C (adjoint.counit.commute f) ○ assoc
-  ; iso = λ X → record 
+  ; iso = λ X → 
+    let λ₀ = unitorʳ.from 
+        λ₀' = adjoint.Ladjunct λ₀
+        ρ = unitorʳ.to
+        module ε = NaturalTransformation adjoint.counit
+    in record 
     { isoˡ = begin 
-      adjoint.Ladjunct unitorʳ.from ∘ (adjoint.counit.η X ∘ unitorʳ.to)
-        ≈⟨ pullʳ C ((adjoint.unit.commute _)) ⟩
-      [ id , unitorʳ.from ]₁ ∘ adjoint.Ladjunct ((adjoint.counit.η X ∘ unitorʳ.to) ⊗₁ id)
-        ≈˘⟨ pushˡ C [-,-].homomorphism ⟩ -- pushˡ ([-,-].homomorphism) ⟩
-      {!   !} 
-        ≈⟨ {!   !} ⟩ 
-      adjoint.Ladjunct (unitorʳ.from ∘ ((adjoint.counit.η X ∘ unitorʳ.to) ⊗₁ id))
-        ≈⟨ ([-,-].F-resp-≈ (Equiv.refl , unitorʳ-commute-from)) ⟩∘⟨refl ⟩
-      adjoint.Ladjunct ((adjoint.counit.η X ∘ unitorʳ.to) ∘ unitorʳ.from)
-        ≈⟨ ([-,-].F-resp-≈ (Equiv.refl , cancelʳ C unitorʳ.isoˡ)) ⟩∘⟨refl ⟩
-      adjoint.Ladjunct (adjoint.counit.η X)
-        ≈⟨ adjoint.zag ⟩
-      id
-      ∎
+      λ₀' ∘ (ε.η X ∘ ρ)                                   ≈⟨ pullʳ C ((adjoint.unit.commute _)) ⟩
+      [ id , λ₀ ]₁ ∘ adjoint.Ladjunct ((ε.η X ∘ ρ) ⊗₁ id) ≈˘⟨ pushˡ C ([ unit ,-] .Functor.homomorphism) ⟩
+      adjoint.Ladjunct (λ₀ ∘ ((ε.η X ∘ ρ) ⊗₁ id))         ≈⟨ ([-,-].F-resp-≈ (Equiv.refl , unitorʳ-commute-from)) ⟩∘⟨refl ⟩
+      adjoint.Ladjunct ((ε.η X ∘ ρ) ∘ λ₀)                 ≈⟨ ([-,-].F-resp-≈ (Equiv.refl , cancelʳ C unitorʳ.isoˡ)) ⟩∘⟨refl ⟩
+      adjoint.Ladjunct (ε.η X)                            ≈⟨ adjoint.zag ⟩
+      id                                                  ∎
     ; isoʳ = begin 
-      (adjoint.counit.η X ∘ unitorʳ.to) ∘ adjoint.Ladjunct unitorʳ.from
-        ≈⟨ pullʳ C unitorʳ-commute-to ⟩
-      adjoint.counit.η X ∘ ((adjoint.Ladjunct unitorʳ.from ⊗₁ id) ∘ unitorʳ.to)
-        ≈⟨ sym-assoc ⟩
-      (adjoint.counit.η X ∘ (adjoint.Ladjunct unitorʳ.from ⊗₁ id)) ∘ unitorʳ.to
-        ≈⟨ adjoint.RLadjunct≈id {f = unitorʳ.from} ⟩∘⟨refl ⟩
-      unitorʳ.from ∘ unitorʳ.to
-        ≈⟨ unitorʳ.isoʳ ⟩
-      id
-      ∎
+      (ε.η X ∘ ρ) ∘ λ₀'         ≈⟨ pullʳ C unitorʳ-commute-to ⟩
+      ε.η X ∘ ((λ₀' ⊗₁ id) ∘ ρ) ≈⟨ sym-assoc ○ adjoint.RLadjunct≈id {f = λ₀} ⟩∘⟨refl ⟩
+      λ₀ ∘ ρ                    ≈⟨ unitorʳ.isoʳ ⟩
+      id                        ∎
     } 
   })
 
