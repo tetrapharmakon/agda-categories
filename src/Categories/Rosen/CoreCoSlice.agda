@@ -5,7 +5,7 @@ open import Categories.Category using (Category)
 open import Categories.Category.Monoidal using (Monoidal)
 open import Categories.Category.Monoidal.Closed using (Closed)
 
-module Categories.Rosen.Core {o ℓ e} {C : Category o ℓ e} {M : Monoidal C} (Cl : Closed M) where
+module Categories.Rosen.CoreCoSlice {o ℓ e} {C : Category o ℓ e} {M : Monoidal C} (Cl : Closed M) where
 
 -- Core definitions for the category of (M,R)-systems.
 -- Exports: Cod, nHom, nHom-identity, MR2, MR2-Setoid, MRS-Profunctor.
@@ -13,7 +13,7 @@ module Categories.Rosen.Core {o ℓ e} {C : Category o ℓ e} {M : Monoidal C} (
 open import Data.Product using (_,_; proj₁; proj₂; _×_)
 open import Relation.Binary.Bundles using (Setoid)
 
-open import Categories.Category.Construction.Arrow
+open import Categories.Category.CoSlice C
 open import Categories.Category.Instance.Setoids using (Setoids)
 open import Categories.Functor using (Functor; _∘F_)
 open import Categories.Functor.Bifunctor using (Bifunctor; appˡ; appʳ)
@@ -26,18 +26,6 @@ import Reason
 open Reason C
 
 open Closed Cl using ([-,-]; [_,_]₀; [_,-]; [-,_]; [_,_]₁)
-
-module Arr = Categories.Category.Construction.Arrow C
-
--- Codomain functor Arrow(C) → C.
-Cod : Functor Arr.Arrow C
-Cod = record
-  { F₀           = Arr.Morphism.cod
-  ; F₁           = Arr.Morphism⇒.cod⇒
-  ; identity     = Equiv.refl
-  ; homomorphism = Equiv.refl
-  ; F-resp-≈     = λ eq → proj₂ eq
-  }
 
 -- nHom sends f : A ⇒ B to the induced natural transformation [-,f] : [B,-] ⇒ [A,-].
 nHom : ∀ {A B} → A ⇒ B → NaturalTransformation ([_,-] B) ([_,-] A)
@@ -57,11 +45,11 @@ record MR2 (A B : Obj) : Set (o ⊔ ℓ ⊔ e) where
   constructor ⟪_,_⟫
   field
     f : A ⇒ B
-    Φ : NaturalTransformation Cod (([_,-] A) ∘F Cod)
+    Φ : NaturalTransformation (Cod A) (([_,-] A) ∘F (Cod A))
 
   Φη = NaturalTransformation.η Φ
   Φη₀ = Φη (record { arr = f })
-  Φcommute = λ {X Y : Category.Obj Arr.Arrow} t → NaturalTransformation.commute Φ {X} {Y} t
+  Φcommute = λ {X Y : Category.Obj (coSlice A)} t → NaturalTransformation.commute Φ {X} {Y} t
 
 -- MR2 as a Setoid: two MR2 elements are equal when their f components are equal
 -- and their Φ components are ≃-equal.
@@ -75,6 +63,8 @@ MR2-Setoid A B = record
     ; trans = λ (pf₁ , h) (pf₂ , k) → Equiv.trans pf₁ pf₂ , Equiv.trans h k
     }
   }
+
+{-
 
 {-
   X -- u --> Y 
@@ -146,11 +136,28 @@ module Naturalities {A B X Y} (ξ : MR2 A B) (u : X ⇒ Y) where
   -}
   nat-1⇒1 : Φid Y ∘ u ≈ [ id , u ]₁ ∘ Φid X
   nat-1⇒1 = Φcommute ξ (1⇒1 u)
+-}
+
+open import Categories.NaturalTransformation.NaturalIsomorphism as NI using (NaturalIsomorphism;niHelper; _ⓘˡ_; _ⓘʳ_)
 
 -- Type of the desired profunctor C.op × C → Sets
 -- sending (A , B) ↦ MR2 A B.
 MRS-Profunctor : Bifunctor (Category.op C) C (Setoids (o ⊔ ℓ ⊔ e) (o ⊔ ℓ ⊔ e))
 MRS-Profunctor = record
+  { F₀ = λ { (A , B) → MR2-Setoid A B }
+  ; F₁ = λ { {(A , B)} {(A' , B')} (u , v) → record
+    { _⟨$⟩_ = λ {⟪ f , Φ ⟫ → ⟪ v ∘ f ∘ u , (nHom u ∘ʳ Cod A') ∘ᵥ {!   !} ∘ᵥ (Φ ∘ʳ reindex {!   !}) ∘ᵥ {! commute u  !} ⟫ }
+    ; cong = λ { {⟪ f , Φ ⟫} {⟪ g , Φ' ⟫} (f≈g , Φ≈Φ') →
+        (∘-resp-≈ Equiv.refl (∘-resp-≈ f≈g Equiv.refl))
+      , {!   !}
+      }
+    }}
+  ; identity = {!   !}
+  ; homomorphism = {!   !}
+  ; F-resp-≈ = {!   !}
+  }
+
+{-
   { F₀ = λ { (A , B) → MR2-Setoid A B }
   ; F₁ = λ { {(A , B)} {(A' , B')} (u , v) → record
     { _⟨$⟩_ = λ {⟪ f , Φ ⟫ → ⟪ v ∘ f ∘ u , (nHom u ∘ʳ Cod) ∘ᵥ Φ ⟫ }
@@ -194,3 +201,4 @@ MRS-Profunctor = record
               } })
      }
   }
+-}
