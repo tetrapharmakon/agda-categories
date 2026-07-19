@@ -1,4 +1,4 @@
-{-# OPTIONS --safe --warning=noUserWarning --warning=noUselessPrivate --warning=noUnsupportedIndexedMatch #-}
+{-# OPTIONS --without-K --warning=noUserWarning --warning=noUselessPrivate --warning=noUnsupportedIndexedMatch #-}
 
 open import Level using (0ℓ; _⊔_)
 open import Categories.Category using (Category)
