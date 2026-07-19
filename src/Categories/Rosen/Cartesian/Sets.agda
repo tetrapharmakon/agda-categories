@@ -1,4 +1,4 @@
-{-# OPTIONS --without-K --warning=noUserWarning --warning=noUselessPrivate #-}
+{-# OPTIONS --without-K --warning=noUserWarning --warning=noUselessPrivate --warning=noUnsupportedIndexedMatch #-}
 
 -- The category of Sets as a Cartesian closed monoidal category.
 -- Used to instantiate the Rosen constructions concretely.
