@@ -37,8 +37,8 @@ Eq = record
       let module x = tab₀ x
           module y = tab₀ y
           module f = tot⇒ f
-          module ϕ = NT (MR2.ϕ x.ξ)
-          module l*ψ = NT ((nHom f.l ∘ʳ Cod) ∘ᵥ MR2.ϕ y.ξ)
+          module Φ = NT (MR2.Φ x.ξ)
+          module l*ψ = NT ((nHom f.l ∘ʳ Cod) ∘ᵥ MR2.Φ y.ξ)
       in
       f.l , f.r ∥
         ( (begin
@@ -48,8 +48,8 @@ Eq = record
              id ∘ (MR2.f y.ξ ∘ f.l) ∎)
         , (λ {t} →
             begin
-              NT.η ((nHom id ∘ʳ Cod) ∘ᵥ MR2.ϕ x.ξ) t ≈⟨ elimˡ C [-,-].identity ⟩
-              ϕ.η t                                  ≈⟨ Equiv.sym (f.eqϕ {t = t}) ⟩
+              NT.η ((nHom id ∘ʳ Cod) ∘ᵥ MR2.Φ x.ξ) t ≈⟨ elimˡ C [-,-].identity ⟩
+              Φ.η t                                  ≈⟨ Equiv.sym (f.eqΦ {t = t}) ⟩
               l*ψ.η t                                ∎)) }
   ; identity = Equiv.refl , Equiv.refl
   ; homomorphism = Equiv.refl , Equiv.refl
@@ -64,25 +64,25 @@ Eq⁻¹ = record
       let module x  = tab₀ x
           module y  = tab₀ y
           module f  = tab⇒ f
-          module ϕ  = NT (MR2.ϕ x.ξ)
-          module l*ψ = NT ((nHom f.l ∘ʳ Cod) ∘ᵥ MR2.ϕ y.ξ)
+          module Φ  = NT (MR2.Φ x.ξ)
+          module l*ψ = NT ((nHom f.l ∘ʳ Cod) ∘ᵥ MR2.Φ y.ξ)
           eqf =
             let eqf' = proj₁ f.eq in
             begin
               f.r ∘ MR2.f x.ξ        ≈⟨ refl⟩∘⟨ Equiv.sym identityʳ ⟩
               f.r ∘ MR2.f x.ξ ∘ id   ≈⟨ eqf' ○ identityˡ ⟩
               MR2.f y.ξ ∘ f.l        ∎
-          eqϕ = proj₂ f.eq
+          eqΦ = proj₂ f.eq
       in
       [ f.l , f.r
       ∥ eqf
       , (λ {s} {t} α →
           let r = Arr.Morphism⇒.cod⇒ α
-              eqϕt : l*ψ.η t ≈ ϕ.η t
-              eqϕt = begin l*ψ.η t ≈⟨ Equiv.sym eqϕ ⟩ 
-                           [ id , id ]₁ ∘ ϕ.η t ≈⟨ (elimˡ C [-,-].identity) ⟩ 
-                           ϕ.η t ∎
-          in eqϕt ⟩∘⟨refl ○ ϕ.commute α) ] }
+              eqΦt : l*ψ.η t ≈ Φ.η t
+              eqΦt = begin l*ψ.η t ≈⟨ Equiv.sym eqΦ ⟩ 
+                           [ id , id ]₁ ∘ Φ.η t ≈⟨ (elimˡ C [-,-].identity) ⟩ 
+                           Φ.η t ∎
+          in eqΦt ⟩∘⟨refl ○ Φ.commute α) ] }
   ; identity = Equiv.refl , Equiv.refl
   ; homomorphism = Equiv.refl , Equiv.refl
   ; F-resp-≈ = λ x → x
@@ -90,7 +90,7 @@ Eq⁻¹ = record
 
 
 -- Surprise motherfucker: the tabulator and total are equivalent categories!!!
--- at first, it seems `total` is imposing a stronger condition, but in the end naturality of ϕ allows to deduce it from first principles.
+-- at first, it seems `total` is imposing a stronger condition, but in the end naturality of Φ allows to deduce it from first principles.
 -- Eq⊣Eq⁻¹: adjoint equivalence proving the total category ≅ the tabulator.
 Eq⊣Eq⁻¹ : Eq ⊣ Eq⁻¹
 Eq⊣Eq⁻¹ = record

@@ -33,7 +33,7 @@ record iMR2ᴿ₀ (A : Obj) : Set (o ⊔ ℓ ⊔ e) where
     B : Obj
     ξ : iMR2 A B 
 
--- iMR2ᴿ⇒: morphisms in the fibre over A: v : X.B ⇒ Y.B compatible with f and ϕ.
+-- iMR2ᴿ⇒: morphisms in the fibre over A: v : X.B ⇒ Y.B compatible with f and Φ.
 record iMR2ᴿ⇒ {A : Obj} (X Y : iMR2ᴿ₀ A) : Set (o ⊔ ℓ ⊔ e) where
   module X = iMR2ᴿ₀ X
   module Y = iMR2ᴿ₀ Y   
@@ -42,7 +42,7 @@ record iMR2ᴿ⇒ {A : Obj} (X Y : iMR2ᴿ₀ A) : Set (o ⊔ ℓ ⊔ e) where
   field
     v : X.B ⇒ Y.B
     eqf : v ∘ ξX.f ≈ ξY.f
-    eqϕ : [ id , v ]₁ ∘ ξX.ϕ ≈ ξY.ϕ ∘ v
+    eqΦ : [ id , v ]₁ ∘ ξX.Φ ≈ ξY.Φ ∘ v
 
 -- iMR2ᴿ A: the fibre category over A of the incoherent MRS profunctor.
 iMR2ᴿ : (A : Obj) → Category (o ⊔ ℓ ⊔ e) (o ⊔ ℓ ⊔ e) e
@@ -55,20 +55,20 @@ iMR2ᴿ A = record
   ; id = record 
     { v = id 
     ; eqf = id-0 
-    ; eqϕ = Equiv.trans (cancel (Functor.identity [-,-])) (sym-id-1) }
+    ; eqΦ = Equiv.trans (cancel (Functor.identity [-,-])) (sym-id-1) }
   ; _∘_ = λ p q → 
     let module p = iMR2ᴿ⇒ p 
         module q = iMR2ᴿ⇒ q
     in record 
       { v = p.v ∘ q.v
       ; eqf = pullʳ C q.eqf ∙ p.eqf 
-      ; eqϕ = let module Hom = Functor [-,-]
+      ; eqΦ = let module Hom = Functor [-,-]
                   module Hom[1-] {A} = Functor (appˡ [-,-] A)
                   module Hom[-1] {A} = Functor (appʳ [-,-] A) 
-              in (begin [ id , p.v ∘ q.v ]₁ ∘ q.ξX.ϕ ≈⟨ pushˡ C Hom[1-].homomorphism ⟩  
-                        [ id , p.v ]₁ ∘ [ id , q.v ]₁ ∘ q.ξX.ϕ ≈⟨ refl⟩∘⟨ q.eqϕ ⟩  
-                        [ id , p.v ]₁ ∘ q.ξY.ϕ ∘ q.v ≈⟨ rw-2-1 p.eqϕ ∙ assoc ⟩  
-                        p.ξY.ϕ ∘ p.v ∘ q.v ∎) 
+              in (begin [ id , p.v ∘ q.v ]₁ ∘ q.ξX.Φ ≈⟨ pushˡ C Hom[1-].homomorphism ⟩  
+                        [ id , p.v ]₁ ∘ [ id , q.v ]₁ ∘ q.ξX.Φ ≈⟨ refl⟩∘⟨ q.eqΦ ⟩  
+                        [ id , p.v ]₁ ∘ q.ξY.Φ ∘ q.v ≈⟨ rw-2-1 p.eqΦ ∙ assoc ⟩  
+                        p.ξY.Φ ∘ p.v ∘ q.v ∎) 
       }
   ; assoc = assoc
   ; sym-assoc = sym-assoc
@@ -89,10 +89,10 @@ MRSreindex {A} {A'} u = record
   { F₀ = λ { x → 
     let module x = iMR2ᴿ₀ x
         f =  iMR2.f x.ξ
-        ϕ = iMR2.ϕ x.ξ
+        Φ = iMR2.Φ x.ξ
     in record 
     { B = x.B
-    ; ξ = ⟪ f ∘ u , [ u , id ]₁ ∘ ϕ ⟫ 
+    ; ξ = ⟪ f ∘ u , [ u , id ]₁ ∘ Φ ⟫ 
     }}
   ; F₁ = λ { {x} {y} f → 
       let module x   = iMR2ᴿ₀ x
@@ -105,9 +105,9 @@ MRSreindex {A} {A'} u = record
     ; eqf = begin f.v ∘ f.ξX.f ∘ u   ≈⟨ sym-assoc ⟩ 
                   (f.v ∘ f.ξX.f) ∘ u ≈⟨ f.eqf ⟩∘⟨refl ⟩ 
                   f.ξY.f ∘ u         ∎
-    ; eqϕ = begin [ id , f.v ]₁ ∘ [ u , id ]₁ ∘ f.ξX.ϕ ≈⟨ sym-assoc ∙ ([ [-,-] ]-commute ⟩∘⟨refl) ∙ assoc ⟩
-                  [ u , id ]₁ ∘ [ id , f.v ]₁ ∘ f.ξX.ϕ ≈⟨ (refl⟩∘⟨ f.eqϕ) ∙ sym-assoc ⟩ 
-                  ([ u , id ]₁ ∘ f.ξY.ϕ) ∘ f.v ∎
+    ; eqΦ = begin [ id , f.v ]₁ ∘ [ u , id ]₁ ∘ f.ξX.Φ ≈⟨ sym-assoc ∙ ([ [-,-] ]-commute ⟩∘⟨refl) ∙ assoc ⟩
+                  [ u , id ]₁ ∘ [ id , f.v ]₁ ∘ f.ξX.Φ ≈⟨ (refl⟩∘⟨ f.eqΦ) ∙ sym-assoc ⟩ 
+                  ([ u , id ]₁ ∘ f.ξY.Φ) ∘ f.v ∎
     }}
   ; identity = λ {A} → refl
   ; homomorphism = λ {X} {Y} {Z} {f} {g} → refl
@@ -115,6 +115,6 @@ MRSreindex {A} {A'} u = record
   }
 
   {-
-  ⟪ f , ϕ ⟫ → ⟪ g , \Psi ⟫
+  ⟪ f , Φ ⟫ → ⟪ g , \Psi ⟫
   
    -}

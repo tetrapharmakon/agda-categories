@@ -49,9 +49,9 @@ private
   module CodF = Functor Cod
 
 -- The unique natural transformation Cod ⇒ [A,-] ∘ Cod in Sets (constant).
--- const-ϕ A: the unique natural transformation Cod ⇒ [A,-]∘Cod in Sets (constant).
-const-ϕ : (A : Obj) → NaturalTransformation Cod (([ A ,-] ∘F Cod))
-const-ϕ A = record
+-- const-Φ A: the unique natural transformation Cod ⇒ [A,-]∘Cod in Sets (constant).
+const-Φ : (A : Obj) → NaturalTransformation Cod (([ A ,-] ∘F Cod))
+const-Φ A = record
   { η = λ m y a → y
   ; commute = λ { _ → ≡.refl }
   ; sym-commute = λ { _ → ≡.refl }
@@ -61,30 +61,30 @@ const-ϕ A = record
 -- so Nat(Cod, [A,-]∘Cod) has exactly one element.
 -- yoneda-argument: in Sets, Cod is represented by the terminal arrow,
 -- so Nat(Cod, [A,-]∘Cod) is a singleton.
-yoneda-argument : ∀ A → (ϕ ψ : NaturalTransformation Cod (([ A ,-] ∘F Cod))) → ϕ ≃ ψ
-yoneda-argument A ϕ ψ {X} {z} =
+yoneda-argument : ∀ A → (Φ ψ : NaturalTransformation Cod (([ A ,-] ∘F Cod))) → Φ ≃ ψ
+yoneda-argument A Φ ψ {X} {z} =
   let α : Arr.Morphism⇒ ⊤-arr X
       α = record { dom⇒ = λ { (lift ()) } ; cod⇒ = λ _ → z ; square = λ { {lift ()} } }
-  in extensionality {f = NaturalTransformation.η ϕ X z} {g = NaturalTransformation.η ψ X z} λ a →
+  in extensionality {f = NaturalTransformation.η Φ X z} {g = NaturalTransformation.η ψ X z} λ a →
     ≡.trans
-      (≡.cong (λ f → f a) (NaturalTransformation.commute ϕ α {x = lift tt}))
+      (≡.cong (λ f → f a) (NaturalTransformation.commute Φ α {x = lift tt}))
       (≡.sym (≡.cong (λ f → f a) (NaturalTransformation.commute ψ α {x = lift tt})))
   where
     ⊤-arr : Arr.Morphism
     ⊤-arr = record { dom = Lift o ⊥ ; cod = Lift o ⊤ ; arr = λ { (lift ()) } }
 
--- Uniqueness: any such natural transformation equals const-ϕ A.
--- unique-ϕ: every such ϕ equals const-ϕ A.
-unique-ϕ : ∀ A → (ϕ : NaturalTransformation Cod (([ A ,-] ∘F Cod))) → const-ϕ A ≃ ϕ
-unique-ϕ A ϕ = yoneda-argument A (const-ϕ A) ϕ
+-- Uniqueness: any such natural transformation equals const-Φ A.
+-- unique-Φ: every such Φ equals const-Φ A.
+unique-Φ : ∀ A → (Φ : NaturalTransformation Cod (([ A ,-] ∘F Cod))) → const-Φ A ≃ Φ
+unique-Φ A Φ = yoneda-argument A (const-Φ A) Φ
 
 -- The left adjoint L : Arrow S → 𝕋MRS.
--- L: left adjoint to V₁; sends an arrow (A → X) to the trivial (M,R)-system with ϕ = const-ϕ A.
+-- L: left adjoint to V₁; sends an arrow (A → X) to the trivial (M,R)-system with Φ = const-Φ A.
 L : Functor Arr.Arrow 𝕋MRS
 L = record
   { F₀ = λ x → 
     let module x = Arr.Morphism x 
-    in (x.dom , x.cod) ∣ ⟪ x.arr , const-ϕ (x.dom) ⟫
+    in (x.dom , x.cod) ∣ ⟪ x.arr , const-Φ (x.dom) ⟫
   ; F₁ = λ { {m} {n} α@(record { dom⇒ = u ; cod⇒ = v ; square = square }) →
     let A = Arr.Morphism.dom m -- m : A ⇒ X
         B = Arr.Morphism.dom n -- n : B ⇒ Y
@@ -102,8 +102,8 @@ L = record
       ; eq = square 
            , (λ {x} {z} →
                yoneda-argument A
-                 ((nHom (id {A}) ∘ʳ Cod) ∘ᵥ const-ϕ A)
-                 ((nHom u ∘ʳ Cod) ∘ᵥ const-ϕ B)
+                 ((nHom (id {A}) ∘ʳ Cod) ∘ᵥ const-Φ A)
+                 ((nHom u ∘ʳ Cod) ∘ᵥ const-Φ B)
                  {x} {z})
       } }
   ; identity = λ { {A} → refl , refl }
@@ -120,7 +120,7 @@ L' : Functor TwSet ElMRS
 L' = record
   { F₀ = λ x → 
     let module x = tMorphism x 
-    in record { A = x.dom ; B = x.cod ; el = ⟪ x.arr , const-ϕ x.dom ⟫ }
+    in record { A = x.dom ; B = x.cod ; el = ⟪ x.arr , const-Φ x.dom ⟫ }
   ; F₁ = λ { {m} {n} α@(record { dom⇐ = u ; cod⇒ = v ; square = square }) →
     let A = tMorphism.dom m -- m : A ⇒ X
         B = tMorphism.dom n -- n : B ⇒ Y
@@ -149,13 +149,13 @@ L⊣V₁ = record
   ; counit = ntHelper 
     (record 
       { η = λ { ((A , B) ∣ ξ) →
-          let ϕ = MR2.ϕ ξ in
+          let Φ = MR2.Φ ξ in
           (λ z → z) , (λ z → z) ∥
             ( refl
             , (λ {x} {z} →
                 yoneda-argument A
-                  ((nHom (id {A}) ∘ʳ Cod) ∘ᵥ const-ϕ A)
-                  ((nHom (id {A}) ∘ʳ Cod) ∘ᵥ ϕ)
+                  ((nHom (id {A}) ∘ʳ Cod) ∘ᵥ const-Φ A)
+                  ((nHom (id {A}) ∘ʳ Cod) ∘ᵥ Φ)
                   {x} {z})
             ) }
       ; commute = λ _ → (λ {x} → refl) , (λ {x} → refl)
@@ -179,7 +179,7 @@ L'⊣U₁ = record
       ; r = id 
       ; eqElts = refl ,
           let module X = Elts₀ X in
-          yoneda-argument X.A ((nHom (id {X.A}) ∘ʳ Cod) ∘ᵥ const-ϕ X.A) (MR2.ϕ X.el)
+          yoneda-argument X.A ((nHom (id {X.A}) ∘ʳ Cod) ∘ᵥ const-Φ X.A) (MR2.Φ X.el)
       } 
     ; commute = λ _ → refl 
               , (λ {x} → refl) 

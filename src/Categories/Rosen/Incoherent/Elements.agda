@@ -7,7 +7,7 @@ open import Categories.Category.Monoidal.Closed using (Closed)
 
 module Categories.Rosen.Incoherent.Elements {o ℓ e} {C : Category o ℓ e} {M : Monoidal C} (Cl : Closed M) where
 
--- Incoherent (M,R)-systems: a simple diagram A —f→ B —ϕ→ [A,B]
+-- Incoherent (M,R)-systems: a simple diagram A —f→ B —Φ→ [A,B]
 -- without the natural transformation condition of full MR2.
 
 open import Data.Product using (_,_; proj₁; proj₂; _×_)
@@ -36,7 +36,7 @@ record twiMR2⇒ (X Y : iMR2₀) : Set (o ⊔ ℓ ⊔ e) where
     l : Y.A ⇒ X.A
     r : X.B ⇒ Y.B
     eqf : r ∘ ξX.f ∘ l ≈ ξY.f
-    eqϕ : ξY.ϕ ∘ r ≈ [ l , r ]₁ ∘ ξX.ϕ
+    eqΦ : ξY.Φ ∘ r ≈ [ l , r ]₁ ∘ ξX.Φ
 
 -- τ'[iMR2]: twisted category of incoherent (M,R)-systems.
 τ'[iMR2] : Category (o ⊔ ℓ) (o ⊔ ℓ ⊔ e) e 
@@ -48,7 +48,7 @@ record twiMR2⇒ (X Y : iMR2₀) : Set (o ⊔ ℓ ⊔ e) where
     { l = id 
     ; r = id 
     ; eqf = trans identityˡ identityʳ 
-    ; eqϕ = id-swap ○ Equiv.sym [-,-].identity ⟩∘⟨refl 
+    ; eqΦ = id-swap ○ Equiv.sym [-,-].identity ⟩∘⟨refl 
     }
   ; _∘_ = λ f g → 
     let module f = twiMR2⇒ f  
@@ -59,7 +59,7 @@ record twiMR2⇒ (X Y : iMR2₀) : Set (o ⊔ ℓ ⊔ e) where
       { l = g.l ∘ f.l 
       ; r = f.r ∘ g.r 
       ; eqf = assoc ○ refl⟩∘⟨ rw-3-1 g.eqf ○ f.eqf 
-      ; eqϕ = pullˡ C f.eqϕ ○ pullʳ C g.eqϕ ○ pullˡ C (Equiv.sym [-,-].homomorphism) }
+      ; eqΦ = pullˡ C f.eqΦ ○ pullʳ C g.eqΦ ○ pullˡ C (Equiv.sym [-,-].homomorphism) }
   ; assoc = sym-assoc , assoc
   ; sym-assoc = assoc , sym-assoc
   ; identityˡ = identityʳ , identityˡ
@@ -71,8 +71,8 @@ record twiMR2⇒ (X Y : iMR2₀) : Set (o ⊔ ℓ ⊔ e) where
 
 ℝ : Functor τ'[iMR2] Arr.Arrow
 ℝ = record
-  { F₀ = λ x → let module x = iMR2₀ x in (record { dom = x.B ; cod = [ x.A , x.B ]₀ ; arr = iMR2.ϕ x.ξ })
-  ; F₁ = λ f → let module f = twiMR2⇒ f in mor⇒ (sym f.eqϕ)
+  { F₀ = λ x → let module x = iMR2₀ x in (record { dom = x.B ; cod = [ x.A , x.B ]₀ ; arr = iMR2.Φ x.ξ })
+  ; F₁ = λ f → let module f = twiMR2⇒ f in mor⇒ (sym f.eqΦ)
   ; identity = refl , [-,-].identity
   ; homomorphism = refl , [-,-].homomorphism
   ; F-resp-≈ = λ z → z .proj₂ , [-,-].F-resp-≈ z

@@ -33,12 +33,12 @@ K = record
   { F₀ = λ x → 
       let module x = tab₀ x
           module ξx = MR2 x.ξ 
-      in record { A = x.L ; ϕ = ξx.ϕ }
+      in record { A = x.L ; Φ = ξx.Φ }
   ; F₁ = λ { {x} {y} f → 
       let module x = tab₀ x
           module y = tab₀ y
           module f = tot⇒ f 
-      in record { u = f.l ; eq = f.eqϕ } }
+      in record { u = f.l ; eq = f.eqΦ } }
   ; identity = λ {A} → Equiv.refl
   ; homomorphism = Equiv.refl
   ; F-resp-≈ = proj₁
@@ -47,21 +47,21 @@ K = record
 -- the inclusion of repairs in total
 𝕁 : Functor repairs total 
 𝕁 = record
-  { F₀ = λ {(record { A = A ; ϕ = ϕ }) → (A , A) ∣ ⟪ id , ϕ ⟫}
+  { F₀ = λ {(record { A = A ; Φ = Φ }) → (A , A) ∣ ⟪ id , Φ ⟫}
   ; F₁ = λ { {X} {Y} f → let module f = rep⇒ f in
   [ f.u , f.u 
   ∥ id-comm C , (λ {s} {t} α →
       let module X₀ = rep₀ X
           module Y₀ = rep₀ Y
-          module ϕX = NT X₀.ϕ
-          module ϕY = NT Y₀.ϕ
+          module ΦX = NT X₀.Φ
+          module ΦY = NT Y₀.Φ
           r = Arr.Morphism⇒.cod⇒ α
       in
       begin
-        (NT.η ((nHom f.u ∘ʳ Cod) ∘ᵥ Y₀.ϕ) t) ∘ r                      ≈⟨ assoc ○ (refl⟩∘⟨ ϕY.commute α) ○ sym-assoc ⟩
-        (NT.η (nHom f.u ∘ʳ Cod) t ∘ Functor.F₁ [ Y₀.A ,-] r) ∘ ϕY.η s ≈⟨ (∘-resp-≈ (NT.commute (nHom f.u ∘ʳ Cod) α) Equiv.refl) ○ assoc ⟩
-        Functor.F₁ [ X₀.A ,-] r ∘ (NT.η (nHom f.u ∘ʳ Cod) s ∘ ϕY.η s) ≈⟨ refl⟩∘⟨ f.eq {x = s} ⟩
-        Functor.F₁ [ X₀.A ,-] r ∘ ϕX.η s                              ∎) ]}
+        (NT.η ((nHom f.u ∘ʳ Cod) ∘ᵥ Y₀.Φ) t) ∘ r                      ≈⟨ assoc ○ (refl⟩∘⟨ ΦY.commute α) ○ sym-assoc ⟩
+        (NT.η (nHom f.u ∘ʳ Cod) t ∘ Functor.F₁ [ Y₀.A ,-] r) ∘ ΦY.η s ≈⟨ (∘-resp-≈ (NT.commute (nHom f.u ∘ʳ Cod) α) Equiv.refl) ○ assoc ⟩
+        Functor.F₁ [ X₀.A ,-] r ∘ (NT.η (nHom f.u ∘ʳ Cod) s ∘ ΦY.η s) ≈⟨ refl⟩∘⟨ f.eq {x = s} ⟩
+        Functor.F₁ [ X₀.A ,-] r ∘ ΦX.η s                              ∎) ]}
   ; identity = Equiv.refl , Equiv.refl
   ; homomorphism = Equiv.refl , Equiv.refl
   ; F-resp-≈ = λ x → x , x
@@ -72,7 +72,7 @@ K = record
 -- note that J is full and faithful (unit is id)
 𝕁⊣K = record 
  { unit = ntHelper (record 
-   { η = λ {record { A = A ; ϕ = ϕ } → record 
+   { η = λ {record { A = A ; Φ = Φ } → record 
       { u = id 
       ; eq =  elimˡ C [-,-].identity
       } }
@@ -87,13 +87,13 @@ K = record
       [ id , MR2.f ξ 
       ∥ Equiv.refl 
      , (λ {s} {t} α →
-           let module ϕ = NT (MR2.ϕ ξ)
+           let module Φ = NT (MR2.Φ ξ)
                r = Arr.Morphism⇒.cod⇒ α
            in
            begin
-             (([ id , id ]₁ ∘ ϕ.η t) ∘ r) ≈⟨ assoc ○ (elimˡ C [-,-].identity) ⟩
-             ϕ.η t ∘ r                    ≈⟨ ϕ.commute α ⟩
-             Functor.F₁ [ L ,-] r ∘ ϕ.η s ∎) ] }
+             (([ id , id ]₁ ∘ Φ.η t) ∘ r) ≈⟨ assoc ○ (elimˡ C [-,-].identity) ⟩
+             Φ.η t ∘ r                    ≈⟨ Φ.commute α ⟩
+             Functor.F₁ [ L ,-] r ∘ Φ.η s ∎) ] }
     ; commute = λ f →
         let module f = tot⇒ f in
         ( Equiv.trans identityˡ (Equiv.sym identityʳ)

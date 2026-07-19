@@ -33,7 +33,7 @@ record totalAtA₀ (A : Obj) : Set (o ⊔ ℓ ⊔ e) where
     B : Obj
     ξ : S.Carrier (Functor.F₀ MRS-Profunctor (A , B))
 
--- Morphisms of the fibre at A: a map r : x.B ⇒ y.B compatible with ϕ.
+-- Morphisms of the fibre at A: a map r : x.B ⇒ y.B compatible with Φ.
 record totalAtA₁ {A : Obj} (x y : totalAtA₀ A) : Set (o ⊔ ℓ ⊔ e) where
   module x = totalAtA₀ x
   module y = totalAtA₀ y
@@ -43,10 +43,10 @@ record totalAtA₁ {A : Obj} (x y : totalAtA₀ A) : Set (o ⊔ ℓ ⊔ e) where
   f = MR2.f x.ξ
   g = MR2.f y.ξ
 
-  module ϕ = NaturalTransformation (MR2.ϕ x.ξ)
-  module ψ = NaturalTransformation (MR2.ϕ y.ξ)
+  module Φ = NaturalTransformation (MR2.Φ x.ξ)
+  module ψ = NaturalTransformation (MR2.Φ y.ξ)
   field
-    eqϕ : [ id , r ]₁ ∘ ϕ.η (record { dom = A ; cod = x.B ; arr = f }) ≈ ψ.η (record { dom = A ; cod = y.B ; arr = g }) ∘ r
+    eqΦ : [ id , r ]₁ ∘ Φ.η (record { dom = A ; cod = x.B ; arr = f }) ≈ ψ.η (record { dom = A ; cod = y.B ; arr = g }) ∘ r
 
 
 -- Category totalAtA A: the fibre over A of the MRS profunctor.
@@ -58,13 +58,13 @@ totalAtA A = record
                       module y = totalAtA₁ y in x.r ≈ y.r
   ; id = record
       { r = id
-      ; eqϕ = cancel [-,-].identity ∙ sym-id-1
+      ; eqΦ = cancel [-,-].identity ∙ sym-id-1
       }
   ; _∘_ = λ u v → let module u = totalAtA₁ u
                       module v = totalAtA₁ v
                   in record
                     { r = u.r ∘ v.r
-                    ; eqϕ = rw-1-2 (Functor.homomorphism [ A ,-]) ∙ skip v.eqϕ ∙ rw-2 u.eqϕ
+                    ; eqΦ = rw-1-2 (Functor.homomorphism [ A ,-]) ∙ skip v.eqΦ ∙ rw-2 u.eqΦ
                     }
   ; assoc = assoc
   ; sym-assoc = sym-assoc
@@ -79,13 +79,13 @@ totalAtA A = record
   ; ∘-resp-≈ = λ f≈g h≈i → ∘-resp-≈ f≈g h≈i
   }
 
--- ∇: functor from the fibre to Arrow, sending (B, ξ) to the ϕ-component B → [A,B].
+-- ∇: functor from the fibre to Arrow, sending (B, ξ) to the Φ-component B → [A,B].
 ∇ : {A : Obj} → Functor (totalAtA A) Arr.Arrow
 ∇ {A} = record
   { F₀ = λ (B ∣ ξ) →
-  let module phi = NaturalTransformation (MR2.ϕ ξ)
+  let module phi = NaturalTransformation (MR2.Φ ξ)
   in record { dom = B ; cod = [ A , B ]₀ ; arr = phi.η (record { dom = A ; cod = B ; arr = MR2.f ξ }) }
-  ; F₁ = λ { {X ∣ ⟪ f , ϕ ⟫} {Y ∣ ⟪ g , ψ ⟫} (record { r = r ; eqϕ = eqϕ }) → mor⇒ {dom⇒ = r} {cod⇒ = Functor.F₁ [ A ,-] r} eqϕ }
+  ; F₁ = λ { {X ∣ ⟪ f , Φ ⟫} {Y ∣ ⟪ g , ψ ⟫} (record { r = r ; eqΦ = eqΦ }) → mor⇒ {dom⇒ = r} {cod⇒ = Functor.F₁ [ A ,-] r} eqΦ }
   ; identity = λ { {X} → Equiv.refl , (Functor.identity [ A ,-])}
   ; homomorphism = λ { {X} {Y} {Z} {f} {g} → Equiv.refl , Functor.homomorphism [ A ,-] }
   ; F-resp-≈ = λ {X} {Y} {f} {g} z → z , Functor.F-resp-≈ [ A ,-] z

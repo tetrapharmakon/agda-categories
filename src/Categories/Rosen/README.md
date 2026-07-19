@@ -9,14 +9,14 @@ Core definitions for the category of (M,R)-systems.
 - `Cod` — Codomain functor `Arrow(C) → C`.
 - `nHom` — sends `f : A ⇒ B` to the induced natural transformation `[-,f] : [B,-] ⇒ [A,-]`.
 - `nHom-identity` — `nHom` respects identity.
-- `MR2` — an (M,R)-system according to Rosen: a pair `(f, ϕ)` where `f : A ⇒ B` and `ϕ : Cod ⇒ [A,-]∘Cod`.
+- `MR2` — an (M,R)-system according to Rosen: a pair `(f, Φ)` where `f : A ⇒ B` and `Φ : Cod ⇒ [A,-]∘Cod`.
 - `MR2-Setoid` — `MR2` as a `Setoid`.
 - `MRS-Profunctor` — the profunctor `C^op × C → Sets` sending `(A, B)` to `MR2 A B`.
 
 ### `Repairs.agda`
 The "fibration of repairs": the category of elements of the functor `A ↦ Nat(Cod, [A,-]∘Cod)`.
-- `rep₀` — objects: `(A, ϕ)` with `ϕ : Cod ⇒ [A,-]∘Cod`.
-- `rep⇒` — morphisms: `u : X.A ⇒ Y.A` such that `(nHom u ∘ʳ Cod) ∘ᵥ Y.ϕ ≃ X.ϕ`.
+- `rep₀` — objects: `(A, Φ)` with `Φ : Cod ⇒ [A,-]∘Cod`.
+- `rep⇒` — morphisms: `u : X.A ⇒ Y.A` such that `(nHom u ∘ʳ Cod) ∘ᵥ Y.Φ ≃ X.Φ`.
 - `repairs` — the total category of this fibration.
 
 ### `TotalCategory.agda`
@@ -51,7 +51,7 @@ Fibre-at-A construction: an alternative approach to higher (M,R)-systems by fixi
 the domain object `A`, which simplifies the definitions.
 - `totalAtA₀` / `totalAtA₁` — objects and morphisms of the fibre over `A`.
 - `totalAtA` — the category totalAtA A (fibre over `A` of `MRS-Profunctor`).
-- `∇` — functor from the fibre to `Arrow`, sending `(B, ξ)` to `ϕ : B → [A,B]`.
+- `∇` — functor from the fibre to `Arrow`, sending `(B, ξ)` to `Φ : B → [A,B]`.
 - `commaNablaV` — comma category `∇ ↓ V₁` (weaker invariant, historical).
 
 ### `Algebras.agda`
@@ -71,9 +71,9 @@ tabulator of `MRS-Profunctor` (see `Tabulator.agda`).
 - `Eq⊣Eq⁻¹` — the adjoint equivalence.
 
 ### `Incoherent/Core.agda`
-Incoherent (M,R)-systems: a simpler variant where `ϕ : B ⇒ [A,B]` is just a
+Incoherent (M,R)-systems: a simpler variant where `Φ : B ⇒ [A,B]` is just a
 morphism (not a natural transformation).
-- `iMR2` — an incoherent (M,R)-system: `(f : A ⇒ B, ϕ : B ⇒ [A,B])`.
+- `iMR2` — an incoherent (M,R)-system: `(f : A ⇒ B, Φ : B ⇒ [A,B])`.
 - `iMR2₀` / `iMR2⇒` — objects and morphisms of the total category.
 - `τ[iMR2]` — total category of incoherent (M,R)-systems.
 
@@ -105,9 +105,9 @@ serving as a type-checking test.
 ### `Cartesian/Adjoints.agda`
 Instances of the Rosen constructions for the Cartesian (Sets) case.
 In this setting, V₁ and U₁ acquire left adjoints.
-- `const-ϕ` — the unique natural transformation `Cod ⇒ [A,-]∘Cod` in Sets.
+- `const-Φ` — the unique natural transformation `Cod ⇒ [A,-]∘Cod` in Sets.
 - `yoneda-argument` — `Nat(Cod, [A,-]∘Cod)` is a singleton.
-- `unique-ϕ` — every such ϕ equals `const-ϕ A`.
+- `unique-Φ` — every such Φ equals `const-Φ A`.
 - `L` / `L⊣V₁` — left adjoint to V₁.
 - `L'` / `L'⊣U₁` — left adjoint to U₁.
 

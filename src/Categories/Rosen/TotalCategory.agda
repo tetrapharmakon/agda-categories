@@ -38,18 +38,18 @@ record tot⇒ (x y : tab₀ MRS-Profunctor) : Set (o ⊔ ℓ ⊔ e) where
   f = MR2.f x.ξ
   g = MR2.f y.ξ
 
-  module ϕ = NT (MR2.ϕ x.ξ)
-  module ψ = NT (MR2.ϕ y.ξ)
-  module l*ψ = NT ((nHom l ∘ʳ Cod) ∘ᵥ MR2.ϕ y.ξ)
+  module Φ = NT (MR2.Φ x.ξ)
+  module ψ = NT (MR2.Φ y.ξ)
+  module l*ψ = NT ((nHom l ∘ʳ Cod) ∘ᵥ MR2.Φ y.ξ)
   
   field
     eqf : r ∘ f ≈ g ∘ l
     nat : ∀ {s t} (α : Arr.Morphism⇒ s t)
         → l*ψ.η t ∘ Arr.Morphism⇒.cod⇒ α
-        ≈ Functor.F₁ [ x.L ,-] (Arr.Morphism⇒.cod⇒ α) ∘ ϕ.η s
+        ≈ Functor.F₁ [ x.L ,-] (Arr.Morphism⇒.cod⇒ α) ∘ Φ.η s
   
-  eqϕ : ∀ {t} → l*ψ.η t ≈ ϕ.η t
-  eqϕ {t} =
+  eqΦ : ∀ {t} → l*ψ.η t ≈ Φ.η t
+  eqΦ {t} =
     Equiv.sym identityʳ
     ○ nat (Category.id Arr.Arrow {A = t})
     ○ elimˡ C [-,-].identity
@@ -60,20 +60,20 @@ total = record
   { Obj = tab₀ MRS-Profunctor
   ; _⇒_ = λ s t → tot⇒ s t
   ; _≈_ = λ h k → tot⇒.l h ≈ tot⇒.l k × tot⇒.r h ≈ tot⇒.r k
-  ; id = λ { {(A , B) ∣ ⟪ f , ϕ ⟫} → 
-       let module ϕNT = NT ϕ
-           module l*ϕ = NT ((nHom id ∘ʳ Cod) ∘ᵥ ϕ)
+  ; id = λ { {(A , B) ∣ ⟪ f , Φ ⟫} → 
+       let module ΦNT = NT Φ
+           module l*Φ = NT ((nHom id ∘ʳ Cod) ∘ᵥ Φ)
        in
        [ id , id
        ∥ id-comm-sym C
        , (λ {s} {t} α → 
          elimˡ C [-,-].identity ⟩∘⟨refl 
-         ○ ϕNT.commute α)
+         ○ ΦNT.commute α)
        ]}
   ; _∘_ = λ { {A} {B} {X} t t' →
        let module t  = tot⇒ t
            module t' = tot⇒ t'
-           module ψ  = NT (MR2.ϕ t.y.ξ)
+           module ψ  = NT (MR2.Φ t.y.ξ)
            module Hom[-1] {X} = Functor (appʳ [-,-] X)
            module Hx = Functor [ t'.x.L ,-]
            module Hy = Functor [ t.x.L ,-]
@@ -86,9 +86,9 @@ total = record
              ([ t.l ∘ t'.l , id ]₁ ∘ ψ.η t₀) ∘ r             ≈⟨ ∘-resp-≈ (∘-resp-≈ (Hom[-1].homomorphism) Equiv.refl) Equiv.refl ⟩
              (([ t'.l , id ]₁ ∘ [ t.l , id ]₁) ∘ ψ.η t₀) ∘ r ≈⟨ ∘-resp-≈ assoc Equiv.refl ○ assoc ⟩
              [ t'.l , id ]₁ ∘ (([ t.l , id ]₁ ∘ ψ.η t₀) ∘ r) ≈⟨ (refl⟩∘⟨ t.nat α) ○  sym-assoc ⟩
-            ([ t'.l , id ]₁ ∘ Hy.F₁ r) ∘ t.ϕ.η s             ≈⟨ (∘-resp-≈ (Equiv.sym [ [-,-] ]-commute) Equiv.refl) ○ assoc ⟩
-             Hx.F₁ r ∘ ([ t'.l , id ]₁ ∘ t.ϕ.η s)            ≈⟨ refl⟩∘⟨ t'.eqϕ {t = s} ⟩
-             Hx.F₁ r ∘ t'.ϕ.η s                              ∎)
+            ([ t'.l , id ]₁ ∘ Hy.F₁ r) ∘ t.Φ.η s             ≈⟨ (∘-resp-≈ (Equiv.sym [ [-,-] ]-commute) Equiv.refl) ○ assoc ⟩
+             Hx.F₁ r ∘ ([ t'.l , id ]₁ ∘ t.Φ.η s)            ≈⟨ refl⟩∘⟨ t'.eqΦ {t = s} ⟩
+             Hx.F₁ r ∘ t'.Φ.η s                              ∎)
        ]}
   ; assoc = assoc , assoc
   ; sym-assoc = sym-assoc , sym-assoc

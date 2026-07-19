@@ -33,7 +33,7 @@ record iMR2ᴸ₀ (B : Obj) : Set (o ⊔ ℓ ⊔ e) where
     A : Obj
     ξ : iMR2 A B 
 
--- iMR2ᴸ⇒: morphisms in the left-fibre over B: u : X.A ⇒ Y.A compatible with f and ϕ.
+-- iMR2ᴸ⇒: morphisms in the left-fibre over B: u : X.A ⇒ Y.A compatible with f and Φ.
 record iMR2ᴸ⇒ {B : Obj} (X Y : iMR2ᴸ₀ B) : Set (o ⊔ ℓ ⊔ e) where
   module X = iMR2ᴸ₀ X
   module Y = iMR2ᴸ₀ Y   
@@ -42,7 +42,7 @@ record iMR2ᴸ⇒ {B : Obj} (X Y : iMR2ᴸ₀ B) : Set (o ⊔ ℓ ⊔ e) where
   field
     u : X.A ⇒ Y.A
     eqf : ξX.f ≈ ξY.f ∘ u
-    eqϕ : ξX.ϕ ≈ [ u , id ]₁ ∘ ξY.ϕ
+    eqΦ : ξX.Φ ≈ [ u , id ]₁ ∘ ξY.Φ
 
 -- iMR2ᴸ B: the left-fibre category over B (fibre over the codomain).
 iMR2ᴸ : (B : Obj) → Category (o ⊔ ℓ ⊔ e) (o ⊔ ℓ ⊔ e) e
@@ -55,7 +55,7 @@ iMR2ᴸ B = record
   ; id = record 
     { u = id 
     ; eqf = sym-id-1 
-    ; eqϕ = Equiv.sym (cancel (Functor.identity [-,-])) 
+    ; eqΦ = Equiv.sym (cancel (Functor.identity [-,-])) 
     }
   ; _∘_ = λ p q → 
     let module p = iMR2ᴸ⇒ p 
@@ -63,13 +63,13 @@ iMR2ᴸ B = record
     in record 
       { u = p.u ∘ q.u 
       ; eqf = q.eqf ∙ rw-1-2 p.eqf 
-      ; eqϕ = let module Hom = Functor [-,-]
+      ; eqΦ = let module Hom = Functor [-,-]
                   module Hom[1-] {A} = Functor (appˡ [-,-] A)
                   module Hom[-1] {A} = Functor (appʳ [-,-] A) 
-              in Equiv.sym (begin [ p.u ∘ q.u , id ]₁ ∘ p.ξY.ϕ ≈⟨ pushˡ C Hom[-1].homomorphism ⟩ 
-                                  [ q.u , id ]₁ ∘ [ p.u , id ]₁ ∘ p.ξY.ϕ ≈⟨ Equiv.sym (refl⟩∘⟨ p.eqϕ) ⟩ 
-                                  [ q.u , id ]₁ ∘ q.ξY.ϕ ≈⟨ Equiv.sym q.eqϕ ⟩ 
-                                  q.ξX.ϕ ∎)
+              in Equiv.sym (begin [ p.u ∘ q.u , id ]₁ ∘ p.ξY.Φ ≈⟨ pushˡ C Hom[-1].homomorphism ⟩ 
+                                  [ q.u , id ]₁ ∘ [ p.u , id ]₁ ∘ p.ξY.Φ ≈⟨ Equiv.sym (refl⟩∘⟨ p.eqΦ) ⟩ 
+                                  [ q.u , id ]₁ ∘ q.ξY.Φ ≈⟨ Equiv.sym q.eqΦ ⟩ 
+                                  q.ξX.Φ ∎)
       }
   ; assoc = assoc
   ; sym-assoc = sym-assoc
@@ -96,7 +96,7 @@ MRSdisplay v = record
      in record
        { Carrier = Σ (x.A ⇒ y.A) (λ u →
            (v ∘ ξx.f ≈ ξy.f ∘ u)
-         × ([ id , v ]₁ ∘ ξx.ϕ ≈ [ u , id ]₁ ∘ ξy.ϕ ∘ v))
+         × ([ id , v ]₁ ∘ ξx.Φ ≈ [ u , id ]₁ ∘ ξy.Φ ∘ v))
        ; _≈_ = λ p q → proj₁ p ≈ proj₁ q
        ; isEquivalence = record { refl = refl ; sym = sym ; trans = trans }
        }}
@@ -113,7 +113,7 @@ MRSdisplay v = record
           module t   = iMR2ᴸ⇒ t
           module Hom[-1] {A} = Functor (appʳ [-,-] A)
       in record
-      { _⟨$⟩_ = λ { (u , (eqf , eqϕ)) →
+      { _⟨$⟩_ = λ { (u , (eqf , eqΦ)) →
           let u' : x'.A ⇒ y'.A
               u' = t.u ∘ u ∘ s.u
               eqf' : v ∘ ξx'.f ≈ ξy'.f ∘ u'
@@ -122,16 +122,16 @@ MRSdisplay v = record
                 (v ∘ ξx.f) ∘ s.u            ≈⟨ rw eqf ∙ assoc ⟩
                 ξy.f ∘ (u ∘ s.u)            ≈⟨ rw t.eqf ∙ assoc ⟩
                 ξy'.f ∘ (t.u ∘ (u ∘ s.u))   ∎
-              eqϕ' : [ id , v ]₁ ∘ ξx'.ϕ ≈ [ u' , id ]₁ ∘ ξy'.ϕ ∘ v
-              eqϕ' = begin
-                [ id , v ]₁ ∘ ξx'.ϕ                               ≈⟨ (refl⟩∘⟨ s.eqϕ) ∙ sym-assoc ⟩
-                ([ id , v ]₁ ∘ [ s.u , id ]₁) ∘ ξx.ϕ              ≈⟨ (rw [ [-,-] ]-commute) ∙ assoc ⟩
-                [ s.u , id ]₁ ∘ ([ id , v ]₁ ∘ ξx.ϕ)              ≈⟨ (refl⟩∘⟨ eqϕ) ∙ sym-assoc ⟩
-                ([ s.u , id ]₁ ∘ [ u , id ]₁) ∘ (ξy.ϕ ∘ v)        ≈⟨ rw (Equiv.sym Hom[-1].homomorphism) ⟩
-                [ u ∘ s.u , id ]₁ ∘ (ξy.ϕ ∘ v)                    ≈⟨ skip (rw t.eqϕ) ∙ sym-assoc ∙ (sym-assoc ⟩∘⟨refl) ∙ assoc ⟩
-                ([ u ∘ s.u , id ]₁ ∘ [ t.u , id ]₁) ∘ (ξy'.ϕ ∘ v) ≈⟨ rw (Equiv.sym Hom[-1].homomorphism) ⟩
-                [ t.u ∘ u ∘ s.u , id ]₁ ∘ (ξy'.ϕ ∘ v)             ∎
-          in (u' , (eqf' , eqϕ')) }
+              eqΦ' : [ id , v ]₁ ∘ ξx'.Φ ≈ [ u' , id ]₁ ∘ ξy'.Φ ∘ v
+              eqΦ' = begin
+                [ id , v ]₁ ∘ ξx'.Φ                               ≈⟨ (refl⟩∘⟨ s.eqΦ) ∙ sym-assoc ⟩
+                ([ id , v ]₁ ∘ [ s.u , id ]₁) ∘ ξx.Φ              ≈⟨ (rw [ [-,-] ]-commute) ∙ assoc ⟩
+                [ s.u , id ]₁ ∘ ([ id , v ]₁ ∘ ξx.Φ)              ≈⟨ (refl⟩∘⟨ eqΦ) ∙ sym-assoc ⟩
+                ([ s.u , id ]₁ ∘ [ u , id ]₁) ∘ (ξy.Φ ∘ v)        ≈⟨ rw (Equiv.sym Hom[-1].homomorphism) ⟩
+                [ u ∘ s.u , id ]₁ ∘ (ξy.Φ ∘ v)                    ≈⟨ skip (rw t.eqΦ) ∙ sym-assoc ∙ (sym-assoc ⟩∘⟨refl) ∙ assoc ⟩
+                ([ u ∘ s.u , id ]₁ ∘ [ t.u , id ]₁) ∘ (ξy'.Φ ∘ v) ≈⟨ rw (Equiv.sym Hom[-1].homomorphism) ⟩
+                [ t.u ∘ u ∘ s.u , id ]₁ ∘ (ξy'.Φ ∘ v)             ∎
+          in (u' , (eqf' , eqΦ')) }
   ; cong = λ { {p} {q} p≈q → skip (rw p≈q) }
   } }
   ; identity = λ { {(x , y)} {p} {q} p≈q →

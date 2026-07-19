@@ -7,7 +7,7 @@ open import Categories.Category.Monoidal.Closed using (Closed)
 
 module Categories.Rosen.Incoherent.Iterated {o ℓ e} {C : Category o ℓ e} {M : Monoidal C} (Cl : Closed M) where
 
--- Incoherent (M,R)-systems: a simple diagram A —f→ B —ϕ→ [A,B]
+-- Incoherent (M,R)-systems: a simple diagram A —f→ B —Φ→ [A,B]
 -- without the natural transformation condition of full MR2.
 
 open import Data.Product using (_,_; proj₁; proj₂; _×_)
@@ -113,8 +113,8 @@ comp = record
     let module x = iMRSᴵᴵ₀ x 
         f = iMR2.f x.ξ₁
         g = iMR2.f x.ξ₂
-        ϕ = iMR2.ϕ x.ξ₁
-        Ψ = iMR2.ϕ x.ξ₂
+        Φ = iMR2.Φ x.ξ₁
+        Ψ = iMR2.Φ x.ξ₂
     in record { A = x.A ; B = x.Y ; ξ = ⟪ g ∘ f , [ f , id ]₁ ∘ Ψ ⟫ }
   ; F₁ = λ S → let module S = iMRSᴵᴵ⇒ S in record 
     { l = S.h.l 
@@ -133,7 +133,7 @@ comp = record
         (f' ∘ l') ∘ g ≈⟨ assoc ○ refl⟩∘⟨ (Equiv.sym S.hᵣ≈kₗ ⟩∘⟨refl) ⟩
         f' ∘ (r ∘ g)  ≈⟨ refl⟩∘⟨ S.h.eqf ○ sym-assoc ⟩
         (f' ∘ g') ∘ l ∎
-    ; eqϕ = let module HomR {A} = Functor (appʳ [-,-] A)
+    ; eqΦ = let module HomR {A} = Functor (appʳ [-,-] A)
                 module HomL {A} = Functor (appˡ [-,-] A)
                 r' = S.k.r
                 l' = S.k.l
@@ -143,16 +143,16 @@ comp = record
                 f = S.k.ξX.f
                 f' = S.k.ξY.f
                 g' = S.h.ξY.f
-                Ψ = S.k.ξY.ϕ
-                ϕ = S.k.ξX.ϕ
+                Ψ = S.k.ξY.Φ
+                Φ = S.k.ξX.Φ
             in begin
         [ l , id ]₁ ∘ ([ g' , id ]₁ ∘ Ψ) ∘ r' ≈⟨ refl⟩∘⟨ assoc ○ sym-assoc ○ (Equiv.sym HomR.homomorphism) ⟩∘⟨refl ⟩
         [ g' ∘ l , id ]₁ ∘ Ψ ∘ r'             ≈⟨ HomR.F-resp-≈ (Equiv.sym S.h.eqf) ⟩∘⟨refl ⟩
         [ r ∘ g , id ]₁ ∘ Ψ ∘ r'              ≈⟨ HomR.homomorphism ⟩∘⟨refl ○ assoc ⟩
         [ g , id ]₁ ∘ [ r , id ]₁ ∘ Ψ ∘ r'    ≈⟨ refl⟩∘⟨ (HomR.F-resp-≈ S.hᵣ≈kₗ ⟩∘⟨refl) ⟩
-        [ g , id ]₁ ∘ [ l' , id ]₁ ∘ Ψ ∘ r'   ≈⟨ refl⟩∘⟨ S.k.eqϕ ○ sym-assoc ⟩
-        ([ g , id ]₁ ∘ [ id , r' ]₁) ∘ ϕ      ≈⟨ (Equiv.sym [ [-,-] ]-commute) ⟩∘⟨refl ○ assoc ⟩
-        [ id , r' ]₁ ∘ [ g , id ]₁ ∘ ϕ        ∎
+        [ g , id ]₁ ∘ [ l' , id ]₁ ∘ Ψ ∘ r'   ≈⟨ refl⟩∘⟨ S.k.eqΦ ○ sym-assoc ⟩
+        ([ g , id ]₁ ∘ [ id , r' ]₁) ∘ Φ      ≈⟨ (Equiv.sym [ [-,-] ]-commute) ⟩∘⟨refl ○ assoc ⟩
+        [ id , r' ]₁ ∘ [ g , id ]₁ ∘ Φ        ∎
     }
   ; identity = refl , refl
   ; homomorphism = refl , refl

@@ -8,7 +8,7 @@ open import Categories.Category.Monoidal.Closed using (Closed)
 module Categories.Rosen.Repairs {o ℓ e} {C : Category o ℓ e} {M : Monoidal C} (Cl : Closed M) where
 
 -- The "fibration of repairs": the category of elements of the functor
--- A ↦ Nat(Cod, [A,-]∘Cod).  Objects rep₀ are (A, ϕ) with ϕ : Cod ⇒ [A,-]∘Cod;
+-- A ↦ Nat(Cod, [A,-]∘Cod).  Objects rep₀ are (A, Φ) with Φ : Cod ⇒ [A,-]∘Cod;
 -- morphisms rep⇒ are commuting pairs.  Exports rep₀, rep⇒, repairs.
 
 open import Data.Product using (_,_)
@@ -26,20 +26,20 @@ open Closed Cl using ([-,-]; [_,_]₀; [_,-]; [-,_]; [_,_]₁)
 open HomReasoning
 open MR
 
--- Objects of the repair fibration: an object A and a natural transformation ϕ : Cod ⇒ [A,-]∘Cod.
+-- Objects of the repair fibration: an object A and a natural transformation Φ : Cod ⇒ [A,-]∘Cod.
 record rep₀ : Set (o ⊔ ℓ ⊔ e) where
   field
     A : Obj
-    ϕ : NaturalTransformation Cod (([_,-] A) ∘F Cod)
+    Φ : NaturalTransformation Cod (([_,-] A) ∘F Cod)
 
 -- Morphisms of the repair fibration: u : X.A ⇒ Y.A such that
--- (nHom u ∘ʳ Cod) ∘ᵥ Y.ϕ ≃ X.ϕ.
+-- (nHom u ∘ʳ Cod) ∘ᵥ Y.Φ ≃ X.Φ.
 record rep⇒ (X Y : rep₀) : Set (o ⊔ ℓ ⊔ e) where
   module X = rep₀ X
   module Y = rep₀ Y
   field
     u : X.A ⇒ Y.A
-    eq : (nHom u ∘ʳ Cod) ∘ᵥ Y.ϕ ≃ X.ϕ
+    eq : (nHom u ∘ʳ Cod) ∘ᵥ Y.Φ ≃ X.Φ
 
 -- The category of repairs: the total category of the fibration.
 repairs : Category (o ⊔ ℓ ⊔ e) (o ⊔ ℓ ⊔ e) e

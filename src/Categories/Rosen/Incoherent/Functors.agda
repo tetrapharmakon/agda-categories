@@ -7,7 +7,7 @@ open import Categories.Category.Monoidal.Closed using (Closed)
 
 module Categories.Rosen.Incoherent.Functors {o ℓ e} {C : Category o ℓ e} {M : Monoidal C} (Cl : Closed M) where
 
--- Incoherent (M,R)-systems: a simple diagram A —f→ B —ϕ→ [A,B]
+-- Incoherent (M,R)-systems: a simple diagram A —f→ B —Φ→ [A,B]
 -- without the natural transformation condition of full MR2.
 
 open import Data.Product using (_,_; proj₁; proj₂; _×_)
@@ -44,12 +44,12 @@ open import Categories.Rosen.Incoherent.Repairs Cl
   { F₀ = λ x → let module x = iMR2₀ x in record 
     { A = x.A 
     ; B = x.B 
-    ; ϕ = iMR2.ϕ x.ξ 
+    ; Φ = iMR2.Φ x.ξ 
     }
   ; F₁ = λ f → let module f = iMR2⇒ f in record 
     { u = f.l
     ; v = f.r
-    ; eq = f.eqϕ
+    ; eq = f.eqΦ
     }
   ; identity = refl
   ; homomorphism = refl

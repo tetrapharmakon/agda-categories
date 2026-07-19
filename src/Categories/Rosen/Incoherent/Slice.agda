@@ -48,7 +48,7 @@ slice {B} = Sl.Slice C ([ unit , B ]₀ × [ B , B ]₀)
 
 to : {B : Obj} → Functor (iMR2ᴸ B) (slice {B})
 to {B} = record
-  { F₀ = λ x → let module x = iMR2ᴸ₀ x in Sl.sliceobj {Y = x.A} ⟨ adjoint.Ladjunct (iMR2.f x.ξ ∘ unitorˡ.from {X = x.A} ∘ β.from) , adjoint.Ladjunct (adjoint.Radjunct (iMR2.ϕ x.ξ) ∘ β.from) ⟩ -- ugly but works
+  { F₀ = λ x → let module x = iMR2ᴸ₀ x in Sl.sliceobj {Y = x.A} ⟨ adjoint.Ladjunct (iMR2.f x.ξ ∘ unitorˡ.from {X = x.A} ∘ β.from) , adjoint.Ladjunct (adjoint.Radjunct (iMR2.Φ x.ξ) ∘ β.from) ⟩ -- ugly but works
   ; F₁ = λ { {X} {Y} f → 
     let module X = iMR2ᴸ₀
         module Y = iMR2ᴸ₀ Y

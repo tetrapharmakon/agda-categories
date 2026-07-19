@@ -7,7 +7,7 @@ open import Categories.Category.Monoidal.Closed using (Closed)
 
 module Categories.Rosen.Incoherent.Repairs {o ℓ e} {C : Category o ℓ e} {M : Monoidal C} (Cl : Closed M) where
 
--- Incoherent (M,R)-systems: a simple diagram A —f→ B —ϕ→ [A,B]
+-- Incoherent (M,R)-systems: a simple diagram A —f→ B —Φ→ [A,B]
 -- without the natural transformation condition of full MR2.
 
 open import Data.Product using (_,_; proj₁; proj₂; _×_)
@@ -29,22 +29,22 @@ open MR
 open import Categories.Rosen.Incoherent.Core Cl
 
 
--- Objects of the incoherent repair fibration: objects A,B and a morphism ϕ : B ⇒ [A,B].
+-- Objects of the incoherent repair fibration: objects A,B and a morphism Φ : B ⇒ [A,B].
 record irep₀ : Set (o ⊔ ℓ ⊔ e) where
   field
     A : Obj
     B : Obj
-    ϕ : B ⇒ [ A , B ]₀
+    Φ : B ⇒ [ A , B ]₀
 
 -- Morphisms of the repair fibration: u : X.A ⇒ Y.A such that
--- (nHom u ∘ʳ Cod) ∘ᵥ Y.ϕ ≃ X.ϕ.
+-- (nHom u ∘ʳ Cod) ∘ᵥ Y.Φ ≃ X.Φ.
 record irep⇒ (X Y : irep₀) : Set (o ⊔ ℓ ⊔ e) where
   module X = irep₀ X
   module Y = irep₀ Y
   field
     u : X.A ⇒ Y.A
     v : X.B ⇒ Y.B
-    eq : [ u , id ]₁ ∘ Y.ϕ ∘ v ≈ [ id , v ]₁ ∘ X.ϕ
+    eq : [ u , id ]₁ ∘ Y.Φ ∘ v ≈ [ id , v ]₁ ∘ X.Φ
 
 -- The category of repairs: the total category of the fibration.
 irepairs : Category (o ⊔ ℓ ⊔ e) (o ⊔ ℓ ⊔ e) e
@@ -61,12 +61,12 @@ irepairs = record
     let module f = irep⇒ f
         module g = irep⇒ g
     in record { u = f.u ∘ g.u ; v = f.v ∘ g.v 
-         ; eq = begin [ f.u ∘ g.u , id ]₁ ∘ f.Y.ϕ ∘ f.v ∘ g.v ≈⟨ Functor.homomorphism ([-, _ ]) ⟩∘⟨refl ⟩ 
-                      ([ g.u , id ]₁ ∘ [ f.u , id ]₁ ) ∘ f.Y.ϕ ∘ f.v ∘ g.v ≈⟨ (refl⟩∘⟨ sym-assoc) ○ assoc ○ (refl⟩∘⟨ sym-assoc) ○ refl⟩∘⟨ (f.eq ⟩∘⟨refl ) ⟩ 
-                      [ g.u , id ]₁ ∘ ([ id , f.v ]₁ ∘ g.Y.ϕ) ∘ g.v ≈⟨ refl⟩∘⟨ assoc ○ pullˡ C ((Equiv.sym [ [-,-] ]-commute)) ⟩ 
-                      ([ id , f.v ]₁ ∘ [ g.u , id ]₁) ∘ g.Y.ϕ ∘ g.v ≈⟨ pullʳ C (g.eq) ⟩
-                      [ id , f.v ]₁ ∘ [ id , g.v ]₁ ∘ g.X.ϕ ≈⟨ pullˡ C (Equiv.sym (Functor.homomorphism [ _ ,-])) ⟩
-                      [ id , f.v ∘ g.v ]₁ ∘ g.X.ϕ ∎ }
+         ; eq = begin [ f.u ∘ g.u , id ]₁ ∘ f.Y.Φ ∘ f.v ∘ g.v ≈⟨ Functor.homomorphism ([-, _ ]) ⟩∘⟨refl ⟩ 
+                      ([ g.u , id ]₁ ∘ [ f.u , id ]₁ ) ∘ f.Y.Φ ∘ f.v ∘ g.v ≈⟨ (refl⟩∘⟨ sym-assoc) ○ assoc ○ (refl⟩∘⟨ sym-assoc) ○ refl⟩∘⟨ (f.eq ⟩∘⟨refl ) ⟩ 
+                      [ g.u , id ]₁ ∘ ([ id , f.v ]₁ ∘ g.Y.Φ) ∘ g.v ≈⟨ refl⟩∘⟨ assoc ○ pullˡ C ((Equiv.sym [ [-,-] ]-commute)) ⟩ 
+                      ([ id , f.v ]₁ ∘ [ g.u , id ]₁) ∘ g.Y.Φ ∘ g.v ≈⟨ pullʳ C (g.eq) ⟩
+                      [ id , f.v ]₁ ∘ [ id , g.v ]₁ ∘ g.X.Φ ≈⟨ pullˡ C (Equiv.sym (Functor.homomorphism [ _ ,-])) ⟩
+                      [ id , f.v ∘ g.v ]₁ ∘ g.X.Φ ∎ }
   ; assoc = assoc
   ; sym-assoc = sym-assoc
   ; identityˡ = identityˡ

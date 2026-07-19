@@ -43,7 +43,7 @@ open Reason C
 open Closed Cl using ([-,-]; [_,_]₀; [_,_]₁)
 
 -- Incoherent higher (M,R)-systems: diagrams
--- A —f→ B —ϕ→ [A,B] —ϕ₂→ [B,[A,B]] —ϕ₃→ [[A,B],[B,[A,B]]] —→ ...
+-- A —f→ B —Φ→ [A,B] —Φ₂→ [B,[A,B]] —Φ₃→ [[A,B],[B,[A,B]]] —→ ...
 -- without the natural transformation condition of full MR2.
 
 -- iMRS3: the 3rd level, IsoComma of ℝ (from ProElements) and V₁ (from
@@ -55,14 +55,14 @@ iMRS3 = IsoComma ℝ [_]f
 𝕚𝕄ℝ𝕊 : (n : ℕ) → Σ (Category (o ⊔ ℓ ⊔ e) (o ⊔ ℓ ⊔ e) e)
   (λ x → Functor x Arr.Arrow)
 𝕚𝕄ℝ𝕊 zero = iMRS3 , record
-  { F₀ = λ x → let module x = IsoCommaObj x in record { arr = iMR2.ϕ (iMR2₀.ξ x.a) }
+  { F₀ = λ x → let module x = IsoCommaObj x in record { arr = iMR2.Φ (iMR2₀.ξ x.a) }
   ; F₁ = λ { {A} {B} f →
     let module A = IsoCommaObj A
         module B = IsoCommaObj B
         module f = IsoComma⇒ f
         ℓ = twiMR2⇒.l f.f
         r = twiMR2⇒.r f.f
-        equ = Equiv.sym (twiMR2⇒.eqϕ f.f)
+        equ = Equiv.sym (twiMR2⇒.eqΦ f.f)
     in mor⇒ {dom⇒ = r} {cod⇒ = [ ℓ , r ]₁} equ }
   ; identity = refl , [-,-].identity
   ; homomorphism = refl , [-,-].homomorphism

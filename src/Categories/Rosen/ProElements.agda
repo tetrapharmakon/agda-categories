@@ -102,7 +102,7 @@ ElMRS = MRS.Elts
 -- A functor from ElMRS to Arrow(C) extracting repair maps (without fixing the domain).
 ℝ : Functor ElMRS Arr.Arrow
 ℝ = record
-  { F₀ = λ x → let module x = MRS.Elts₀ x in record { arr = MR2.ϕη₀ x.el }
+  { F₀ = λ x → let module x = MRS.Elts₀ x in record { arr = MR2.Φη₀ x.el }
   ; F₁ = λ { {X} {Y} f → 
     let module X = MRS.Elts₀ X 
         module Y = MRS.Elts₀ Y
@@ -126,27 +126,27 @@ ElMRS = MRS.Elts
       t₃ : Arr.Morphism⇒ d c
       t₃ = record { dom⇒ = id ; cod⇒ = id ; square = identityˡ ○ Equiv.sym (proj₁ f.eqElts) ○ Equiv.sym identityʳ }
 
-      eqϕ : ∀ (m : Arr.Morphism) → [ f.l , id ]₁ ∘ η XE.ϕ m ≈ η YE.ϕ m
-      eqϕ m = proj₂ f.eqElts {x = m}
+      eqΦ : ∀ (m : Arr.Morphism) → [ f.l , id ]₁ ∘ η XE.Φ m ≈ η YE.Φ m
+      eqΦ m = proj₂ f.eqElts {x = m}
 
-      lem1 : η XE.ϕ a ≈ η XE.ϕ b
+      lem1 : η XE.Φ a ≈ η XE.Φ b
       lem1 = begin
-        η XE.ϕ a           ≈˘⟨ identityʳ ⟩
-        η XE.ϕ a ∘ id     ≈⟨ commute XE.ϕ t₁ ⟩
-        [ id , id ]₁ ∘ η XE.ϕ b  ≈⟨ (Hom.identity ⟩∘⟨refl) ⟩ 
-        id ∘ η XE.ϕ b     ≈⟨ identityˡ ⟩
-        η XE.ϕ b          ∎
+        η XE.Φ a           ≈˘⟨ identityʳ ⟩
+        η XE.Φ a ∘ id     ≈⟨ commute XE.Φ t₁ ⟩
+        [ id , id ]₁ ∘ η XE.Φ b  ≈⟨ (Hom.identity ⟩∘⟨refl) ⟩ 
+        id ∘ η XE.Φ b     ≈⟨ identityˡ ⟩
+        η XE.Φ b          ∎
 
-      lem2 : η XE.ϕ c ∘ f.r ≈ [ id , f.r ]₁ ∘ η XE.ϕ b
-      lem2 = commute XE.ϕ t₂
+      lem2 : η XE.Φ c ∘ f.r ≈ [ id , f.r ]₁ ∘ η XE.Φ b
+      lem2 = commute XE.Φ t₂
 
-      lem3 : η YE.ϕ c ≈ η YE.ϕ d
+      lem3 : η YE.Φ c ≈ η YE.Φ d
       lem3 = begin
-        η YE.ϕ c           ≈˘⟨ identityʳ ⟩
-        η YE.ϕ c ∘ id     ≈⟨ commute YE.ϕ t₃ ⟩
-        [ id , id ]₁ ∘ η YE.ϕ d ≈⟨ Hom.identity ⟩∘⟨refl ⟩ 
-        id ∘ η YE.ϕ d     ≈⟨ identityˡ ⟩
-        η YE.ϕ d          ∎
+        η YE.Φ c           ≈˘⟨ identityʳ ⟩
+        η YE.Φ c ∘ id     ≈⟨ commute YE.Φ t₃ ⟩
+        [ id , id ]₁ ∘ η YE.Φ d ≈⟨ Hom.identity ⟩∘⟨refl ⟩ 
+        id ∘ η YE.Φ d     ≈⟨ identityˡ ⟩
+        η YE.Φ d          ∎
 
       decompose : [ f.l , f.r ]₁ ≈ [ f.l , id ]₁ ∘ [ id , f.r ]₁
       decompose = [ [-,-] ]-decompose₁
@@ -155,17 +155,17 @@ ElMRS = MRS.Elts
     { dom⇒ = f.r
     ; cod⇒ = [ f.l , f.r ]₁  
     ; square = begin
-      [ f.l , f.r ]₁ ∘ η XE.ϕ a
+      [ f.l , f.r ]₁ ∘ η XE.Φ a
         ≈⟨ decompose ⟩∘⟨refl ○ assoc ⟩
-      [ f.l , id ]₁ ∘ ([ id , f.r ]₁ ∘ η XE.ϕ a)
+      [ f.l , id ]₁ ∘ ([ id , f.r ]₁ ∘ η XE.Φ a)
         ≈˘⟨ refl⟩∘⟨ Equiv.trans lem2 (refl⟩∘⟨ Equiv.sym lem1) ⟩
-      [ f.l , id ]₁ ∘ (η XE.ϕ c ∘ f.r)
+      [ f.l , id ]₁ ∘ (η XE.Φ c ∘ f.r)
         ≈⟨ sym-assoc ⟩
-      ([ f.l , id ]₁ ∘ η XE.ϕ c) ∘ f.r
-        ≈⟨ ∘-resp-≈ (eqϕ c) refl ⟩
-      (η YE.ϕ c) ∘ f.r
+      ([ f.l , id ]₁ ∘ η XE.Φ c) ∘ f.r
+        ≈⟨ ∘-resp-≈ (eqΦ c) refl ⟩
+      (η YE.Φ c) ∘ f.r
         ≈⟨ ∘-resp-≈ lem3 refl ⟩
-      η YE.ϕ d ∘ f.r
+      η YE.Φ d ∘ f.r
         ∎
     } }
   ; identity = Equiv.refl , [-,-].identity
