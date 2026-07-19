@@ -154,6 +154,7 @@ module Naturalities {A B X Y} (ξ : MR2 A B) (u : X ⇒ Y) where
   nat-1⇒uᴿ = Φcommute ξ (Category.id Arr.Arrow {A = record { arr = u }} , 1⇒u u) 
   
   nat-1⇒uᴸ : ΦXᵤ ∘ id {Y} ≈ [ id {X} , id {Y} ]₁ ∘ Φᵤᵤ
+  -- simplified: ΦXᵤ ≈ Φᵤᵤ
   nat-1⇒uᴸ = Φcommute ξ (1⇒u u , Category.id Arr.Arrow {A = record { arr = u }})
   
   nat-1⇒u² : ΦXᵤ ∘ u ≈ [ id {X} , u ]₁ ∘ ΦᵤX
@@ -161,12 +162,16 @@ module Naturalities {A B X Y} (ξ : MR2 A B) (u : X ⇒ Y) where
   -- naturality on u⇒1:
   -- 
   nat-u⇒1ᴿ : ΦᵤY ∘ id {Y} ≈ [ id {X} , id {Y} ]₁ ∘ Φᵤᵤ
+  -- simplified: ΦᵤY ≈ Φᵤᵤ
+  -- hence ΦXᵤ ≈ ΦᵤY
   nat-u⇒1ᴿ = Φcommute ξ (Category.id Arr.Arrow {A = record { arr = u }} , u⇒1 u) 
 
   nat-u⇒1ᴸ : Φᵤᵤ ∘ id {Y} ≈ [ u , id {Y} ]₁ ∘ ΦYᵤ
+  -- simplified: Φᵤᵤ ≈ [ u , id {Y} ]₁ ∘ ΦYᵤ
   nat-u⇒1ᴸ = Φcommute ξ (u⇒1 u , Category.id Arr.Arrow {A = record { arr = u }}) 
 
   nat-u⇒1² : ΦᵤY ∘ id {Y} ≈ [ u , id {Y} ]₁ ∘ ΦYᵤ
+  -- simplified: ΦᵤY ≈ [ u , id {Y} ]₁ ∘ ΦYᵤ
   nat-u⇒1² = Φcommute ξ (u⇒1 u , u⇒1 u) 
   
   -- naturality on 1⇒1:
@@ -175,6 +180,7 @@ module Naturalities {A B X Y} (ξ : MR2 A B) (u : X ⇒ Y) where
   nat-1⇒1ᴿ = Φcommute ξ (Category.id Arr.Arrow {A = record { arr = u }} , 1⇒1 u)
 
   nat-1⇒1ᴸ : ΦXᵤ ∘ id {Y} ≈ [ u , id {Y} ]₁ ∘ ΦYᵤ
+  -- simplified: ΦXᵤ ≈ [ u , id {Y} ]₁ ∘ ΦYᵤ
   nat-1⇒1ᴸ = Φcommute ξ (1⇒1 u , Category.id Arr.Arrow {A = record { arr = u }})
 
   nat-1⇒1² : Φid X Y ∘ u ≈ [ u , u ]₁ ∘ Φid Y X
