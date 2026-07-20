@@ -128,60 +128,60 @@ open MR
 module Naturalities {A B X Y} (ξ : MR2 A B) (u : X ⇒ Y) where
   open MR2
   module ξ = MR2 ξ
+  u⇒ : Morphism C
+  u⇒ = record { arr = u }
+
+  1⇒ : ∀ {X} → Morphism C
+  1⇒ {X} = record { arr = id {X} }
 
   Φid : (X Y : Obj) → Y ⇒ [ X , Y ]₀
-  Φid X Y = Φη ξ (record { arr = id {X} } , record { arr = id {Y} })
+  Φid X Y = Φη ξ (1⇒ {X} , 1⇒ {Y})
   
   ΦYᵤ : Y ⇒ [ Y , Y ]₀
-  ΦYᵤ = Φη ξ (record { arr = id {Y} } , record { arr = u })
+  ΦYᵤ = Φη ξ (1⇒ {Y} , u⇒)
 
   ΦXᵤ : Y ⇒ [ X , Y ]₀
-  ΦXᵤ = Φη ξ (record { arr = id {X} } , record { arr = u })
+  ΦXᵤ = Φη ξ (1⇒ {X} , u⇒)
   
   Φᵤᵤ : Y ⇒ [ X , Y ]₀
-  Φᵤᵤ = Φη ξ (record { arr = u } , record { arr = u }) 
+  Φᵤᵤ = Φη ξ (u⇒ , u⇒) 
 
   ΦᵤY : Y ⇒ [ X , Y ]₀
-  ΦᵤY = Φη ξ (record { arr = u } , record { arr = id {Y} })
+  ΦᵤY = Φη ξ (u⇒ , 1⇒ {Y})
 
   ΦᵤX : X ⇒ [ X , X ]₀
-  ΦᵤX = Φη ξ (record { arr = u } , record { arr = id {X} })
+  ΦᵤX = Φη ξ (u⇒ , 1⇒ {X})
   
   --------------------
   -- naturality on 1⇒u:
   -- 
   nat-1⇒uᴿ : Φᵤᵤ ∘ u ≈ [ id {X} , u ]₁ ∘ ΦᵤX
-  nat-1⇒uᴿ = Φcommute ξ (Category.id Arr.Arrow {A = record { arr = u }} , 1⇒u u) 
+  nat-1⇒uᴿ = Φcommute ξ (Category.id Arr.Arrow {A = u⇒} , 1⇒u u) 
   
-  nat-1⇒uᴸ : ΦXᵤ ∘ id {Y} ≈ [ id {X} , id {Y} ]₁ ∘ Φᵤᵤ
-  -- simplified: ΦXᵤ ≈ Φᵤᵤ
-  nat-1⇒uᴸ = Φcommute ξ (1⇒u u , Category.id Arr.Arrow {A = record { arr = u }})
+  nat-1⇒uᴸ : ΦXᵤ ≈ Φᵤᵤ -- ΦXᵤ ∘ id {Y} ≈ [ id {X} , id {Y} ]₁ ∘ Φᵤᵤ
+  nat-1⇒uᴸ = sym-id-1 ∙ Φcommute ξ (1⇒u u , Category.id Arr.Arrow {A = u⇒}) ∙ cancel [-,-].identity
   
   nat-1⇒u² : ΦXᵤ ∘ u ≈ [ id {X} , u ]₁ ∘ ΦᵤX
   nat-1⇒u² = Φcommute ξ (1⇒u u , 1⇒u u)  
   -- naturality on u⇒1:
   -- 
-  nat-u⇒1ᴿ : ΦᵤY ∘ id {Y} ≈ [ id {X} , id {Y} ]₁ ∘ Φᵤᵤ
-  -- simplified: ΦᵤY ≈ Φᵤᵤ
-  -- hence ΦXᵤ ≈ ΦᵤY
-  nat-u⇒1ᴿ = Φcommute ξ (Category.id Arr.Arrow {A = record { arr = u }} , u⇒1 u) 
+  nat-u⇒1ᴿ : ΦᵤY ≈ Φᵤᵤ -- ΦᵤY ∘ id {Y} ≈ [ id {X} , id {Y} ]₁ ∘ Φᵤᵤ
+  -- hence ΦXᵤ ≈ ΦᵤY by transitivity
+  nat-u⇒1ᴿ = sym-id-1 ∙ Φcommute ξ (Category.id Arr.Arrow {A = u⇒} , u⇒1 u) ∙ cancel [-,-].identity
 
-  nat-u⇒1ᴸ : Φᵤᵤ ∘ id {Y} ≈ [ u , id {Y} ]₁ ∘ ΦYᵤ
-  -- simplified: Φᵤᵤ ≈ [ u , id {Y} ]₁ ∘ ΦYᵤ
-  nat-u⇒1ᴸ = Φcommute ξ (u⇒1 u , Category.id Arr.Arrow {A = record { arr = u }}) 
+  nat-u⇒1ᴸ : Φᵤᵤ ≈ [ u , id {Y} ]₁ ∘ ΦYᵤ -- Φᵤᵤ ∘ id {Y} ≈ [ u , id {Y} ]₁ ∘ ΦYᵤ
+  nat-u⇒1ᴸ = sym-id-1 ∙ Φcommute ξ (u⇒1 u , Category.id Arr.Arrow {A = u⇒}) 
 
-  nat-u⇒1² : ΦᵤY ∘ id {Y} ≈ [ u , id {Y} ]₁ ∘ ΦYᵤ
-  -- simplified: ΦᵤY ≈ [ u , id {Y} ]₁ ∘ ΦYᵤ
-  nat-u⇒1² = Φcommute ξ (u⇒1 u , u⇒1 u) 
+  nat-u⇒1² : ΦᵤY ≈ [ u , id {Y} ]₁ ∘ ΦYᵤ -- ΦᵤY ∘ id {Y} ≈ [ u , id {Y} ]₁ ∘ ΦYᵤ
+  nat-u⇒1² = sym-id-1 ∙ Φcommute ξ (u⇒1 u , u⇒1 u) 
   
   -- naturality on 1⇒1:
   -- 
   nat-1⇒1ᴿ : ΦᵤY ∘ u ≈ [ id {X} , u ]₁ ∘ ΦᵤX
-  nat-1⇒1ᴿ = Φcommute ξ (Category.id Arr.Arrow {A = record { arr = u }} , 1⇒1 u)
+  nat-1⇒1ᴿ = Φcommute ξ (Category.id Arr.Arrow {A = u⇒} , 1⇒1 u)
 
-  nat-1⇒1ᴸ : ΦXᵤ ∘ id {Y} ≈ [ u , id {Y} ]₁ ∘ ΦYᵤ
-  -- simplified: ΦXᵤ ≈ [ u , id {Y} ]₁ ∘ ΦYᵤ
-  nat-1⇒1ᴸ = Φcommute ξ (1⇒1 u , Category.id Arr.Arrow {A = record { arr = u }})
+  nat-1⇒1ᴸ : ΦXᵤ ≈ [ u , id {Y} ]₁ ∘ ΦYᵤ -- ΦXᵤ ∘ id {Y} ≈ [ u , id {Y} ]₁ ∘ ΦYᵤ
+  nat-1⇒1ᴸ = sym-id-1 ∙ Φcommute ξ (1⇒1 u , Category.id Arr.Arrow {A = u⇒})
 
   nat-1⇒1² : Φid X Y ∘ u ≈ [ u , u ]₁ ∘ Φid Y X
   nat-1⇒1² = Φcommute ξ (1⇒1 u , 1⇒1 u)
