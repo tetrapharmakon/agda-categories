@@ -188,22 +188,6 @@ module Naturalities {A B X Y} (ξ : MR2 A B) (u : X ⇒ Y) where
 
 open Naturalities
 
--- NICod⇒NIid : ∀ {A B} (ξ : MR2 A B) → NaturalTransformation idF ([_,-] A)
--- NICod⇒NIid ξ = let module ξ = MR2 ξ in ntHelper (record 
---   { η = λ X → Naturalities.Φid ξ ξ.f X 
---   ; commute = λ f → nat-1⇒1 ξ f 
---   })
-
--- NIid⇒NICod : ∀ {A B} → (f : A ⇒ B) (φ : NaturalTransformation idF ([_,-] A)) → MR2 A B
--- NIid⇒NICod f φ = ⟪ f , ntHelper (record 
---   { η = λ X → 
---     let module X = Morphism X 
---         module φ = NaturalTransformation φ
---     in φ.η X.cod 
---   ; commute = λ { {X} {Y} h → NaturalTransformation.commute φ (Morphism⇒.cod⇒ h) }
---   }) ⟫
-
-
 -- open import Categories.NaturalTransformation.NaturalIsomorphism as NI using (NaturalIsomorphism;niHelper; _ⓘˡ_; _ⓘʳ_)
 
 -- fattoide : NaturalIsomorphism ([_,-] unit) idF
@@ -232,10 +216,27 @@ open Naturalities
 --     } 
 --   })
 
--- -- Type of the desired profunctor C.op × C → Sets
--- -- sending (A , B) ↦ MR2 A B.
--- MRS-Profunctor : Bifunctor (Category.op C) C (Setoids (o ⊔ ℓ ⊔ e) (o ⊔ ℓ ⊔ e))
--- MRS-Profunctor = record
+-- Type of the desired profunctor C.op × C → Sets
+-- sending (A , B) ↦ MR2 A B.
+MRS-Profunctor : Bifunctor (Category.op C) C (Setoids (o ⊔ ℓ ⊔ e) (o ⊔ ℓ ⊔ e))
+MRS-Profunctor = record
+  { F₀ = λ { (A , B) → MR2-Setoid A B }
+  ; F₁ = λ { {(A , B)} {(A' , B')} (u , v) → record
+    { _⟨$⟩_ = λ {⟪ f , Φ ⟫ → ⟪ v ∘ f ∘ u , Φ ⟫ }
+    ; cong = λ { {⟪ f , Φ ⟫} {⟪ g , Φ' ⟫} (f≈g , Φ≈Φ') →
+        (∘-resp-≈ Equiv.refl (∘-resp-≈ f≈g Equiv.refl))
+      , {!   !} -- (λ {x} → ∘-resp-≈ʳ (Φ≈Φ' {x}))
+      }
+    }}
+  ; identity = λ { {(A , B)} {⟪ f , Φ ⟫} {⟪ g , Φ' ⟫} →
+      let module Hom = Functor [-,-] in
+      let module CodF = Functor Cod in
+        ( λ (f≈g , Φ≈Φ') → Equiv.trans identityˡʳ f≈g
+        , λ { {h} → {!   !} })
+     }
+  ; homomorphism = {!   !}
+  ; F-resp-≈ = {!   !}
+  } -- record
 --   { F₀ = λ { (A , B) → MR2-Setoid A B }
 --   ; F₁ = λ { {(A , B)} {(A' , B')} (u , v) → record
 --     { _⟨$⟩_ = λ {⟪ f , Φ ⟫ → ⟪ v ∘ f ∘ u , (nHom u ∘ʳ Cod) ∘ᵥ Φ ⟫ }
