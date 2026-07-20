@@ -99,10 +99,11 @@ module LeftAdjoint ⦃ pushout : ∀ {X Y Z} (f : X ⇒ Y) (g : X ⇒ Z) → Pus
     { F₀ = λ { (sliceobj {Y} f) →
         let module P = Pushout (pushout f u)
         in sliceobj (P.i₂) }
-    ; F₁ = λ { {M} {N} (slicearr {h} ∇) →
-        let module P  = Pushout (pushout (coSliceObj.arr _) u)
-            module P' = Pushout (pushout (coSliceObj.arr _) u)
-        in slicearr {h = P.universal ({!   !} ○ {!   !})} P'.universal∘i₂≈h₂ }
+    ; F₁ = λ {M} {N} (slicearr {h} ∇) →
+        let module P' = Pushout (pushout (coSliceObj.arr M) u)
+            module P  = Pushout (pushout (coSliceObj.arr N) u)
+        in slicearr {h = P'.universal {h₁ = P.i₁ ∘ h} {h₂ = P.i₂} 
+          (pullʳ ∇ ○ P.commute)} P'.universal∘i₂≈h₂ 
     ; identity = {!!}
     ; homomorphism = {!!}
     ; F-resp-≈ = {!!}
