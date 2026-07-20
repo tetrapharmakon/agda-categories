@@ -186,6 +186,26 @@ module Naturalities {A B X Y} (ξ : MR2 A B) (u : X ⇒ Y) where
   nat-1⇒1² : Φid X Y ∘ u ≈ [ u , u ]₁ ∘ Φid Y X
   nat-1⇒1² = Φcommute ξ (1⇒1 u , 1⇒1 u)
 
+  -- cross naturalities: both slots change, but by different Arrow morphisms
+
+  nat-1⇒u×u⇒1 : Φid X Y ≈ Φᵤᵤ -- Φid X Y ∘ id {Y} ≈ [ id {X} , id {Y} ]₁ ∘ Φᵤᵤ
+  nat-1⇒u×u⇒1 = sym-id-1 ∙ Φcommute ξ (1⇒u u , u⇒1 u) ∙ cancel [-,-].identity
+
+  nat-1⇒u×1⇒1 : Φid X Y ∘ u ≈ [ id {X} , u ]₁ ∘ ΦᵤX
+  nat-1⇒u×1⇒1 = Φcommute ξ (1⇒u u , 1⇒1 u)
+
+  nat-u⇒1×1⇒u : Φᵤᵤ ∘ u ≈ [ u , u ]₁ ∘ Φid Y X
+  nat-u⇒1×1⇒u = Φcommute ξ (u⇒1 u , 1⇒u u)
+
+  nat-u⇒1×1⇒1 : ΦᵤY ∘ u ≈ [ u , u ]₁ ∘ Φid Y X
+  nat-u⇒1×1⇒1 = Φcommute ξ (u⇒1 u , 1⇒1 u)
+
+  nat-1⇒1×1⇒u : ΦXᵤ ∘ u ≈ [ u , u ]₁ ∘ Φid Y X
+  nat-1⇒1×1⇒u = Φcommute ξ (1⇒1 u , 1⇒u u)
+
+  nat-1⇒1×u⇒1 : Φid X Y ≈ [ u , id {Y} ]₁ ∘ ΦYᵤ -- Φid X Y ∘ id {Y} ≈ [ u , id {Y} ]₁ ∘ ΦYᵤ
+  nat-1⇒1×u⇒1 = sym-id-1 ∙ Φcommute ξ (1⇒1 u , u⇒1 u)
+
 open Naturalities
 
 -- open import Categories.NaturalTransformation.NaturalIsomorphism as NI using (NaturalIsomorphism;niHelper; _ⓘˡ_; _ⓘʳ_)
