@@ -88,3 +88,30 @@ commute u = niHelper (record
   ; commute = λ {X} {Y} f → trans identityˡ (sym identityʳ) 
   ; iso = λ X → record { isoˡ = identityˡ ; isoʳ = identity² } 
   })
+
+
+open import Categories.Diagram.Pushout 𝒞
+open import Categories.Adjoint using (Adjoint; _⊣_)
+
+module LeftAdjoint ⦃ pushout : ∀ {X Y Z} (f : X ⇒ Y) (g : X ⇒ Z) → Pushout f g ⦄ where
+  S : ∀ {A A'} (u : A ⇒ A') → Functor (coSlice A) (coSlice A')
+  S u = record
+    { F₀ = λ { (sliceobj {Y} f) →
+        let module P = Pushout (pushout f u)
+        in sliceobj (P.i₂) }
+    ; F₁ = λ { {M} {N} (slicearr {h} ∇) →
+        let module P  = Pushout (pushout (coSliceObj.arr _) u)
+            module P' = Pushout (pushout (coSliceObj.arr _) u)
+        in slicearr {h = P.universal ({!   !} ○ {!   !})} P'.universal∘i₂≈h₂ }
+    ; identity = {!!}
+    ; homomorphism = {!!}
+    ; F-resp-≈ = {!!}
+    }
+
+  S⊣reindex : ∀ {A A'} (u : A ⇒ A') → Adjoint (S u) (reindex u)
+  S⊣reindex u = record
+    { unit = {!!}
+    ; counit = {!!}
+    ; zig = {!!}
+    ; zag = {!!}
+    }
