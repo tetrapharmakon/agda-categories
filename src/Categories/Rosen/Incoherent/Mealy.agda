@@ -58,6 +58,10 @@ Mealy⇒-≈ f g =
   in
  f.l ≈ g.l × f.l ≈ g.l × f.u ≈ g.u
 
+
+open HomReasoning
+open MR
+
 totalMealy : Category (o ⊔ ℓ ⊔ e) (o ⊔ ℓ ⊔ e) e
 totalMealy = record
   { Obj = Mealy₀
@@ -70,12 +74,17 @@ totalMealy = record
     let module f = Mealy⇒ f 
         module g = Mealy⇒ g
     in record { l = f.l ∘ g.l ; r = f.r ∘ g.r ; u = f.u ∘ g.u 
-              ; d-eq = {!   !} ; s-eq = {!   !} }
+              ; d-eq = pullʳ C g.d-eq ∙ (pullˡ C f.d-eq ∙ assoc) ∙ (refl⟩∘⟨ Equiv.sym ⊗.homomorphism) 
+              ; s-eq = pullʳ C g.s-eq ∙ (pullˡ C f.s-eq ∙ assoc) ∙ (refl⟩∘⟨ Equiv.sym ⊗.homomorphism)  }
   ; assoc = assoc , (assoc , assoc)
   ; sym-assoc = sym-assoc , (sym-assoc , sym-assoc)
   ; identityˡ = identityˡ , (identityˡ , identityˡ)
   ; identityʳ = identityʳ , (identityʳ , identityʳ)
   ; identity² = identity² , (identity² , identity²)
-  ; equiv = {!   !}
-  ; ∘-resp-≈ = {!   !}
+  ; equiv = record 
+    { refl = refl , (refl , refl) 
+    ; sym = λ { (x1 , (x2 , x3)) → sym x1 , (sym x2 , sym x3) }
+    ; trans = λ { (x1 , (x2 , x3)) (y1 , (y2 , y3)) → (trans x1 y1) , (trans x2 y2 , trans x3 y3) } 
+    }
+  ; ∘-resp-≈ = λ (eq1 , (eq2 , eq3)) (eq'1 , (eq'2 , eq'3)) → ∘-resp-≈ eq1 eq'1 , ∘-resp-≈ eq2 eq'2 , ∘-resp-≈ eq3 eq'3
   }
