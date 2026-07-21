@@ -55,3 +55,9 @@ open import Categories.Rosen.Incoherent.Repairs Cl
   ; homomorphism = refl
   ; F-resp-≈ = λ z → z .proj₁
   }
+
+
+open import Categories.Rosen.Incoherent.Mealy Cl
+
+Arbib : Functor τ[iMR2] totalMealy
+Arbib = {!   !}
