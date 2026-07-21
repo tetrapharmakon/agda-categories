@@ -15,9 +15,9 @@ module Categories.Rosen.Incoherent.Functors {o ℓ e} {C : Category o ℓ e} {M 
 open import Data.Product using (_,_; proj₁; proj₂; _×_)
 
 open import Categories.Category.Construction.Arrow
-open import Categories.Functor using (Functor)
+open import Categories.Functor using (Functor;_∘F_)
 open import Categories.Functor.Bifunctor using (appˡ; appʳ)
-open import Categories.Functor.Bifunctor.Properties using ([_]-commute)
+open import Categories.Functor.Bifunctor.Properties using ([_]-commute;[_]-decompose₁;[_]-decompose₂)
 open import Categories.Morphism.Reasoning as MR
 
 import Reason
@@ -80,13 +80,15 @@ Arbib = record
     }
   ; F₁ = λ f → let module f = twiMR2⇒ f in 
     record 
-      { l = {!  !}
+      { l = f.l
       ; r = f.r 
       ; u = [ f.l , f.r ]₁ 
-      ; d-eq = {!   !} 
-      ; s-eq = {!   !} 
+      ; d-eq = {!  !} 
+      ; s-eq = pullˡ C (adjoint.counit.sym-commute f.r) 
+             ∙ assoc ∙ {!   !} 
+             ∙ (refl⟩∘⟨ Functor.F-resp-≈ (-⊗ _) ((Equiv.sym [ [-,-] ]-decompose₂)) )
       }
-  ; identity = {!   !}
-  ; homomorphism = {!   !}
-  ; F-resp-≈ = {!   !}
+  ; identity = refl , refl , [-,-].identity
+  ; homomorphism = refl , refl , [-,-].homomorphism
+  ; F-resp-≈ = λ z → z .proj₁ , z .proj₁ , [-,-].F-resp-≈ z
   }

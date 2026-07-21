@@ -62,6 +62,8 @@ Mealy⇒-≈ f g =
 open HomReasoning
 open MR
 
+-- !!! This is not the total category of Mealy automata that 
+-- is usually recorded in the literature \cite{foo,bar}
 totalMealy : Category (o ⊔ ℓ ⊔ e) (o ⊔ ℓ ⊔ e) e
 totalMealy = record
   { Obj = Mealy₀
@@ -69,22 +71,32 @@ totalMealy = record
   ; _≈_ = Mealy⇒-≈
   ; id = record 
     { l = id ; r = id ; u = id 
-    ; d-eq = {!   !} ; s-eq = {!   !} }
+    ; d-eq = identityˡ ; s-eq = identityˡ }
   ; _∘_ = λ f g → 
     let module f = Mealy⇒ f 
         module g = Mealy⇒ g
     in record { l = g.l ∘ f.l ; r = f.r ∘ g.r ; u = f.u ∘ g.u 
-              ; d-eq = (refl⟩∘⟨ refl⟩∘⟨ Functor.homomorphism (_ ⊗)) ∙ {!   !} 
-              ; s-eq = {!   !} }
-  ; assoc = {!   !} -- assoc , (assoc , assoc)
-  ; sym-assoc = {!   !} -- sym-assoc , (sym-assoc , sym-assoc)
-  ; identityˡ = {!   !} -- identityˡ , (identityˡ , identityˡ)
-  ; identityʳ = {!   !} -- identityʳ , (identityʳ , identityʳ)
-  ; identity² = {!   !} -- identity² , (identity² , identity²)
+              ; d-eq = (refl⟩∘⟨ pushʳ C (Functor.homomorphism (_ ⊗-))) 
+                     ∙ sym-assoc ∙ anti-assoc-4 
+                     ∙ (refl⟩∘⟨ pullˡ C g.d-eq) 
+                     ∙ (refl⟩∘⟨ pullʳ C (Equiv.sym [ ⊗ ]-commute)) 
+                     ∙ sym-assoc-3 ∙ (f.d-eq ⟩∘⟨refl) 
+                     ∙ pullʳ C (Equiv.sym (Functor.homomorphism (-⊗ _))) 
+              ; s-eq = (refl⟩∘⟨ pushʳ C (Functor.homomorphism (_ ⊗-))) 
+                     ∙ sym-assoc ∙ anti-assoc-4 
+                     ∙ (refl⟩∘⟨ pullˡ C g.s-eq) 
+                     ∙ (refl⟩∘⟨ pullʳ C (Equiv.sym [ ⊗ ]-commute)) 
+                     ∙ sym-assoc-3 ∙ (f.s-eq ⟩∘⟨refl) 
+                     ∙ pullʳ C (Equiv.sym (Functor.homomorphism (-⊗ _)))  }
+  ; assoc = sym-assoc , sym-assoc , assoc
+  ; sym-assoc = assoc , assoc , sym-assoc
+  ; identityˡ = identityʳ , identityʳ , identityˡ
+  ; identityʳ = identityˡ , identityˡ , identityʳ
+  ; identity² = identityˡ , identity² , identity²
   ; equiv = record 
-    { refl = {!   !} -- refl , (refl , refl) 
-    ; sym = {!   !} -- λ { (x1 , (x2 , x3)) → sym x1 , (sym x2 , sym x3) }
-    ; trans = {!   !} -- λ { (x1 , (x2 , x3)) (y1 , (y2 , y3)) → (trans x1 y1) , (trans x2 y2 , trans x3 y3) } 
+    { refl = λ {x} → refl , refl , refl
+    ; sym = λ x → (sym (x .proj₁)) , sym (x .proj₁) , sym (x .proj₂ .proj₂)
+    ; trans = λ x x₁ → (trans (x .proj₁) (x₁ .proj₁)) , trans (x .proj₁) (x₁ .proj₁) , (trans (x .proj₂ .proj₂) (x₁ .proj₂ .proj₂))
     } 
-  ; ∘-resp-≈ = {!   !} -- λ (eq1 , (eq2 , eq3)) (eq'1 , (eq'2 , eq'3)) → ∘-resp-≈ eq1 eq'1 , ∘-resp-≈ eq2 eq'2 , ∘-resp-≈ eq3 eq'3
+  ; ∘-resp-≈ = λ x x₁ → (∘-resp-≈ (x₁ .proj₁) (x .proj₁)) , (∘-resp-≈ (x₁ .proj₁) (x .proj₁)) , ∘-resp-≈ (x .proj₂ .proj₂) (x₁ .proj₂ .proj₂)
   }
