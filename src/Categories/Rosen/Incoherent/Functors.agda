@@ -5,6 +5,8 @@ open import Categories.Category using (Category)
 open import Categories.Category.Monoidal using (Monoidal)
 open import Categories.Category.Monoidal.Closed using (Closed)
 
+-- open import Categories.Category.Monoidal.Symmetric using (Symmetric)
+
 module Categories.Rosen.Incoherent.Functors {o ℓ e} {C : Category o ℓ e} {M : Monoidal C} (Cl : Closed M) where
 
 -- Incoherent (M,R)-systems: a simple diagram A —f→ B —Φ→ [A,B]
@@ -20,13 +22,15 @@ open import Categories.Morphism.Reasoning as MR
 
 import Reason
 open Reason C
-open Closed Cl using ([-,-]; [_,_]₀; [_,_]₁)
+open Closed Cl using (adjoint;[-,-]; [_,_]₀; [_,_]₁;⊗;_⊗₀_;_⊗₁_;_⊗-;-⊗_)
 open HomReasoning
 open MR
 
+-- open Symmetric S hiding (_⊗-; -⊗_; unit; _⊗₀_; _⊗₁_) renaming (braided-iso to β)
 -- module Arr = Categories.Category.Construction.Arrow C
 
 open import Categories.Rosen.Incoherent.Core Cl
+open import Categories.Rosen.Incoherent.Elements Cl
 
 [_]f : Functor τ[iMR2] Arr.Arrow 
 [_]f = record
@@ -59,5 +63,30 @@ open import Categories.Rosen.Incoherent.Repairs Cl
 
 open import Categories.Rosen.Incoherent.Mealy Cl
 
-Arbib : Functor τ[iMR2] totalMealy
-Arbib = {!   !}
+Arbib : Functor τ'[iMR2] totalMealy
+Arbib = record
+  { F₀ = λ x → 
+    let module x = iMR2₀ x 
+        module ξX = iMR2 x.ξ
+        Φ* = adjoint.Radjunct ξX.Φ
+    in record 
+    { A = x.A 
+    ; B = x.B 
+    ; m = record 
+      { E = [ x.A , x.B ]₀ 
+      ; d = adjoint.Ladjunct (Φ* ∘ (adjoint.counit.η x.B ⊗₁ id)) 
+      ; s = adjoint.counit.η x.B 
+      } 
+    }
+  ; F₁ = λ f → let module f = twiMR2⇒ f in 
+    record 
+      { l = {!  !}
+      ; r = f.r 
+      ; u = [ f.l , f.r ]₁ 
+      ; d-eq = {!   !} 
+      ; s-eq = {!   !} 
+      }
+  ; identity = {!   !}
+  ; homomorphism = {!   !}
+  ; F-resp-≈ = {!   !}
+  }

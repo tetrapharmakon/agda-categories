@@ -45,11 +45,11 @@ record Mealy⇒ (X Y : Mealy₀) : Set (o ⊔ ℓ ⊔ e) where
   module mX = Mealy X.m
   module mY = Mealy Y.m
   field
-    l : X.A ⇒ Y.A 
+    l : Y.A ⇒ X.A 
     r : X.B ⇒ Y.B 
     u : mX.E ⇒ mY.E 
-    d-eq : u ∘ mX.d ≈ mY.d ∘ u ⊗₁ l
-    s-eq : r ∘ mX.s ≈ mY.s ∘ u ⊗₁ l
+    d-eq : u ∘ mX.d ∘ id ⊗₁ l ≈ mY.d ∘ u ⊗₁ id
+    s-eq : r ∘ mX.s ∘ id ⊗₁ l ≈ mY.s ∘ u ⊗₁ id
 
 Mealy⇒-≈ : {A B : Mealy₀} → Mealy⇒ A B → Mealy⇒ A B → Set e
 Mealy⇒-≈ f g = 
@@ -69,22 +69,22 @@ totalMealy = record
   ; _≈_ = Mealy⇒-≈
   ; id = record 
     { l = id ; r = id ; u = id 
-    ; d-eq = id-0 ∙ intro-1 ⊗.identity ; s-eq = id-0 ∙ intro-1 ⊗.identity }
+    ; d-eq = {!   !} ; s-eq = {!   !} }
   ; _∘_ = λ f g → 
     let module f = Mealy⇒ f 
         module g = Mealy⇒ g
-    in record { l = f.l ∘ g.l ; r = f.r ∘ g.r ; u = f.u ∘ g.u 
-              ; d-eq = pullʳ C g.d-eq ∙ (pullˡ C f.d-eq ∙ assoc) ∙ (refl⟩∘⟨ Equiv.sym ⊗.homomorphism) 
-              ; s-eq = pullʳ C g.s-eq ∙ (pullˡ C f.s-eq ∙ assoc) ∙ (refl⟩∘⟨ Equiv.sym ⊗.homomorphism)  }
-  ; assoc = assoc , (assoc , assoc)
-  ; sym-assoc = sym-assoc , (sym-assoc , sym-assoc)
-  ; identityˡ = identityˡ , (identityˡ , identityˡ)
-  ; identityʳ = identityʳ , (identityʳ , identityʳ)
-  ; identity² = identity² , (identity² , identity²)
+    in record { l = g.l ∘ f.l ; r = f.r ∘ g.r ; u = f.u ∘ g.u 
+              ; d-eq = (refl⟩∘⟨ refl⟩∘⟨ Functor.homomorphism (_ ⊗)) ∙ {!   !} 
+              ; s-eq = {!   !} }
+  ; assoc = {!   !} -- assoc , (assoc , assoc)
+  ; sym-assoc = {!   !} -- sym-assoc , (sym-assoc , sym-assoc)
+  ; identityˡ = {!   !} -- identityˡ , (identityˡ , identityˡ)
+  ; identityʳ = {!   !} -- identityʳ , (identityʳ , identityʳ)
+  ; identity² = {!   !} -- identity² , (identity² , identity²)
   ; equiv = record 
-    { refl = refl , (refl , refl) 
-    ; sym = λ { (x1 , (x2 , x3)) → sym x1 , (sym x2 , sym x3) }
-    ; trans = λ { (x1 , (x2 , x3)) (y1 , (y2 , y3)) → (trans x1 y1) , (trans x2 y2 , trans x3 y3) } 
-    }
-  ; ∘-resp-≈ = λ (eq1 , (eq2 , eq3)) (eq'1 , (eq'2 , eq'3)) → ∘-resp-≈ eq1 eq'1 , ∘-resp-≈ eq2 eq'2 , ∘-resp-≈ eq3 eq'3
+    { refl = {!   !} -- refl , (refl , refl) 
+    ; sym = {!   !} -- λ { (x1 , (x2 , x3)) → sym x1 , (sym x2 , sym x3) }
+    ; trans = {!   !} -- λ { (x1 , (x2 , x3)) (y1 , (y2 , y3)) → (trans x1 y1) , (trans x2 y2 , trans x3 y3) } 
+    } 
+  ; ∘-resp-≈ = {!   !} -- λ (eq1 , (eq2 , eq3)) (eq'1 , (eq'2 , eq'3)) → ∘-resp-≈ eq1 eq'1 , ∘-resp-≈ eq2 eq'2 , ∘-resp-≈ eq3 eq'3
   }
