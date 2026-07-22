@@ -5,10 +5,9 @@ open import Categories.Category using (Category)
 open import Categories.Category.Monoidal using (Monoidal)
 open import Categories.Category.Monoidal.Closed using (Closed)
 
-module Categories.Rosen.VariantCore {o ℓ e} {C : Category o ℓ e} {M : Monoidal C} (Cl : Closed M) where
+module Categories.Rosen.Variants.FullyPoly {o ℓ e} {C : Category o ℓ e} {M : Monoidal C} (Cl : Closed M) where
 
--- Core definitions for the category of (M,R)-systems.
--- Exports: Cod, nHom, nHom-identity, MR2, MR2-Setoid, MRS-Profunctor.
+-- Fully polymorphic natural MR systems
 
 open import Data.Product using (_,_; proj₁; proj₂; _×_)
 open import Relation.Binary.Bundles using (Setoid)
@@ -208,36 +207,8 @@ module Naturalities {A B X Y} (ξ : MR2 A B) (u : X ⇒ Y) where
 
 open Naturalities
 
--- open import Categories.NaturalTransformation.NaturalIsomorphism as NI using (NaturalIsomorphism;niHelper; _ⓘˡ_; _ⓘʳ_)
 
--- fattoide : NaturalIsomorphism ([_,-] unit) idF
--- fattoide = niHelper (record 
---   { η = λ X → adjoint.counit.η X ∘ unitorʳ.to
---   ; η⁻¹ = λ X → adjoint.Ladjunct unitorʳ.from 
---   ; commute = λ f → assoc ○ refl⟩∘⟨ unitorʳ-commute-to ○ pullˡ C (adjoint.counit.commute f) ○ assoc
---   ; iso = λ X → 
---     let λ₀ = unitorʳ.from 
---         λ₀' = adjoint.Ladjunct λ₀
---         ρ = unitorʳ.to
---         module ε = NaturalTransformation adjoint.counit
---     in record 
---     { isoˡ = begin 
---       λ₀' ∘ (ε.η X ∘ ρ)                                   ≈⟨ pullʳ C ((adjoint.unit.commute _)) ⟩
---       [ id , λ₀ ]₁ ∘ adjoint.Ladjunct ((ε.η X ∘ ρ) ⊗₁ id) ≈˘⟨ pushˡ C ([ unit ,-] .Functor.homomorphism) ⟩
---       adjoint.Ladjunct (λ₀ ∘ ((ε.η X ∘ ρ) ⊗₁ id))         ≈⟨ ([-,-].F-resp-≈ (Equiv.refl , unitorʳ-commute-from)) ⟩∘⟨refl ⟩
---       adjoint.Ladjunct ((ε.η X ∘ ρ) ∘ λ₀)                 ≈⟨ ([-,-].F-resp-≈ (Equiv.refl , cancelʳ C unitorʳ.isoˡ)) ⟩∘⟨refl ⟩
---       adjoint.Ladjunct (ε.η X)                            ≈⟨ adjoint.zag ⟩
---       id                                                  ∎
---     ; isoʳ = begin 
---       (ε.η X ∘ ρ) ∘ λ₀'         ≈⟨ pullʳ C unitorʳ-commute-to ⟩
---       ε.η X ∘ ((λ₀' ⊗₁ id) ∘ ρ) ≈⟨ sym-assoc ○ adjoint.RLadjunct≈id {f = λ₀} ⟩∘⟨refl ⟩
---       λ₀ ∘ ρ                    ≈⟨ unitorʳ.isoʳ ⟩
---       id                        ∎
---     } 
---   })
-
--- Type of the desired profunctor C.op × C → Sets
--- sending (A , B) ↦ MR2 A B.
+-- super trivial profunctoriality because Φ does not depend on anything
 MRS-Profunctor : Bifunctor (Category.op C) C (Setoids (o ⊔ ℓ ⊔ e) (o ⊔ ℓ ⊔ e))
 MRS-Profunctor = record
   { F₀ = λ { (A , B) → MR2-Setoid A B }
@@ -256,47 +227,4 @@ MRS-Profunctor = record
      }
   ; homomorphism = {!   !}
   ; F-resp-≈ = {!   !}
-  } -- record
---   { F₀ = λ { (A , B) → MR2-Setoid A B }
---   ; F₁ = λ { {(A , B)} {(A' , B')} (u , v) → record
---     { _⟨$⟩_ = λ {⟪ f , Φ ⟫ → ⟪ v ∘ f ∘ u , (nHom u ∘ʳ Cod) ∘ᵥ Φ ⟫ }
---     ; cong = λ { {⟪ f , Φ ⟫} {⟪ g , Φ' ⟫} (f≈g , Φ≈Φ') →
---         (∘-resp-≈ Equiv.refl (∘-resp-≈ f≈g Equiv.refl))
---       , (λ {x} → ∘-resp-≈ʳ (Φ≈Φ' {x}))
---       }
---     }}
---   ; identity = λ { {(A , B)} {⟪ f , Φ ⟫} {⟪ g , Φ' ⟫} →
---       let module Hom = Functor [-,-] in
---       let module CodF = Functor Cod in
---         ( λ (f≈g , Φ≈Φ') → Equiv.trans identityˡʳ f≈g
---         , λ { {h} → Equiv.trans (elimˡ C Hom.identity) (Φ≈Φ' {h}) })
---      }
---   ; homomorphism = λ { {f = (u₁ , v₁)} {g = (u₂ , v₂)} {⟪ f , Φ ⟫} {⟪ g , Φ' ⟫} →
---        let module Hom = Functor [-,-]
---            module Hom[1-] {A} = Functor (appˡ [-,-] A)
---            module Hom[-1] {A} = Functor (appʳ [-,-] A) in
---          ( λ { (f≈g , Φ≈Φ') →
---              (begin (v₂ ∘ v₁) ∘ f ∘ u₁ ∘ u₂     ≈˘⟨ assoc ○ assoc ⟩
---                     (((v₂ ∘ v₁) ∘ f) ∘ u₁) ∘ u₂ ≈⟨ (refl⟩∘⟨ f≈g) ⟩∘⟨refl ⟩∘⟨refl ⟩
---                     (((v₂ ∘ v₁) ∘ g) ∘ u₁) ∘ u₂ ≈⟨ (assoc ⟩∘⟨refl) ○ (assoc ⟩∘⟨refl) ⟩
---                     (v₂ ∘ (v₁ ∘ (g ∘ u₁))) ∘ u₂ ≈⟨ assoc ○ sym-assoc ○ assoc ⟩
---                     v₂ ∘ (v₁ ∘ g ∘ u₁) ∘ u₂     ∎)
---         , λ { {h} →
---             let module Φ = NaturalTransformation Φ
---                 module Φ' = NaturalTransformation Φ'
---             in
---             begin [ u₁ ∘ u₂ , id ]₁ ∘ Φ.η h              ≈⟨ ∘-resp-≈ Equiv.refl (Φ≈Φ' {h}) ⟩
---                   [ u₁ ∘ u₂ , id ]₁ ∘ Φ'.η h             ≈⟨ Hom[-1].homomorphism ⟩∘⟨refl ⟩
---                   ([ u₂ , id ]₁ ∘ [ u₁ , id ]₁) ∘ Φ'.η h ≈⟨ assoc ⟩
---                   [ u₂ , id ]₁ ∘ ([ u₁ , id ]₁ ∘ Φ'.η h) ∎ } })
---      }
---   ; F-resp-≈ = λ { {(A , B)} {(A' , B')} {f = (u , v)} {g = (u' , v')} (u≈u' , v≈v') {⟪ f , Φ ⟫} {⟪ g , Φ' ⟫} →
---        let module Hom = Functor [-,-] in
---          ( λ { (f≈g , Φ≈Φ') → ∘-resp-≈ v≈v' (∘-resp-≈ f≈g u≈u')
---         , λ { {h} →
---             let module Φ = NaturalTransformation Φ
---                 module Φ' = NaturalTransformation Φ'
---             in ∘-resp-≈ (Hom.F-resp-≈ (u≈u' , Equiv.refl)) (Φ≈Φ' {h})
---               } })
---      }
---   }
+  }

@@ -5,13 +5,7 @@ open import Categories.Category using (Category)
 open import Categories.Category.Monoidal using (Monoidal)
 open import Categories.Category.Monoidal.Closed using (Closed)
 
--- open import Categories.Category.Monoidal.Symmetric using (Symmetric)
-
 module Categories.Rosen.Incoherent.Functors {o ℓ e} {C : Category o ℓ e} {M : Monoidal C} (Cl : Closed M) where
-
--- A functor from the category of twisted MR systems to the category of twisted Mealy automata
--- cf. Categories.Rosen.Incoherent.Mealy for the definition
--- the functor was defined by Arbib in \cite{}
 
 open import Data.Product using (_,_; proj₁; proj₂; _×_)
 
@@ -27,11 +21,43 @@ open Closed Cl using (adjoint; mate;[-,-]; [_,_]₀; [_,_]₁;⊗;_⊗₀_;_⊗�
 open HomReasoning
 open MR
 
--- open Symmetric S hiding (_⊗-; -⊗_; unit; _⊗₀_; _⊗₁_) renaming (braided-iso to β)
--- module Arr = Categories.Category.Construction.Arrow C
-
 open import Categories.Rosen.Incoherent.Core Cl
 open import Categories.Rosen.Incoherent.Elements Cl
+
+[_]f : Functor τ[iMR2] Arr.Arrow 
+[_]f = record
+  { F₀ = λ x → let module x = iMR2₀ x in record { dom = x.A ; cod = x.B ; arr = iMR2.f x.ξ }
+  ; F₁ = λ f → let module f = iMR2⇒ f in mor⇒ f.eqf
+  ; identity = refl , refl
+  ; homomorphism = refl , refl
+  ; F-resp-≈ = λ x → x
+  }
+
+open import Categories.Rosen.Incoherent.Repairs Cl
+
+[_]Φ : Functor τ[iMR2] irepairs
+[_]Φ = record
+  { F₀ = λ x → let module x = iMR2₀ x in record 
+    { A = x.A 
+    ; B = x.B 
+    ; Φ = iMR2.Φ x.ξ 
+    }
+  ; F₁ = λ f → let module f = iMR2⇒ f in record 
+    { u = f.l
+    ; v = f.r
+    ; eq = f.eqΦ
+    }
+  ; identity = refl
+  ; homomorphism = refl
+  ; F-resp-≈ = λ z → z .proj₁
+  }
+
+
+open import Categories.Rosen.Incoherent.Mealy Cl
+
+-- A functor from the category of twisted MR systems to the category of twisted Mealy automata
+-- cf. Categories.Rosen.Incoherent.Mealy for the definition
+-- the functor was defined by Arbib in \cite{}
 
 module _ {X Y : iMR2₀} (f : twiMR2⇒ X Y) where
   module X = iMR2₀ X
@@ -77,38 +103,6 @@ module _ {X Y : iMR2₀} (f : twiMR2⇒ X Y) where
           (ΦY ∘ ε F.Y.B) ∘ [ F.l , F.r ]₁ ⊗₁ id                                               ≈˘⟨ (adjoint.LRadjunct≈id ⟩∘⟨refl) ⟩∘⟨refl ⟩
           ((adjoint.Ladjunct ΦY*) ∘ ε F.Y.B) ∘ [ F.l , F.r ]₁ ⊗₁ id                           ≈˘⟨ adjoint.Ladjunct-comm′ ⟩∘⟨refl ⟩
           adjoint.Ladjunct (ΦY* ∘ ε F.Y.B ⊗₁ id) ∘ [ F.l , F.r ]₁ ⊗₁ id                       ∎
-      
-
-[_]f : Functor τ[iMR2] Arr.Arrow 
-[_]f = record
-  { F₀ = λ x → let module x = iMR2₀ x in record { dom = x.A ; cod = x.B ; arr = iMR2.f x.ξ }
-  ; F₁ = λ f → let module f = iMR2⇒ f in mor⇒ f.eqf
-  ; identity = refl , refl
-  ; homomorphism = refl , refl
-  ; F-resp-≈ = λ x → x
-  }
-
-open import Categories.Rosen.Incoherent.Repairs Cl
-
-[_]Φ : Functor τ[iMR2] irepairs
-[_]Φ = record
-  { F₀ = λ x → let module x = iMR2₀ x in record 
-    { A = x.A 
-    ; B = x.B 
-    ; Φ = iMR2.Φ x.ξ 
-    }
-  ; F₁ = λ f → let module f = iMR2⇒ f in record 
-    { u = f.l
-    ; v = f.r
-    ; eq = f.eqΦ
-    }
-  ; identity = refl
-  ; homomorphism = refl
-  ; F-resp-≈ = λ z → z .proj₁
-  }
-
-
-open import Categories.Rosen.Incoherent.Mealy Cl
 
 Arbib : Functor τ'[iMR2] totalMealy
 Arbib = record
