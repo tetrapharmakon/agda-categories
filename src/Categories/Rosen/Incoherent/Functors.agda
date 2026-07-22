@@ -36,11 +36,17 @@ module _ {X Y : iMR2₀} (f : twiMR2⇒ X Y) where
   module X = iMR2₀ X
   module Y = iMR2₀ Y
   module F = twiMR2⇒ f
+  ε = adjoint.counit.η
 
   lemma-epsilon :
-    F.r ∘ adjoint.counit.η X.B ∘ id ⊗₁ F.l ≈
-    adjoint.counit.η Y.B ∘ [ F.l , F.r ]₁ ⊗₁ id
-  lemma-epsilon = {!   !}
+    F.r ∘ ε X.B ∘ id {[ F.X.A , F.X.B ]₀} ⊗₁ F.l ≈ ε Y.B ∘ [ F.l , F.r ]₁ ⊗₁ id {F.Y.A}
+  lemma-epsilon = 
+    begin F.r ∘ ε X.B ∘ id {[ F.X.A , F.X.B ]₀} ⊗₁ F.l ≈⟨ pullˡ C (adjoint.counit.sym-commute F.r) ∙ assoc ⟩
+          ε Y.B ∘ Functor.F₁ ((-⊗ F.X.A) ∘F appˡ [-,-] F.X.A) F.r ∘ id {[ F.X.A , F.X.B ]₀} ⊗₁ F.l ≈⟨ (refl⟩∘⟨ Equiv.sym [ ⊗ ]-commute) ⟩
+          ε Y.B ∘ (id {[ F.X.A , F.Y.B ]₀} ⊗₁ F.l) ∘ [ id {F.X.A} , F.r ]₁ ⊗₁ id {F.Y.A} ≈⟨ {!   !} ⟩
+          ε Y.B ∘ [ F.l , id {F.Y.B} ]₁ ⊗₁ id {F.Y.A} ∘ [ id {F.X.A} , F.r ]₁ ⊗₁ id {F.Y.A} ≈˘⟨ refl⟩∘⟨ {!   !} ⟩
+          ε Y.B ∘ [ F.l , F.r ]₁ ⊗₁ id {{!   !}} ∎ 
+  -- pullˡ C (adjoint.counit.sym-commute F.r) ∙ assoc ∙ (refl⟩∘⟨ Equiv.sym [ ⊗ ]-commute) ∙ {!   !}
 
 [_]f : Functor τ[iMR2] Arr.Arrow 
 [_]f = record
