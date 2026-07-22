@@ -139,7 +139,7 @@ Arbib = record
       { l = f.l
       ; r = f.r 
       ; u = [ f.l , f.r ]₁ 
-      ; d-eq = {!  !} 
+      ; d-eq = lemma-delta f 
       ; s-eq = lemma-epsilon f 
       }
   ; identity = refl , refl , [-,-].identity
