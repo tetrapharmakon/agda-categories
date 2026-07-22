@@ -22,7 +22,7 @@ open import Categories.Morphism.Reasoning as MR
 
 import Reason
 open Reason C
-open Closed Cl using (adjoint;[-,-]; [_,_]₀; [_,_]₁;⊗;_⊗₀_;_⊗₁_;_⊗-;-⊗_)
+open Closed Cl using (adjoint; mate;[-,-]; [_,_]₀; [_,_]₁;⊗;_⊗₀_;_⊗₁_;_⊗-;-⊗_)
 open HomReasoning
 open MR
 
@@ -31,6 +31,16 @@ open MR
 
 open import Categories.Rosen.Incoherent.Core Cl
 open import Categories.Rosen.Incoherent.Elements Cl
+
+module _ {X Y : iMR2₀} (f : twiMR2⇒ X Y) where
+  module X = iMR2₀ X
+  module Y = iMR2₀ Y
+  module F = twiMR2⇒ f
+
+  lemma-epsilon :
+    F.r ∘ adjoint.counit.η X.B ∘ id ⊗₁ F.l ≈
+    adjoint.counit.η Y.B ∘ [ F.l , F.r ]₁ ⊗₁ id
+  lemma-epsilon = {!   !}
 
 [_]f : Functor τ[iMR2] Arr.Arrow 
 [_]f = record
@@ -78,15 +88,18 @@ Arbib = record
       ; s = adjoint.counit.η x.B 
       } 
     }
-  ; F₁ = λ f → let module f = twiMR2⇒ f in 
-    record 
+  ; F₁ = λ f → 
+    let module f = twiMR2⇒ f 
+        module AX = adjoint {f.X.A}
+        module AY = adjoint {f.Y.A}
+        εXB = AX.counit.η f.X.B
+        εYB = AY.counit.η f.Y.B
+    in record 
       { l = f.l
       ; r = f.r 
       ; u = [ f.l , f.r ]₁ 
       ; d-eq = {!  !} 
-      ; s-eq = pullˡ C (adjoint.counit.sym-commute f.r) 
-             ∙ assoc ∙ {!   !} 
-             ∙ (refl⟩∘⟨ Functor.F-resp-≈ (-⊗ _) ((Equiv.sym [ [-,-] ]-decompose₂)) )
+      ; s-eq = lemma-epsilon f 
       }
   ; identity = refl , refl , [-,-].identity
   ; homomorphism = refl , refl , [-,-].homomorphism
