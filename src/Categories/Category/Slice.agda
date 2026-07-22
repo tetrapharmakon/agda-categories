@@ -2,7 +2,8 @@
 open import Categories.Category.Core
 
 -- slice category (https://ncatlab.org/nlab/show/over+category)
--- TODO: Forgetful Functor from Slice to 𝒞
+
+
 module Categories.Category.Slice {o ℓ e} (𝒞 : Category o ℓ e) where
 
 open Category 𝒞
@@ -60,3 +61,23 @@ Slice A       = record
           z ∘ g ∘ f ≈⟨ pullˡ △ ⟩
           y ∘ f     ≈⟨ △′ ⟩
           x         ∎
+
+
+open import Categories.Functor using (Functor; _∘F_)
+Dom : (A : Obj) → Functor (Slice A) 𝒞
+Dom A = record
+  { F₀           = SliceObj.Y
+  ; F₁           = Slice⇒.h
+  ; identity     = refl
+  ; homomorphism = refl
+  ; F-resp-≈     = λ z → z
+  }
+
+C/_ : {A A' : Obj} (u : A ⇒ A') → Functor (Slice A) (Slice A')
+C/ u = record
+  { F₀ = λ x → let module x = SliceObj x in sliceobj (u ∘ x.arr)
+  ; F₁ = λ f → let module f = Slice⇒ f in slicearr (trans assoc (∘-resp-≈ refl f.△))
+  ; identity = λ {A} → refl
+  ; homomorphism = λ {X} {Y} {Z} {f} {g} → refl
+  ; F-resp-≈ = λ {A} {B} {f} {g} z → z
+  }

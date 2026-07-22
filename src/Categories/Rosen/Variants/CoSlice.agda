@@ -5,7 +5,7 @@ open import Categories.Category using (Category)
 open import Categories.Category.Monoidal using (Monoidal)
 open import Categories.Category.Monoidal.Closed using (Closed)
 
-module Categories.Rosen.CoreCoSlice {o ℓ e} {C : Category o ℓ e} {M : Monoidal C} (Cl : Closed M) where
+module Categories.Rosen.Variants.CoSlice {o ℓ e} {C : Category o ℓ e} {M : Monoidal C} (Cl : Closed M) where
 
 -- Core definitions for the category of (M,R)-systems.
 -- Exports: Cod, nHom, nHom-identity, MR2, MR2-Setoid, MRS-Profunctor.
@@ -146,7 +146,7 @@ MRS-Profunctor : Bifunctor (Category.op C) C (Setoids (o ⊔ ℓ ⊔ e) (o ⊔ �
 MRS-Profunctor = record
   { F₀ = λ { (A , B) → MR2-Setoid A B }
   ; F₁ = λ { {(A , B)} {(A' , B')} (u , v) → record
-    { _⟨$⟩_ = λ {⟪ f , Φ ⟫ → ⟪ v ∘ f ∘ u , (nHom u ∘ʳ Cod A') ∘ᵥ {!   !} ∘ᵥ (Φ ∘ʳ reindex {!   !}) ∘ᵥ {! commute u  !} ⟫ }
+    { _⟨$⟩_ = λ {⟪ f , Φ ⟫ → ⟪ v ∘ f ∘ u , (nHom u ∘ʳ Cod A') ∘ᵥ {!   !} ∘ᵥ (Φ ∘ʳ {!   !} /C) ∘ᵥ {! commute u  !} ⟫ }
     ; cong = λ { {⟪ f , Φ ⟫} {⟪ g , Φ' ⟫} (f≈g , Φ≈Φ') →
         (∘-resp-≈ Equiv.refl (∘-resp-≈ f≈g Equiv.refl))
       , {!   !}

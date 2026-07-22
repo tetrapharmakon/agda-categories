@@ -29,27 +29,6 @@ open Closed Cl using (adjoint; unitorˡ;unitorʳ-commute-to; unitorʳ-commute-fr
 
 module Arr = Categories.Category.Construction.Arrow C
 
-{-
--- Domain functor Arrow(C) → C.
-Dom : Functor Arr.Arrow C
-Dom = record
-  { F₀           = Arr.Morphism.dom
-  ; F₁           = Arr.Morphism⇒.dom⇒
-  ; identity     = Equiv.refl
-  ; homomorphism = Equiv.refl
-  ; F-resp-≈     = λ eq → proj₁ eq
-  }
-
--- Codomain functor Arrow(C) → C.
-Cod : Functor Arr.Arrow C
-Cod = record
-  { F₀           = Arr.Morphism.cod
-  ; F₁           = Arr.Morphism⇒.cod⇒
-  ; identity     = Equiv.refl
-  ; homomorphism = Equiv.refl
-  ; F-resp-≈     = λ eq → proj₂ eq
-  }
--}
 -- nHom sends f : A ⇒ B to the induced natural transformation [-,f] : [B,-] ⇒ [A,-].
 nHom : ∀ {A B} → A ⇒ B → NaturalTransformation ([_,-] B) ([_,-] A)
 nHom {A} {B} f = record
@@ -62,12 +41,6 @@ nHom {A} {B} f = record
 nHom-identity : ∀ {A} → nHom (id {A}) ≃ idN
 nHom-identity = [-,-].identity
 
-{-
-_ᵒ×_ : ∀ {o ℓ e} (𝓐 𝓑 : Category o ℓ e) → Category o ℓ e
-𝓐 ᵒ× 𝓑 = Product (Category.op 𝓐) 𝓑
-
-C⇒ᵒ×C⇒ = Arr.Arrow ᵒ× Arr.Arrow
--}
 -- definition of an (M,R)-system according to Rosen
 record MR2 (A B : Obj) : Set (o ⊔ ℓ ⊔ e) where
   eta-equality
@@ -77,8 +50,8 @@ record MR2 (A B : Obj) : Set (o ⊔ ℓ ⊔ e) where
     Φ : NaturalTransformation U ([_,-] A ∘F U)
 
   Φη = NaturalTransformation.η Φ
-  -- Φη₀ = Φη (record { arr = f } , record { arr = f })
   Φcommute = λ {X Y : Category.Obj E} t → NaturalTransformation.commute Φ {X} {Y} t
+
 -- MR2 as a Setoid: two MR2 elements are equal when their f components are equal
 -- and their Φ components are ≃-equal.
 MR2-Setoid : Obj → Obj → Setoid (o ⊔ ℓ ⊔ e) (o ⊔ e) -- (o ⊔ ℓ ⊔ e) (o ⊔ ℓ ⊔ e)
@@ -92,11 +65,10 @@ MR2-Setoid A B = record
     }
   }
 
-
 open HomReasoning
 open MR
 
--- super trivial profunctoriality because Φ does not depend on anything
+-- the same proof that works for Cod works in general
 MRS-Profunctor : Bifunctor (Category.op C) C (Setoids (o ⊔ ℓ ⊔ e) (o ⊔ e))
 MRS-Profunctor = record
   { F₀ = (λ { (A , B) → MR2-Setoid A B })
@@ -140,21 +112,4 @@ MRS-Profunctor = record
             in ∘-resp-≈ (Hom.F-resp-≈ (u≈u' , Equiv.refl)) (Φ≈Φ' {h})
               } })
      }
-  } -- record
-  -- { F₀ = λ { (A , B) → MR2-Setoid A B }
-  -- ; F₁ = λ { {(A , B)} {(A' , B')} (u , v) → record
-  --   { _⟨$⟩_ = λ {⟪ f , Φ ⟫ → ⟪ v ∘ f ∘ u , Φ ⟫ }
-  --   ; cong = λ { {⟪ f , Φ ⟫} {⟪ g , Φ' ⟫} (f≈g , Φ≈Φ') →
-  --       (∘-resp-≈ Equiv.refl (∘-resp-≈ f≈g Equiv.refl))
-  --     , {!   !} -- (λ {x} → ∘-resp-≈ʳ (Φ≈Φ' {x}))
-  --     }
-  --   }}
-  -- ; identity = λ { {(A , B)} {⟪ f , Φ ⟫} {⟪ g , Φ' ⟫} →
-  --     let module Hom = Functor [-,-] in
-  --     let module CodF = Functor Cod in
-  --       ( λ (f≈g , Φ≈Φ') → Equiv.trans identityˡʳ f≈g
-  --       , λ { {h} → {!   !} })
-  --    }
-  -- ; homomorphism = {!   !}
-  -- ; F-resp-≈ = {!   !}
-  -- }
+  }
