@@ -34,19 +34,54 @@ open import Categories.Rosen.Incoherent.Elements Cl
 
 module _ {X Y : iMR2₀} (f : twiMR2⇒ X Y) where
   module X = iMR2₀ X
+  ΦX = iMR2.Φ X.ξ 
+  ΦX* = adjoint.Radjunct ΦX
   module Y = iMR2₀ Y
+  ΦY = iMR2.Φ Y.ξ 
+  ΦY* = adjoint.Radjunct ΦY
   module F = twiMR2⇒ f
   ε = adjoint.counit.η
 
   lemma-epsilon :
     F.r ∘ ε X.B ∘ id {[ F.X.A , F.X.B ]₀} ⊗₁ F.l ≈ ε Y.B ∘ [ F.l , F.r ]₁ ⊗₁ id {F.Y.A}
   lemma-epsilon = 
-    begin F.r ∘ ε X.B ∘ id {[ F.X.A , F.X.B ]₀} ⊗₁ F.l ≈⟨ pullˡ C (adjoint.counit.sym-commute F.r) ∙ assoc ⟩
-          ε Y.B ∘ Functor.F₁ ((-⊗ F.X.A) ∘F appˡ [-,-] F.X.A) F.r ∘ id {[ F.X.A , F.X.B ]₀} ⊗₁ F.l ≈⟨ (refl⟩∘⟨ Equiv.sym [ ⊗ ]-commute) ⟩
-          ε Y.B ∘ (id {[ F.X.A , F.Y.B ]₀} ⊗₁ F.l) ∘ [ id {F.X.A} , F.r ]₁ ⊗₁ id {F.Y.A} ≈⟨ {!   !} ⟩
-          ε Y.B ∘ [ F.l , id {F.Y.B} ]₁ ⊗₁ id {F.Y.A} ∘ [ id {F.X.A} , F.r ]₁ ⊗₁ id {F.Y.A} ≈˘⟨ refl⟩∘⟨ {!   !} ⟩
-          ε Y.B ∘ [ F.l , F.r ]₁ ⊗₁ id {{!   !}} ∎ 
-  -- pullˡ C (adjoint.counit.sym-commute F.r) ∙ assoc ∙ (refl⟩∘⟨ Equiv.sym [ ⊗ ]-commute) ∙ {!   !}
+    begin F.r ∘ ε X.B ∘ id {[ F.X.A , F.X.B ]₀} ⊗₁ F.l 
+      ≈⟨ pullˡ C (adjoint.counit.sym-commute F.r) ∙ assoc ⟩
+          ε Y.B ∘ Functor.F₁ ((-⊗ F.X.A) ∘F appˡ [-,-] F.X.A) F.r ∘ id {[ F.X.A , F.X.B ]₀} ⊗₁ F.l 
+      ≈⟨ (refl⟩∘⟨ Equiv.sym [ ⊗ ]-commute) ⟩
+          ε Y.B ∘ id {[ F.X.A , F.Y.B ]₀} ⊗₁ F.l ∘ [ id {F.X.A} , F.r ]₁ ⊗₁ id {F.Y.A} 
+      ≈⟨ pullˡ C (Equiv.sym (mate.commute₂ F.l {F.Y.B})) ⟩
+          (ε Y.B ∘ [ F.l , id {F.Y.B} ]₁ ⊗₁ id {F.Y.A}) ∘ [ id {F.X.A} , F.r ]₁ ⊗₁ id {F.Y.A} 
+      ≈⟨ assoc ⟩
+          ε Y.B ∘ [ F.l , id {F.Y.B} ]₁ ⊗₁ id {F.Y.A} ∘ [ id {F.X.A} , F.r ]₁ ⊗₁ id {F.Y.A} 
+      ≈˘⟨ refl⟩∘⟨ Functor.homomorphism (appʳ ⊗ F.Y.A) ⟩
+          ε Y.B ∘ ([ F.l , id {F.Y.B} ]₁ ∘ [ id {F.X.A} , F.r ]₁) ⊗₁ id {F.Y.A}  
+      ≈˘⟨ refl⟩∘⟨ Functor.F-resp-≈ (appʳ ⊗ F.Y.A) [ [-,-] ]-decompose₁ ⟩ 
+          ε Y.B ∘ [ F.l , F.r ]₁ ⊗₁ id {F.Y.A} ∎ 
+
+  lemma-delta :
+    [ F.l , F.r ]₁ ∘ adjoint.Ladjunct (ΦX* ∘ (ε X.B ⊗₁ id)) ∘ id {[ F.X.A , F.X.B ]₀} ⊗₁ F.l
+      ≈
+    adjoint.Ladjunct (ΦY* ∘ (ε Y.B ⊗₁ id)) ∘ [ F.l , F.r ]₁ ⊗₁ id {F.Y.A}
+  lemma-delta = 
+    begin [ F.l , F.r ]₁ ∘ adjoint.Ladjunct (ΦX* ∘ ε F.X.B ⊗₁ id) ∘ id ⊗₁ F.l 
+      ≈⟨ refl⟩∘⟨ (adjoint.Ladjunct-comm′ ∙ ((adjoint.LRadjunct≈id ⟩∘⟨refl)) ⟩∘⟨refl) ⟩ 
+          [ F.l , F.r ]₁ ∘ (ΦX ∘ ε F.X.B) ∘ id ⊗₁ F.l 
+      ≈⟨ refl⟩∘⟨ pullʳ C (Equiv.sym (mate.commute₂ F.l)) ⟩ 
+          [ F.l , F.r ]₁ ∘ ΦX ∘ ε F.X.B ∘ ([ F.l , id ]₁ ⊗₁ id) 
+      ≈⟨ refl⟩∘⟨ pullˡ C (adjoint.counit.sym-commute F.ξX.Φ) ⟩ 
+          [ F.l , F.r ]₁ ∘ (ε _ ∘ [ id {F.Y.A} , F.ξX.Φ ]₁ ⊗₁ id) ∘ ([ F.l , id ]₁ ⊗₁ id) 
+      ≈⟨ sym-assoc ∙ (pullˡ C (adjoint.counit.sym-commute _) ⟩∘⟨refl) ⟩
+          ((ε _ ∘ [ id , [ F.l , F.r ]₁ ]₁ ⊗₁ id) ∘ [ id , F.ξX.Φ ]₁ ⊗₁ id) ∘ [ F.l , id ]₁ ⊗₁ id 
+          -- ((f ∘ g) ∘ h) ∘ i 
+      ≈⟨ anti-assoc-4 ∙ (refl⟩∘⟨ Equiv.sym ((Functor.homomorphism _ ○ refl⟩∘⟨ Functor.homomorphism _))) ⟩
+          ε _ ∘ ([ id , [ F.l , F.r ]₁ ]₁ ∘ [ id , F.ξX.Φ ]₁ ∘ [ F.l , id ]₁) ⊗₁ id {F.Y.A} 
+      ≈⟨ {!   !} ⟩
+          (ΦY ∘ ε F.Y.B) ∘ [ F.l , F.r ]₁ ⊗₁ id 
+      ≈˘⟨ (adjoint.LRadjunct≈id ⟩∘⟨refl) ⟩∘⟨refl ⟩
+          ((adjoint.Ladjunct ΦY*) ∘ ε F.Y.B) ∘ [ F.l , F.r ]₁ ⊗₁ id 
+      ≈˘⟨ adjoint.Ladjunct-comm′ ⟩∘⟨refl ⟩
+          adjoint.Ladjunct (ΦY* ∘ ε F.Y.B ⊗₁ id) ∘ [ F.l , F.r ]₁ ⊗₁ id ∎
 
 [_]f : Functor τ[iMR2] Arr.Arrow 
 [_]f = record
