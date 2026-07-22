@@ -74,9 +74,14 @@ module _ {X Y : iMR2₀} (f : twiMR2⇒ X Y) where
       ≈⟨ sym-assoc ∙ (pullˡ C (adjoint.counit.sym-commute _) ⟩∘⟨refl) ⟩
           ((ε _ ∘ [ id , [ F.l , F.r ]₁ ]₁ ⊗₁ id) ∘ [ id , F.ξX.Φ ]₁ ⊗₁ id) ∘ [ F.l , id ]₁ ⊗₁ id 
           -- ((f ∘ g) ∘ h) ∘ i 
-      ≈⟨ anti-assoc-4 ∙ (refl⟩∘⟨ Equiv.sym ((Functor.homomorphism _ ○ refl⟩∘⟨ Functor.homomorphism _))) ⟩
-          ε _ ∘ ([ id , [ F.l , F.r ]₁ ]₁ ∘ [ id , F.ξX.Φ ]₁ ∘ [ F.l , id ]₁) ⊗₁ id {F.Y.A} 
+      ≈⟨ anti-assoc-4 ∙ (refl⟩∘⟨ Equiv.sym ((Functor.homomorphism (appʳ ⊗ F.Y.A) ○ refl⟩∘⟨ Functor.homomorphism (appʳ ⊗ F.Y.A)))) ⟩
+          ε _ ∘ ([ id , [ F.l , F.r ]₁ ]₁ ∘ [ id , ΦX ]₁ ∘ [ F.l , id ]₁) ⊗₁ id {F.Y.A} 
+      ≈⟨ refl⟩∘⟨ Functor.F-resp-≈ (appʳ ⊗ F.Y.A) (pullˡ C (Equiv.sym (Functor.homomorphism (appˡ [-,-] F.Y.A)))) ⟩
+          ε _ ∘ ([ id , [ F.l , F.r ]₁ ∘ ΦX ]₁ ∘ [ F.l , id ]₁) ⊗₁ id {F.Y.A} 
+      ≈⟨ refl⟩∘⟨ Functor.F-resp-≈ (appʳ ⊗ F.Y.A) (Functor.F-resp-≈ (appˡ [-,-] F.Y.A) (sym F.eqΦ) ⟩∘⟨refl) ⟩
+          ε _ ∘ ([ id , ΦY ∘ F.r ]₁ ∘ [ F.l , id ]₁) ⊗₁ id {F.Y.A} 
       ≈⟨ {!   !} ⟩
+          {!   !}
           (ΦY ∘ ε F.Y.B) ∘ [ F.l , F.r ]₁ ⊗₁ id 
       ≈˘⟨ (adjoint.LRadjunct≈id ⟩∘⟨refl) ⟩∘⟨refl ⟩
           ((adjoint.Ladjunct ΦY*) ∘ ε F.Y.B) ∘ [ F.l , F.r ]₁ ⊗₁ id 
