@@ -25,10 +25,6 @@ open import Categories.Rosen.Functorial.Core Cl U
 
 open Closed Cl using ([-,-]; [_,-]; [_,_]₁)
 
--- import Reason
--- open Reason C
-
-
 -- The total category of the MRS-profunctor tabulator.
 -- Equivalent to the tabulator of MRS-Profunctor (see Tabulator.agda).
 
@@ -40,20 +36,20 @@ record tot⇒ (x y : tab₀ MRS-Profunctor) : Set (o ⊔ ℓ ⊔ e) where
   module x = tab₀ x
   module y = tab₀ y
   field
-    l : x.L ⇒ y.L 
-    r : x.R ⇒ y.R 
-  
+    l : x.L ⇒ y.L
+    r : x.R ⇒ y.R
+
   f = MR2.f x.ξ
   g = MR2.f y.ξ
 
   module Φ = NT (MR2.Φ x.ξ)
   module ψ = NT (MR2.Φ y.ξ)
   module l*ψ = NT ((nHom l ∘ʳ U) ∘ᵥ MR2.Φ y.ξ)
-  
+
   field
     eqf : r ∘ f ≈ g ∘ l
     nat : ∀ {s t} (h : s E.⇒ t) → l*ψ.η t ∘ U.F₁ h ≈ Functor.F₁ [ x.L ,-] (U.F₁ h) ∘ Φ.η s
-  
+
   eqΦ : ∀ {t} → l*ψ.η t ≈ Φ.η t
   eqΦ {t} = introʳ C U.identity ○ nat (E.id) ○ elimˡ C (Functor.identity ([ _ ,-] ∘F U))
 
@@ -63,7 +59,7 @@ total = record
   { Obj = tab₀ MRS-Profunctor
   ; _⇒_ = λ s t → tot⇒ s t
   ; _≈_ = λ h k → tot⇒.l h ≈ tot⇒.l k × tot⇒.r h ≈ tot⇒.r k
-  ; id = λ { {(A , B) ∣ ⟪ f , Φ ⟫} → 
+  ; id = λ { {(A , B) ∣ ⟪ f , Φ ⟫} →
        let module ΦNT = NT Φ in
        [ id , id ∥ id-comm-sym C
        , (λ α → elimˡ C [-,-].identity ⟩∘⟨refl ○ ΦNT.commute α)
@@ -76,22 +72,21 @@ total = record
            module Hx = Functor [ t'.x.L ,-]
            module Hy = Functor [ t.x.L ,-]
        in
-       [ t.l ∘ t'.l , t.r ∘ t'.r ∥ 
+       [ t.l ∘ t'.l , t.r ∘ t'.r ∥
          pullʳ C t'.eqf ○ pullˡ C t.eqf ○ assoc
        , (λ {s} {t₀} α →
-          --  let r = Arr.Morphism⇒.cod⇒ α in
            begin
-             ([-,-].F₁ (t.l ∘ t'.l , id) ∘ ψ.η t₀) ∘ U.F₁ α -- ([ t.l ∘ t'.l , id ]₁ ∘ ψ.η t₀) ∘ r             
-               ≈⟨ (Hom[-1].homomorphism ⟩∘⟨refl) ⟩∘⟨refl ⟩ -- ∘-resp-≈ (∘-resp-≈ (Hom[-1].homomorphism) Equiv.refl) Equiv.refl ⟩
+             ([-,-].F₁ (t.l ∘ t'.l , id) ∘ ψ.η t₀) ∘ U.F₁ α
+               ≈⟨ (Hom[-1].homomorphism ⟩∘⟨refl) ⟩∘⟨refl ⟩
              (([ t'.l , id ]₁ ∘ [ t.l , id ]₁) ∘ ψ.η t₀) ∘ U.F₁ α
-               ≈⟨ ∘-resp-≈ˡ assoc ○ assoc ⟩ -- ∘-resp-≈ assoc Equiv.refl ○ assoc ⟩
-             [-,-].F₁ (t'.l , id) ∘ ([-,-].F₁ (t.l , id) ∘ ψ.η t₀) ∘ U.F₁ α -- [ t'.l , id ]₁ ∘ (([ t.l , id ]₁ ∘ ψ.η t₀) ∘ r) 
+               ≈⟨ ∘-resp-≈ˡ assoc ○ assoc ⟩
+             [-,-].F₁ (t'.l , id) ∘ ([-,-].F₁ (t.l , id) ∘ ψ.η t₀) ∘ U.F₁ α
                ≈⟨ (refl⟩∘⟨ t.nat α) ○  sym-assoc ⟩
-            ([-,-].F₁ (t'.l , id) ∘ [-,-].F₁ (id , U.F₁ α)) ∘ t'.ψ.η s -- ([ t'.l , id ]₁ ∘ Hy.F₁ r) ∘ t.Φ.η s             
-              ≈⟨ ∘-resp-≈ˡ (Equiv.sym [ [-,-] ]-commute) ○ assoc ⟩
-             [-,-].F₁ (id , U.F₁ α) ∘ [-,-].F₁ (t'.l , id) ∘ t'.ψ.η s -- Hx.F₁ r ∘ ([ t'.l , id ]₁ ∘ t.Φ.η s)            
+             ([-,-].F₁ (t'.l , id) ∘ [-,-].F₁ (id , U.F₁ α)) ∘ t'.ψ.η s
+               ≈⟨ ∘-resp-≈ˡ (Equiv.sym [ [-,-] ]-commute) ○ assoc ⟩
+             [-,-].F₁ (id , U.F₁ α) ∘ [-,-].F₁ (t'.l , id) ∘ t'.ψ.η s
                ≈⟨ refl⟩∘⟨ t'.eqΦ {t = s} ⟩
-             [-,-].F₁ (id , U.F₁ α) ∘ t'.Φ.η s ∎)-- Hx.F₁ r ∘ t'.Φ.η s                              ∎)
+             [-,-].F₁ (id , U.F₁ α) ∘ t'.Φ.η s ∎)
        ]}
   ; assoc = assoc , assoc
   ; sym-assoc = sym-assoc , sym-assoc
@@ -104,49 +99,4 @@ total = record
     ; trans = λ { (p₁ , q₁) (p₂ , q₂) → Equiv.trans p₁ p₂ , Equiv.trans q₁ q₂ }
     }
   ; ∘-resp-≈ = λ { (p₁ , q₁) (p₂ , q₂) → ∘-resp-≈ p₁ p₂ , ∘-resp-≈ q₁ q₂ }
-  } -- record
---   { Obj = tab₀ MRS-Profunctor
---   ; _⇒_ = λ s t → tot⇒ s t
---   ; _≈_ = λ h k → tot⇒.l h ≈ tot⇒.l k × tot⇒.r h ≈ tot⇒.r k
---   ; id = λ { {(A , B) ∣ ⟪ f , Φ ⟫} → 
---        let module ΦNT = NT Φ
---            module l*Φ = NT ((nHom id ∘ʳ U) ∘ᵥ Φ)
---        in
---        [ id , id
---        ∥ id-comm-sym C
---        , (λ {s} {t} α → 
---          elimˡ C [-,-].identity ⟩∘⟨refl 
---          ○ ΦNT.commute α)
---        ]}
---   ; _∘_ = λ { {A} {B} {X} t t' →
---        let module t  = tot⇒ t
---            module t' = tot⇒ t'
---            module ψ  = NT (MR2.Φ t.y.ξ)
---            module Hom[-1] {X} = Functor (appʳ [-,-] X)
---            module Hx = Functor [ t'.x.L ,-]
---            module Hy = Functor [ t.x.L ,-]
---        in
---        [ t.l ∘ t'.l , t.r ∘ t'.r ∥ 
---          pullʳ C t'.eqf ○ pullˡ C t.eqf ○ assoc
---        , (λ {s} {t₀} α →
---            let r = Arr.Morphism⇒.cod⇒ α in
---            begin
---              ([ t.l ∘ t'.l , id ]₁ ∘ ψ.η t₀) ∘ r             ≈⟨ ∘-resp-≈ (∘-resp-≈ (Hom[-1].homomorphism) Equiv.refl) Equiv.refl ⟩
---              (([ t'.l , id ]₁ ∘ [ t.l , id ]₁) ∘ ψ.η t₀) ∘ r ≈⟨ ∘-resp-≈ assoc Equiv.refl ○ assoc ⟩
---              [ t'.l , id ]₁ ∘ (([ t.l , id ]₁ ∘ ψ.η t₀) ∘ r) ≈⟨ (refl⟩∘⟨ t.nat α) ○  sym-assoc ⟩
---             ([ t'.l , id ]₁ ∘ Hy.F₁ r) ∘ t.Φ.η s             ≈⟨ (∘-resp-≈ (Equiv.sym [ [-,-] ]-commute) Equiv.refl) ○ assoc ⟩
---              Hx.F₁ r ∘ ([ t'.l , id ]₁ ∘ t.Φ.η s)            ≈⟨ refl⟩∘⟨ t'.eqΦ {t = s} ⟩
---              Hx.F₁ r ∘ t'.Φ.η s                              ∎)
---        ]}
---   ; assoc = assoc , assoc
---   ; sym-assoc = sym-assoc , sym-assoc
---   ; identityˡ = identityˡ , identityˡ
---   ; identityʳ = identityʳ , identityʳ
---   ; identity² = identity² , identity²
---   ; equiv = record
---     { refl = Equiv.refl , Equiv.refl
---     ; sym = λ { (p , q) → Equiv.sym p , Equiv.sym q }
---     ; trans = λ { (p₁ , q₁) (p₂ , q₂) → Equiv.trans p₁ p₂ , Equiv.trans q₁ q₂ }
---     }
---   ; ∘-resp-≈ = λ { (p₁ , q₁) (p₂ , q₂) → ∘-resp-≈ p₁ p₂ , ∘-resp-≈ q₁ q₂ }
---   }
+  }
