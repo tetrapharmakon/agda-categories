@@ -25,7 +25,7 @@ open import Categories.Rosen.Functorial.Core Cl U
 
 open Closed Cl using ([-,-]; [_,-]; [_,_]₁)
 
--- The total category of the MRS-profunctor tabulator.
+-- The total category of the (functorial) MRS-profunctor tabulator.
 -- Equivalent to the tabulator of MRS-Profunctor (see Tabulator.agda).
 
 open HomReasoning
