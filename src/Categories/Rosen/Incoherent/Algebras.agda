@@ -7,7 +7,7 @@ open import Categories.Category.Monoidal using (Monoidal)
 open import Categories.Category.Monoidal.Closed using (Closed)
 open import Categories.Category.Monoidal.Symmetric using (Symmetric)
 
-module Categories.Rosen.Algebras
+module Categories.Rosen.Incoherent.Algebras
   {o ℓ e} {C : Category o ℓ e}
   (M : Monoidal C)
   (Cl : Closed M)
