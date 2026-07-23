@@ -39,9 +39,9 @@ open HomReasoning
 
 open Closed Cl using ([-,-]; [_,_]₀; [_,-]; [-,_]; [_,_]₁)
 
-open import Categories.Rosen.Core Cl
-open import Categories.Rosen.Tabulator Cl using (𝕋MRS; V₁)
-open import Categories.Rosen.ProElements Cl {F = MRS-Profunctor} using (ElMRS;Elts₀;Elts⇒;U₁)
+open import Categories.Rosen.Coherent.Core Cl
+open import Categories.Rosen.Coherent.Tabulator Cl using (𝕋MRS; V₁)
+open import Categories.Rosen.Coherent.ProElements Cl {F = MRS-Profunctor} using (ElMRS;Elts₀;Elts⇒;U₁)
 
 open import Categories.Functor.Profunctor.Tabulator
 

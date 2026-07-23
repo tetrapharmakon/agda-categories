@@ -5,7 +5,7 @@ open import Categories.Category using (Category)
 open import Categories.Category.Monoidal using (Monoidal)
 open import Categories.Category.Monoidal.Closed using (Closed)
 
-module Categories.Rosen.HigherMRS {o ℓ e} {C : Category o ℓ e} {M : Monoidal C} (Cl : Closed M) where
+module Categories.Rosen.Functorial.HigherMRS {o ℓ e} {C : Category o ℓ e} {M : Monoidal C} (Cl : Closed M) where
 
 -- Higher-order (M,R)-systems following a Fibonacci-style construction:
 -- each step A → B → [A,B] → [B,[A,B]] → ... embeds the two previous
@@ -29,9 +29,9 @@ open import Categories.Morphism as BaseMorphism using (_≅_; Iso)
 open import Categories.Morphism.Properties as Morphismₚ using (Iso-∘; Iso-swap)
 import Relation.Binary.Reasoning.Setoid as SetoidR
 open import Categories.NaturalTransformation.NaturalIsomorphism as NI using (NaturalIsomorphism;niHelper; _ⓘˡ_; _ⓘʳ_)
-open import Categories.Rosen.Core Cl
-open import Categories.Rosen.ProElements Cl {F = MRS-Profunctor}
-open import Categories.Rosen.Tabulator Cl using (V₁; 𝕋MRS)
+open import Categories.Rosen.Functorial.Core Cl
+open import Categories.Rosen.Functorial.ProElements Cl {F = MRS-Profunctor}
+open import Categories.Rosen.Functorial.Tabulator Cl using (V₁; 𝕋MRS)
 
 import Reason
 open Reason C

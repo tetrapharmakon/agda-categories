@@ -17,10 +17,10 @@ open import Categories.Functor using (Functor)
 open import Categories.Functor.Profunctor.Tabulator
 open import Categories.Morphism.Reasoning as MR
 open import Categories.NaturalTransformation using (ntHelper; _∘ᵥ_; _∘ʳ_) renaming (NaturalTransformation to NT)
-open import Categories.Rosen.Core Cl
-open import Categories.Rosen.Repairs Cl
-open import Categories.Rosen.TotalCategory Cl using (tot⇒; total; [_,_∥_,_])
-open import Categories.Rosen.ProElements Cl {F = MRS-Profunctor}
+open import Categories.Rosen.Coherent.Core Cl
+open import Categories.Rosen.Coherent.Repairs Cl
+open import Categories.Rosen.Coherent.TotalCategory Cl using (tot⇒; total; [_,_∥_,_])
+open import Categories.Rosen.Coherent.ProElements Cl {F = MRS-Profunctor}
 
 open Closed Cl using ([-,-]; [_,_]₀; [_,-]; [_,_]₁)
 open HomReasoning

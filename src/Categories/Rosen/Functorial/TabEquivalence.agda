@@ -5,7 +5,7 @@ open import Categories.Category using (Category)
 open import Categories.Category.Monoidal using (Monoidal)
 open import Categories.Category.Monoidal.Closed using (Closed)
 
-module Categories.Rosen.TabEquivalence {o ℓ e} {C : Category o ℓ e} {M : Monoidal C} (Cl : Closed M) where
+module Categories.Rosen.Functorial.TabEquivalence {o ℓ e} {C : Category o ℓ e} {M : Monoidal C} (Cl : Closed M) where
 
 -- Equivalence between the total category (see TotalCategory.agda) and the
 -- tabulator of MRS-Profunctor (see Tabulator.agda).
@@ -20,9 +20,9 @@ open import Categories.Functor using (Functor)
 open import Categories.Functor.Profunctor.Tabulator
 open import Categories.Morphism.Reasoning as MR
 open import Categories.NaturalTransformation using (ntHelper; _∘ᵥ_; _∘ʳ_) renaming (NaturalTransformation to NT)
-open import Categories.Rosen.Core Cl
-open import Categories.Rosen.ProElements Cl {F = MRS-Profunctor}
-open import Categories.Rosen.TotalCategory Cl using (tot⇒; total; [_,_∥_,_])
+open import Categories.Rosen.Functorial.Core Cl
+open import Categories.Rosen.Functorial.ProElements Cl {F = MRS-Profunctor}
+open import Categories.Rosen.Functorial.TotalCategory Cl using (tot⇒; total; [_,_∥_,_])
 
 open Closed Cl using ([-,-]; [_,_]₀; [_,-]; [_,_]₁)
 open HomReasoning

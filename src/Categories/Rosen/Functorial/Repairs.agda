@@ -5,7 +5,7 @@ open import Categories.Category using (Category)
 open import Categories.Category.Monoidal using (Monoidal)
 open import Categories.Category.Monoidal.Closed using (Closed)
 
-module Categories.Rosen.Repairs {o ℓ e} {C : Category o ℓ e} {M : Monoidal C} (Cl : Closed M) where
+module Categories.Rosen.Functorial.Repairs {o ℓ e} {C : Category o ℓ e} {M : Monoidal C} (Cl : Closed M) where
 
 -- The "fibration of repairs": the category of elements of the functor
 -- A ↦ Nat(Cod, [A,-]∘Cod).  Objects rep₀ are (A, Φ) with Φ : Cod ⇒ [A,-]∘Cod;
@@ -18,7 +18,7 @@ open import Categories.Functor using (Functor; _∘F_)
 open import Categories.Morphism.Reasoning as MR
 open import Categories.NaturalTransformation using (NaturalTransformation; _∘ᵥ_; _∘ʳ_)
 open import Categories.NaturalTransformation.Equivalence using (_≃_)
-open import Categories.Rosen.Core Cl
+open import Categories.Rosen.Functorial.Core Cl
 
 import Reason
 open Reason C

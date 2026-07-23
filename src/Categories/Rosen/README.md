@@ -2,9 +2,13 @@
 
 Work-in-progress documentation of the `Categories.Rosen` module hierarchy.
 
-## Modules
+## Coherent (M,R)-systems
 
-### `Core.agda`
+The core coherent definitions live in the `Coherent/` subdirectory.
+A copy of all Coherent files (with `Categories.Rosen.Functorial.*` module paths)
+is maintained in `Functorial/` as a starting point for future variants.
+
+### `Coherent/Core.agda`
 Core definitions for the category of (M,R)-systems.
 - `Cod` — Codomain functor `Arrow(C) → C`.
 - `nHom` — sends `f : A ⇒ B` to the induced natural transformation `[-,f] : [B,-] ⇒ [A,-]`.
@@ -13,18 +17,18 @@ Core definitions for the category of (M,R)-systems.
 - `MR2-Setoid` — `MR2` as a `Setoid`.
 - `MRS-Profunctor` — the profunctor `C^op × C → Sets` sending `(A, B)` to `MR2 A B`.
 
-### `Repairs.agda`
+### `Coherent/Repairs.agda`
 The "fibration of repairs": the category of elements of the functor `A ↦ Nat(Cod, [A,-]∘Cod)`.
 - `rep₀` — objects: `(A, Φ)` with `Φ : Cod ⇒ [A,-]∘Cod`.
 - `rep⇒` — morphisms: `u : X.A ⇒ Y.A` such that `(nHom u ∘ʳ Cod) ∘ᵥ Y.Φ ≃ X.Φ`.
 - `repairs` — the total category of this fibration.
 
-### `TotalCategory.agda`
+### `Coherent/TotalCategory.agda`
 The total category of the MRS-profunctor tabulator.
 - `tot⇒` — morphisms in the total category.
 - `total` — the total category, equivalent to the tabulator of `MRS-Profunctor`.
 
-### `HigherMRS.agda`
+### `Coherent/HigherMRS.agda`
 Higher-order (M,R)-systems in a Fibonacci-style construction: each step
 `A → B → [A,B] → [B,[A,B]] → ...` embeds the two previous levels into an
 internal hom. Built as iterated IsoCommas of ℝ and Vᵢ.
@@ -37,7 +41,7 @@ internal hom. Built as iterated IsoCommas of ℝ and Vᵢ.
 - `MRS-chain` — a chain `⋯ → 2 → 1 → 0` as a functor `ℕ^op → Cats`.
 - `MRS∞` — the limit of the chain (the "∞-level" MRS category).
 
-### `Tabulator.agda`
+### `Coherent/Tabulator.agda`
 Tabulator of `MRS-Profunctor`: a canonical category `𝕋MRS` attached to the
 profunctor `MRS-Profunctor : C^op × C → Sets`, equipped with a universal 2-cell.
 - `𝕋MRS` — the tabulator category of `MRS-Profunctor`.
@@ -46,7 +50,7 @@ profunctor `MRS-Profunctor : C^op × C → Sets`, equipped with a universal 2-ce
 - `V₁` — extracts the "f" component from each `MR2` object.
 - `ϵ` — natural transformation from `MRS-Profunctor` to the lifted hom functor.
 
-### `FibreA.agda`
+### `Coherent/FibreA.agda`
 Fibre-at-A construction: an alternative approach to higher (M,R)-systems by fixing
 the domain object `A`, which simplifies the definitions.
 - `totalAtA₀` / `totalAtA₁` — objects and morphisms of the fibre over `A`.
@@ -64,7 +68,7 @@ category of algebras for the endofunctor `X ↦ A + (A ⊗ X)`.
 - `to` / `from` — comparison functors between `iMR2ᴿ A` and `F-Algebra-Category {A}`.
 - `AlgA≣MRS^A` — `StrongEquivalence (iMR2ᴿ A) (F-Algebra-Category {A})`.
 
-### `TabEquivalence.agda`
+### `Coherent/TabEquivalence.agda`
 Equivalence between the total category (see `TotalCategory.agda`) and the
 tabulator of `MRS-Profunctor` (see `Tabulator.agda`).
 - `Eq` / `Eq⁻¹` — inverse functors (identity on objects) establishing the equivalence.
@@ -111,7 +115,7 @@ In this setting, V₁ and U₁ acquire left adjoints.
 - `L` / `L⊣V₁` — left adjoint to V₁.
 - `L'` / `L'⊣U₁` — left adjoint to U₁.
 
-### `ProElements.agda`
+### `Coherent/ProElements.agda`
 Modified category of elements for a bifunctor `F : C^op × C → Sets`, specialised to `MRS-Profunctor`.
 - `EltsCat` — generic (modified) category-of-elements construction.
 - `ElMRS` — the category of elements of `MRS-Profunctor`.

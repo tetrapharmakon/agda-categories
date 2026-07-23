@@ -5,7 +5,7 @@ open import Categories.Category using (Category)
 open import Categories.Category.Monoidal using (Monoidal)
 open import Categories.Category.Monoidal.Closed using (Closed)
 
-module Categories.Rosen.Tabulator {o ℓ e} {C : Category o ℓ e} {M : Monoidal C} (Cl : Closed M) where
+module Categories.Rosen.Functorial.Tabulator {o ℓ e} {C : Category o ℓ e} {M : Monoidal C} (Cl : Closed M) where
 
 -- Tabulator of MRS-Profunctor: a canonical category 𝕋MRS attached to the
 -- profunctor MRS-Profunctor : C^op × C → Sets, equipped with a universal
@@ -21,7 +21,7 @@ open import Categories.Functor.Hom using (Hom[_][-,-])
 open import Categories.Functor.Profunctor.Tabulator
 open import Categories.Morphism.Reasoning as MR
 open import Categories.NaturalTransformation using (NaturalTransformation; ntHelper)
-open import Categories.Rosen.Core Cl
+open import Categories.Rosen.Functorial.Core Cl
 
 import Reason
 open Reason C

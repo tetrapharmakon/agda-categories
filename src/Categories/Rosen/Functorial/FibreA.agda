@@ -5,7 +5,7 @@ open import Categories.Category using (Category)
 open import Categories.Category.Monoidal using (Monoidal)
 open import Categories.Category.Monoidal.Closed using (Closed)
 
-module Categories.Rosen.FibreA {o ℓ e} {C : Category o ℓ e} {M : Monoidal C} (Cl : Closed M) where
+module Categories.Rosen.Functorial.FibreA {o ℓ e} {C : Category o ℓ e} {M : Monoidal C} (Cl : Closed M) where
 
 -- Fibre-at-A: alternative construction for higher (M,R)-systems by
 -- fixing the domain object A, which simplifies the definitions.
@@ -18,8 +18,8 @@ open import Categories.Category.Construction.Arrow C using (Morphism; Morphism�
 open import Categories.Category.Construction.Comma
 open import Categories.Functor using (Functor)
 open import Categories.NaturalTransformation using (NaturalTransformation)
-open import Categories.Rosen.Core Cl
-open import Categories.Rosen.Tabulator Cl using (𝕋MRS; V₁)
+open import Categories.Rosen.Functorial.Core Cl
+open import Categories.Rosen.Functorial.Tabulator Cl using (𝕋MRS; V₁)
 
 import Reason
 open Reason C

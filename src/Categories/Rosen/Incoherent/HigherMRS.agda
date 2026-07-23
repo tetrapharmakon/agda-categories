@@ -36,7 +36,7 @@ open import Categories.NaturalTransformation.NaturalIsomorphism as NI
 open import Categories.Rosen.Incoherent.Core Cl
 open import Categories.Rosen.Incoherent.Elements Cl
 open import Categories.Rosen.Incoherent.Functors Cl
-open import Categories.Rosen.Tabulator Cl using (V₁; 𝕋MRS)
+open import Categories.Rosen.Coherent.Tabulator Cl using (V₁; 𝕋MRS)
 
 import Reason
 open Reason C
