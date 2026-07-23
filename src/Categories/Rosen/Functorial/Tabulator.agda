@@ -4,8 +4,9 @@ open import Level using (_⊔_; lift)
 open import Categories.Category using (Category)
 open import Categories.Category.Monoidal using (Monoidal)
 open import Categories.Category.Monoidal.Closed using (Closed)
+open import Categories.Functor using (Functor; _∘F_)
 
-module Categories.Rosen.Functorial.Tabulator {o ℓ e} {C : Category o ℓ e} {M : Monoidal C} (Cl : Closed M) where
+module Categories.Rosen.Functorial.Tabulator {o ℓ e} {C : Category o ℓ e} {E : Category (o ⊔ ℓ) (ℓ ⊔ e) e} {M : Monoidal C} (Cl : Closed M) (U : Functor E C) where
 
 -- Tabulator of MRS-Profunctor: a canonical category 𝕋MRS attached to the
 -- profunctor MRS-Profunctor : C^op × C → Sets, equipped with a universal
@@ -15,13 +16,12 @@ module Categories.Rosen.Functorial.Tabulator {o ℓ e} {C : Category o ℓ e} {M
 open import Data.Product using (_,_; proj₁)
 
 open import Categories.Category.Construction.Arrow
-open import Categories.Functor using (Functor; _∘F_)
 open import Categories.Functor.Construction.LiftSetoids using (LiftSetoids)
 open import Categories.Functor.Hom using (Hom[_][-,-])
 open import Categories.Functor.Profunctor.Tabulator
 open import Categories.Morphism.Reasoning as MR
 open import Categories.NaturalTransformation using (NaturalTransformation; ntHelper)
-open import Categories.Rosen.Functorial.Core Cl
+open import Categories.Rosen.Functorial.Core Cl U
 
 import Reason
 open Reason C
