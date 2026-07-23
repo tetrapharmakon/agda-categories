@@ -1,12 +1,12 @@
 {-# OPTIONS --without-K --warning=noUserWarning --warning=noUselessPrivate --warning=noUnsupportedIndexedMatch #-}
 
-open import Level using (_⊔_)
+open import Level using (_⊔_;suc;lift)
 open import Categories.Category using (Category)
 open import Categories.Category.Monoidal using (Monoidal)
 open import Categories.Category.Monoidal.Closed using (Closed)
 open import Categories.Functor using (Functor; _∘F_) renaming (id to idF)
 
-module Categories.Rosen.Variants.Functorial {o ℓ e} {C E : Category o ℓ e} {M : Monoidal C} (Cl : Closed M) (U : Functor E C) where
+module Categories.Rosen.Variants.Functorial {o ℓ e} {C : Category o ℓ e} {E : Category (o ⊔ ℓ) (ℓ ⊔ e) e} {M : Monoidal C} (Cl : Closed M) (U : Functor E C) where
 
 -- Functorial natural MR systems
 
@@ -54,7 +54,10 @@ record MR2 (A B : Obj) : Set (o ⊔ ℓ ⊔ e) where
 
 -- MR2 as a Setoid: two MR2 elements are equal when their f components are equal
 -- and their Φ components are ≃-equal.
-MR2-Setoid : Obj → Obj → Setoid (o ⊔ ℓ ⊔ e) (o ⊔ e) -- (o ⊔ ℓ ⊔ e) (o ⊔ ℓ ⊔ e)
+  
+open import Categories.Functor.Construction.LiftSetoids using (LiftSetoids)
+
+MR2-Setoid : Obj → Obj → Setoid (o ⊔ ℓ ⊔ e) (o ⊔ ℓ ⊔ e)
 MR2-Setoid A B = record
   { Carrier = MR2 A B
   ; _≈_ = λ (⟪ f , Φ ⟫) (⟪ g , Φ' ⟫) → (f ≈ g) × (Φ ≃ Φ')
@@ -68,8 +71,8 @@ MR2-Setoid A B = record
 open HomReasoning
 open MR
 
--- the same proof that works for Cod works in general
-MRS-Profunctor : Bifunctor (Category.op C) C (Setoids (o ⊔ ℓ ⊔ e) (o ⊔ e))
+-- the same proof that works for Cod works in general:
+MRS-Profunctor : Bifunctor (Category.op C) C (Setoids (o ⊔ ℓ ⊔ e) (o ⊔ ℓ ⊔ e))
 MRS-Profunctor = record
   { F₀ = (λ { (A , B) → MR2-Setoid A B })
   ; F₁ = λ { {(A , B)} {(A' , B')} (u , v) → record
