@@ -8,7 +8,7 @@ open import Categories.Category.Monoidal.Closed using (Closed)
 open import Categories.Functor using (Functor)
 open import Categories.Functor.Bifunctor using (Bifunctor; appˡ; appʳ)
 
-module Categories.Rosen.Functorial.ProElements {o ℓ e} {C : Category o ℓ e} {M : Monoidal C} (Cl : Closed M) {F : Bifunctor (Category.op C) C (Setoids (o ⊔ ℓ ⊔ e) (o ⊔ ℓ ⊔ e))} where
+module Categories.Rosen.Functorial.ProElements {o ℓ e} {C : Category o ℓ e} {E : Category (o ⊔ ℓ) (ℓ ⊔ e) e} {M : Monoidal C} (Cl : Closed M) (U : Functor E C) {F : Bifunctor (Category.op C) C (Setoids (o ⊔ ℓ ⊔ e) (o ⊔ ℓ ⊔ e))} where
 
 -- Modified category of elements for a bifunctor F : C^op × C → Sets, specialised to MRS-Profunctor.
 -- EltsCat is a generic (modified) category-of-elements construction; ElMRS is its instance.
@@ -22,7 +22,7 @@ open import Categories.Category.Construction.TwistedArrow C renaming (Morphism t
 open import Categories.Functor.Bifunctor.Properties using ([_]-decompose₁)
 open import Categories.Functor.Profunctor.Tabulator
 open import Categories.NaturalTransformation using (NaturalTransformation)
-open import Categories.Rosen.Functorial.Core Cl
+open import Categories.Rosen.Functorial.Core Cl U
 
 open import Function.Equality using (_⟨$⟩_; cong)
 
@@ -126,7 +126,7 @@ ElMRS = MRS.Elts
       t₃ : Arr.Morphism⇒ d c
       t₃ = record { dom⇒ = id ; cod⇒ = id ; square = identityˡ ○ Equiv.sym (proj₁ f.eqElts) ○ Equiv.sym identityʳ }
 
-      eqΦ : ∀ (m : Arr.Morphism) → [ f.l , id ]₁ ∘ η XE.Φ m ≈ η YE.Φ m
+      eqΦ : ∀ (m : E.Obj) → [ f.l , id ]₁ ∘ η XE.Φ m ≈ η YE.Φ m
       eqΦ m = proj₂ f.eqElts {x = m}
 
       lem1 : η XE.Φ a ≈ η XE.Φ b
