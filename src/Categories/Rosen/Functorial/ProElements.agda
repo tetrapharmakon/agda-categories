@@ -111,38 +111,27 @@ ElMRS = MRS.Elts
         open HomReasoning
         module XE = MR2 X.el
         module YE = MR2 Y.el
-        a = record { arr = XE.f }
-        b = record { arr = XE.f ∘ f.l }
-        -- c = record { arr = f.r ∘ XE.f ∘ f.l }
-        d = record { arr = YE.f }
         module Hom  {A} = Functor (appʳ [-,-] A)
 
         eqΦ : ∀ (m : E.Obj) → [ f.l , id ]₁ ∘ η XE.Φ m ≈ η YE.Φ m
         eqΦ m = proj₂ f.eqElts {x = m}
 
---       lem1 : η XE.Φ a ≈ η XE.Φ b
---       lem1 = begin
---         η XE.Φ a           ≈˘⟨ identityʳ ⟩
---         η XE.Φ a ∘ id     ≈⟨ commute XE.Φ t₁ ⟩
---         [ id , id ]₁ ∘ η XE.Φ b  ≈⟨ (Hom.identity ⟩∘⟨refl) ⟩ 
---         id ∘ η XE.Φ b     ≈⟨ identityˡ ⟩
---         η XE.Φ b          ∎
-
-        lem2 : η XE.Φ {!   !} ∘ {!   !} ≈ [ id , {!   !} ]₁ ∘ η XE.Φ {!   !}
-        lem2 = {!   !} -- commute XE.Φ t₂
+        lem2 : η XE.Φ XE.e₁ ∘ U.F₁ XE.h ≈ [ id , U.F₁ XE.h ]₁ ∘ η XE.Φ XE.e₀
+        lem2 = commute XE.Φ XE.h
   
     in record 
       { dom⇒ = f.r
       ; cod⇒ = [ f.l , f.r ]₁ 
       ; square = begin [ f.l , f.r ]₁ ∘ MR2.Φη₀ f.X.el ≈⟨ ([ [-,-] ]-decompose₁ ⟩∘⟨refl ○ assoc) ⟩ 
-                       [ f.l , id ]₁ ∘ [ id , f.r ]₁ ∘ MR2.Φη₀ f.X.el ≈⟨ rw-2-1 (Equiv.sym [ [-,-] ]-commute) ⟩ 
-                       {!   !} ≈⟨ {!   !} ⟩ 
+                       [ f.l , id ]₁ ∘ [ id , f.r ]₁ ∘ MR2.Φη₀ f.X.el ≈⟨ refl⟩∘⟨ {!    !} ⟩
+                       [ f.l , id ]₁ ∘ [ id , U.F₁ ? ]₁ ∘ MR2.Φη₀ f.X.el ≈⟨ refl⟩∘⟨ {!    !} ⟩
+                       {!   !} ≈⟨ {!  lem2 !} ⟩ 
                        {!   !} ≈⟨ {!   !} ⟩ 
                        MR2.Φη₀ f.Y.el ∘ f.r ∎ }
   }
-  ; identity = {!   !}
+  ; identity = refl , [-,-].identity
   ; homomorphism = λ {X} {Y} {Z} {f} {g} → refl , [-,-].homomorphism
-  ; F-resp-≈ = {!   !}
+  ; F-resp-≈ = λ (f≈gL , f≈gR) → f≈gR , ([-,-].F-resp-≈ (f≈gL , f≈gR))
   } -- record
 --   { F₀ = λ x → let module x = MRS.Elts₀ x in record { arr = MR2.Φη₀ x.el }
 --   ; F₁ = λ { {X} {Y} f → 

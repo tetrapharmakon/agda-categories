@@ -57,6 +57,21 @@ record MR2 (A B : Obj) : Set (o ⊔ ℓ ⊔ e) where
     Φ : NaturalTransformation U ([_,-] A ∘F U)
     Ue≈f : Σ E.Obj (λ x → Σ E.Obj (λ y → Σ (x E.⇒ y) (λ e → Σ (U.F₀ x ≡ A) (λ p → Σ (U.F₀ y ≡ B) (λ q → subst (λ z → z ⇒ B) p (subst (λ z → U.F₀ x ⇒ z) q (U.F₁ e)) ≈ f)))))
 
+  -- accessors
+  e₀ : E.Obj
+  e₀ = proj₁ Ue≈f
+  e₁ : E.Obj
+  e₁ = proj₁ (proj₂ Ue≈f) 
+  h : e₀ E.⇒ e₁
+  h = proj₁ (proj₂ (proj₂ Ue≈f))
+  Ue≡f₀ : _
+  Ue≡f₀ = proj₂ (proj₂ (proj₂ Ue≈f))
+  eq₀ : _
+  eq₀ = proj₁ Ue≡f₀
+  eq₁ : _
+  eq₁ = proj₁ (proj₂ Ue≡f₀)
+  eq⇒ : _
+  eq⇒ = proj₂ (proj₂ Ue≡f₀)
   Φη = NaturalTransformation.η Φ
   Φcommute = λ {X Y : Category.Obj E} t → NaturalTransformation.commute Φ {X} {Y} t
   Φη₀ = let (_ , y , _ , _ , q , _) = Ue≈f
