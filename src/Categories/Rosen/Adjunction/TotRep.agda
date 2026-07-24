@@ -13,7 +13,7 @@ open import Data.Product using (_,_; proj₁; proj₂; _×_)
 
 open import Categories.Adjoint using (_⊣_)
 open import Categories.Category.Construction.Arrow
-open import Categories.Functor using (Functor)
+open import Categories.Functor using (Functor;_∘F_)
 open import Categories.Functor.Profunctor.Tabulator
 open import Categories.Morphism.Reasoning as MR
 open import Categories.NaturalTransformation using (ntHelper; _∘ᵥ_; _∘ʳ_) renaming (NaturalTransformation to NT)
@@ -44,6 +44,12 @@ K = record
   ; F-resp-≈ = proj₁
   }
 
+-- [_,Cod] : (X : Obj) → Functor C C
+-- [ X ,Cod] = 
+
+[_,Cod]₁ : ∀ {A A'} → (u : A ⇒ A') → NT ([ A' ,-] ∘F Cod) ([ A ,-] ∘F Cod)
+[ u ,Cod]₁ = nHom u ∘ʳ Cod
+
 -- the inclusion of repairs in total
 𝕁 : Functor repairs total 
 𝕁 = record
@@ -58,10 +64,10 @@ K = record
           r = Arr.Morphism⇒.cod⇒ α
       in
       begin
-        (NT.η ((nHom f.u ∘ʳ Cod) ∘ᵥ Y₀.Φ) t) ∘ r                      ≈⟨ assoc ○ (refl⟩∘⟨ ΦY.commute α) ○ sym-assoc ⟩
-        (NT.η (nHom f.u ∘ʳ Cod) t ∘ Functor.F₁ [ Y₀.A ,-] r) ∘ ΦY.η s ≈⟨ (∘-resp-≈ (NT.commute (nHom f.u ∘ʳ Cod) α) Equiv.refl) ○ assoc ⟩
-        Functor.F₁ [ X₀.A ,-] r ∘ (NT.η (nHom f.u ∘ʳ Cod) s ∘ ΦY.η s) ≈⟨ refl⟩∘⟨ f.eq {x = s} ⟩
-        Functor.F₁ [ X₀.A ,-] r ∘ ΦX.η s                              ∎) ]}
+        (NT.η ([ f.u ,Cod]₁ ∘ᵥ Y₀.Φ) t) ∘ r                      ≈⟨ assoc ○ (refl⟩∘⟨ ΦY.commute α) ○ sym-assoc ⟩
+        (NT.η [ f.u ,Cod]₁ t ∘ Functor.F₁ [ Y₀.A ,-] r) ∘ ΦY.η s ≈⟨ (∘-resp-≈ (NT.commute [ f.u ,Cod]₁ α) Equiv.refl) ○ assoc ⟩
+        Functor.F₁ [ X₀.A ,-] r ∘ (NT.η [ f.u ,Cod]₁ s ∘ ΦY.η s) ≈⟨ refl⟩∘⟨ f.eq {x = s} ⟩
+        Functor.F₁ [ X₀.A ,-] r ∘ ΦX.η s                         ∎) ]}
   ; identity = Equiv.refl , Equiv.refl
   ; homomorphism = Equiv.refl , Equiv.refl
   ; F-resp-≈ = λ x → x , x
