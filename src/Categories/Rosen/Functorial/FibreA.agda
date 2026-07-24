@@ -47,8 +47,7 @@ record totalAtA₁ {A : Obj} (x y : totalAtA₀ A) : Set (o ⊔ ℓ ⊔ e) where
   module Φ = NaturalTransformation (MR2.Φ x.ξ)
   module ψ = NaturalTransformation (MR2.Φ y.ξ)
   field
-    eqΦ : [ id , r ]₁ ∘ Φ.η (record { dom = A ; cod = x.B ; arr = f }) ≈ ψ.η (record { dom = A ; cod = y.B ; arr = g }) ∘ r
-
+    eqΦ : [ id , r ]₁ ∘ MR2.Φη₀ x.ξ ≈ MR2.Φη₀ y.ξ ∘ r
 
 -- Category totalAtA A: the fibre over A of the MRS profunctor.
 totalAtA : (A : Obj) → Category (o ⊔ ℓ ⊔ e) (o ⊔ ℓ ⊔ e) e
@@ -63,9 +62,12 @@ totalAtA A = record
       }
   ; _∘_ = λ u v → let module u = totalAtA₁ u
                       module v = totalAtA₁ v
+                      module [A,-] = Functor ([ A ,-])
                   in record
                     { r = u.r ∘ v.r
-                    ; eqΦ = rw-1-2 (Functor.homomorphism [ A ,-]) ∙ skip v.eqΦ ∙ rw-2 u.eqΦ
+                    ; eqΦ = rw-1-2 [A,-].homomorphism 
+                          ∙ skip v.eqΦ 
+                          ∙ rw-2 u.eqΦ
                     }
   ; assoc = assoc
   ; sym-assoc = sym-assoc
@@ -84,12 +86,12 @@ totalAtA A = record
 ∇ : {A : Obj} → Functor (totalAtA A) Arr.Arrow
 ∇ {A} = record
   { F₀ = λ (B ∣ ξ) →
-  let module phi = NaturalTransformation (MR2.Φ ξ)
-  in record { dom = B ; cod = [ A , B ]₀ ; arr = phi.η (record { dom = A ; cod = B ; arr = MR2.f ξ }) }
-  ; F₁ = λ { {X ∣ ⟪ f , Φ , _ ⟫} {Y ∣ ⟪ g , ψ , _ ⟫} (record { r = r ; eqΦ = eqΦ }) → mor⇒ {dom⇒ = r} {cod⇒ = Functor.F₁ [ A ,-] r} eqΦ }
-  ; identity = λ { {X} → Equiv.refl , (Functor.identity [ A ,-])}
-  ; homomorphism = λ { {X} {Y} {Z} {f} {g} → Equiv.refl , Functor.homomorphism [ A ,-] }
-  ; F-resp-≈ = λ {X} {Y} {f} {g} z → z , Functor.F-resp-≈ [ A ,-] z
+    let module Φ = NaturalTransformation (MR2.Φ ξ)
+    in record { arr = MR2.Φη₀ ξ }
+  ; F₁ = λ { (record { r = r ; eqΦ = eqΦ }) → mor⇒ {dom⇒ = r} {cod⇒ = Functor.F₁ [ A ,-] r} eqΦ }
+  ; identity = refl , [-,-].identity
+  ; homomorphism = Equiv.refl , Functor.homomorphism [ A ,-]
+  ; F-resp-≈ = λ z → z , Functor.F-resp-≈ [ A ,-] z
   }
 
 -- The same construction of HigherMRS.agda, but with a comma category instead of PB.
