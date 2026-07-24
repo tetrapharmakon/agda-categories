@@ -4,8 +4,9 @@ open import Level using (_⊔_)
 open import Categories.Category using (Category)
 open import Categories.Category.Monoidal using (Monoidal)
 open import Categories.Category.Monoidal.Closed using (Closed)
+open import Categories.Functor using (Functor)
 
-module Categories.Rosen.Functorial.FibreA {o ℓ e} {C : Category o ℓ e} {M : Monoidal C} (Cl : Closed M) where
+module Categories.Rosen.Functorial.FibreA {o ℓ e} {C : Category o ℓ e} {E : Category (o ⊔ ℓ) (ℓ ⊔ e) e} {M : Monoidal C} (Cl : Closed M) (U : Functor E C) where
 
 -- Fibre-at-A: alternative construction for higher (M,R)-systems by
 -- fixing the domain object A, which simplifies the definitions.
@@ -18,8 +19,8 @@ open import Categories.Category.Construction.Arrow C using (Morphism; Morphism�
 open import Categories.Category.Construction.Comma
 open import Categories.Functor using (Functor)
 open import Categories.NaturalTransformation using (NaturalTransformation)
-open import Categories.Rosen.Functorial.Core Cl
-open import Categories.Rosen.Functorial.Tabulator Cl using (𝕋MRS; V₁)
+open import Categories.Rosen.Functorial.Core Cl U
+open import Categories.Rosen.Functorial.Tabulator Cl U using (𝕋MRS; V₁)
 
 import Reason
 open Reason C
@@ -85,7 +86,7 @@ totalAtA A = record
   { F₀ = λ (B ∣ ξ) →
   let module phi = NaturalTransformation (MR2.Φ ξ)
   in record { dom = B ; cod = [ A , B ]₀ ; arr = phi.η (record { dom = A ; cod = B ; arr = MR2.f ξ }) }
-  ; F₁ = λ { {X ∣ ⟪ f , Φ ⟫} {Y ∣ ⟪ g , ψ ⟫} (record { r = r ; eqΦ = eqΦ }) → mor⇒ {dom⇒ = r} {cod⇒ = Functor.F₁ [ A ,-] r} eqΦ }
+  ; F₁ = λ { {X ∣ ⟪ f , Φ , _ ⟫} {Y ∣ ⟪ g , ψ , _ ⟫} (record { r = r ; eqΦ = eqΦ }) → mor⇒ {dom⇒ = r} {cod⇒ = Functor.F₁ [ A ,-] r} eqΦ }
   ; identity = λ { {X} → Equiv.refl , (Functor.identity [ A ,-])}
   ; homomorphism = λ { {X} {Y} {Z} {f} {g} → Equiv.refl , Functor.homomorphism [ A ,-] }
   ; F-resp-≈ = λ {X} {Y} {f} {g} z → z , Functor.F-resp-≈ [ A ,-] z
