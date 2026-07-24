@@ -5,7 +5,7 @@ open import Categories.Category using (Category)
 open import Categories.Category.Monoidal using (Monoidal)
 open import Categories.Category.Monoidal.Closed using (Closed)
 
-module Categories.Rosen.Variants.CoSlice {o ℓ e} {C : Category o ℓ e} {M : Monoidal C} (Cl : Closed M) where
+module Categories.Rosen.Variants.Slice {o ℓ e} {C : Category o ℓ e} {M : Monoidal C} (Cl : Closed M) where
 
 -- Core definitions for the category of (M,R)-systems.
 -- Exports: Cod, nHom, nHom-identity, MR2, MR2-Setoid, MRS-Profunctor.
@@ -13,7 +13,7 @@ module Categories.Rosen.Variants.CoSlice {o ℓ e} {C : Category o ℓ e} {M : M
 open import Data.Product using (_,_; proj₁; proj₂; _×_)
 open import Relation.Binary.Bundles using (Setoid)
 
-open import Categories.Category.CoSlice C
+open import Categories.Category.Slice C
 open import Categories.Category.Instance.Setoids using (Setoids)
 open import Categories.Functor using (Functor; _∘F_)
 open import Categories.Functor.Bifunctor using (Bifunctor; appˡ; appʳ)
@@ -45,11 +45,11 @@ record MR2 (A B : Obj) : Set (o ⊔ ℓ ⊔ e) where
   constructor ⟪_,_⟫
   field
     f : A ⇒ B
-    Φ : NaturalTransformation (Cod A) (([_,-] A) ∘F (Cod A))
+    Φ : NaturalTransformation (Dom B) (([_,-] A) ∘F (Dom B))
 
   Φη = NaturalTransformation.η Φ
   Φη₀ = Φη (record { arr = f })
-  Φcommute = λ {X Y : Category.Obj (coSlice A)} t → NaturalTransformation.commute Φ {X} {Y} t
+  Φcommute = λ {X Y : Category.Obj (Slice B)} t → NaturalTransformation.commute Φ {X} {Y} t
 
 -- MR2 as a Setoid: two MR2 elements are equal when their f components are equal
 -- and their Φ components are ≃-equal.
@@ -146,7 +146,7 @@ MRS-Profunctor : Bifunctor (Category.op C) C (Setoids (o ⊔ ℓ ⊔ e) (o ⊔ �
 MRS-Profunctor = record
   { F₀ = λ { (A , B) → MR2-Setoid A B }
   ; F₁ = λ { {(A , B)} {(A' , B')} (u , v) → record
-    { _⟨$⟩_ = λ {⟪ f , Φ ⟫ → ⟪ v ∘ f ∘ u , (nHom u ∘ʳ Cod A') ∘ᵥ {!   !} ∘ᵥ (Φ ∘ʳ {!   !} /C) ∘ᵥ {! commute u  !} ⟫ }
+    { _⟨$⟩_ = λ {⟪ f , Φ ⟫ → ⟪ v ∘ f ∘ u , (nHom u ∘ʳ Dom B') ∘ᵥ {!   !} ∘ᵥ (Φ ∘ʳ {!   !}) ∘ᵥ {!   !} ⟫ }
     ; cong = λ { {⟪ f , Φ ⟫} {⟪ g , Φ' ⟫} (f≈g , Φ≈Φ') →
         (∘-resp-≈ Equiv.refl (∘-resp-≈ f≈g Equiv.refl))
       , {!   !}

@@ -10,8 +10,9 @@ module Categories.Rosen.Functorial.Core {o ℓ e} {C : Category o ℓ e} {E : Ca
 
 -- Functorial natural MR systems
 
-open import Data.Product using (_,_; proj₁; proj₂; _×_)
+open import Data.Product using (_,_; proj₁; proj₂; _×_; Σ)
 open import Relation.Binary.Bundles using (Setoid)
+open import Relation.Binary.PropositionalEquality using (_≡_; subst)
 
 open import Categories.Category.Construction.Arrow
 open import Categories.Category.Instance.Setoids using (Setoids)
@@ -25,6 +26,12 @@ open import Categories.NaturalTransformation.Equivalence using (_≃_)
 import Reason
 open Reason C
 
+module E = Category E
+module U = Functor U
+
+postulate
+  irrelevance : ∀ {ℓ} {A : Set ℓ} → A
+  
 open Closed Cl using (adjoint; unitorˡ;unitorʳ-commute-to; unitorʳ-commute-from;unitorʳ; [-,-]; unit; [_,_]₀; [_,-]; [-,_]; [_,_]₁; _⊗₁_)
 
 module Arr = Categories.Category.Construction.Arrow C
@@ -44,13 +51,16 @@ nHom-identity = [-,-].identity
 -- definition of an (M,R)-system according to Rosen
 record MR2 (A B : Obj) : Set (o ⊔ ℓ ⊔ e) where
   eta-equality
-  constructor ⟪_,_⟫
+  constructor ⟪_,_,_⟫
   field
     f : A ⇒ B
     Φ : NaturalTransformation U ([_,-] A ∘F U)
+    Ue≈f : Σ E.Obj (λ x → Σ E.Obj (λ y → Σ (x E.⇒ y) (λ e → Σ (U.F₀ x ≡ A) (λ p → Σ (U.F₀ y ≡ B) (λ q → subst (λ z → z ⇒ B) p (subst (λ z → U.F₀ x ⇒ z) q (U.F₁ e)) ≈ f)))))
 
   Φη = NaturalTransformation.η Φ
   Φcommute = λ {X Y : Category.Obj E} t → NaturalTransformation.commute Φ {X} {Y} t
+  Φη₀ = let (_ , y , _ , _ , q , _) = Ue≈f
+        in subst (λ z → z ⇒ [_,_]₀ A z) q (Φη y)
 
 -- MR2 as a Setoid: two MR2 elements are equal when their f components are equal
 -- and their Φ components are ≃-equal.
@@ -60,7 +70,7 @@ open import Categories.Functor.Construction.LiftSetoids using (LiftSetoids)
 MR2-Setoid : Obj → Obj → Setoid (o ⊔ ℓ ⊔ e) (o ⊔ ℓ ⊔ e)
 MR2-Setoid A B = record
   { Carrier = MR2 A B
-  ; _≈_ = λ (⟪ f , Φ ⟫) (⟪ g , Φ' ⟫) → (f ≈ g) × (Φ ≃ Φ')
+  ; _≈_ = λ (⟪ f , Φ , irrelevance ⟫) (⟪ g , Φ' , irrelevance ⟫) → (f ≈ g) × (Φ ≃ Φ')
   ; isEquivalence = record
     { refl = Equiv.refl , (λ {x₁} → Equiv.refl)
     ; sym = λ (pf , k) → Equiv.sym pf , Equiv.sym k
@@ -76,18 +86,18 @@ MRS-Profunctor : Bifunctor (Category.op C) C (Setoids (o ⊔ ℓ ⊔ e) (o ⊔ �
 MRS-Profunctor = record
   { F₀ = (λ { (A , B) → MR2-Setoid A B })
   ; F₁ = λ { {(A , B)} {(A' , B')} (u , v) → record
-    { _⟨$⟩_ = λ {⟪ f , Φ ⟫ → ⟪ v ∘ f ∘ u , (nHom u ∘ʳ U) ∘ᵥ Φ ⟫ }
-    ; cong = λ { {⟪ f , Φ ⟫} {⟪ g , Φ' ⟫} (f≈g , Φ≈Φ') →
+    { _⟨$⟩_ = λ {⟪ f , Φ , _ ⟫ → ⟪ v ∘ f ∘ u , (nHom u ∘ʳ U) ∘ᵥ Φ , irrelevance ⟫ }
+    ; cong = λ { {⟪ f , Φ , _ ⟫} {⟪ g , Φ' , _ ⟫} (f≈g , Φ≈Φ') →
         (∘-resp-≈ Equiv.refl (∘-resp-≈ f≈g Equiv.refl))
       , (λ {x} → ∘-resp-≈ʳ (Φ≈Φ' {x}))
       }
     }}
-  ; identity = λ { {(A , B)} {⟪ f , Φ ⟫} {⟪ g , Φ' ⟫} →
+  ; identity = λ { {(A , B)} {⟪ f , Φ , _ ⟫} {⟪ g , Φ' , _ ⟫} →
       let module Hom = Functor [-,-] in
         ( λ (f≈g , Φ≈Φ') → Equiv.trans identityˡʳ f≈g
         , λ { {h} → trans (∘-resp-≈ Hom.identity Φ≈Φ') identityˡ })
      }
-  ; homomorphism = λ { {f = (u₁ , v₁)} {g = (u₂ , v₂)} {⟪ f , Φ ⟫} {⟪ g , Φ' ⟫} →
+  ; homomorphism = λ { {f = (u₁ , v₁)} {g = (u₂ , v₂)} {⟪ f , Φ , _ ⟫} {⟪ g , Φ' , _ ⟫} →
        let module Hom = Functor [-,-]
            module Hom[1-] {A} = Functor (appˡ [-,-] A)
            module Hom[-1] {A} = Functor (appʳ [-,-] A) in
@@ -106,7 +116,7 @@ MRS-Profunctor = record
                   ([ u₂ , id ]₁ ∘ [ u₁ , id ]₁) ∘ Φ'.η h ≈⟨ assoc ⟩
                   [ u₂ , id ]₁ ∘ ([ u₁ , id ]₁ ∘ Φ'.η h) ∎ } })
      }
-  ; F-resp-≈ = λ { {(A , B)} {(A' , B')} {f = (u , v)} {g = (u' , v')} (u≈u' , v≈v') {⟪ f , Φ ⟫} {⟪ g , Φ' ⟫} →
+  ; F-resp-≈ = λ { {(A , B)} {(A' , B')} {f = (u , v)} {g = (u' , v')} (u≈u' , v≈v') {⟪ f , Φ , _ ⟫} {⟪ g , Φ' , _ ⟫} →
        let module Hom = Functor [-,-] in
          ( λ { (f≈g , Φ≈Φ') → ∘-resp-≈ v≈v' (∘-resp-≈ f≈g u≈u')
         , λ { {h} →
