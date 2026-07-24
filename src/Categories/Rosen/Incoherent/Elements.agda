@@ -69,6 +69,17 @@ record twiMR2⇒ (X Y : iMR2₀) : Set (o ⊔ ℓ ⊔ e) where
   ; ∘-resp-≈ = λ x x₁ → ∘-resp-≈ (x₁ .proj₁) (x .proj₁) , ∘-resp-≈ (x .proj₂) (x₁ .proj₂)
   }
 
+open import Categories.Category.Construction.TwistedArrow C renaming (Morphism to tMorphism; Morphism⇒ to tMorphism⇒)
+
+𝕃 : Functor τ'[iMR2] TwistedArrow
+𝕃 = record
+  { F₀ = λ x → let module x = iMR2₀ x in (record { arr = iMR2.f x.ξ })
+  ; F₁ = λ f → let module f = twiMR2⇒ f in mor⇒ f.eqf
+  ; identity = refl , refl
+  ; homomorphism = refl , refl
+  ; F-resp-≈ = λ x → x
+  }
+
 ℝ : Functor τ'[iMR2] Arr.Arrow
 ℝ = record
   { F₀ = λ x → let module x = iMR2₀ x in (record { dom = x.B ; cod = [ x.A , x.B ]₀ ; arr = iMR2.Φ x.ξ })

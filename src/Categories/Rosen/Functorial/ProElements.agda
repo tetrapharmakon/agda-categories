@@ -124,7 +124,6 @@ ElMRS = MRS.Elts
       ; cod⇒ = [ f.l , f.r ]₁ 
       ; square = begin [ f.l , f.r ]₁ ∘ MR2.Φη₀ f.X.el ≈⟨ ([ [-,-] ]-decompose₁ ⟩∘⟨refl ○ assoc) ⟩ 
                        [ f.l , id ]₁ ∘ [ id , f.r ]₁ ∘ MR2.Φη₀ f.X.el ≈⟨ refl⟩∘⟨ {!    !} ⟩
-                       [ f.l , id ]₁ ∘ [ id , U.F₁ ? ]₁ ∘ MR2.Φη₀ f.X.el ≈⟨ refl⟩∘⟨ {!    !} ⟩
                        {!   !} ≈⟨ {!  lem2 !} ⟩ 
                        {!   !} ≈⟨ {!   !} ⟩ 
                        MR2.Φη₀ f.Y.el ∘ f.r ∎ }
