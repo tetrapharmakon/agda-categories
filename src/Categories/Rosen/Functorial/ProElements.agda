@@ -19,7 +19,7 @@ open import Relation.Binary.Bundles using (Setoid)
 open import Categories.Category.Construction.Arrow
 import Relation.Binary.Reasoning.Setoid as SetoidR
 open import Categories.Category.Construction.TwistedArrow C renaming (Morphism to tMorphism; Morphism⇒ to tMorphism⇒)
-open import Categories.Functor.Bifunctor.Properties using ([_]-decompose₁)
+open import Categories.Functor.Bifunctor.Properties using ([_]-decompose₁;[_]-commute)
 open import Categories.Functor.Profunctor.Tabulator
 open import Categories.NaturalTransformation using (NaturalTransformation)
 open import Categories.Rosen.Functorial.Core Cl U
@@ -107,80 +107,122 @@ ElMRS = MRS.Elts
     let module X = MRS.Elts₀ X 
         module Y = MRS.Elts₀ Y
         module f = MRS.Elts⇒ f 
-    in let
-      open NaturalTransformation
-      open HomReasoning
+        open NaturalTransformation
+        open HomReasoning
+        module XE = MR2 X.el
+        module YE = MR2 Y.el
+        a = record { arr = XE.f }
+        b = record { arr = XE.f ∘ f.l }
+        -- c = record { arr = f.r ∘ XE.f ∘ f.l }
+        d = record { arr = YE.f }
+        module Hom  {A} = Functor (appʳ [-,-] A)
 
-      module XE = MR2 X.el
-      module YE = MR2 Y.el
-      a = record { arr = XE.f }
-      b = record { arr = XE.f ∘ f.l }
-      c = record { arr = f.r ∘ XE.f ∘ f.l }
-      d = record { arr = YE.f }
-      module Hom  {A} = Functor (appʳ [-,-] A)
+        eqΦ : ∀ (m : E.Obj) → [ f.l , id ]₁ ∘ η XE.Φ m ≈ η YE.Φ m
+        eqΦ m = proj₂ f.eqElts {x = m}
 
-      t₁ : Arr.Morphism⇒ b a
-      t₁ = record { dom⇒ = f.l ; cod⇒ = id ; square = identityˡ }
-      t₂ : Arr.Morphism⇒ b c
-      t₂ = record { dom⇒ = id ; cod⇒ = f.r ; square = Equiv.sym identityʳ }
-      t₃ : Arr.Morphism⇒ d c
-      t₃ = record { dom⇒ = id ; cod⇒ = id ; square = identityˡ ○ Equiv.sym (proj₁ f.eqElts) ○ Equiv.sym identityʳ }
+--       lem1 : η XE.Φ a ≈ η XE.Φ b
+--       lem1 = begin
+--         η XE.Φ a           ≈˘⟨ identityʳ ⟩
+--         η XE.Φ a ∘ id     ≈⟨ commute XE.Φ t₁ ⟩
+--         [ id , id ]₁ ∘ η XE.Φ b  ≈⟨ (Hom.identity ⟩∘⟨refl) ⟩ 
+--         id ∘ η XE.Φ b     ≈⟨ identityˡ ⟩
+--         η XE.Φ b          ∎
 
-      eqΦ : ∀ (m : E.Obj) → [ f.l , id ]₁ ∘ η XE.Φ m ≈ η YE.Φ m
-      eqΦ m = proj₂ f.eqElts {x = m}
-
-      lem1 : η XE.Φ a ≈ η XE.Φ b
-      lem1 = begin
-        η XE.Φ a           ≈˘⟨ identityʳ ⟩
-        η XE.Φ a ∘ id     ≈⟨ commute XE.Φ t₁ ⟩
-        [ id , id ]₁ ∘ η XE.Φ b  ≈⟨ (Hom.identity ⟩∘⟨refl) ⟩ 
-        id ∘ η XE.Φ b     ≈⟨ identityˡ ⟩
-        η XE.Φ b          ∎
-
-      lem2 : η XE.Φ c ∘ f.r ≈ [ id , f.r ]₁ ∘ η XE.Φ b
-      lem2 = commute XE.Φ t₂
-
-      lem3 : η YE.Φ c ≈ η YE.Φ d
-      lem3 = begin
-        η YE.Φ c           ≈˘⟨ identityʳ ⟩
-        η YE.Φ c ∘ id     ≈⟨ commute YE.Φ t₃ ⟩
-        [ id , id ]₁ ∘ η YE.Φ d ≈⟨ Hom.identity ⟩∘⟨refl ⟩ 
-        id ∘ η YE.Φ d     ≈⟨ identityˡ ⟩
-        η YE.Φ d          ∎
-
-      decompose : [ f.l , f.r ]₁ ≈ [ f.l , id ]₁ ∘ [ id , f.r ]₁
-      decompose = [ [-,-] ]-decompose₁
-
+        lem2 : η XE.Φ {!   !} ∘ {!   !} ≈ [ id , {!   !} ]₁ ∘ η XE.Φ {!   !}
+        lem2 = {!   !} -- commute XE.Φ t₂
+  
     in record 
-    { dom⇒ = f.r
-    ; cod⇒ = [ f.l , f.r ]₁  
-    ; square = begin
-      [ f.l , f.r ]₁ ∘ η XE.Φ a
-        ≈⟨ decompose ⟩∘⟨refl ○ assoc ⟩
-      [ f.l , id ]₁ ∘ ([ id , f.r ]₁ ∘ η XE.Φ a)
-        ≈˘⟨ refl⟩∘⟨ Equiv.trans lem2 (refl⟩∘⟨ Equiv.sym lem1) ⟩
-      [ f.l , id ]₁ ∘ (η XE.Φ c ∘ f.r)
-        ≈⟨ sym-assoc ⟩
-      ([ f.l , id ]₁ ∘ η XE.Φ c) ∘ f.r
-        ≈⟨ ∘-resp-≈ (eqΦ c) refl ⟩
-      (η YE.Φ c) ∘ f.r
-        ≈⟨ ∘-resp-≈ lem3 refl ⟩
-      η YE.Φ d ∘ f.r
-        ∎
-    } }
-  ; identity = Equiv.refl , [-,-].identity
-  ; homomorphism = Equiv.refl , [-,-].homomorphism
-  ; F-resp-≈ = λ (f≈gL , f≈gR) → f≈gR , ([-,-].F-resp-≈ (f≈gL , f≈gR))
+      { dom⇒ = f.r
+      ; cod⇒ = [ f.l , f.r ]₁ 
+      ; square = begin [ f.l , f.r ]₁ ∘ MR2.Φη₀ f.X.el ≈⟨ ([ [-,-] ]-decompose₁ ⟩∘⟨refl ○ assoc) ⟩ 
+                       [ f.l , id ]₁ ∘ [ id , f.r ]₁ ∘ MR2.Φη₀ f.X.el ≈⟨ rw-2-1 (Equiv.sym [ [-,-] ]-commute) ⟩ 
+                       {!   !} ≈⟨ {!   !} ⟩ 
+                       {!   !} ≈⟨ {!   !} ⟩ 
+                       MR2.Φη₀ f.Y.el ∘ f.r ∎ }
   }
+  ; identity = {!   !}
+  ; homomorphism = λ {X} {Y} {Z} {f} {g} → refl , [-,-].homomorphism
+  ; F-resp-≈ = {!   !}
+  } -- record
+--   { F₀ = λ x → let module x = MRS.Elts₀ x in record { arr = MR2.Φη₀ x.el }
+--   ; F₁ = λ { {X} {Y} f → 
+--     let module X = MRS.Elts₀ X 
+--         module Y = MRS.Elts₀ Y
+--         module f = MRS.Elts⇒ f 
+--     in let
+--       open NaturalTransformation
+--       open HomReasoning
 
--- U₁: forgetful functor from ElMRS to the twisted arrow category of C.
-U₁ : Functor ElMRS TwistedArrow
-U₁ = record
-  { F₀ = λ {record { A = A ; B = B ; el = el } → 
-   record { arr = MR2.f el }}
-  ; F₁ = λ {record { l = l ; r = r ; eqElts = eqElts } → mor⇒ {dom⇐ = l} {cod⇒ = r} (proj₁ eqElts) }
-  ; identity = let open HomReasoning in 
-    (sym identityˡ ○ identityʳ) , refl
-  ; homomorphism = refl , refl
-  ; F-resp-≈ = λ {A} {B} {f} {g} z → z
-  }
+--       module XE = MR2 X.el
+--       module YE = MR2 Y.el
+--       a = record { arr = XE.f }
+--       b = record { arr = XE.f ∘ f.l }
+--       c = record { arr = f.r ∘ XE.f ∘ f.l }
+--       d = record { arr = YE.f }
+--       module Hom  {A} = Functor (appʳ [-,-] A)
+
+--       t₁ : Arr.Morphism⇒ b a
+--       t₁ = record { dom⇒ = f.l ; cod⇒ = id ; square = identityˡ }
+--       t₂ : Arr.Morphism⇒ b c
+--       t₂ = record { dom⇒ = id ; cod⇒ = f.r ; square = Equiv.sym identityʳ }
+--       t₃ : Arr.Morphism⇒ d c
+--       t₃ = record { dom⇒ = id ; cod⇒ = id ; square = identityˡ ○ Equiv.sym (proj₁ f.eqElts) ○ Equiv.sym identityʳ }
+
+--       eqΦ : ∀ (m : E.Obj) → [ f.l , id ]₁ ∘ η XE.Φ m ≈ η YE.Φ m
+--       eqΦ m = proj₂ f.eqElts {x = m}
+
+--       lem1 : η XE.Φ a ≈ η XE.Φ b
+--       lem1 = begin
+--         η XE.Φ a           ≈˘⟨ identityʳ ⟩
+--         η XE.Φ a ∘ id     ≈⟨ commute XE.Φ t₁ ⟩
+--         [ id , id ]₁ ∘ η XE.Φ b  ≈⟨ (Hom.identity ⟩∘⟨refl) ⟩ 
+--         id ∘ η XE.Φ b     ≈⟨ identityˡ ⟩
+--         η XE.Φ b          ∎
+
+--       lem2 : η XE.Φ c ∘ f.r ≈ [ id , f.r ]₁ ∘ η XE.Φ b
+--       lem2 = commute XE.Φ t₂
+
+--       lem3 : η YE.Φ c ≈ η YE.Φ d
+--       lem3 = begin
+--         η YE.Φ c           ≈˘⟨ identityʳ ⟩
+--         η YE.Φ c ∘ id     ≈⟨ commute YE.Φ t₃ ⟩
+--         [ id , id ]₁ ∘ η YE.Φ d ≈⟨ Hom.identity ⟩∘⟨refl ⟩ 
+--         id ∘ η YE.Φ d     ≈⟨ identityˡ ⟩
+--         η YE.Φ d          ∎
+
+--       decompose : [ f.l , f.r ]₁ ≈ [ f.l , id ]₁ ∘ [ id , f.r ]₁
+--       decompose = [ [-,-] ]-decompose₁
+
+--     in record 
+--     { dom⇒ = f.r
+--     ; cod⇒ = [ f.l , f.r ]₁  
+--     ; square = begin
+--       [ f.l , f.r ]₁ ∘ η XE.Φ a
+--         ≈⟨ decompose ⟩∘⟨refl ○ assoc ⟩
+--       [ f.l , id ]₁ ∘ ([ id , f.r ]₁ ∘ η XE.Φ a)
+--         ≈˘⟨ refl⟩∘⟨ Equiv.trans lem2 (refl⟩∘⟨ Equiv.sym lem1) ⟩
+--       [ f.l , id ]₁ ∘ (η XE.Φ c ∘ f.r)
+--         ≈⟨ sym-assoc ⟩
+--       ([ f.l , id ]₁ ∘ η XE.Φ c) ∘ f.r
+--         ≈⟨ ∘-resp-≈ (eqΦ c) refl ⟩
+--       (η YE.Φ c) ∘ f.r
+--         ≈⟨ ∘-resp-≈ lem3 refl ⟩
+--       η YE.Φ d ∘ f.r
+--         ∎
+--     } }
+--   ; identity = Equiv.refl , [-,-].identity
+--   ; homomorphism = Equiv.refl , [-,-].homomorphism
+--   ; F-resp-≈ = λ (f≈gL , f≈gR) → f≈gR , ([-,-].F-resp-≈ (f≈gL , f≈gR))
+--   }
+
+-- -- U₁: forgetful functor from ElMRS to the twisted arrow category of C.
+-- U₁ : Functor ElMRS TwistedArrow
+-- U₁ = record
+--   { F₀ = λ {record { A = A ; B = B ; el = el } → 
+--    record { arr = MR2.f el }}
+--   ; F₁ = λ {record { l = l ; r = r ; eqElts = eqElts } → mor⇒ {dom⇐ = l} {cod⇒ = r} (proj₁ eqElts) }
+--   ; identity = let open HomReasoning in 
+--     (sym identityˡ ○ identityʳ) , refl
+--   ; homomorphism = refl , refl
+--   ; F-resp-≈ = λ {A} {B} {f} {g} z → z
+--   }
