@@ -123,8 +123,8 @@ ElMRS = MRS.Elts
       { dom⇒ = f.r
       ; cod⇒ = [ f.l , f.r ]₁ 
       ; square = begin [ f.l , f.r ]₁ ∘ MR2.Φη₀ f.X.el ≈⟨ ([ [-,-] ]-decompose₁ ⟩∘⟨refl ○ assoc) ⟩ 
-                       [ f.l , id ]₁ ∘ [ id , f.r ]₁ ∘ MR2.Φη₀ f.X.el ≈⟨ refl⟩∘⟨ {!    !} ⟩
-                       {!   !} ≈⟨ {!  lem2 !} ⟩ 
+                       [ f.l , id ]₁ ∘ [ id , f.r ]₁ ∘ MR2.Φη₀ f.X.el ≈⟨ rw-2-1 (Equiv.sym [ [-,-] ]-commute) ∙ assoc ⟩
+                       [ id , f.r ]₁ ∘ [ f.l , id ]₁ ∘ XE.Φη₀ ≈⟨ {! Equiv.sym (XE.Φcommute _) !} ⟩ 
                        {!   !} ≈⟨ {!   !} ⟩ 
                        MR2.Φη₀ f.Y.el ∘ f.r ∎ }
   }
