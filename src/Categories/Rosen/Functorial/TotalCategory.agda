@@ -10,7 +10,6 @@ module Categories.Rosen.Functorial.TotalCategory {o ℓ e} {C : Category o ℓ e
 
 open Category C
 
-module E = Category E
 module U = Functor U
 
 open import Data.Product using (_,_; _×_)
@@ -18,10 +17,10 @@ open import Data.Product using (_,_; _×_)
 open import Categories.Category.Construction.Arrow
 open import Categories.Functor.Bifunctor using (appʳ)
 open import Categories.Functor.Bifunctor.Properties using ([_]-commute)
-open import Categories.Functor.Profunctor.Tabulator
+open import Categories.Functor.Profunctor.Tabulator using (tab₀; tab⇒)
 open import Categories.Morphism.Reasoning as MR
 open import Categories.NaturalTransformation using (_∘ᵥ_; _∘ʳ_) renaming (NaturalTransformation to NT)
-open import Categories.Rosen.Functorial.Core Cl U
+open import Categories.Rosen.Functorial.Core Cl U using (nHom; MR2; MRS-Profunctor)
 
 open Closed Cl using ([-,-]; [_,-]; [_,_]₁)
 
@@ -48,10 +47,10 @@ record tot⇒ (x y : tab₀ MRS-Profunctor) : Set (o ⊔ ℓ ⊔ e) where
 
   field
     eqf : r ∘ f ≈ g ∘ l
-    nat : ∀ {s t} (h : s E.⇒ t) → l*ψ.η t ∘ U.F₁ h ≈ Functor.F₁ [ x.L ,-] (U.F₁ h) ∘ Φ.η s
+    nat : ∀ {s t : Category.Obj E} (h : Category._⇒_ E s t) → l*ψ.η t ∘ U.F₁ h ≈ Functor.F₁ [ x.L ,-] (U.F₁ h) ∘ Φ.η s
 
   eqΦ : ∀ {t} → l*ψ.η t ≈ Φ.η t
-  eqΦ {t} = introʳ C U.identity ○ nat (E.id) ○ elimˡ C (Functor.identity ([ _ ,-] ∘F U))
+  eqΦ {t} = introʳ C U.identity ○ nat (Category.id E) ○ elimˡ C (Functor.identity ([ _ ,-] ∘F U))
 
 
 total : Category (o ⊔ ℓ ⊔ e) (o ⊔ ℓ ⊔ e) e
@@ -59,11 +58,10 @@ total = record
   { Obj = tab₀ MRS-Profunctor
   ; _⇒_ = λ s t → tot⇒ s t
   ; _≈_ = λ h k → tot⇒.l h ≈ tot⇒.l k × tot⇒.r h ≈ tot⇒.r k
-  ; id = λ { {(A , B) ∣ ⟪ f , Φ , _ ⟫} →
-       let module ΦNT = NT Φ in
-       [ id , id ∥ id-comm-sym C
-       , (λ α → elimˡ C [-,-].identity ⟩∘⟨refl ○ ΦNT.commute α)
-       ]}
+  ; id = λ { {A} → 
+    let module A = tab₀ A
+        module Φ = NT (MR2.Φ A.ξ) 
+    in [ id , id ∥ (id-comm-sym C) , ((λ α → elimˡ C [-,-].identity ⟩∘⟨refl ○ Φ.commute α)) ] }
   ; _∘_ = λ { {A} {B} {X} t t' →
        let module t  = tot⇒ t
            module t' = tot⇒ t'
@@ -71,23 +69,16 @@ total = record
            module Hom[-1] {X} = Functor (appʳ [-,-] X)
            module Hx = Functor [ t'.x.L ,-]
            module Hy = Functor [ t.x.L ,-]
-       in
-       [ t.l ∘ t'.l , t.r ∘ t'.r ∥
-         pullʳ C t'.eqf ○ pullˡ C t.eqf ○ assoc
-       , (λ {s} {t₀} α →
-           begin
-             ([-,-].F₁ (t.l ∘ t'.l , id) ∘ ψ.η t₀) ∘ U.F₁ α
-               ≈⟨ (Hom[-1].homomorphism ⟩∘⟨refl) ⟩∘⟨refl ⟩
-             (([ t'.l , id ]₁ ∘ [ t.l , id ]₁) ∘ ψ.η t₀) ∘ U.F₁ α
-               ≈⟨ ∘-resp-≈ˡ assoc ○ assoc ⟩
-             [-,-].F₁ (t'.l , id) ∘ ([-,-].F₁ (t.l , id) ∘ ψ.η t₀) ∘ U.F₁ α
-               ≈⟨ (refl⟩∘⟨ t.nat α) ○  sym-assoc ⟩
-             ([-,-].F₁ (t'.l , id) ∘ [-,-].F₁ (id , U.F₁ α)) ∘ t'.ψ.η s
-               ≈⟨ ∘-resp-≈ˡ (Equiv.sym [ [-,-] ]-commute) ○ assoc ⟩
-             [-,-].F₁ (id , U.F₁ α) ∘ [-,-].F₁ (t'.l , id) ∘ t'.ψ.η s
-               ≈⟨ refl⟩∘⟨ t'.eqΦ {t = s} ⟩
-             [-,-].F₁ (id , U.F₁ α) ∘ t'.Φ.η s ∎)
-       ]}
+       in [ t.l ∘ t'.l , t.r ∘ t'.r 
+          ∥ pullʳ C t'.eqf ○ pullˡ C t.eqf ○ assoc 
+          , (λ {s} {t} h → 
+            begin ([ t.l ∘ t'.l , id ]₁ ∘ ψ.η t) ∘ U.F₁ h             ≈⟨ (Hom[-1].homomorphism ⟩∘⟨refl) ⟩∘⟨refl ⟩ 
+                  (([ t'.l , id ]₁ ∘ [ t.l , id ]₁) ∘ ψ.η t) ∘ U.F₁ h ≈⟨ ∘-resp-≈ˡ assoc ○ assoc ⟩ 
+                  [ t'.l , id ]₁ ∘ ([ t.l , id ]₁ ∘ ψ.η t) ∘ U.F₁ h   ≈⟨ (refl⟩∘⟨ t.nat h) ○  sym-assoc ⟩ 
+                  ([ t'.l , id ]₁ ∘ [ id , U.F₁ h ]₁) ∘ t'.ψ.η s      ≈⟨ ∘-resp-≈ˡ (Equiv.sym [ [-,-] ]-commute) ○ assoc ⟩ 
+                  [ id , U.F₁ h ]₁ ∘ t'.l*ψ.η s                       ≈⟨ refl⟩∘⟨ t'.eqΦ {t = s} ⟩ 
+                  [ id {t'.x.L} , (U.F₁ h) ]₁ ∘ t'.Φ.η s              ∎) ]
+      }
   ; assoc = assoc , assoc
   ; sym-assoc = sym-assoc , sym-assoc
   ; identityˡ = identityˡ , identityˡ
