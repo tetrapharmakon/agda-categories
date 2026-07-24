@@ -59,7 +59,7 @@ total = record
   { Obj = tab₀ MRS-Profunctor
   ; _⇒_ = λ s t → tot⇒ s t
   ; _≈_ = λ h k → tot⇒.l h ≈ tot⇒.l k × tot⇒.r h ≈ tot⇒.r k
-  ; id = λ { {(A , B) ∣ ⟪ f , Φ ⟫} →
+  ; id = λ { {(A , B) ∣ ⟪ f , Φ , _ ⟫} →
        let module ΦNT = NT Φ in
        [ id , id ∥ id-comm-sym C
        , (λ α → elimˡ C [-,-].identity ⟩∘⟨refl ○ ΦNT.commute α)
