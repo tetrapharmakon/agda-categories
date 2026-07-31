@@ -5,13 +5,13 @@ open import Categories.Category using (Category)
 open import Categories.Category.Cocartesian using (BinaryCoproducts)
 open import Categories.Category.Monoidal using (Monoidal)
 open import Categories.Category.Monoidal.Closed using (Closed)
-open import Categories.Category.Monoidal.Symmetric using (Symmetric)
+-- open import Categories.Category.Monoidal.Symmetric using (Symmetric)
 
 module Categories.Rosen.Incoherent.Algebras
   {o ℓ e} {C : Category o ℓ e}
   (M : Monoidal C)
   (Cl : Closed M)
-  (S : Symmetric M)
+  -- (S : Symmetric M)
   (BC : BinaryCoproducts C)
   where
 
@@ -24,13 +24,13 @@ module Categories.Rosen.Incoherent.Algebras
 --    objects are triples (B , f : A ⇒ B , Φ : B ⇒ [ A , B ]) and morphisms are
 --    maps v : B ⇒ B' compatible with both f and Φ.
 --
--- 2. We consider the endofunctor X ↦ A + (A ⊗ X).  In settings where ⊗
+-- 2. We consider the endofunctor X ↦ A + (X ⊗ A).  In settings where ⊗
 --    distributes over coproducts, this is (naturally isomorphic to)
---    X ↦ A ⊗ (𝟙 + X).  We work directly with A + (A ⊗ X), so we do not assume
+--    X ↦ A ⊗ (𝟙 + X).  We work directly with A + (X ⊗ A), so we do not assume
 --    any distributivity laws.
 --
 -- The main result in this module is an explicit equivalence between iMR2ᴿ A
--- and the category of algebras for X ↦ A + (A ⊗ X).
+-- and the category of algebras for X ↦ A + (X ⊗ A).
 ----------------------------------------------------------------------
 
 open Category C
@@ -49,16 +49,18 @@ open HomReasoning
 open MR C
 open Monoidal M using (_⊗-; -⊗_; unit; _⊗₀_; _⊗₁_)
 open BinaryCoproducts BC
-open Symmetric S hiding (_⊗-; -⊗_; unit; _⊗₀_; _⊗₁_) renaming (braided-iso to β)
+-- open Symmetric S hiding (_⊗-; -⊗_; unit; _⊗₀_; _⊗₁_) renaming (braided-iso to β)
 open Closed Cl using (adjoint; [_,_]₀; [_,_]₁; [_,-])
 
--- Endofunctor X ↦ A + (A ⊗ X) on C.
-_⊗[I+_] : {A : Obj} → Functor C C
-_⊗[I+_] {A} = A +- ∘F A ⊗-
+-- Endofunctor X ↦ A + (X ⊗ A) on C.
+_⊗[_+I] : {A : Obj} → Functor C C
+_⊗[_+I] {A} = A +- ∘F -⊗ A
 
--- Category of algebras for X ↦ A + (A ⊗ X).
+module K {A} = Functor (_⊗[_+I] {A})
+
+-- Category of algebras for X ↦ A + (X ⊗ A).
 F-Algebra-Category : {A : Obj} → Category _ _ _
-F-Algebra-Category {A} = F-Algebras (_⊗[I+_] {A})
+F-Algebra-Category {A} = F-Algebras (_⊗[_+I] {A})
 
 
 -- Comparison functor iMR2ᴿ A → Alg(A + A ⊗ -).
@@ -71,6 +73,7 @@ F-Algebra-Category {A} = F-Algebras (_⊗[I+_] {A})
 --   α = [ f , Φ# ∘ β.from ]
 --
 -- where β.from : A ⊗ B ⇒ B ⊗ A is the braiding.
+
 to : {A : Obj} → Functor (iMR2ᴿ A) (F-Algebra-Category {A})
 to {A} = record
   { F₀ = λ x →
@@ -79,7 +82,7 @@ to {A} = record
         Φ# = adjoint.Radjunct ξ.Φ
     in record
       { A = x.B
-      ; α = [ ξ.f , Φ# ∘ β.from ]
+      ; α = [ ξ.f , Φ# ]
       }
   ; F₁ = λ f →
     let module f = iMR2ᴿ⇒ f
@@ -87,34 +90,33 @@ to {A} = record
         ΦY# = adjoint.Radjunct f.ξY.Φ
         idA = id {A = A}
         module ⊗A = Functor (-⊗ A)
-        yoga : f.v ∘ ΦX# ∘ β.from ≈ ΦY# ∘ β.from ∘ (idA ⊗₁ f.v)
+        yoga : f.v ∘ ΦX# ≈ ΦY# ∘ (f.v ⊗₁ idA)
         yoga = begin
-            f.v ∘ ΦX# ∘ β.from                                 ≈⟨ sym-assoc ○ (Equiv.sym (adjoint.Radjunct-comm′ {f = f.ξX.Φ} {g = f.v})) ⟩∘⟨refl ⟩
-            adjoint.Radjunct ([ id , f.v ]₁ ∘ f.ξX.Φ) ∘ β.from ≈⟨ adjoint.Radjunct-resp-≈ f.eqΦ ⟩∘⟨refl ⟩
-            adjoint.Radjunct (f.ξY.Φ ∘ f.v) ∘ β.from           ≈⟨ (refl⟩∘⟨ ⊗A.homomorphism ○ sym-assoc) ⟩∘⟨refl ○ assoc ⟩
-            ΦY# ∘ (f.v ⊗₁ idA) ∘ β.from                        ≈⟨ refl⟩∘⟨ braiding.⇒.sym-commute {X = (A , f.X.B)} {Y = (A , f.Y.B)} (idA , f.v) ⟩
-            ΦY# ∘ β.from ∘ (idA ⊗₁ f.v)                        ∎
+            f.v ∘ ΦX#                                 ≈⟨ (Equiv.sym (adjoint.Radjunct-comm′ {f = f.ξX.Φ} {g = f.v})) ⟩ 
+            adjoint.Radjunct ([ id , f.v ]₁ ∘ f.ξX.Φ) ≈⟨ adjoint.Radjunct-resp-≈ f.eqΦ ⟩
+            adjoint.Radjunct (f.ξY.Φ ∘ f.v)           ≈⟨ {! ⊗A.homomorphism  !} ⟩
+            ΦY# ∘ (f.v ⊗₁ idA)                        ∎
       in record
       { f = f.v
       ; commutes =
-          let F₁v = idA +₁ (idA ⊗₁ f.v)
+          let F₁v = idA +₁ (f.v ⊗₁ idA)
           in begin
-            f.v ∘ [ f.ξX.f , ΦX# ∘ β.from ]         ≈⟨ ∘-distribˡ-[] ⟩
-            [ f.v ∘ f.ξX.f , f.v ∘ (ΦX# ∘ β.from) ] ≈⟨ +-unique (assoc ○ refl⟩∘⟨ +₁∘i₁ ○ refl⟩∘⟨ identityʳ ○ inject₁ ○ (Equiv.sym f.eqf))
-                                                                (assoc ○ refl⟩∘⟨ +₁∘i₂ ○ sym-assoc ○ inject₂ ⟩∘⟨refl ○ assoc ○ Equiv.sym yoga) ⟩
-            [ f.ξY.f , ΦY# ∘ β.from ] ∘ F₁v         ∎
+            f.v ∘ [ f.ξX.f , ΦX# ]         ≈⟨ ∘-distribˡ-[] ⟩
+            [ f.v ∘ f.ξX.f , f.v ∘ ΦX# ] ≈⟨ +-unique (assoc ○ refl⟩∘⟨ +₁∘i₁ ○ refl⟩∘⟨ identityʳ ○ inject₁ ○ (Equiv.sym f.eqf))
+                                                     (assoc ○ refl⟩∘⟨ +₁∘i₂ ○ sym-assoc ○ inject₂ ⟩∘⟨refl ○ assoc ○ sym-assoc ○ Equiv.sym yoga) ⟩
+            [ f.ξY.f , ΦY# ] ∘ F₁v         ∎
       }
   ; identity = Equiv.refl
   ; homomorphism = Equiv.refl
   ; F-resp-≈ = λ eq → eq
   }
   
--- Converse functor Alg(A + A ⊗ -) → iMR2ᴿ A.
+-- Converse functor Alg(A + - ⊗ A) → iMR2ᴿ A.
 --
 -- Given an algebra α : A + (A ⊗ B) ⇒ B, define
 --
 --   f = α ∘ i₁
---   Φ = Ladjunct (α ∘ i₂ ∘ β.from)
+--   Φ = Ladjunct (α ∘ i₂)
 --
 -- i.e. transpose the composite B ⊗ A --β.from→ A ⊗ B --α∘i₂→ B.
 from : {A : Obj} → Functor (F-Algebra-Category {A}) (iMR2ᴿ A) 
@@ -124,7 +126,7 @@ from {A} = record
         α = x.α
     in record
       { B = x.A
-      ; ξ = ⟪ α ∘ i₁ , adjoint.Ladjunct (α ∘ i₂ ∘ β.from) ⟫
+      ; ξ = ⟪ α ∘ i₁ , adjoint.Ladjunct (α ∘ i₂) ⟫
       }
   ; F₁ = λ {X} {Y} f →
     let module x = F-Algebra X
@@ -134,8 +136,8 @@ from {A} = record
         αx = x.α
         αy = y.α
         idA = id {A = A}
-        hx = αx ∘ i₂ ∘ β.from
-        hy = αy ∘ i₂ ∘ β.from
+        hx = αx ∘ i₂ 
+        hy = αy ∘ i₂ 
     in record
       { v = f'
       ; eqf = pullˡ (f.commutes f) ○ assoc ○ ∘-resp-≈ʳ (Equiv.trans inject₁ identityʳ) 
@@ -144,18 +146,16 @@ from {A} = record
               F₁f = idA +₁ (idA ⊗₁ f')
               tensorEq : f' ∘ hx ≈ hy ∘ (f' ⊗₁ idA)
               tensorEq = begin
-                f' ∘ hx                            ≈⟨ sym-assoc ○ (f.commutes f) ⟩∘⟨refl ⟩
-                (αy ∘ F₁f) ∘ i₂ ∘ β.from           ≈⟨ sym-assoc ○ assoc ⟩∘⟨refl ⟩
-                (αy ∘ (F₁f ∘ i₂)) ∘ β.from         ≈⟨ assoc ○ refl⟩∘⟨ +₁∘i₂ ⟩∘⟨refl ⟩
-                αy ∘ (i₂ ∘ (idA ⊗₁ f')) ∘ β.from   ≈⟨ sym-assoc ○ (Equiv.sym assoc) ⟩∘⟨refl ○ assoc ⟩
-                (αy ∘ i₂) ∘ (idA ⊗₁ f') ∘ β.from   ≈⟨ refl⟩∘⟨ braiding.⇒.sym-commute {X = (x.A , A)} {Y = (y.A , A)} (f' , idA) ○ assoc ○ refl⟩∘⟨ sym-assoc ○ sym-assoc ⟩
-                (αy ∘ (i₂ ∘ β.from)) ∘ (f' ⊗₁ idA) ∎
+                f' ∘ hx                           ≈⟨ sym-assoc ○ (f.commutes f) ⟩∘⟨refl ⟩
+                (αy ∘ Functor.F₁ _⊗[_+I] f') ∘ i₂ ≈⟨ pullʳ +₁∘i₂ ⟩
+                αy ∘ (i₂ ∘  (f' ⊗₁ idA))          ≈⟨ sym-assoc ⟩
+                hy ∘ f' ⊗₁ idA                    ∎
+              η = adjoint.unit.η
           in begin
-            [ id , f' ]₁ ∘ adjoint.Ladjunct hx             ≈⟨ sym-assoc ⟩
-            ([ id , f' ]₁ ∘ HomA.F₁ hx) ∘ adjoint.unit.η _ ≈⟨ (Equiv.sym HomA.homomorphism) ⟩∘⟨refl ⟩
-            HomA.F₁ (f' ∘ hx) ∘ adjoint.unit.η _           ≈⟨ (HomA.F-resp-≈ tensorEq) ⟩∘⟨refl ⟩
-            HomA.F₁ (hy ∘ (f' ⊗₁ idA)) ∘ adjoint.unit.η _  ≈⟨ adjoint.Ladjunct-comm′ {f = f'} {g = hy} ⟩
-            adjoint.Ladjunct hy ∘ f' ∎
+            [ id , f' ]₁ ∘ HomA.F₁ hx ∘ η _  ≈⟨ pullˡ (Equiv.sym HomA.homomorphism) ⟩
+            HomA.F₁ (f' ∘ hx) ∘ η _          ≈⟨ (HomA.F-resp-≈ tensorEq) ⟩∘⟨refl ⟩
+            HomA.F₁ (hy ∘ (f' ⊗₁ idA)) ∘ η _ ≈⟨ adjoint.Ladjunct-comm′ {f = f'} {g = hy} ⟩
+            {!   !}   ∎
       }
   ; identity = Equiv.refl
   ; homomorphism = Equiv.refl
@@ -176,6 +176,24 @@ from {A} = record
 
 AlgA≣MRS^A : {A : Obj} → StrongEquivalence (iMR2ᴿ A) (F-Algebra-Category {A})
 AlgA≣MRS^A {A} = record 
+  { F = to {A} 
+  ; G = from {A} 
+  ; weak-inverse = record 
+    { F∘G≈id = niHelper (record 
+      { η = λ X → record { f = id ; commutes = {!   !} } 
+      ; η⁻¹ = λ X → record { f = id ; commutes = {!   !} } 
+      ; commute = λ f → Equiv.trans identityˡ (Equiv.sym identityʳ) 
+      ; iso = λ X → record { isoˡ = identityˡ ; isoʳ = identity² }
+       })
+    ; G∘F≈id = niHelper (record 
+      { η = λ X → record { v = id ; eqf = {!   !} ; eqΦ = {!   !} } 
+      ; η⁻¹ = λ X → record { v = id ; eqf = Equiv.trans identityˡ (Equiv.sym inject₁) ; eqΦ = {!   !} } 
+      ; commute = λ f → Equiv.trans identityˡ (Equiv.sym identityʳ) 
+      ; iso = λ X → record { isoˡ = identityˡ ; isoʳ = identityˡ } 
+      }) 
+    }
+  } -- record 
+{-
   { F = to {A} 
   ; G = from {A}
   ; weak-inverse = record 
@@ -202,8 +220,8 @@ AlgA≣MRS^A {A} = record
              in begin id ∘ [ α ∘ i₁ , hₐ ∘ βAB ]          ≈⟨ identityˡ ⟩
                       [ α ∘ i₁ , hₐ ∘ βAB ]               ≈⟨ αFG≈α ⟩
                       α                                   ≈˘⟨ identityʳ ⟩
-                      α ∘ id                              ≈⟨ ∘-resp-≈ʳ (Equiv.sym (Functor.identity (_⊗[I+_] {A = A}))) ⟩
-                      α ∘ Functor.F₁ (_⊗[I+_] {A = A}) id ∎
+                      α ∘ id                              ≈⟨ ∘-resp-≈ʳ (Equiv.sym (Functor.identity (_⊗[_+I] {A = A}))) ⟩
+                      α ∘ Functor.F₁ (_⊗[_+I] {A = A}) id ∎
          } 
       ; η⁻¹ = λ X → record 
          { f = id 
@@ -227,8 +245,8 @@ AlgA≣MRS^A {A} = record
              in begin id ∘ α                                                  ≈⟨ identityˡ ⟩
                       α                                                       ≈˘⟨ αFG≈α ⟩
                       [ α ∘ i₁ , hₐ ∘ βAB ]                                   ≈˘⟨ identityʳ ⟩
-                      [ α ∘ i₁ , hₐ ∘ βAB ] ∘ id                              ≈⟨ ∘-resp-≈ʳ (Equiv.sym (Functor.identity (_⊗[I+_] {A = A}))) ⟩
-                      [ α ∘ i₁ , hₐ ∘ βAB ] ∘ Functor.F₁ (_⊗[I+_] {A = A}) id ∎
+                      [ α ∘ i₁ , hₐ ∘ βAB ] ∘ id                              ≈⟨ ∘-resp-≈ʳ (Equiv.sym (Functor.identity (_⊗[_+I] {A = A}))) ⟩
+                      [ α ∘ i₁ , hₐ ∘ βAB ] ∘ Functor.F₁ (_⊗[_+I] {A = A}) id ∎
          } 
       ; commute = λ f → Equiv.trans identityˡ (Equiv.sym identityʳ) 
       ; iso = λ X → record 
@@ -310,3 +328,4 @@ AlgA≣MRS^A {A} = record
       }) 
     } 
   }
+-}
