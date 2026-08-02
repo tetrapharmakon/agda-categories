@@ -1,6 +1,6 @@
 {-# OPTIONS --without-K --warning=noUserWarning --warning=noUselessPrivate --warning=noUnsupportedIndexedMatch #-}
 
-open import Level using (Level; 0ℓ; _⊔_; suc; lift)
+open import Level using (Level; 0ℓ; _⊔_; suc; lift; Lift)
 open import Categories.Category using (Category)
 open import Categories.Functor using (Functor;_∘F_)
 open import Categories.Category.Instance.Sets using (Sets)
@@ -48,16 +48,28 @@ l = liftF o (suc o) 0ℓ C
 
 open import Data.Product using (_,_; Σ)
 
-trivialMR2 : ∀ {A} → iMR2 A A
-trivialMR2 = ⟪ (λ z → z) , (λ z z₁ → z) ⟫
+
+open import Data.Unit.Polymorphic using (⊤; tt)
+
+ιMR2 : ∀ {A} → iMR2 A A
+ιMR2 = ⟪ (λ z → z) , (λ z z₁ → z) ⟫
+
+⊤MR2 : ∀ {A} → iMR2 A ⊤
+⊤MR2 = ⟪ (λ z → tt) , (λ z z₁ → tt) ⟫
+
+uniq : {A : Set o} → (A → ⊤)
+uniq {A} a = tt
+
+bang : {A : Set o} → (f g : A → ⊤) → f ≡ g
+bang f g = ≡-refl
 
 s₀⁰ : Functor 𝟘-simplex τ[iMR2]
 s₀⁰ = record
-  { F₀ = λ { (lift A) → record { A = A ; B = A ; ξ = trivialMR2 } }
-  ; F₁ = λ { (lift f) → record { l = f ; r = f ; eqf = ≡-refl ; eqΦ = ≡-refl } }
+  { F₀ = λ { (lift A) → record { A = A ; B = ⊤ ; ξ = ⊤MR2 } }
+  ; F₁ = λ { (lift f) → record { l = f ; r = {!   !} ; eqf = ≡-refl ; eqΦ = ≡-refl } }
   ; identity = (λ {x} → ≡-refl) , (λ {x} → ≡-refl)
   ; homomorphism = (λ {x} → ≡-refl) , (λ {x} → ≡-refl)
-  ; F-resp-≈ = λ x → x .Level.lower , x .Level.lower
+  ; F-resp-≈ = λ {A} {B} {f} {g} z → z .Lift.lower , (λ {x} → ≡-refl)
   }
 
 s₀¹ : Functor τ[iMR2] iMRSᴵᴵ
@@ -65,9 +77,9 @@ s₀¹ = record
   { F₀ = λ x → let module x = iMR2₀ x in record
     { A = x.A
     ; B = x.B
-    ; Y = x.B
+    ; Y = ⊤
     ; ξ₁ = x.ξ
-    ; ξ₂ = trivialMR2
+    ; ξ₂ = {!   !}
     }
   ; F₁ = λ f → let module f = iMR2⇒ f in record
     { h = record
@@ -77,8 +89,8 @@ s₀¹ = record
       ; eqΦ = f.eqΦ
       }
     ; k = record
-      { l = f.r
-      ; r = f.r
+      { l = {!   !}
+      ; r = {!   !}
       ; eqf = λ {x} → ≡-refl
       ; eqΦ = λ {x} → ≡-refl
       }
@@ -89,8 +101,7 @@ s₀¹ = record
   ; homomorphism = λ {X} {Y} {Z} {f} {g} →
       ((λ {x} → ≡-refl) , (λ {x} → ≡-refl)) ,
       (λ {x} → ≡-refl) , (λ {x} → ≡-refl)
-  ; F-resp-≈ = λ {A} {B} {f} {g} z →
-      z , z .Data.Product.proj₂ , z .Data.Product.proj₂
+  ; F-resp-≈ = {!   !}
   }
 
 s₁¹ : Functor τ[iMR2] iMRSᴵᴵ
@@ -99,7 +110,7 @@ s₁¹ = record
     { A = x.A
     ; B = x.A
     ; Y = x.B
-    ; ξ₁ = trivialMR2
+    ; ξ₁ = ιMR2
     ; ξ₂ = x.ξ
     }
   ; F₁ = λ f → let module f = iMR2⇒ f in record
@@ -142,7 +153,7 @@ iMRSᴵᴵ-defines-truncated-simplicial-object = record
   ; s₀¹ = s₀¹
   ; s₁¹ = s₁¹
   ; d₀¹-s₀⁰ = NI.refl
-  ; d₁¹-s₀⁰ = NI.refl
+  ; d₁¹-s₀⁰ = {!   !} -- NI.refl
   ; face-face₀₁ = NI.refl
   ; face-face₀₂ = NI.niHelper record
       { η = λ _ → lift (Category.id C)
@@ -156,25 +167,25 @@ iMRSᴵᴵ-defines-truncated-simplicial-object = record
           }
       }
   ; face-face₁₂ = NI.refl
-  ; degen-degen₀₀ = NI.refl
+  ; degen-degen₀₀ = {!   !} -- NI.refl
   ; d₀²-s₀¹ = NI.refl
   ; d₁²-s₀¹ = NI.niHelper record
       { η = λ _ → record
           { l = id
-          ; r = id
-          ; eqf = λ {x} → ≡-refl
+          ; r = {!   !} -- id
+          ; eqf = λ {x} → {!   !} -- ≡-refl
           ; eqΦ = λ {x} → {!   !}
           }
       ; η⁻¹ = λ _ → record
           { l = id
-          ; r = id
+          ; r = {!   !} -- id
           ; eqf = λ {x} → ≡-refl
           ; eqΦ = λ {x} → {!   !}
           }
-      ; commute = λ _ → {!   !}
+      ; commute = λ _ → (λ {x} → ≡-refl) , (λ {x} → {!   !})
       ; iso = λ _ → record
           { isoˡ = (λ {x} → ≡-refl) , (λ {x} → ≡-refl)
-          ; isoʳ = (λ {x} → ≡-refl) , (λ {x} → ≡-refl)
+          ; isoʳ = (λ {x} → ≡-refl) , (λ {x} → {!   !})
           }
       }
   ; d₁²-s₁¹ = NI.niHelper record
@@ -197,6 +208,6 @@ iMRSᴵᴵ-defines-truncated-simplicial-object = record
           }
       }
   ; d₂²-s₁¹ = NI.refl
-  ; face-degen₀₁ = NI.refl
-  ; face-degen₂₀ = NI.refl
+  ; face-degen₀₁ = {!   !} -- NI.refl
+  ; face-degen₂₀ = {!   !} -- NI.refl
   }
