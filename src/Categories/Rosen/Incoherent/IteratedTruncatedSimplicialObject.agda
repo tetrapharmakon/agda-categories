@@ -1,9 +1,10 @@
 {-# OPTIONS --without-K --warning=noUserWarning --warning=noUselessPrivate --warning=noUnsupportedIndexedMatch #-}
 
-open import Level using (Level; 0ℓ; _⊔_; suc)
+open import Level using (Level; 0ℓ; _⊔_; suc; lift)
 open import Categories.Category using (Category)
 open import Categories.Functor using (Functor;_∘F_)
 open import Categories.Category.Instance.Sets using (Sets)
+open import Categories.NaturalTransformation.NaturalIsomorphism as NI
 open import Relation.Binary.PropositionalEquality using (_≡_; isEquivalence; subst) renaming (refl to ≡-refl; sym to ≡-sym)
 
 module Categories.Rosen.Incoherent.IteratedTruncatedSimplicialObject
@@ -24,9 +25,10 @@ private
   Cl = Sets-Closed
 
 open import Categories.Rosen.Incoherent.Core Cl using (τ[iMR2];⟪_,_⟫;iMR2;iMR2₀;iMR2⇒)
-open import Categories.Rosen.Incoherent.Iterated Cl using (iMRSᴵᴵ;comp;deg₀²;deg₂²)
+open import Categories.Rosen.Incoherent.Iterated Cl using (iMRSᴵᴵ;comp;deg₀²;deg₂²;iMRSᴵᴵ⇒)
 open import Categories.Rosen.Incoherent.Functors Cl
--- open import Categories.Rosen.Incoherent.CartesianAdjoints o
+
+open Category C
 
 -- The three simplex categories.  C is lifted only to place all three
 -- categories at the common universe levels required by Cats.
@@ -39,23 +41,24 @@ open import Categories.Rosen.Incoherent.Functors Cl
 -- 𝟚-simplex : Category (suc o) (suc o) o
 -- 𝟚-simplex = iMRSᴵᴵ
 
+open HomReasoning
 
 l : Functor C 𝟘-simplex
 l = liftF o (suc o) 0ℓ C
 
 open import Data.Product using (_,_; Σ)
 
+trivialMR2 : ∀ {A} → iMR2 A A
+trivialMR2 = ⟪ (λ z → z) , (λ z z₁ → z) ⟫
+
 s₀⁰ : Functor 𝟘-simplex τ[iMR2]
 s₀⁰ = record
-  { F₀ = λ x → record { A = x .Level.lower ; B = x .Level.lower ; ξ = ⟪ (λ z → z) , (λ z z₁ → z) ⟫ }
-  ; F₁ = λ f → record { l = f .Level.lower ; r = f .Level.lower ; eqf = ≡-refl ; eqΦ = ≡-refl }
+  { F₀ = λ { (lift A) → record { A = A ; B = A ; ξ = trivialMR2 } }
+  ; F₁ = λ { (lift f) → record { l = f ; r = f ; eqf = ≡-refl ; eqΦ = ≡-refl } }
   ; identity = (λ {x} → ≡-refl) , (λ {x} → ≡-refl)
   ; homomorphism = (λ {x} → ≡-refl) , (λ {x} → ≡-refl)
   ; F-resp-≈ = λ x → x .Level.lower , x .Level.lower
   }
-
-trivialMR2 : ∀ {A} → iMR2 A A
-trivialMR2 = ⟪ (λ z → z) , (λ z z₁ → z) ⟫
 
 s₀¹ : Functor τ[iMR2] iMRSᴵᴵ
 s₀¹ = record
@@ -101,14 +104,14 @@ s₁¹ = record
     }
   ; F₁ = λ f → let module f = iMR2⇒ f in record
     { k = record
-      { l = f.l -- f.l
-      ; r = f.r -- f.l
-      ; eqf = f.eqf -- f.eqf
-      ; eqΦ = f.eqΦ -- f.eqΦ
+      { l = f.l
+      ; r = f.r
+      ; eqf = f.eqf
+      ; eqΦ = f.eqΦ
       }
     ; h = record
-      { l = f.l -- f.l
-      ; r = f.l -- f.r
+      { l = f.l
+      ; r = f.l
       ; eqf = λ {x} → ≡-refl
       ; eqΦ = λ {x} → ≡-refl
       }
@@ -123,9 +126,7 @@ s₁¹ = record
       (z .Data.Product.proj₁ , z .Data.Product.proj₁) , z
   }
 
--- The intended fields are 𝟘-simplex, 𝟙-simplex, and 𝟚-simplex.
--- The face, degeneracy, and simplicial-identity fields are left for the
--- pointwise development.
+-- The category-valued simplicial object has the following three levels.
 iMRSᴵᴵ-defines-truncated-simplicial-object :
   TruncatedSimplicialObject (Cats (suc o) (suc o) o)
 iMRSᴵᴵ-defines-truncated-simplicial-object = record
@@ -140,16 +141,62 @@ iMRSᴵᴵ-defines-truncated-simplicial-object = record
   ; s₀⁰ = s₀⁰
   ; s₀¹ = s₀¹
   ; s₁¹ = s₁¹
-  ; d₀¹-s₀⁰ = {!   !}
-  ; d₁¹-s₀⁰ = {!   !}
-  ; face-face₀₁ = {!   !}
-  ; face-face₀₂ = {!   !}
-  ; face-face₁₂ = {!   !}
-  ; degen-degen₀₀ = {!   !}
-  ; d₀²-s₀¹ = {!   !}
-  ; d₁²-s₀¹ = {!   !}
-  ; d₁²-s₁¹ = {!   !}
-  ; d₂²-s₁¹ = {!   !}
-  ; face-degen₀₁ = {!   !}
-  ; face-degen₂₀ = {!   !}
+  ; d₀¹-s₀⁰ = NI.refl
+  ; d₁¹-s₀⁰ = NI.refl
+  ; face-face₀₁ = NI.refl
+  ; face-face₀₂ = NI.niHelper record
+      { η = λ _ → lift (Category.id C)
+      ; η⁻¹ = λ _ → lift (Category.id C)
+      ; commute = λ {X} {Y} f →
+          let module f = iMRSᴵᴵ⇒ f
+          in lift {o} (identityˡ ○ Equiv.sym f.hᵣ≈kₗ ○ Equiv.sym identityʳ)
+      ; iso = λ _ → record
+          { isoˡ = lift identity²
+          ; isoʳ = lift identity²
+          }
+      }
+  ; face-face₁₂ = NI.refl
+  ; degen-degen₀₀ = NI.refl
+  ; d₀²-s₀¹ = NI.refl
+  ; d₁²-s₀¹ = NI.niHelper record
+      { η = λ _ → record
+          { l = id
+          ; r = id
+          ; eqf = λ {x} → ≡-refl
+          ; eqΦ = λ {x} → {!   !}
+          }
+      ; η⁻¹ = λ _ → record
+          { l = id
+          ; r = id
+          ; eqf = λ {x} → ≡-refl
+          ; eqΦ = λ {x} → {!   !}
+          }
+      ; commute = λ _ → {!   !}
+      ; iso = λ _ → record
+          { isoˡ = (λ {x} → ≡-refl) , (λ {x} → ≡-refl)
+          ; isoʳ = (λ {x} → ≡-refl) , (λ {x} → ≡-refl)
+          }
+      }
+  ; d₁²-s₁¹ = NI.niHelper record
+      { η = λ _ → record
+          { l = id
+          ; r = id
+          ; eqf = λ {x} → ≡-refl
+          ; eqΦ = λ {x} → ≡-refl
+          }
+      ; η⁻¹ = λ _ → record
+          { l = id
+          ; r = id
+          ; eqf = λ {x} → ≡-refl
+          ; eqΦ = λ {x} → ≡-refl
+          }
+      ; commute = λ _ → (λ {x} → ≡-refl) , (λ {x} → ≡-refl)
+      ; iso = λ _ → record
+          { isoˡ = (λ {x} → ≡-refl) , (λ {x} → ≡-refl)
+          ; isoʳ = (λ {x} → ≡-refl) , (λ {x} → ≡-refl)
+          }
+      }
+  ; d₂²-s₁¹ = NI.refl
+  ; face-degen₀₁ = NI.refl
+  ; face-degen₂₀ = NI.refl
   }
