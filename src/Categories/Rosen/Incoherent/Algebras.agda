@@ -94,8 +94,9 @@ to {A} = record
         yoga = begin
             f.v ∘ ΦX#                                 ≈⟨ (Equiv.sym (adjoint.Radjunct-comm′ {f = f.ξX.Φ} {g = f.v})) ⟩ 
             adjoint.Radjunct ([ id , f.v ]₁ ∘ f.ξX.Φ) ≈⟨ adjoint.Radjunct-resp-≈ f.eqΦ ⟩
-            adjoint.Radjunct (f.ξY.Φ ∘ f.v)           ≈⟨ ? ⟩
-            {!   !} ≈⟨  {!   !} ⟩ 
+            adjoint.Radjunct (f.ξY.Φ ∘ f.v)           ≈⟨ refl⟩∘⟨ ⊗A.homomorphism ⟩
+            adjoint.counit.η _ ∘ (⊗A.F₁ f.ξY.Φ ∘ ⊗A.F₁ f.v) ≈⟨ sym-assoc ⟩
+            (adjoint.counit.η _ ∘ ⊗A.F₁ f.ξY.Φ) ∘ ⊗A.F₁ f.v ≈⟨ Equiv.refl ⟩
             ΦY# ∘ (f.v ⊗₁ idA)                        ∎
       in record
       { f = f.v
