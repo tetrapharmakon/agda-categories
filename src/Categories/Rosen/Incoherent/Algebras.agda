@@ -94,7 +94,8 @@ to {A} = record
         yoga = begin
             f.v ∘ ΦX#                                 ≈⟨ (Equiv.sym (adjoint.Radjunct-comm′ {f = f.ξX.Φ} {g = f.v})) ⟩ 
             adjoint.Radjunct ([ id , f.v ]₁ ∘ f.ξX.Φ) ≈⟨ adjoint.Radjunct-resp-≈ f.eqΦ ⟩
-            adjoint.Radjunct (f.ξY.Φ ∘ f.v)           ≈⟨ {! ⊗A.homomorphism  !} ⟩
+            adjoint.Radjunct (f.ξY.Φ ∘ f.v)           ≈⟨ ? ⟩
+            {!   !} ≈⟨  {!   !} ⟩ 
             ΦY# ∘ (f.v ⊗₁ idA)                        ∎
       in record
       { f = f.v
@@ -155,7 +156,7 @@ from {A} = record
             [ id , f' ]₁ ∘ HomA.F₁ hx ∘ η _  ≈⟨ pullˡ (Equiv.sym HomA.homomorphism) ⟩
             HomA.F₁ (f' ∘ hx) ∘ η _          ≈⟨ (HomA.F-resp-≈ tensorEq) ⟩∘⟨refl ⟩
             HomA.F₁ (hy ∘ (f' ⊗₁ idA)) ∘ η _ ≈⟨ adjoint.Ladjunct-comm′ {f = f'} {g = hy} ⟩
-            {!   !}   ∎
+            _                                ∎
       }
   ; identity = Equiv.refl
   ; homomorphism = Equiv.refl
@@ -180,14 +181,99 @@ AlgA≣MRS^A {A} = record
   ; G = from {A} 
   ; weak-inverse = record 
     { F∘G≈id = niHelper (record 
-      { η = λ X → record { f = id ; commutes = {!   !} } 
-      ; η⁻¹ = λ X → record { f = id ; commutes = {!   !} } 
+      { η = λ X → record 
+        { f = id 
+        ; commutes = 
+             let module X = F-Algebra X
+                 α = X.α
+                 B = X.A
+                 h = α ∘ i₂
+                 hₐ = adjoint.Radjunct (adjoint.Ladjunct h)
+
+                 h≈ : hₐ ≈ α ∘ i₂
+                 h≈ = begin hₐ               ≈⟨ adjoint.RLadjunct≈id ⟩
+                            α ∘ i₂                 ∎
+
+                 αFG≈α : [ α ∘ i₁ , hₐ ] ≈ α
+                 αFG≈α = Equiv.trans ([]-cong₂ Equiv.refl h≈) (+-g-η {f = α})
+             in begin id ∘ [ α ∘ i₁ , hₐ ]          ≈⟨ identityˡ ⟩
+                      [ α ∘ i₁ , hₐ ]               ≈⟨ αFG≈α ⟩
+                      α                                   ≈˘⟨ identityʳ ⟩
+                      α ∘ id                              ≈⟨ ∘-resp-≈ʳ (Equiv.sym (Functor.identity (_⊗[_+I] {A = A}))) ⟩
+                      α ∘ Functor.F₁ (_⊗[_+I] {A = A}) id ∎
+        } 
+      ; η⁻¹ = λ X → record 
+        { f = id 
+        ; commutes = 
+             let module X = F-Algebra X
+                 α = X.α
+                 B = X.A
+                 h = α ∘ i₂
+                 hₐ = adjoint.Radjunct (adjoint.Ladjunct h)
+
+                 h≈ : hₐ ≈ α ∘ i₂
+                 h≈ = begin hₐ               ≈⟨ adjoint.RLadjunct≈id ⟩ -- ∘-resp-≈ˡ adjoint.RLadjunct≈id ○ assoc ○ refl⟩∘⟨ assoc ⟩
+                            α ∘ i₂                 ∎
+
+                 αFG≈α : [ α ∘ i₁ , hₐ ] ≈ α
+                 αFG≈α = Equiv.trans ([]-cong₂ Equiv.refl h≈) (+-g-η {f = α})
+             in begin id ∘ α                                                  ≈⟨ identityˡ ⟩
+                      α                                                       ≈˘⟨ αFG≈α ⟩
+                      [ α ∘ i₁ , hₐ ]                                   ≈˘⟨ identityʳ ⟩
+                      [ α ∘ i₁ , hₐ ] ∘ id                              ≈⟨ ∘-resp-≈ʳ (Equiv.sym (Functor.identity (_⊗[_+I] {A = A}))) ⟩
+                      [ α ∘ i₁ , hₐ ] ∘ Functor.F₁ (_⊗[_+I] {A = A}) id ∎
+        } 
       ; commute = λ f → Equiv.trans identityˡ (Equiv.sym identityʳ) 
       ; iso = λ X → record { isoˡ = identityˡ ; isoʳ = identity² }
        })
     ; G∘F≈id = niHelper (record 
-      { η = λ X → record { v = id ; eqf = {!   !} ; eqΦ = {!   !} } 
-      ; η⁻¹ = λ X → record { v = id ; eqf = Equiv.trans identityˡ (Equiv.sym inject₁) ; eqΦ = {!   !} } 
+      { η = λ X → record { v = id ; eqf = identityˡ ○ inject₁ 
+      ; eqΦ = let module X = iMR2ᴿ₀ X
+                  module ξ = iMR2 X.ξ
+                  B = X.B
+                  Φ# = adjoint.Radjunct ξ.Φ
+                  α = [ ξ.f , Φ# ]
+
+                  Φ′ : B ⇒ [ A , B ]₀
+                  Φ′ = adjoint.Ladjunct (α ∘ i₂)
+
+                  Φ′≈Φ : Φ′ ≈ ξ.Φ
+                  Φ′≈Φ =
+                   let step₁ : α ∘ i₂ ≈ Φ#
+                       step₁ = begin
+                         α ∘ i₂    ≈⟨ inject₂ ⟩
+                         Φ#               ∎
+                   in Equiv.trans (adjoint.Ladjunct-resp-≈ step₁) adjoint.LRadjunct≈id
+              in begin [ id , id ]₁ ∘ Φ′ ≈⟨ ∘-resp-≈ˡ (Functor.identity ([ A ,-])) ⟩
+                      id ∘ Φ′           ≈⟨ identityˡ ⟩
+                      Φ′                ≈⟨ Φ′≈Φ ⟩
+                      ξ.Φ               ≈˘⟨ identityʳ ⟩
+                      ξ.Φ ∘ id          ∎
+      } 
+      ; η⁻¹ = λ X → record { v = id ; eqf = Equiv.trans identityˡ (Equiv.sym inject₁) 
+      ; eqΦ = let module X = iMR2ᴿ₀ X
+                  module ξ = iMR2 X.ξ
+                  B = X.B
+                  Φ# = adjoint.Radjunct ξ.Φ
+                  α = [ ξ.f , Φ# ]
+
+                  Φ′ : B ⇒ [ A , B ]₀
+                  Φ′ = adjoint.Ladjunct (α ∘ i₂)
+
+                  Φ′≈Φ : Φ′ ≈ ξ.Φ
+                  Φ′≈Φ =
+                   let step₁ : α ∘ i₂ ≈ Φ#
+                       step₁ = begin
+                         α ∘ i₂     ≈⟨ inject₂ ⟩
+                         Φ#               ∎
+                   in Equiv.trans (adjoint.Ladjunct-resp-≈ step₁) adjoint.LRadjunct≈id
+             in begin
+               [ id , id ]₁ ∘ ξ.Φ  ≈⟨ ∘-resp-≈ˡ (Functor.identity ([ A ,-])) ⟩
+               id ∘ ξ.Φ            ≈⟨ identityˡ ⟩
+               ξ.Φ                 ≈˘⟨ Φ′≈Φ ⟩
+               Φ′                  ≈˘⟨ identityʳ ⟩
+               Φ′ ∘ id             ∎
+      } 
       ; commute = λ f → Equiv.trans identityˡ (Equiv.sym identityʳ) 
       ; iso = λ X → record { isoˡ = identityˡ ; isoʳ = identityˡ } 
       }) 
