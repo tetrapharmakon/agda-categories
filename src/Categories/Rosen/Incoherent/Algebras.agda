@@ -271,13 +271,8 @@ AlgA≣MRS^A {A} = record
                 Φ′ : B ⇒ [ A , B ]₀
                 Φ′ = adjoint.Ladjunct (α ∘ i₂)
 
-                step₁ : α ∘ i₂ ≈ Φ#
-                step₁ = begin
-                  α ∘ i₂ ≈⟨ inject₂ ⟩
-                  Φ#     ∎
-
                 Φ′≈Φ : Φ′ ≈ ξ.Φ
-                Φ′≈Φ = Equiv.trans (adjoint.Ladjunct-resp-≈ step₁)
+                Φ′≈Φ = Equiv.trans (adjoint.Ladjunct-resp-≈ inject₂)
                                    adjoint.LRadjunct≈id
             in begin
                  [ id , id ]₁ ∘ Φ′
@@ -300,21 +295,15 @@ AlgA≣MRS^A {A} = record
                 Φ′ : B ⇒ [ A , B ]₀
                 Φ′ = adjoint.Ladjunct (α ∘ i₂)
 
-                step₁ : α ∘ i₂ ≈ Φ#
-                step₁ = begin
-                  α ∘ i₂ ≈⟨ inject₂ ⟩
-                  Φ#     ∎
-
                 Φ′≈Φ : Φ′ ≈ ξ.Φ
-                Φ′≈Φ = Equiv.trans (adjoint.Ladjunct-resp-≈ step₁)
+                Φ′≈Φ = Equiv.trans (adjoint.Ladjunct-resp-≈ inject₂)
                                    adjoint.LRadjunct≈id
             in begin
-                 [ id , id ]₁ ∘ ξ.Φ
-                   ≈⟨ ∘-resp-≈ˡ (Functor.identity ([ A ,-])) ⟩
-                 id ∘ ξ.Φ ≈⟨ identityˡ ⟩
-                 ξ.Φ      ≈˘⟨ Φ′≈Φ ⟩
-                 Φ′       ≈˘⟨ identityʳ ⟩
-                 Φ′ ∘ id  ∎
+                 [ id , id ]₁ ∘ ξ.Φ ≈⟨ ∘-resp-≈ˡ (Functor.identity ([ A ,-])) ⟩
+                 id ∘ ξ.Φ           ≈⟨ identityˡ ⟩
+                 ξ.Φ                ≈˘⟨ Φ′≈Φ ⟩
+                 Φ′                 ≈˘⟨ identityʳ ⟩
+                 Φ′ ∘ id            ∎
         }
       ; commute = λ f → Equiv.trans identityˡ (Equiv.sym identityʳ)
       ; iso     = λ X → record
