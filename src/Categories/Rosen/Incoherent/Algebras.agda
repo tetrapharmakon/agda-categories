@@ -67,17 +67,17 @@ F-Algebra-Category : {A : Obj} → Category _ _ _
 F-Algebra-Category {A} = F-Algebras (_⊗[_+I] {A})
 
 
--- Comparison functor iMR2ᴿ A → Alg(A + A ⊗ -).
+-- Comparison functor iMR2ᴿ A → Alg(A + - ⊗ A).
 --
 -- On objects (B , f , Φ), we use closedness to transpose
 -- Φ : B ⇒ [ A , B ]₀
--- into Φ# : A ⊗ B ⇒ B and define the algebra structure
+-- into Φ# : B ⊗ A ⇒ B and define the algebra structure
 --
---   α : A + (A ⊗ B) ⇒ B
+--   α : A + (B ⊗ A) ⇒ B
 --   α = [ f , Φ# ]
 --
 -- No braiding is involved: Φ lives in [ A , B ]₀, so transposing
--- it gives a map out of A ⊗ B directly.
+-- it gives a map out of B ⊗ A directly.
 
 to : {A : Obj} → Functor (iMR2ᴿ A) (F-Algebra-Category {A})
 to {A} = record
@@ -126,12 +126,12 @@ to {A} = record
 
 -- Converse functor Alg(A + - ⊗ A) → iMR2ᴿ A.
 --
--- Given an algebra α : A + (A ⊗ B) ⇒ B, define
+-- Given an algebra α : A + (B ⊗ A) ⇒ B, define
 --
 --   f = α ∘ i₁
 --   Φ = Ladjunct (α ∘ i₂)
 --
--- i.e. transpose α ∘ i₂ : A ⊗ B ⇒ B through the closed structure.
+-- i.e. transpose α ∘ i₂ : B ⊗ A ⇒ B through the closed structure.
 
 from : {A : Obj} → Functor (F-Algebra-Category {A}) (iMR2ᴿ A)
 from {A} = record
@@ -192,6 +192,69 @@ from {A} = record
 -- No braiding or symmetry of the monoidal structure is used.
 ------------------------------------------------------------------------
 
+private
+  module F∘G {A : Obj} {X : F-Algebra (_⊗[_+I] {A})} where
+    module X = F-Algebra X
+    α   = X.α
+    h   = α ∘ i₂
+    hₐ  = adjoint.Radjunct (adjoint.Ladjunct h)
+
+    h≈ : hₐ ≈ α ∘ i₂
+    h≈ = begin
+      hₐ     ≈⟨ adjoint.RLadjunct≈id ⟩
+      α ∘ i₂ ∎
+
+    αFG≈α : [ α ∘ i₁ , hₐ ] ≈ α
+    αFG≈α = Equiv.trans ([]-cong₂ Equiv.refl h≈) (+-g-η {f = α})
+
+    commutes₊ : id ∘ [ α ∘ i₁ , hₐ ] ≈
+                α ∘ Functor.F₁ (_⊗[_+I] {A = A}) id
+    commutes₊ = begin
+      id ∘ [ α ∘ i₁ , hₐ ] ≈⟨ identityˡ ⟩
+      [ α ∘ i₁ , hₐ ]      ≈⟨ αFG≈α ⟩
+      α                    ≈˘⟨ identityʳ ⟩
+      α ∘ id               ≈⟨ ∘-resp-≈ʳ
+        (Equiv.sym (Functor.identity (_⊗[_+I] {A = A}))) ⟩
+      α ∘ Functor.F₁ (_⊗[_+I] {A = A}) id ∎
+
+    commutes₋ : id ∘ α ≈
+                [ α ∘ i₁ , hₐ ] ∘ Functor.F₁ (_⊗[_+I] {A = A}) id
+    commutes₋ = begin
+      id ∘ α               ≈⟨ identityˡ ⟩
+      α                    ≈˘⟨ αFG≈α ⟩
+      [ α ∘ i₁ , hₐ ]      ≈˘⟨ identityʳ ⟩
+      [ α ∘ i₁ , hₐ ] ∘ id ≈⟨ ∘-resp-≈ʳ
+        (Equiv.sym (Functor.identity (_⊗[_+I] {A = A}))) ⟩
+      [ α ∘ i₁ , hₐ ] ∘ Functor.F₁ (_⊗[_+I] {A = A}) id ∎
+
+  module G∘F {A : Obj} {X : iMR2ᴿ₀ A} where
+    module X = iMR2ᴿ₀ X
+    module ξ = iMR2 X.ξ
+
+    Φ′ : X.B ⇒ [ A , X.B ]₀
+    Φ′  = adjoint.Ladjunct ([ ξ.f , adjoint.Radjunct ξ.Φ ] ∘ i₂)
+
+    Φ′≈Φ : Φ′ ≈ ξ.Φ
+    Φ′≈Φ = Equiv.trans (adjoint.Ladjunct-resp-≈ inject₂)
+                       adjoint.LRadjunct≈id
+
+    eqΦ₊ : [ id , id ]₁ ∘ Φ′ ≈ ξ.Φ ∘ id
+    eqΦ₊ = begin
+      [ id , id ]₁ ∘ Φ′ ≈⟨ ∘-resp-≈ˡ (Functor.identity ([ A ,-])) ⟩
+      id ∘ Φ′           ≈⟨ identityˡ ⟩
+      Φ′                ≈⟨ Φ′≈Φ ⟩
+      ξ.Φ               ≈˘⟨ identityʳ ⟩
+      ξ.Φ ∘ id          ∎
+
+    eqΦ₋ : [ id , id ]₁ ∘ ξ.Φ ≈ Φ′ ∘ id
+    eqΦ₋ = begin
+      [ id , id ]₁ ∘ ξ.Φ ≈⟨ ∘-resp-≈ˡ (Functor.identity ([ A ,-])) ⟩
+      id ∘ ξ.Φ           ≈⟨ identityˡ ⟩
+      ξ.Φ                ≈˘⟨ Φ′≈Φ ⟩
+      Φ′                 ≈˘⟨ identityʳ ⟩
+      Φ′ ∘ id            ∎
+
+
 AlgA≣MRS^A : {A : Obj} →
              StrongEquivalence (iMR2ᴿ A) (F-Algebra-Category {A})
 AlgA≣MRS^A {A} = record
@@ -201,55 +264,11 @@ AlgA≣MRS^A {A} = record
     { F∘G≈id = niHelper (record
       { η       = λ X → record
         { f        = id
-        ; commutes =
-            let module X = F-Algebra X
-                α       = X.α
-                B       = X.A
-                h       = α ∘ i₂
-                hₐ      = adjoint.Radjunct (adjoint.Ladjunct h)
-
-                h≈ : hₐ ≈ α ∘ i₂
-                h≈ = begin
-                  hₐ     ≈⟨ adjoint.RLadjunct≈id ⟩
-                  α ∘ i₂ ∎
-
-                αFG≈α : [ α ∘ i₁ , hₐ ] ≈ α
-                αFG≈α = Equiv.trans
-                  ([]-cong₂ Equiv.refl h≈)
-                  (+-g-η {f = α})
-            in begin
-                 id ∘ [ α ∘ i₁ , hₐ ] ≈⟨ identityˡ ⟩
-                 [ α ∘ i₁ , hₐ ]      ≈⟨ αFG≈α ⟩
-                 α                    ≈˘⟨ identityʳ ⟩
-                 α ∘ id               ≈⟨ ∘-resp-≈ʳ
-                   (Equiv.sym (Functor.identity (_⊗[_+I] {A = A}))) ⟩
-                 α ∘ Functor.F₁ (_⊗[_+I] {A = A}) id ∎
+        ; commutes = F∘G.commutes₊ {X = X}
         }
       ; η⁻¹     = λ X → record
         { f        = id
-        ; commutes =
-            let module X = F-Algebra X
-                α       = X.α
-                B       = X.A
-                h       = α ∘ i₂
-                hₐ      = adjoint.Radjunct (adjoint.Ladjunct h)
-
-                h≈ : hₐ ≈ α ∘ i₂
-                h≈ = begin
-                  hₐ     ≈⟨ adjoint.RLadjunct≈id ⟩
-                  α ∘ i₂ ∎
-
-                αFG≈α : [ α ∘ i₁ , hₐ ] ≈ α
-                αFG≈α = Equiv.trans
-                  ([]-cong₂ Equiv.refl h≈)
-                  (+-g-η {f = α})
-            in begin
-                 id ∘ α ≈⟨ identityˡ ⟩
-                 α      ≈˘⟨ αFG≈α ⟩
-                 [ α ∘ i₁ , hₐ ] ≈˘⟨ identityʳ ⟩
-                 [ α ∘ i₁ , hₐ ] ∘ id ≈⟨ ∘-resp-≈ʳ
-                   (Equiv.sym (Functor.identity (_⊗[_+I] {A = A}))) ⟩
-                 [ α ∘ i₁ , hₐ ] ∘ Functor.F₁ (_⊗[_+I] {A = A}) id ∎
+        ; commutes = F∘G.commutes₋ {X = X}
         }
       ; commute = λ f → Equiv.trans identityˡ (Equiv.sym identityʳ)
       ; iso     = λ X → record
@@ -261,49 +280,12 @@ AlgA≣MRS^A {A} = record
       { η       = λ X → record
         { v   = id
         ; eqf = identityˡ ○ inject₁
-        ; eqΦ =
-            let module X = iMR2ᴿ₀ X
-                module ξ = iMR2 X.ξ
-                B       = X.B
-                Φ#      = adjoint.Radjunct ξ.Φ
-                α       = [ ξ.f , Φ# ]
-
-                Φ′ : B ⇒ [ A , B ]₀
-                Φ′ = adjoint.Ladjunct (α ∘ i₂)
-
-                Φ′≈Φ : Φ′ ≈ ξ.Φ
-                Φ′≈Φ = Equiv.trans (adjoint.Ladjunct-resp-≈ inject₂)
-                                   adjoint.LRadjunct≈id
-            in begin
-                 [ id , id ]₁ ∘ Φ′
-                   ≈⟨ ∘-resp-≈ˡ (Functor.identity ([ A ,-])) ⟩
-                 id ∘ Φ′ ≈⟨ identityˡ ⟩
-                 Φ′      ≈⟨ Φ′≈Φ ⟩
-                 ξ.Φ     ≈˘⟨ identityʳ ⟩
-                 ξ.Φ ∘ id ∎
+        ; eqΦ = G∘F.eqΦ₊ {X = X}
         }
       ; η⁻¹     = λ X → record
         { v   = id
         ; eqf = Equiv.trans identityˡ (Equiv.sym inject₁)
-        ; eqΦ =
-            let module X = iMR2ᴿ₀ X
-                module ξ = iMR2 X.ξ
-                B       = X.B
-                Φ#      = adjoint.Radjunct ξ.Φ
-                α       = [ ξ.f , Φ# ]
-
-                Φ′ : B ⇒ [ A , B ]₀
-                Φ′ = adjoint.Ladjunct (α ∘ i₂)
-
-                Φ′≈Φ : Φ′ ≈ ξ.Φ
-                Φ′≈Φ = Equiv.trans (adjoint.Ladjunct-resp-≈ inject₂)
-                                   adjoint.LRadjunct≈id
-            in begin
-                 [ id , id ]₁ ∘ ξ.Φ ≈⟨ ∘-resp-≈ˡ (Functor.identity ([ A ,-])) ⟩
-                 id ∘ ξ.Φ           ≈⟨ identityˡ ⟩
-                 ξ.Φ                ≈˘⟨ Φ′≈Φ ⟩
-                 Φ′                 ≈˘⟨ identityʳ ⟩
-                 Φ′ ∘ id            ∎
+        ; eqΦ = G∘F.eqΦ₋ {X = X}
         }
       ; commute = λ f → Equiv.trans identityˡ (Equiv.sym identityʳ)
       ; iso     = λ X → record
