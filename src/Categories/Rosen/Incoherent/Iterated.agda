@@ -107,6 +107,38 @@ iMRSᴵᴵ = record
   ; ∘-resp-≈ = λ f≈g f'≈g' → ((∘-resp-≈ (f≈g .proj₁ .proj₁) (f'≈g' .proj₁ .proj₁)) , ∘-resp-≈ (f≈g .proj₁ .proj₂) (f'≈g' .proj₁ .proj₂)) , (∘-resp-≈ (f≈g .proj₂ .proj₁) (f'≈g' .proj₂ .proj₁)) , ∘-resp-≈ (f≈g .proj₂ .proj₂) (f'≈g' .proj₂ .proj₂)
   }
 
+deg₀² : Functor iMRSᴵᴵ τ[iMR2]
+deg₀² = record
+  { F₀ = λ x → 
+    let module x = iMRSᴵᴵ₀ x 
+    in record { A = x.A ; B = x.B ; ξ = x.ξ₁ }
+  ; F₁ = λ S → let module S = iMRSᴵᴵ⇒ S in record 
+    { l = S.h.l 
+    ; r = S.h.r 
+    ; eqf = S.h.eqf 
+    ; eqΦ = S.h.eqΦ
+    }
+  ; identity = λ {A} → refl , refl -- refl , refl , refl , refl
+  ; homomorphism = λ {X} {Y} {Z} {f} {g} → refl , refl -- refl , refl , refl , refl
+  ; F-resp-≈ = λ {A} {B} {f} {g} z → z .proj₁ -- λ z → z .proj₁ .proj₁ , z .proj₂ .proj₁
+  }
+
+deg₂² : Functor iMRSᴵᴵ τ[iMR2]
+deg₂² = record
+  { F₀ = λ x → 
+    let module x = iMRSᴵᴵ₀ x 
+    in record { A = x.B ; B = x.Y ; ξ = x.ξ₂ }
+  ; F₁ = λ S → let module S = iMRSᴵᴵ⇒ S in record 
+    { l = S.k.l 
+    ; r = S.k.r 
+    ; eqf = S.k.eqf 
+    ; eqΦ = S.k.eqΦ
+    }
+  ; identity = λ {A} → refl , refl -- refl , refl , refl , refl
+  ; homomorphism = λ {X} {Y} {Z} {f} {g} → refl , refl -- refl , refl , refl , refl
+  ; F-resp-≈ = λ {A} {B} {f} {g} z → z .proj₂ -- λ z → z .proj₁ .proj₁ , z .proj₂ .proj₁
+  }
+
 comp : Functor iMRSᴵᴵ τ[iMR2]
 comp = record
   { F₀ = λ x → 

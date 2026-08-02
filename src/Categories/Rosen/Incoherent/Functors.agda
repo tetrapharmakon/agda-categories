@@ -24,6 +24,24 @@ open MR
 open import Categories.Rosen.Incoherent.Core Cl
 open import Categories.Rosen.Incoherent.Elements Cl
 
+[_]A : Functor τ[iMR2] C 
+[_]A = record
+  { F₀ = λ x → let module x = iMR2₀ x in x.A
+  ; F₁ = λ f → let module f = iMR2⇒ f in f.l
+  ; identity = λ {A} → refl
+  ; homomorphism = λ {X} {Y} {Z} {f} {g} → refl
+  ; F-resp-≈ = λ {A} {B} {f} {g} z → z .proj₁
+  }
+
+[_]B : Functor τ[iMR2] C
+[_]B = record
+  { F₀ = λ x → let module x = iMR2₀ x in x.B
+  ; F₁ = λ f → let module f = iMR2⇒ f in f.r
+  ; identity = λ {B} → refl
+  ; homomorphism = λ {X} {Y} {Z} {f} {g} → refl
+  ; F-resp-≈ = λ {A} {B} {f} {g} z → z .proj₂
+  }
+
 [_]f : Functor τ[iMR2] Arr.Arrow 
 [_]f = record
   { F₀ = λ x → let module x = iMR2₀ x in record { dom = x.A ; cod = x.B ; arr = iMR2.f x.ξ }
@@ -136,3 +154,4 @@ Arbib = record
   ; homomorphism = refl , refl , [-,-].homomorphism
   ; F-resp-≈ = λ z → z .proj₁ , z .proj₁ , [-,-].F-resp-≈ z
   }
+

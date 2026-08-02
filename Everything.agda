@@ -406,6 +406,7 @@ import Categories.Tactic.Category
 import Categories.Theory.Lawvere
 import Categories.Theory.Lawvere.Instance.Identity
 import Categories.Theory.Lawvere.Instance.Triv
+import Categories.TruncatedSimplicialObject
 import Categories.Utils.EqReasoning
 import Categories.Utils.Product
 import Categories.Yoneda
