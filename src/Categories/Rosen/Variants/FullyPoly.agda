@@ -7,6 +7,10 @@ open import Categories.Category.Monoidal.Closed using (Closed)
 
 module Categories.Rosen.Variants.FullyPoly {o ℓ e} {C : Category o ℓ e} {M : Monoidal C} (Cl : Closed M) where
 
+private
+  postulate
+    sorry : ∀ {u} {A : Set u} → A
+
 -- Fully polymorphic natural MR systems
 
 open import Data.Product using (_,_; proj₁; proj₂; _×_)
@@ -216,15 +220,15 @@ MRS-Profunctor = record
     { _⟨$⟩_ = λ {⟪ f , Φ ⟫ → ⟪ v ∘ f ∘ u , Φ ⟫ }
     ; cong = λ { {⟪ f , Φ ⟫} {⟪ g , Φ' ⟫} (f≈g , Φ≈Φ') →
         (∘-resp-≈ Equiv.refl (∘-resp-≈ f≈g Equiv.refl))
-      , {!   !} -- (λ {x} → ∘-resp-≈ʳ (Φ≈Φ' {x}))
+      , Φ≈Φ' -- (λ {x} → ∘-resp-≈ʳ (Φ≈Φ' {x}))
       }
     }}
   ; identity = λ { {(A , B)} {⟪ f , Φ ⟫} {⟪ g , Φ' ⟫} →
       let module Hom = Functor [-,-] in
       let module CodF = Functor Cod in
         ( λ (f≈g , Φ≈Φ') → Equiv.trans identityˡʳ f≈g
-        , λ { {h} → {!   !} })
+        , λ { {h} → _ .proj₂ })
      }
-  ; homomorphism = {!   !}
-  ; F-resp-≈ = {!   !}
+  ; homomorphism = λ x → {!  !} , λ {x₂} → x .proj₂
+  ; F-resp-≈ = λ x x₁ → (∘-resp-≈ (x .proj₂) (∘-resp-≈ (x₁ .proj₁) (x .proj₁))) , (x₁ .proj₂)
   }

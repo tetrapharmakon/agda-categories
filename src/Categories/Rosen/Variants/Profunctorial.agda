@@ -10,6 +10,10 @@ open import Categories.Category.Instance.Setoids using (Setoids)
 
 module Categories.Rosen.Variants.Profunctorial {o ℓ e} {C E : Category o ℓ e} {M : Monoidal C} (Cl : Closed M) where
 
+private
+  postulate
+    sorry : ∀ {u} {A : Set u} → A
+
 open import Categories.Category.CoSlice C
 open import Categories.Category.Slice C
 

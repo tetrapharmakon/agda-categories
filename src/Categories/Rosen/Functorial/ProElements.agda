@@ -10,6 +10,10 @@ open import Categories.Functor.Bifunctor using (Bifunctor; appˡ; appʳ)
 
 module Categories.Rosen.Functorial.ProElements {o ℓ e} {C : Category o ℓ e} {E : Category (o ⊔ ℓ) (ℓ ⊔ e) e} {M : Monoidal C} (Cl : Closed M) (U : Functor E C) {F : Bifunctor (Category.op C) C (Setoids (o ⊔ ℓ ⊔ e) (o ⊔ ℓ ⊔ e))} where
 
+private
+  postulate
+    sorry : ∀ {u} {A : Set u} → A
+
 -- Modified category of elements for a bifunctor F : C^op × C → Sets, specialised to MRS-Profunctor.
 -- EltsCat is a generic (modified) category-of-elements construction; ElMRS is its instance.
 -- Exports: EltsCat, ElMRS, ℝ, U₁.

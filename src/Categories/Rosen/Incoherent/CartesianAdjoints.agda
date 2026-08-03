@@ -13,6 +13,10 @@ open import Relation.Binary.PropositionalEquality using (_≡_; isEquivalence; s
 open import Data.Product using (_,_; Σ)
 module Categories.Rosen.Incoherent.CartesianAdjoints (o : Level) where
 
+private
+  postulate
+    sorry : ∀ {u} {A : Set u} → A
+
 open import Categories.Rosen.Cartesian.Sets
 open Sets-MonoidalClosed {o}
 
@@ -72,7 +76,7 @@ L⊣A = record
   { unit = ntHelper (record { η = λ X → mor⇒ {dom⇒ = id} {cod⇒ = id} ≡-refl ; commute = λ {X} {Y} f → (λ {x} → ≡-refl) , (λ {x} → ≡-refl) }) 
   ; counit = ntHelper (record 
     { η = λ X → record { l = id ; r = id ; eqf = λ {x} → ≡-refl 
-      ; eqΦ = {!  !} } 
+      ; eqΦ = λ {x} → {!  !} } 
     ; commute = λ f → (λ {x} → ≡-refl) , (λ {x} → ≡-refl) }) 
   ; zig = λ {A} → (λ {x} → ≡-refl) , (λ {x} → ≡-refl) 
   ; zag = λ {B} → (λ {x} → ≡-refl) , (λ {x} → ≡-refl) 
@@ -81,7 +85,7 @@ L⊣A = record
 L'⊣𝕃 : L' ⊣ 𝕃
 L'⊣𝕃 = record 
   { unit = ntHelper (record { η = λ X → tmor⇒ λ {x} → ≡-refl ; commute = λ f → (λ {x} → ≡-refl) , (λ {x} → ≡-refl) }) 
-  ; counit = ntHelper (record { η = λ X → record { l = id ; r = id ; eqf = λ {x} → ≡-refl ; eqΦ = {!  !} } ; commute = λ {X} {Y} f → (λ {x} → ≡-refl) , (λ {x} → ≡-refl) }) 
+  ; counit = ntHelper (record { η = λ X → record { l = id ; r = id ; eqf = λ {x} → ≡-refl ; eqΦ = identityʳ ○ {! sorry !} } ; commute = λ {X} {Y} f → (λ {x} → ≡-refl) , (λ {x} → ≡-refl) }) 
   ; zig = λ {A} → (λ {x} → ≡-refl) , (λ {x} → ≡-refl) 
   ; zag = λ {B} → (λ {x} → ≡-refl) , (λ {x} → ≡-refl) 
   }

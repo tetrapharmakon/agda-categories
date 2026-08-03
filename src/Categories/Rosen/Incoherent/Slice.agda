@@ -16,6 +16,10 @@ module Categories.Rosen.Incoherent.Slice
   (BC : BinaryProducts C)
   where
 
+private
+  postulate
+    sorry : ∀ {u} {A : Set u} → A
+
 ----------------------------------------------------------------------
 -- Incoherent (M,R)-Systems as Algebras
 --

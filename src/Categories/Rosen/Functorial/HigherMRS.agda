@@ -7,6 +7,10 @@ open import Categories.Category.Monoidal.Closed using (Closed)
 
 module Categories.Rosen.Functorial.HigherMRS {o ℓ e} {C : Category o ℓ e} {M : Monoidal C} (Cl : Closed M) where
 
+private
+  postulate
+    sorry : ∀ {u} {A : Set u} → A
+
 -- Higher-order (M,R)-systems following a Fibonacci-style construction:
 -- each step A → B → [A,B] → [B,[A,B]] → ... embeds the two previous
 -- levels into an internal hom.  Built as iterated IsoCommas of ℝ and Vᵢ.
