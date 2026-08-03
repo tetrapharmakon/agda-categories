@@ -40,8 +40,9 @@ open Category C
 
 -- 𝟚-simplex : Category (suc o) (suc o) o
 -- 𝟚-simplex = iMRSᴵᴵ
-
+open import Categories.Morphism.Reasoning as MR
 open HomReasoning
+open MR
 
 l : Functor C 𝟘-simplex
 l = liftF o (suc o) 0ℓ C
@@ -57,19 +58,21 @@ open import Data.Unit.Polymorphic using (⊤; tt)
 ⊤MR2 : ∀ {A} → iMR2 A ⊤
 ⊤MR2 = ⟪ (λ z → tt) , (λ z z₁ → tt) ⟫
 
-uniq : {A : Set o} → (A → ⊤)
+uniq : {A : Set o} → (A → (⊤ {o}))
 uniq {A} a = tt
 
-bang : {A : Set o} → (f g : A → ⊤) → f ≡ g
+bang : {A : Set o} → (f g : A → (⊤ {o})) → f ≡ g
 bang f g = ≡-refl
 
 s₀⁰ : Functor 𝟘-simplex τ[iMR2]
 s₀⁰ = record
-  { F₀ = λ { (lift A) → record { A = A ; B = ⊤ ; ξ = ⊤MR2 } }
-  ; F₁ = λ { (lift f) → record { l = f ; r = {!   !} ; eqf = ≡-refl ; eqΦ = ≡-refl } }
+  { F₀ = λ { (lift A) → record { A = A ; B = A ; ξ = ιMR2 } }
+  ; F₁ = λ { (lift f) → record { l = f ; r = f ; eqf = ≡-refl ; eqΦ = ≡-refl } }
   ; identity = (λ {x} → ≡-refl) , (λ {x} → ≡-refl)
   ; homomorphism = (λ {x} → ≡-refl) , (λ {x} → ≡-refl)
-  ; F-resp-≈ = λ {A} {B} {f} {g} z → z .Lift.lower , (λ {x} → ≡-refl)
+  ; F-resp-≈ = λ {A} {B} {f} {g} z → z .Lift.lower , (λ {x} → {!   !})
+    -- Goal: prove the endpoint equality for the constant maps
+    -- uniq : A → ⊤ and uniq : B → ⊤, pointwise.
   }
 
 s₀¹ : Functor τ[iMR2] iMRSᴵᴵ
@@ -77,9 +80,9 @@ s₀¹ = record
   { F₀ = λ x → let module x = iMR2₀ x in record
     { A = x.A
     ; B = x.B
-    ; Y = ⊤
+    ; Y = x.B
     ; ξ₁ = x.ξ
-    ; ξ₂ = {!   !}
+    ; ξ₂ = ιMR2
     }
   ; F₁ = λ f → let module f = iMR2⇒ f in record
     { h = record
@@ -89,8 +92,8 @@ s₀¹ = record
       ; eqΦ = f.eqΦ
       }
     ; k = record
-      { l = {!   !}
-      ; r = {!   !}
+      { l = f.r
+      ; r = f.r
       ; eqf = λ {x} → ≡-refl
       ; eqΦ = λ {x} → ≡-refl
       }
@@ -101,7 +104,7 @@ s₀¹ = record
   ; homomorphism = λ {X} {Y} {Z} {f} {g} →
       ((λ {x} → ≡-refl) , (λ {x} → ≡-refl)) ,
       (λ {x} → ≡-refl) , (λ {x} → ≡-refl)
-  ; F-resp-≈ = {!   !}
+  ; F-resp-≈ = λ {A} {B} {f} {g} z → z , z .Data.Product.proj₂ , (λ {x} → z .Data.Product.proj₂)
   }
 
 s₁¹ : Functor τ[iMR2] iMRSᴵᴵ
@@ -138,6 +141,28 @@ s₁¹ = record
   }
 
 -- The category-valued simplicial object has the following three levels.
+--
+-- The remaining holes cannot be filled for the present incoherent
+-- definitions, regardless of which canonical MR2 object is used for a
+-- degeneracy:
+--
+-- * If s₀⁰ uses ⊤MR2 : iMR2 A ⊤, then its two endpoint functors are A and
+--   ⊤.  Hence d₀¹ ∘ s₀⁰ is the identity, but d₁¹ ∘ s₀⁰ asks for a natural
+--   isomorphism ⊤ ≅ A for every set A.
+--
+-- * If s₀⁰ uses ιMR2 : iMR2 A A instead, both endpoint identities can hold.
+--   However, for ξ = (f , Φ), the usual choice
+--   s₀¹ ξ = (ξ , ιMR2) has composite
+--
+--       comp (s₀¹ ξ) = (id ∘ f , [ f , id ]₁ ∘ ιMR2.Φ).
+--
+--   In Sets, the second component is the constant map (b , a) ↦ b.  The
+--   identity d₁² ∘ s₀¹ ≈ id would therefore require every incoherent
+--   Φ : B → (A → B) to be this constant map.  That is false in general.
+--
+-- Thus ιMR2 is the correct endpoint degeneracy, but the simplicial object
+-- requires either coherent MR2 systems, a restriction to normalized Φ, or
+-- a weaker notion of morphism that forgets the Φ-compatibility.
 iMRSᴵᴵ-defines-truncated-simplicial-object :
   TruncatedSimplicialObject (Cats (suc o) (suc o) o)
 iMRSᴵᴵ-defines-truncated-simplicial-object = record
@@ -153,39 +178,98 @@ iMRSᴵᴵ-defines-truncated-simplicial-object = record
   ; s₀¹ = s₀¹
   ; s₁¹ = s₁¹
   ; d₀¹-s₀⁰ = NI.refl
-  ; d₁¹-s₀⁰ = {!   !} -- NI.refl
+  ; d₁¹-s₀⁰ = {!   !}
+  -- Goal: construct a natural isomorphism
+  -- (l ∘F [_]B ∘F s₀⁰) ≃ idF.  Objectwise this requires ⊤ ≅ A.
+  -- Goal: prove that the second endpoint of the degenerate 1-simplex
+  -- is naturally isomorphic to the original set. With the current
+  -- definition of s₀⁰, this asks for ⊤ ≅ A for every set A.
   ; face-face₀₁ = NI.refl
   ; face-face₀₂ = NI.niHelper record
       { η = λ _ → lift (Category.id C)
-      ; η⁻¹ = λ _ → lift (Category.id C)
-      ; commute = λ {X} {Y} f →
-          let module f = iMRSᴵᴵ⇒ f
-          in lift {o} (identityˡ ○ Equiv.sym f.hᵣ≈kₗ ○ Equiv.sym identityʳ)
+       ; η⁻¹ = λ _ → lift (Category.id C)
+       ; commute = λ {X} {Y} f →
+           let module f = iMRSᴵᴵ⇒ f in
+           lift {o} (λ {x} → ≡-sym (f.hᵣ≈kₗ {x}))
       ; iso = λ _ → record
           { isoˡ = lift identity²
           ; isoʳ = lift identity²
           }
       }
   ; face-face₁₂ = NI.refl
-  ; degen-degen₀₀ = {!   !} -- NI.refl
+  ; degen-degen₀₀ = niHelper (record
+    { η = λ X →
+        record
+        { h =
+            record
+            { l = λ z → z
+            ; r = λ z → z
+            ; eqf = λ {x} → ≡-refl
+            ; eqΦ = λ {x} → ≡-refl
+            }
+        ; k =
+            record
+            { l = λ z → z
+            ; r = λ z → z
+            ; eqf = λ {x} → ≡-refl
+            ; eqΦ = λ {x} → ≡-refl
+            }
+        ; hᵣ≈kₗ = λ {x} → ≡-refl
+        }
+    ; η⁻¹ = λ X →
+        record
+        { h =
+            record
+            { l = λ z → z
+            ; r = λ z → z
+            ; eqf = λ {x} → ≡-refl
+            ; eqΦ = λ {x} → ≡-refl
+            }
+        ; k =
+            record
+            { l = λ z → z
+            ; r = λ z → z
+            ; eqf = λ {x} → ≡-refl
+            ; eqΦ = λ {x} → ≡-refl
+            }
+        ; hᵣ≈kₗ = λ {x} → ≡-refl
+        }
+    ; commute = λ {X} {Y} f →
+        ((λ {x} → ≡-refl) , (λ {x} → ≡-refl)) ,
+        (λ {x} → ≡-refl) , (λ {x} → ≡-refl)
+    ; iso = λ X →
+        record
+        { isoˡ =
+            ((λ {x} → ≡-refl) , (λ {x} → ≡-refl)) ,
+            (λ {x} → ≡-refl) , (λ {x} → ≡-refl)
+        ; isoʳ =
+            ((λ {x} → ≡-refl) , (λ {x} → ≡-refl)) ,
+            (λ {x} → ≡-refl) , (λ {x} → ≡-refl)
+        }
+    })
+  -- Goal: construct a natural isomorphism
+  -- (s₀¹ ∘F s₀⁰) ≃ (s₁¹ ∘F s₀⁰).
   ; d₀²-s₀¹ = NI.refl
   ; d₁²-s₀¹ = NI.niHelper record
       { η = λ _ → record
           { l = id
-          ; r = {!   !} -- id
-          ; eqf = λ {x} → {!   !} -- ≡-refl
-          ; eqΦ = λ {x} → {!   !}
+          ; r = id
+          ; eqf = λ {x} → ≡-refl
+          ; eqΦ = λ {x} → {!   !} -- identityʳ ○ refl⟩∘⟨ λ {x = x₂} → ≡-refl
+          -- Goal: prove [id,id]₁ ∘ Φ ∘ id ≈ [id,id]₁ ∘ Φ₀.
           }
       ; η⁻¹ = λ _ → record
           { l = id
-          ; r = {!   !} -- id
+          ; r = id
           ; eqf = λ {x} → ≡-refl
-          ; eqΦ = λ {x} → {!   !}
+          ; eqΦ = λ {x} → {!   !} -- identityʳ ○ refl⟩∘⟨ λ {x = x₂} → ≡-refl
+          -- Goal: prove the inverse Φ-square,
+          -- [id,id]₁ ∘ Φ₀ ∘ id ≈ [id,id]₁ ∘ Φ.
           }
-      ; commute = λ _ → (λ {x} → ≡-refl) , (λ {x} → {!   !})
+      ; commute = λ _ → (λ {x} → ≡-refl) , (λ {x} → ≡-refl)
       ; iso = λ _ → record
           { isoˡ = (λ {x} → ≡-refl) , (λ {x} → ≡-refl)
-          ; isoʳ = (λ {x} → ≡-refl) , (λ {x} → {!   !})
+          ; isoʳ = (λ {x} → ≡-refl) , (λ {x} → ≡-refl)
           }
       }
   ; d₁²-s₁¹ = NI.niHelper record
@@ -208,6 +292,52 @@ iMRSᴵᴵ-defines-truncated-simplicial-object = record
           }
       }
   ; d₂²-s₁¹ = NI.refl
-  ; face-degen₀₁ = {!   !} -- NI.refl
-  ; face-degen₂₀ = {!   !} -- NI.refl
+  ; face-degen₀₁ = niHelper (record
+    { η = λ X →
+        record
+        { l = λ z → z
+        ; r = λ z → z
+        ; eqf = λ {x} → ≡-refl
+        ; eqΦ = λ {x} → ≡-refl
+        }
+    ; η⁻¹ = λ X →
+        record
+        { l = λ z → z
+        ; r = λ z → z
+        ; eqf = λ {x} → ≡-refl
+        ; eqΦ = λ {x} → ≡-refl
+        }
+    ; commute = λ {X} {Y} f → (λ {x} → ≡-refl) , (λ {x} → ≡-refl)
+    ; iso = λ X →
+        record
+        { isoˡ = (λ {x} → ≡-refl) , (λ {x} → ≡-refl)
+        ; isoʳ = (λ {x} → ≡-refl) , (λ {x} → ≡-refl)
+        }
+    })
+  -- Goal: prove the natural-isomorphism equation
+  -- d₀² ∘F s₁¹ ≃ s₀⁰ ∘F d₀¹.
+  ; face-degen₂₀ = niHelper (record
+    { η = λ X →
+        record
+        { l = λ z → z
+        ; r = λ z → z
+        ; eqf = λ {x} → ≡-refl
+        ; eqΦ = λ {x} → ≡-refl
+        }
+    ; η⁻¹ = λ X →
+        record
+        { l = λ z → z
+        ; r = λ z → z
+        ; eqf = λ {x} → ≡-refl
+        ; eqΦ = λ {x} → ≡-refl
+        }
+    ; commute = λ {X} {Y} f → (λ {x} → ≡-refl) , (λ {x} → ≡-refl)
+    ; iso = λ X →
+        record
+        { isoˡ = (λ {x} → ≡-refl) , (λ {x} → ≡-refl)
+        ; isoʳ = (λ {x} → ≡-refl) , (λ {x} → ≡-refl)
+        }
+    })
+  -- Goal: prove the natural-isomorphism equation
+  -- d₂² ∘F s₀¹ ≃ s₀⁰ ∘F d₁¹.
   }
