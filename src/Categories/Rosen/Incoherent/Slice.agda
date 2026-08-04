@@ -16,10 +16,6 @@ module Categories.Rosen.Incoherent.Slice
   (BC : BinaryProducts C)
   where
 
-private
-  postulate
-    sorry : ∀ {u} {A : Set u} → A
-
 ----------------------------------------------------------------------
 -- Incoherent (M,R)-Systems as Algebras
 --
@@ -45,49 +41,88 @@ open Monoidal M using (_⊗-; -⊗_; unit; _⊗₀_; _⊗₁_)
 open BinaryProducts BC
 
 open Symmetric S hiding (_⊗-; -⊗_; unit; _⊗₀_; _⊗₁_) renaming (braided-iso to β)
-open Closed Cl using (adjoint; [_,_]₀; [_,_]₁; [_,-])
+open Closed Cl using (adjoint; mate; [_,_]₀; [_,_]₁; [_,-])
 
-slice : {B : Obj} → Category (o ⊔ ℓ) (ℓ ⊔ e) e
-slice {B} = Sl.Slice C ([ unit , B ]₀ × [ B , B ]₀)
+slice : (B : Obj) → Category (o ⊔ ℓ) (ℓ ⊔ e) e
+slice B = Sl.Slice C (B × [ B , B ]₀)
 
-to : {B : Obj} → Functor (iMR2ᴸ B) (slice {B})
+module To {B : Obj} {X Y : iMR2ᴸ₀ B} (f : iMR2ᴸ⇒ X Y) where
+  module X = iMR2ᴸ₀ X
+  module Y = iMR2ᴸ₀ Y
+  module f = iMR2ᴸ⇒ f
+
+  q-comm :
+    adjoint.Ladjunct (adjoint.Radjunct f.ξY.Φ ∘ β.from) ∘ f.u
+      ≈ adjoint.Ladjunct (adjoint.Radjunct f.ξX.Φ ∘ β.from)
+  q-comm = {!!}
+
+to : {B : Obj} → Functor (iMR2ᴸ B) (slice B)
 to {B} = record
-  { F₀ = λ x → let module x = iMR2ᴸ₀ x in Sl.sliceobj {Y = x.A} ⟨ adjoint.Ladjunct (iMR2.f x.ξ ∘ unitorˡ.from {X = x.A} ∘ β.from) , adjoint.Ladjunct (adjoint.Radjunct (iMR2.Φ x.ξ) ∘ β.from) ⟩ -- ugly but works
-  ; F₁ = λ { {X} {Y} f → 
-    let module X = iMR2ᴸ₀
-        module Y = iMR2ᴸ₀ Y
-        module f = iMR2ᴸ⇒ f 
-    in Sl.slicearr {h = f.u} 
-    (begin {!   !} ≈⟨ ⟨⟩∘ ⟩ 
-           {!   !} ≈⟨ ⟨⟩-cong₂ {!   !} {!   !} ⟩ 
-           {!   !} ∎)}
-  ; identity = {!   !}
-  ; homomorphism = {!   !}
-  ; F-resp-≈ = {!   !}
+  { F₀ = λ x → 
+    let module x = iMR2ᴸ₀ x 
+        ΦX# = adjoint.Radjunct (iMR2.Φ x.ξ)
+    in Sl.sliceobj {Y = x.A} 
+    ⟨ iMR2.f x.ξ  
+    , adjoint.Ladjunct (ΦX# ∘ β.from) ⟩ 
+  ; F₁ = λ { {X} {Y} f →
+     let module X = iMR2ᴸ₀ X
+         module Y = iMR2ᴸ₀ Y
+         module f = iMR2ᴸ⇒ f
+     in Sl.slicearr {h = f.u}
+       (begin
+         ⟨ f.ξY.f , adjoint.Ladjunct (adjoint.Radjunct f.ξY.Φ ∘ β.from) ⟩ ∘ f.u
+           ≈⟨ ⟨⟩∘ ⟩
+         ⟨ f.ξY.f ∘ f.u
+         , adjoint.Ladjunct (adjoint.Radjunct f.ξY.Φ ∘ β.from) ∘ f.u ⟩
+           ≈⟨ ⟨⟩-cong₂ (Equiv.sym f.eqf) (To.q-comm f) ⟩
+         ⟨ f.ξX.f
+         , adjoint.Ladjunct (adjoint.Radjunct f.ξX.Φ ∘ β.from) ⟩ ∎) }
+  ; identity = Equiv.refl
+  ; homomorphism = Equiv.refl
+  ; F-resp-≈ = λ z → z
   }
   
 -- Converse functor slice → iMR2ᴸ B.
-from : {B : Obj} → Functor (slice {B}) (iMR2ᴸ B) 
-from {B} = {!   !}
+from : {B : Obj} → Functor (slice B) (iMR2ᴸ B) 
+from {B} = record
+  { F₀ = λ x →
+      let module x = Sl.SliceObj x
+          π₂x# = adjoint.Radjunct (π₂ ∘ x.arr)
+      in record
+        { A = x.Y
+        ; ξ = ⟪ π₁ ∘ x.arr , adjoint.Ladjunct (π₂x# ∘ β.from) ⟫
+        }
+  ; F₁ = λ { {X} {Y} f →
+      let module f = Sl.Slice⇒ f
+      in record
+        { u = f.h
+        ; eqf = pushʳ (Equiv.sym f.△)
+        ; eqΦ = {!!}
+        } }
+  ; identity = Equiv.refl
+  ; homomorphism = Equiv.refl
+  ; F-resp-≈ = λ z → z
+  }
 
 ------------------------------------------------------------------------
 -- Equivalence
 ------------------------------------------------------------------------
 
-AlgA≣MRS-B : {B : Obj} → StrongEquivalence (iMR2ᴸ B) (slice {B})
+AlgA≣MRS-B : {B : Obj} → StrongEquivalence (iMR2ᴸ B) (slice B)
 AlgA≣MRS-B {B} = record 
   { F = to 
   ; G = from 
   ; weak-inverse = record 
-    { F∘G≈id = niHelper (record 
-      { η = {!   !} 
-      ; η⁻¹ = {!   !} 
-      ; commute = {!   !} 
-      ; iso = {!   !} }) 
-    ; G∘F≈id = niHelper (record 
-      { η = {!   !} 
-      ; η⁻¹ = {!   !} 
-      ; commute = {!   !} 
-      ; iso = {!   !} }) 
+     { F∘G≈id = niHelper (record 
+       { η = λ X → Sl.slicearr {h = id} (identityʳ ○ {!   !}) 
+       ; η⁻¹ = λ X → Sl.slicearr {h = id} (identityʳ ○ {!   !}) 
+       ; commute = λ f → {!   !} 
+       ; iso = λ X → record { isoˡ = identityˡ ; isoʳ = identityˡ } 
+       })
+     ; G∘F≈id = niHelper (record
+       { η = λ X → record { u = id ; eqf = Equiv.trans project₁ (Equiv.sym identityʳ) ; eqΦ = {!   !} }
+       ; η⁻¹ = λ X → record { u = id ; eqf = Equiv.sym identityʳ ○ {!   !} ; eqΦ = {!   !} }
+       ; commute = λ X → {!   !}
+       ; iso = λ X → record { isoˡ = identityˡ ; isoʳ = identityˡ } })
     } 
   }
