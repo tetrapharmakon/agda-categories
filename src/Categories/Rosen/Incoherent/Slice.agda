@@ -30,6 +30,8 @@ open import Categories.Functor using (Functor; _∘F_)
 import Categories.Morphism.Reasoning as MR
 open import Categories.NaturalTransformation.NaturalIsomorphism using (niHelper)
 open import Categories.Rosen.Incoherent.Core Cl
+open import Categories.Functor.Bifunctor using (appˡ; appʳ)
+open import Categories.Functor.Bifunctor.Properties using ([_]-decompose₁;[_]-commute)
 open import Categories.Rosen.Incoherent.Displayed Cl using (iMR2ᴸ; iMR2ᴸ₀; iMR2ᴸ⇒)
 
 import Categories.Category.Slice as Sl
@@ -46,15 +48,27 @@ open Closed Cl using (adjoint; mate; [_,_]₀; [_,_]₁; [_,-])
 slice : (B : Obj) → Category (o ⊔ ℓ) (ℓ ⊔ e) e
 slice B = Sl.Slice C (B × [ B , B ]₀)
 
+
 module To {B : Obj} {X Y : iMR2ᴸ₀ B} (f : iMR2ᴸ⇒ X Y) where
   module X = iMR2ᴸ₀ X
   module Y = iMR2ᴸ₀ Y
   module f = iMR2ᴸ⇒ f
+  ε₀ = adjoint.counit.η
+  η₀ = adjoint.unit.η
 
   q-comm :
     adjoint.Ladjunct (adjoint.Radjunct f.ξY.Φ ∘ β.from) ∘ f.u
       ≈ adjoint.Ladjunct (adjoint.Radjunct f.ξX.Φ ∘ β.from)
-  q-comm = {!!}
+  q-comm = 
+    begin ([ id , (ε₀ _ ∘ f.ξY.Φ ⊗₁ id) ∘ β.from ]₁ ∘ η₀ _) ∘ f.u               ≈⟨ pullʳ (adjoint.unit.commute f.u) ⟩ 
+          [ id , (ε₀ _ ∘ f.ξY.Φ ⊗₁ id) ∘ β.from ]₁ ∘ [ id , f.u ⊗₁ id ]₁ ∘ η₀ _ ≈⟨ pullˡ (Equiv.sym (Functor.homomorphism [ _ ,-])) ⟩ 
+          [ id , ((ε₀ _ ∘ f.ξY.Φ ⊗₁ id) ∘ β.from) ∘ f.u ⊗₁ id ]₁ ∘ η₀ _ ≈⟨ Functor.F-resp-≈ [ _ ,-] (pullʳ (braiding.⇒.commute (f.u , id))) ⟩∘⟨refl ⟩ 
+          [ id , (ε₀ _ ∘ f.ξY.Φ ⊗₁ id) ∘ id ⊗₁ f.u ∘ β.from ]₁ ∘ η₀ _ ≈⟨ Functor.F-resp-≈ [ _ ,-] {!   !} ⟩∘⟨refl ⟩ 
+          [ id , ε₀ _ ∘ (id ⊗₁ f.u ∘ f.ξY.Φ ⊗₁ id) ∘ β.from ]₁ ∘ η₀ _ ≈⟨ Functor.F-resp-≈ [ _ ,-] {!   !} ⟩∘⟨refl ⟩ 
+          {!   !} ≈⟨ {!   !} ⟩ 
+          [ id , (ε₀ _ ∘ [ f.u , id ]₁ ⊗₁ id ∘ f.ξY.Φ ⊗₁ id) ∘ β.from ]₁ ∘ η₀ f.X.A ≈˘⟨ Functor.F-resp-≈ [ _ ,-] ((refl⟩∘⟨ Functor.homomorphism (-⊗ _)) ⟩∘⟨refl) ⟩∘⟨refl ⟩ 
+          [ id , (ε₀ _ ∘ ([ f.u , id ]₁ ∘ f.ξY.Φ) ⊗₁ id) ∘ β.from ]₁ ∘ η₀ f.X.A     ≈˘⟨ Functor.F-resp-≈ [ _ ,-] ((refl⟩∘⟨ Functor.F-resp-≈ (-⊗ _) f.eqΦ) ⟩∘⟨refl) ⟩∘⟨refl ⟩ 
+          [ id , (ε₀ _ ∘ f.ξX.Φ ⊗₁ id) ∘ β.from ]₁ ∘ η₀ f.X.A ∎
 
 to : {B : Obj} → Functor (iMR2ᴸ B) (slice B)
 to {B} = record
