@@ -56,18 +56,31 @@ module To {B : Obj} {X Y : iMR2ᴸ₀ B} (f : iMR2ᴸ⇒ X Y) where
   ε₀ = adjoint.counit.η
   η₀ = adjoint.unit.η
 
+  cowedge : ∀ {A A'} {u : A ⇒ A'} → ε₀ B ∘ id ⊗₁ u ≈ ε₀ B ∘ [ u , id ]₁ ⊗₁ id
+  cowedge = Equiv.sym (mate.commute₂ _)
+
   q-comm :
     adjoint.Ladjunct (adjoint.Radjunct f.ξY.Φ ∘ β.from) ∘ f.u
       ≈ adjoint.Ladjunct (adjoint.Radjunct f.ξX.Φ ∘ β.from)
   q-comm = 
-    begin ([ id , (ε₀ _ ∘ f.ξY.Φ ⊗₁ id) ∘ β.from ]₁ ∘ η₀ _) ∘ f.u               ≈⟨ pullʳ (adjoint.unit.commute f.u) ⟩ 
-          [ id , (ε₀ _ ∘ f.ξY.Φ ⊗₁ id) ∘ β.from ]₁ ∘ [ id , f.u ⊗₁ id ]₁ ∘ η₀ _ ≈⟨ pullˡ (Equiv.sym (Functor.homomorphism [ _ ,-])) ⟩ 
-          [ id , ((ε₀ _ ∘ f.ξY.Φ ⊗₁ id) ∘ β.from) ∘ f.u ⊗₁ id ]₁ ∘ η₀ _ ≈⟨ Functor.F-resp-≈ [ _ ,-] (pullʳ (braiding.⇒.commute (f.u , id))) ⟩∘⟨refl ⟩ 
-          [ id , (ε₀ _ ∘ f.ξY.Φ ⊗₁ id) ∘ id ⊗₁ f.u ∘ β.from ]₁ ∘ η₀ _ ≈⟨ Functor.F-resp-≈ [ _ ,-] {!   !} ⟩∘⟨refl ⟩ 
-          [ id , ε₀ _ ∘ (id ⊗₁ f.u ∘ f.ξY.Φ ⊗₁ id) ∘ β.from ]₁ ∘ η₀ _ ≈⟨ Functor.F-resp-≈ [ _ ,-] {!   !} ⟩∘⟨refl ⟩ 
-          {!   !} ≈⟨ {!   !} ⟩ 
-          [ id , (ε₀ _ ∘ [ f.u , id ]₁ ⊗₁ id ∘ f.ξY.Φ ⊗₁ id) ∘ β.from ]₁ ∘ η₀ f.X.A ≈˘⟨ Functor.F-resp-≈ [ _ ,-] ((refl⟩∘⟨ Functor.homomorphism (-⊗ _)) ⟩∘⟨refl) ⟩∘⟨refl ⟩ 
-          [ id , (ε₀ _ ∘ ([ f.u , id ]₁ ∘ f.ξY.Φ) ⊗₁ id) ∘ β.from ]₁ ∘ η₀ f.X.A     ≈˘⟨ Functor.F-resp-≈ [ _ ,-] ((refl⟩∘⟨ Functor.F-resp-≈ (-⊗ _) f.eqΦ) ⟩∘⟨refl) ⟩∘⟨refl ⟩ 
+    begin ([ id , (ε₀ _ ∘ f.ξY.Φ ⊗₁ id) ∘ β.from ]₁ ∘ η₀ _) ∘ f.u               
+            ≈⟨ pullʳ (adjoint.unit.commute f.u) ⟩ 
+          [ id , (ε₀ _ ∘ f.ξY.Φ ⊗₁ id) ∘ β.from ]₁ ∘ [ id , f.u ⊗₁ id ]₁ ∘ η₀ _ 
+            ≈⟨ pullˡ (Equiv.sym (Functor.homomorphism [ _ ,-])) ⟩ 
+          [ id , ((ε₀ _ ∘ f.ξY.Φ ⊗₁ id) ∘ β.from) ∘ f.u ⊗₁ id ]₁ ∘ η₀ _ 
+            ≈⟨ Functor.F-resp-≈ [ _ ,-] (pullʳ (braiding.⇒.commute (f.u , id))) ⟩∘⟨refl ⟩ 
+          [ id , (ε₀ _ ∘ f.ξY.Φ ⊗₁ id) ∘ id ⊗₁ f.u ∘ β.from ]₁ ∘ η₀ _ 
+             ≈⟨ Functor.F-resp-≈ [ _ ,-] assoc ⟩∘⟨refl ⟩
+          [ id , ε₀ _ ∘ (f.ξY.Φ ⊗₁ id ∘ id ⊗₁ f.u ∘ β.from) ]₁ ∘ η₀ _ 
+            ≈⟨ Functor.F-resp-≈ [ _ ,-] (refl⟩∘⟨ pullˡ (Equiv.sym [ ⊗ ]-commute)) ⟩∘⟨refl ⟩ 
+          [ id , ε₀ _ ∘ (id ⊗₁ f.u ∘ f.ξY.Φ ⊗₁ id) ∘ β.from ]₁ ∘ η₀ _ 
+            ≈⟨ Functor.F-resp-≈ [ _ ,-] (refl⟩∘⟨ assoc ○ pullˡ cowedge) ⟩∘⟨refl ⟩ 
+          [ id , (ε₀ _ ∘ [ f.u , id ]₁ ⊗₁ id) ∘ f.ξY.Φ ⊗₁ id ∘ β.from ]₁ ∘ η₀ _  
+            ≈⟨ Functor.F-resp-≈ [ _ ,-] (assoc ○ (refl⟩∘⟨ sym-assoc) ○ sym-assoc) ⟩∘⟨refl ⟩ 
+          [ id , (ε₀ _ ∘ [ f.u , id ]₁ ⊗₁ id ∘ f.ξY.Φ ⊗₁ id) ∘ β.from ]₁ ∘ η₀ f.X.A 
+            ≈˘⟨ Functor.F-resp-≈ [ _ ,-] ((refl⟩∘⟨ Functor.homomorphism (-⊗ _)) ⟩∘⟨refl) ⟩∘⟨refl ⟩ 
+          [ id , (ε₀ _ ∘ ([ f.u , id ]₁ ∘ f.ξY.Φ) ⊗₁ id) ∘ β.from ]₁ ∘ η₀ f.X.A     
+            ≈˘⟨ Functor.F-resp-≈ [ _ ,-] ((refl⟩∘⟨ Functor.F-resp-≈ (-⊗ _) f.eqΦ) ⟩∘⟨refl) ⟩∘⟨refl ⟩ 
           [ id , (ε₀ _ ∘ f.ξX.Φ ⊗₁ id) ∘ β.from ]₁ ∘ η₀ f.X.A ∎
 
 to : {B : Obj} → Functor (iMR2ᴸ B) (slice B)
@@ -128,8 +141,20 @@ AlgA≣MRS-B {B} = record
   ; G = from 
   ; weak-inverse = record 
      { F∘G≈id = niHelper (record 
-       { η = λ X → Sl.slicearr {h = id} (identityʳ ○ {!   !}) 
-       ; η⁻¹ = λ X → Sl.slicearr {h = id} (identityʳ ○ {!   !}) 
+       { η = λ X → 
+         let module X = Sl.SliceObj X 
+             f = π₁ ∘ X.arr
+             g = π₂ ∘ X.arr
+         in Sl.slicearr {h = id} (identityʳ ○ 
+         (begin Sl.SliceObj.arr (Functor.F₀ Categories.Functor.id X) ≈⟨  {!  !} ⟩ 
+                {!   !} ≈⟨  {!   !} ⟩ 
+                {!   !} ≈⟨  {!   !} ⟩ 
+                Sl.SliceObj.arr (Functor.F₀ (to ∘F from) X) ∎)) 
+       ; η⁻¹ = λ X → Sl.slicearr {h = id} (identityʳ ○ 
+         (begin Sl.SliceObj.arr (Functor.F₀ (to ∘F from) X) ≈⟨  {!   !} ⟩ 
+                {!   !} ≈⟨  {!   !} ⟩ 
+                Sl.SliceObj.arr X ≈⟨  {!   !} ⟩ 
+                Sl.SliceObj.arr (Functor.F₀ Categories.Functor.id X) ∎)) 
        ; commute = λ f → {!   !} 
        ; iso = λ X → record { isoˡ = identityˡ ; isoʳ = identityˡ } 
        })
