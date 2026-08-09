@@ -145,16 +145,21 @@ AlgA≣MRS-B {B} = record
          let module X = Sl.SliceObj X 
              f = π₁ ∘ X.arr
              g = π₂ ∘ X.arr
-         in Sl.slicearr {h = id} (identityʳ ○ 
-         (begin Sl.SliceObj.arr (Functor.F₀ Categories.Functor.id X) ≈⟨  {!  !} ⟩ 
-                {!   !} ≈⟨  {!   !} ⟩ 
-                {!   !} ≈⟨  {!   !} ⟩ 
+          in Sl.slicearr {h = id} (identityʳ ○
+          (begin Sl.SliceObj.arr (Functor.F₀ Categories.Functor.id X)
+                 ≈˘⟨ identityˡ ⟩
+                 id ∘ X.arr
+                 ≈˘⟨ ∘-resp-≈ˡ η ⟩
+                 ⟨ π₁ , π₂ ⟩ ∘ X.arr
+                 ≈⟨ ⟨⟩∘ ⟩
+                 ⟨ π₁ ∘ X.arr , π₂ ∘ X.arr ⟩ ≈⟨  {!  !} ⟩
+                -- {!   !} ≈⟨  {!   !} ⟩ 
+                -- {!   !} ≈⟨  {!   !} ⟩ 
                 Sl.SliceObj.arr (Functor.F₀ (to ∘F from) X) ∎)) 
        ; η⁻¹ = λ X → Sl.slicearr {h = id} (identityʳ ○ 
          (begin Sl.SliceObj.arr (Functor.F₀ (to ∘F from) X) ≈⟨  {!   !} ⟩ 
                 {!   !} ≈⟨  {!   !} ⟩ 
-                Sl.SliceObj.arr X ≈⟨  {!   !} ⟩ 
-                Sl.SliceObj.arr (Functor.F₀ Categories.Functor.id X) ∎)) 
+                Sl.SliceObj.arr X ∎)) 
        ; commute = λ f → {!   !} 
        ; iso = λ X → record { isoˡ = identityˡ ; isoʳ = identityˡ } 
        })
