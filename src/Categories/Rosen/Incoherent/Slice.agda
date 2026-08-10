@@ -186,9 +186,24 @@ AlgA≣MRS-B {B} = record
        ; iso = λ X → record { isoˡ = identityˡ ; isoʳ = identityˡ }
        })
      ; G∘F≈id = niHelper (record
-       { η = λ X → record { u = id ; eqf = Equiv.trans project₁ (Equiv.sym identityʳ) ; eqΦ = {!   !} }
-       ; η⁻¹ = λ X → record { u = id ; eqf = Equiv.sym identityʳ ○ {!   !} ; eqΦ = {!   !} }
-       ; commute = λ X → {!   !}
+       { η = λ X → record
+         { u = id
+         ; eqf = Equiv.trans project₁ (Equiv.sym identityʳ)
+         ; eqΦ = {!   !}
+         }
+       ; η⁻¹ = λ X →
+         let module X = iMR2ᴸ₀ X
+             module Xξ = iMR2 X.ξ
+         in record
+         { u = id
+         ; eqf = Equiv.sym identityʳ ○
+           (begin Xξ.f ≈⟨ {!   !} ⟩
+                  {!   !} ≈⟨ {!   !} ⟩
+                  {!   !} ≈˘⟨ {!   !} ⟩
+                  {!   !} ∎) ⟩∘⟨refl
+         ; eqΦ = {!  begin ? ≈⟨ ? ⟩ ? ≈⟨ ? ⟩ ? ≈⟨ ? ⟩ ? ∎ !}
+         }
+       ; commute = λ X → {! begin ? ≈⟨ ? ⟩ ? ≈⟨ ? ⟩ ? ≈⟨ ? ⟩ ? ∎  !}
        ; iso = λ X → record { isoˡ = identityˡ ; isoʳ = identityˡ } })
     }
   }
