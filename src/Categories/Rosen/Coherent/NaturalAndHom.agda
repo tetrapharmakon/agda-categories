@@ -4,7 +4,9 @@ open import Level using (_⊔_)
 open import Categories.Category using (Category)
 open import Categories.Category.Monoidal using (Monoidal)
 open import Categories.Category.Monoidal.Closed using (Closed)
-open import Categories.Category.Monoidal.Properties using (coherence₃)
+open import Categories.Category.Monoidal.Properties using (coherence₂)
+open import Categories.Category.Monoidal.Utilities using (unitor-coherenceʳ; unitorˡ-naturalIsomorphism)
+import Categories.NaturalTransformation.NaturalIsomorphism.Properties as NIProps
 
 module Categories.Rosen.Coherent.NaturalAndHom {o ℓ e} {C : Category o ℓ e} {M : Monoidal C} (Cl : Closed M) where
 
@@ -51,8 +53,17 @@ lem α = begin adjoint.Radjunct ([ α , id ]₁ ∘ [ id , unitorʳ.from ]₁ �
               unitorʳ.from ∘ adjoint.Radjunct ([ α , id ]₁ ∘ adjoint.unit.η _) ∘ unitorˡ.to ≈⟨ refl⟩∘⟨ adjoint.Radjunct-resp-≈ (Equiv.sym (mate.commute₁ α)) ⟩∘⟨refl ⟩
               unitorʳ.from ∘ adjoint.Radjunct ([ id , id ⊗₁ α ]₁ ∘ adjoint.unit.η _) ∘ unitorˡ.to ≈⟨ refl⟩∘⟨ adjoint.RLadjunct≈id ⟩∘⟨refl ⟩
               unitorʳ.from ∘ (id ⊗₁ α) ∘ unitorˡ.to ≈⟨ begin
-                unitorʳ.from ∘ (id ⊗₁ α) ∘ unitorˡ.to ≈⟨ {! coherence₃ M  !}  ⟩
+                unitorʳ.from ∘ (id ⊗₁ α) ∘ unitorˡ.to ≈⟨ Equiv.sym unitors ⟩∘⟨refl ⟩
                 unitorˡ.from ∘ (id ⊗₁ α) ∘ unitorˡ.to ≈⟨ pullˡ C (M .Monoidal.unitorˡ-commute-from) ⟩
                 (α ∘ unitorˡ.from) ∘ unitorˡ.to ≈⟨ pullʳ C unitorˡ.isoʳ ⟩
                 α ∘ id ≈⟨ identityʳ ⟩ α ∎ ⟩
               α ∎
+  where
+  unitors : M .Monoidal.unitorˡ.from {X = M .Monoidal.unit} ≈ M .Monoidal.unitorʳ.from {X = M .Monoidal.unit}
+  unitors = NIProps.push-eq (unitorˡ-naturalIsomorphism M) (begin
+    id ⊗₁ unitorˡ.from ≈˘⟨ cancelʳ C associator.isoʳ ⟩
+    (id ⊗₁ unitorˡ.from ∘ associator.from) ∘ associator.to ≈⟨ M .Monoidal.triangle ⟩∘⟨refl ⟩
+    unitorʳ.from ⊗₁ id ∘ associator.to ≈⟨ unitor-coherenceʳ M ⟩∘⟨refl ⟩
+    unitorʳ.from ∘ associator.to ≈˘⟨ coherence₂ M ⟩∘⟨refl ⟩
+    (id ⊗₁ unitorʳ.from ∘ associator.from) ∘ associator.to ≈⟨ cancelʳ C associator.isoʳ ⟩
+    id ⊗₁ unitorʳ.from ∎)
