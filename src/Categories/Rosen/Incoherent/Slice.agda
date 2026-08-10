@@ -145,21 +145,43 @@ AlgA≣MRS-B {B} = record
          let module X = Sl.SliceObj X
              f = π₁ ∘ X.arr
              g = π₂ ∘ X.arr
+             g# = adjoint.Radjunct g
           in Sl.slicearr {h = id} (identityʳ ○
-          (begin Sl.SliceObj.arr (Functor.F₀ Categories.Functor.id X)
-                 ≈˘⟨ identityˡ ⟩
+          (begin Sl.SliceObj.arr X
+                  ≈˘⟨ identityˡ ⟩
                  id ∘ X.arr
-                 ≈˘⟨ ∘-resp-≈ˡ η ⟩
+                  ≈˘⟨ ∘-resp-≈ˡ η ⟩
                  ⟨ π₁ , π₂ ⟩ ∘ X.arr
-                 ≈⟨ ⟨⟩∘ ⟩
-                 ⟨ π₁ ∘ X.arr , π₂ ∘ X.arr ⟩ ≈˘⟨ ⟨⟩-congˡ (adjoint.LRadjunct≈id {f = g}) ⟩
-                ⟨ π₁ ∘ X.arr , adjoint.Ladjunct (adjoint.Radjunct (π₂ ∘ X.arr)) ⟩ ≈˘⟨ ⟨⟩-congˡ (adjoint.Ladjunct-resp-≈ (elimʳ commutative)) ⟩
-                ⟨ π₁ ∘ X.arr , adjoint.Ladjunct (adjoint.Radjunct (π₂ ∘ X.arr) ∘ β.from ∘ β.from) ⟩ ≈˘⟨ ⟨⟩-congˡ {!   !} ⟩
-                ⟨ π₁ ∘ X.arr , adjoint.Ladjunct (adjoint.Radjunct (adjoint.Ladjunct (adjoint.Radjunct (π₂ ∘ X.arr) ∘ β.from)) ∘ β.from) ⟩ ∎))
-       ; η⁻¹ = λ X → Sl.slicearr {h = id} (identityʳ ○
-         (begin Sl.SliceObj.arr (Functor.F₀ (to ∘F from) X) ≈⟨  {!   !} ⟩
-                {!   !} ≈⟨  {!   !} ⟩
-                Sl.SliceObj.arr X ∎))
+                  ≈⟨ ⟨⟩∘ ⟩
+                 ⟨ π₁ ∘ X.arr , π₂ ∘ X.arr ⟩
+                  ≈˘⟨ ⟨⟩-congˡ (adjoint.LRadjunct≈id {f = g}) ⟩
+                ⟨ π₁ ∘ X.arr , adjoint.Ladjunct g# ⟩
+                  ≈˘⟨ ⟨⟩-congˡ (adjoint.Ladjunct-resp-≈ (elimʳ commutative)) ⟩
+                ⟨ π₁ ∘ X.arr , adjoint.Ladjunct (g# ∘ β.from ∘ β.from) ⟩
+                  ≈˘⟨ ⟨⟩-congˡ (adjoint.Ladjunct-resp-≈ assoc) ⟩
+                ⟨ π₁ ∘ X.arr , adjoint.Ladjunct ((g# ∘ β.from) ∘ β.from) ⟩
+                  ≈˘⟨ ⟨⟩-congˡ (adjoint.Ladjunct-resp-≈ (adjoint.RLadjunct≈id ⟩∘⟨refl)) ⟩
+                ⟨ π₁ ∘ X.arr , adjoint.Ladjunct (adjoint.Radjunct (adjoint.Ladjunct (g# ∘ β.from)) ∘ β.from) ⟩ ∎))
+       ; η⁻¹ = λ X →
+         let module X = Sl.SliceObj X
+             f = π₁ ∘ X.arr
+             g = π₂ ∘ X.arr
+             g# = adjoint.Radjunct g in Sl.slicearr {h = id} (identityʳ ○ Equiv.sym
+               (begin Sl.SliceObj.arr X
+                  ≈˘⟨ identityˡ ⟩
+                 id ∘ X.arr
+                  ≈˘⟨ ∘-resp-≈ˡ η ⟩
+                 ⟨ π₁ , π₂ ⟩ ∘ X.arr
+                  ≈⟨ ⟨⟩∘ ⟩
+                 ⟨ π₁ ∘ X.arr , π₂ ∘ X.arr ⟩
+                  ≈˘⟨ ⟨⟩-congˡ (adjoint.LRadjunct≈id {f = g}) ⟩
+                ⟨ π₁ ∘ X.arr , adjoint.Ladjunct g# ⟩
+                  ≈˘⟨ ⟨⟩-congˡ (adjoint.Ladjunct-resp-≈ (elimʳ commutative)) ⟩
+                ⟨ π₁ ∘ X.arr , adjoint.Ladjunct (g# ∘ β.from ∘ β.from) ⟩
+                  ≈˘⟨ ⟨⟩-congˡ (adjoint.Ladjunct-resp-≈ assoc) ⟩
+                ⟨ π₁ ∘ X.arr , adjoint.Ladjunct ((g# ∘ β.from) ∘ β.from) ⟩
+                  ≈˘⟨ ⟨⟩-congˡ (adjoint.Ladjunct-resp-≈ (adjoint.RLadjunct≈id ⟩∘⟨refl)) ⟩
+                ⟨ π₁ ∘ X.arr , adjoint.Ladjunct (adjoint.Radjunct (adjoint.Ladjunct (g# ∘ β.from)) ∘ β.from) ⟩ ∎))
        ; commute = λ f → {!   !}
        ; iso = λ X → record { isoˡ = identityˡ ; isoʳ = identityˡ }
        })
