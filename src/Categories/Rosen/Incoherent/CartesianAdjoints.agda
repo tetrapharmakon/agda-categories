@@ -71,12 +71,24 @@ L' = record
 
 open import Categories.NaturalTransformation using (NaturalTransformation; ntHelper)
 
+-- The counits below cannot be constructed for arbitrary incoherent systems.
+-- Since L and L' equip an arrow with the constant repair map, their eqΦ fields
+-- would require every Φ : B → (A → B) to satisfy Φ b a ≡ b.  This is false for
+-- an unconstrained Φ, so the two sorry terms mark genuine obstructions rather
+-- than missing equational reasoning.
+--
+-- In the coherent Cartesian construction, Φ is natural in the arrow variable
+-- and a Yoneda argument proves that it is the unique constant repair map.  An
+-- iMR2 stores no such naturality data, so that argument is unavailable here;
+-- proving these adjunctions requires restricting the objects or restoring the
+-- coherent naturality condition.
+
 L⊣A : L ⊣ [_]f
 L⊣A = record 
   { unit = ntHelper (record { η = λ X → mor⇒ {dom⇒ = id} {cod⇒ = id} ≡-refl ; commute = λ {X} {Y} f → (λ {x} → ≡-refl) , (λ {x} → ≡-refl) }) 
   ; counit = ntHelper (record 
     { η = λ X → record { l = id ; r = id ; eqf = λ {x} → ≡-refl 
-      ; eqΦ = λ {x} → {!  !} } 
+      ; eqΦ = λ {x} → sorry } 
     ; commute = λ f → (λ {x} → ≡-refl) , (λ {x} → ≡-refl) }) 
   ; zig = λ {A} → (λ {x} → ≡-refl) , (λ {x} → ≡-refl) 
   ; zag = λ {B} → (λ {x} → ≡-refl) , (λ {x} → ≡-refl) 
@@ -85,7 +97,7 @@ L⊣A = record
 L'⊣𝕃 : L' ⊣ 𝕃
 L'⊣𝕃 = record 
   { unit = ntHelper (record { η = λ X → tmor⇒ λ {x} → ≡-refl ; commute = λ f → (λ {x} → ≡-refl) , (λ {x} → ≡-refl) }) 
-  ; counit = ntHelper (record { η = λ X → record { l = id ; r = id ; eqf = λ {x} → ≡-refl ; eqΦ = identityʳ ○ {! sorry !} } ; commute = λ {X} {Y} f → (λ {x} → ≡-refl) , (λ {x} → ≡-refl) }) 
+  ; counit = ntHelper (record { η = λ X → record { l = id ; r = id ; eqf = λ {x} → ≡-refl ; eqΦ = sorry } ; commute = λ {X} {Y} f → (λ {x} → ≡-refl) , (λ {x} → ≡-refl) }) 
   ; zig = λ {A} → (λ {x} → ≡-refl) , (λ {x} → ≡-refl) 
   ; zag = λ {B} → (λ {x} → ≡-refl) , (λ {x} → ≡-refl) 
   }
