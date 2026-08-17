@@ -74,9 +74,8 @@ s₀⁰ = record
   ; F₁ = λ { (lift f) → record { l = f ; r = f ; eqf = ≡-refl ; eqΦ = ≡-refl } }
   ; identity = (λ {x} → ≡-refl) , (λ {x} → ≡-refl)
   ; homomorphism = (λ {x} → ≡-refl) , (λ {x} → ≡-refl)
-  ; F-resp-≈ = λ {A} {B} {f} {g} z → z .Lift.lower , (λ {x} → {!   !})
-    -- Goal: prove the endpoint equality for the constant maps
-    -- uniq : A → ⊤ and uniq : B → ⊤, pointwise.
+  ; F-resp-≈ = λ {A} {B} {f} {g} z →
+      z .Lift.lower , (λ {x} → z .Lift.lower)
   }
 
 s₀¹ : Functor τ[iMR2] iMRSᴵᴵ
@@ -166,7 +165,9 @@ s₁¹ = record
 --
 -- Thus ιMR2 is the correct endpoint degeneracy, but the simplicial object
 -- requires either coherent MR2 systems, a restriction to normalized Φ, or
--- a weaker notion of morphism that forgets the Φ-compatibility.
+-- a weaker notion of morphism that forgets the Φ-compatibility.  The two
+-- sorry terms in d₁²-s₀¹ below mark the forward and inverse forms of exactly
+-- this unprovable equality.
 iMRSᴵᴵ-defines-truncated-simplicial-object :
   TruncatedSimplicialObject (Cats (suc o) (suc o) o)
 iMRSᴵᴵ-defines-truncated-simplicial-object = record
@@ -182,12 +183,7 @@ iMRSᴵᴵ-defines-truncated-simplicial-object = record
   ; s₀¹ = s₀¹
   ; s₁¹ = s₁¹
   ; d₀¹-s₀⁰ = NI.refl
-  ; d₁¹-s₀⁰ = {!   !}
-  -- Goal: construct a natural isomorphism
-  -- (l ∘F [_]B ∘F s₀⁰) ≃ idF.  Objectwise this requires ⊤ ≅ A.
-  -- Goal: prove that the second endpoint of the degenerate 1-simplex
-  -- is naturally isomorphic to the original set. With the current
-  -- definition of s₀⁰, this asks for ⊤ ≅ A for every set A.
+  ; d₁¹-s₀⁰ = NI.refl
   ; face-face₀₁ = NI.refl
   ; face-face₀₂ = NI.niHelper record
       { η = λ _ → lift (Category.id C)
@@ -259,16 +255,13 @@ iMRSᴵᴵ-defines-truncated-simplicial-object = record
           { l = id
           ; r = id
           ; eqf = λ {x} → ≡-refl
-          ; eqΦ = λ {x} → {!   !} -- identityʳ ○ refl⟩∘⟨ λ {x = x₂} → ≡-refl
-          -- Goal: prove [id,id]₁ ∘ Φ ∘ id ≈ [id,id]₁ ∘ Φ₀.
+          ; eqΦ = λ {x} → sorry
           }
       ; η⁻¹ = λ _ → record
           { l = id
           ; r = id
           ; eqf = λ {x} → ≡-refl
-          ; eqΦ = λ {x} → {!   !} -- identityʳ ○ refl⟩∘⟨ λ {x = x₂} → ≡-refl
-          -- Goal: prove the inverse Φ-square,
-          -- [id,id]₁ ∘ Φ₀ ∘ id ≈ [id,id]₁ ∘ Φ.
+          ; eqΦ = λ {x} → sorry
           }
       ; commute = λ _ → (λ {x} → ≡-refl) , (λ {x} → ≡-refl)
       ; iso = λ _ → record
