@@ -11,7 +11,8 @@ module Categories.Rosen.Coherent.HigherMRS {o ℓ e} {C : Category o ℓ e} {M :
 -- each step A → B → [A,B] → [B,[A,B]] → ... embeds the two previous
 -- levels into an internal hom.  Built as iterated IsoCommas of ℝ and Vᵢ.
 -- Exports: MRS3, 𝕄ℝ𝕊, 𝕄ℝ𝕊ₒ, Π-MRS, pℕ, 𝕄ℝ𝕊-F, 𝕄ℝ𝕊-down,
---          downF, MRS-chain, MRS∞, MRS∞-proj, MRS∞-commute.
+--          downF, MRS-chain, MRS∞, MRS∞-Obj, MRS∞-at,
+--          MRS∞-proj, MRS∞-commute.
 
 open import Data.Nat using (ℕ; zero; suc)
 open import Data.Product using (Σ;_,_;proj₁;proj₂)
@@ -213,3 +214,12 @@ MRS∞ = MRS-Limit.apex
 MRS∞-proj = MRS-Limit.proj
 -- MRS∞-commute: universal property of the limit.
 MRS∞-commute = MRS-Limit.limit-commute
+
+-- Objects of a chosen inverse limit.  A limit witness does not determine a
+-- canonical object; an MRS∞-Obj must be supplied separately.
+MRS∞-Obj : MRS-Limit → Set (o ⊔ ℓ ⊔ e)
+MRS∞-Obj L = Category.Obj (MRS∞ L)
+
+-- The finite-stage component of an object of the inverse limit.
+MRS∞-at : ∀ {L : MRS-Limit} → MRS∞-Obj L → (n : ℕ) → Category.Obj (𝕄ℝ𝕊ₒ n)
+MRS∞-at {L} X∞ n = Functor.F₀ (MRS∞-proj L n) X∞
