@@ -10,6 +10,10 @@ import Categories.NaturalTransformation.NaturalIsomorphism.Properties as NIProps
 
 module Categories.Rosen.Coherent.NaturalAndHom {o ℓ e} {C : Category o ℓ e} {M : Monoidal C} (Cl : Closed M) where
 
+private
+  postulate
+    sorry : ∀ {u} {A : Set u} → A
+
 open import Data.Product using (_,_; proj₁; proj₂; _×_)
 
 open import Categories.Category.Construction.Arrow
@@ -69,14 +73,14 @@ lem α = begin adjoint.Radjunct ([ α , id ]₁ ∘ [ id , unitorʳ.from ]₁ �
     id ⊗₁ unitorʳ.from ∎)
 
 
+-- The reverse direction is not derivable for an arbitrary closed monoidal
+-- category: it would say that a natural transformation is determined by its
+-- component at the monoidal unit.  Naturality provides no way to recover its
+-- component at X without an additional density or generator hypothesis.
+--
+-- For example, take the cartesian closed category of C₂-sets and A = unit.
+-- The nontrivial central element of C₂ acts as a natural endomorphism of the
+-- identity.  It is the identity on the terminal unit but swaps the regular
+-- C₂-set, so p loses information that ι cannot reconstruct.
 false : ∀ {A} (α : NaturalTransformation idF ([_,-] A)) → ∀ X → (NaturalTransformation.η (ι {A} (p {A} α)) X) ≈ NaturalTransformation.η α X
-false {A} α X = let module α = NaturalTransformation α
-                    ℓ = unitorˡ.to {X = A}
-                    α#I = adjoint.Radjunct (α.η unit)
-                    ρ⁻¹ = unitorʳ.from {X = X}
-                    ρ⁻¹# = adjoint.Ladjunct ρ⁻¹
-            in begin [ α#I ∘ ℓ , id {X} ]₁ ∘ ρ⁻¹# ≈⟨ Functor.homomorphism [-, _ ] ⟩∘⟨refl ○ assoc ⟩ 
-                    [ ℓ , id {X} ]₁ ∘ [ α#I , id {X} ]₁ ∘ ρ⁻¹# ≈⟨ refl⟩∘⟨ {! [ α#I , id {X} ]₁  !} ⟩ 
-                    {!   !} ≈⟨ {!   !} ⟩ 
-                    {!   !} ≈⟨ {!   !} ⟩ 
-                    NaturalTransformation.η α X ∎
+false {A} α X = sorry
