@@ -120,11 +120,20 @@ from {B} = record
         ; ξ = ⟪ π₁ ∘ x.arr , adjoint.Ladjunct (π₂x# ∘ β.from) ⟫
         }
   ; F₁ = λ { {X} {Y} f →
-      let module f = Sl.Slice⇒ f
+      let module X = Sl.SliceObj X
+          module Y = Sl.SliceObj Y
+          module f = Sl.Slice⇒ f
       in record
         { u = f.h
         ; eqf = pushʳ (Equiv.sym f.△)
-        ; eqΦ = {!!}
+        ; eqΦ =
+          begin
+            adjoint.Ladjunct (adjoint.Radjunct (π₂ ∘ X.arr) ∘ β.from)
+              ≈⟨ {! naturality of swap in the exponent, via f.△ (π₂∘X.arr ≈ (π₂∘Y.arr)∘f.h),
+                     functoriality of -⊗ B, braiding naturality, and the mate square
+                     between adjoint{X.Y} and adjoint{Y.Y} !} ⟩
+            [ f.h , id ]₁ ∘ adjoint.Ladjunct (adjoint.Radjunct (π₂ ∘ Y.arr) ∘ β.from)
+          ∎
         } }
   ; identity = Equiv.refl
   ; homomorphism = Equiv.refl
