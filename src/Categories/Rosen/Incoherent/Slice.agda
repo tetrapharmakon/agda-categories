@@ -123,16 +123,51 @@ from {B} = record
       let module X = Sl.SliceObj X
           module Y = Sl.SliceObj Y
           module f = Sl.Slice⇒ f
+          ε₀ = adjoint.counit.η
+          η₀ = adjoint.unit.η
+          g1 = π₂ ∘ X.arr
+          g2 = π₂ ∘ Y.arr
+          eqg : g1 ≈ g2 ∘ f.h
+          eqg = (refl⟩∘⟨ Equiv.sym f.△) ○ sym-assoc
+          k = ε₀ _ ∘ g2 ⊗₁ id
+          -- naturality of Ladjunct across a change of exponent along f.h,
+          -- via the mate square between adjoint{X.Y} and adjoint{Y.Y}
+          wedge : [ id , id ⊗₁ f.h ]₁ ∘ η₀ _ ≈ [ f.h , id ]₁ ∘ η₀ _
+          wedge = mate.commute₁ _
+          wedge2 : adjoint.Ladjunct ((k ∘ β.from) ∘ id ⊗₁ f.h) ≈ [ f.h , id ]₁ ∘ adjoint.Ladjunct (k ∘ β.from)
+          wedge2 = begin
+            [ id , (k ∘ β.from) ∘ id ⊗₁ f.h ]₁ ∘ η₀ _
+              ≈⟨ Functor.homomorphism [ _ ,-] ⟩∘⟨refl ⟩
+            ([ id , k ∘ β.from ]₁ ∘ [ id , id ⊗₁ f.h ]₁) ∘ η₀ _
+              ≈⟨ assoc ⟩
+            [ id , k ∘ β.from ]₁ ∘ [ id , id ⊗₁ f.h ]₁ ∘ η₀ _
+              ≈⟨ refl⟩∘⟨ wedge ⟩
+            [ id , k ∘ β.from ]₁ ∘ [ f.h , id ]₁ ∘ η₀ _
+              ≈⟨ sym-assoc ⟩
+            ([ id , k ∘ β.from ]₁ ∘ [ f.h , id ]₁) ∘ η₀ _
+              ≈⟨ [ [-,-] ]-commute ⟩∘⟨refl ⟩
+            ([ f.h , id ]₁ ∘ [ id , k ∘ β.from ]₁) ∘ η₀ _
+              ≈⟨ assoc ⟩
+            [ f.h , id ]₁ ∘ [ id , k ∘ β.from ]₁ ∘ η₀ _
+              ∎
       in record
         { u = f.h
         ; eqf = pushʳ (Equiv.sym f.△)
         ; eqΦ =
           begin
-            adjoint.Ladjunct (adjoint.Radjunct (π₂ ∘ X.arr) ∘ β.from)
-              ≈⟨ {! naturality of swap in the exponent, via f.△ (π₂∘X.arr ≈ (π₂∘Y.arr)∘f.h),
-                     functoriality of -⊗ B, braiding naturality, and the mate square
-                     between adjoint{X.Y} and adjoint{Y.Y} !} ⟩
-            [ f.h , id ]₁ ∘ adjoint.Ladjunct (adjoint.Radjunct (π₂ ∘ Y.arr) ∘ β.from)
+            adjoint.Ladjunct (adjoint.Radjunct g1 ∘ β.from)
+              ≈⟨ adjoint.Ladjunct-resp-≈ ((refl⟩∘⟨ Functor.F-resp-≈ (-⊗ _) eqg) ⟩∘⟨refl) ⟩
+            adjoint.Ladjunct ((ε₀ _ ∘ (g2 ∘ f.h) ⊗₁ id) ∘ β.from)
+              ≈⟨ adjoint.Ladjunct-resp-≈ ((refl⟩∘⟨ Functor.homomorphism (-⊗ _)) ⟩∘⟨refl) ⟩
+            adjoint.Ladjunct ((ε₀ _ ∘ g2 ⊗₁ id ∘ f.h ⊗₁ id) ∘ β.from)
+              ≈⟨ adjoint.Ladjunct-resp-≈ (sym-assoc ⟩∘⟨refl) ⟩
+            adjoint.Ladjunct (((ε₀ _ ∘ g2 ⊗₁ id) ∘ f.h ⊗₁ id) ∘ β.from)
+              ≈⟨ adjoint.Ladjunct-resp-≈ (pullʳ (braiding.⇒.sym-commute (id , f.h))) ⟩
+            adjoint.Ladjunct (k ∘ β.from ∘ id ⊗₁ f.h)
+              ≈⟨ adjoint.Ladjunct-resp-≈ sym-assoc ⟩
+            adjoint.Ladjunct ((k ∘ β.from) ∘ id ⊗₁ f.h)
+              ≈⟨ wedge2 ⟩
+            [ f.h , id ]₁ ∘ adjoint.Ladjunct (k ∘ β.from)
           ∎
         } }
   ; identity = Equiv.refl
