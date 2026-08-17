@@ -36,14 +36,14 @@ p α = let module α = NaturalTransformation α
 ι : ∀ {A} →  (A ⇒ unit) → (NaturalTransformation idF ([_,-] A))
 ι ξ = let ρ⁻¹ = unitorʳ.from
       in ntHelper (record
-        { η = λ X → [ ξ , id {X} ]₁ ∘ adjoint.Ladjunct ρ⁻¹
-        ; commute = λ {X} {Y} f →
-            begin ([ ξ , id {Y} ]₁ ∘ adjoint.Ladjunct ρ⁻¹) ∘ f                       ≈⟨ pullʳ C (Equiv.sym adjoint.Ladjunct-comm′) ⟩
+         { η = λ X → [ ξ , id {X} ]₁ ∘ adjoint.Ladjunct ρ⁻¹
+         ; commute = λ {X} {Y} f →
+             begin ([ ξ , id {Y} ]₁ ∘ adjoint.Ladjunct ρ⁻¹) ∘ f                       ≈⟨ pullʳ C (Equiv.sym adjoint.Ladjunct-comm′) ⟩
                   [ ξ , id {Y} ]₁ ∘ adjoint.Ladjunct (ρ⁻¹ ∘ f ⊗₁ id)                 ≈⟨ refl⟩∘⟨ adjoint.Ladjunct-resp-≈ (M .Monoidal.unitorʳ-commute-from) ⟩
                   [ ξ , id {Y} ]₁ ∘ adjoint.Ladjunct (f ∘ ρ⁻¹)                       ≈⟨ refl⟩∘⟨ Functor.homomorphism ([_,-] unit) ⟩∘⟨refl ⟩
                   [ ξ , id {Y} ]₁ ∘ ([ id , f ]₁ ∘ [ id , ρ⁻¹ ]₁) ∘ adjoint.unit.η _ ≈⟨ refl⟩∘⟨ assoc ⟩
-                  [ ξ , id {Y} ]₁ ∘ [ id , f ]₁ ∘ adjoint.Ladjunct ρ⁻¹               ≈⟨ pullˡ C (Equiv.sym [ [-,-] ]-commute) ○ assoc ⟩
-                  [ id , f ]₁ ∘ [ ξ , id {X} ]₁ ∘ adjoint.Ladjunct ρ⁻¹               ∎
+                   [ ξ , id {Y} ]₁ ∘ [ id , f ]₁ ∘ adjoint.Ladjunct ρ⁻¹               ≈⟨ pullˡ C (Equiv.sym [ [-,-] ]-commute) ○ assoc ⟩
+                   [ id , f ]₁ ∘ [ ξ , id {X} ]₁ ∘ adjoint.Ladjunct ρ⁻¹               ∎
         })
 
 lem : ∀ {A} (α : A ⇒ unit) → p (ι α) ≈ α
@@ -67,3 +67,16 @@ lem α = begin adjoint.Radjunct ([ α , id ]₁ ∘ [ id , unitorʳ.from ]₁ �
     unitorʳ.from ∘ associator.to ≈˘⟨ coherence₂ M ⟩∘⟨refl ⟩
     (id ⊗₁ unitorʳ.from ∘ associator.from) ∘ associator.to ≈⟨ cancelʳ C associator.isoʳ ⟩
     id ⊗₁ unitorʳ.from ∎)
+
+
+false : ∀ {A} (α : NaturalTransformation idF ([_,-] A)) → ∀ X → (NaturalTransformation.η (ι {A} (p {A} α)) X) ≈ NaturalTransformation.η α X
+false {A} α X = let module α = NaturalTransformation α
+                    ℓ = unitorˡ.to {X = A}
+                    α#I = adjoint.Radjunct (α.η unit)
+                    ρ⁻¹ = unitorʳ.from {X = X}
+                    ρ⁻¹# = adjoint.Ladjunct ρ⁻¹
+            in begin [ α#I ∘ ℓ , id {X} ]₁ ∘ ρ⁻¹# ≈⟨ Functor.homomorphism [-, _ ] ⟩∘⟨refl ○ assoc ⟩ 
+                    [ ℓ , id {X} ]₁ ∘ [ α#I , id {X} ]₁ ∘ ρ⁻¹# ≈⟨ refl⟩∘⟨ {! [ α#I , id {X} ]₁  !} ⟩ 
+                    {!   !} ≈⟨ {!   !} ⟩ 
+                    {!   !} ≈⟨ {!   !} ⟩ 
+                    NaturalTransformation.η α X ∎
