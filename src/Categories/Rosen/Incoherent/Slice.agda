@@ -43,7 +43,7 @@ open Monoidal M using (_⊗-; -⊗_; unit; _⊗₀_; _⊗₁_)
 open BinaryProducts BC
 
 open Symmetric S hiding (_⊗-; -⊗_; unit; _⊗₀_; _⊗₁_) renaming (braided-iso to β)
-open Closed Cl using (adjoint; mate; [_,_]₀; [_,_]₁; [_,-])
+open Closed Cl using (adjoint; mate; [-,-]; [_,_]₀; [_,_]₁; [_,-])
 
 slice : (B : Obj) → Category (o ⊔ ℓ) (ℓ ⊔ e) e
 slice B = Sl.Slice C (B × [ B , B ]₀)
@@ -182,28 +182,57 @@ AlgA≣MRS-B {B} = record
                 ⟨ π₁ ∘ X.arr , adjoint.Ladjunct ((g# ∘ β.from) ∘ β.from) ⟩
                   ≈˘⟨ ⟨⟩-congˡ (adjoint.Ladjunct-resp-≈ (adjoint.RLadjunct≈id ⟩∘⟨refl)) ⟩
                 ⟨ π₁ ∘ X.arr , adjoint.Ladjunct (adjoint.Radjunct (adjoint.Ladjunct (g# ∘ β.from)) ∘ β.from) ⟩ ∎))
-       ; commute = λ f → {!   !}
+       ; commute = λ f → identityˡ ○ Equiv.sym identityʳ
        ; iso = λ X → record { isoˡ = identityˡ ; isoʳ = identityˡ }
        })
      ; G∘F≈id = niHelper (record
-       { η = λ X → record
+       { η = λ X →
+         let module X = iMR2ᴸ₀ X
+             module Xξ = iMR2 X.ξ
+             Φ# = adjoint.Radjunct Xξ.Φ
+         in record
          { u = id
          ; eqf = Equiv.trans project₁ (Equiv.sym identityʳ)
-         ; eqΦ = {!   !}
+         ; eqΦ =
+           (begin
+             adjoint.Ladjunct (adjoint.Radjunct (π₂ ∘ ⟨ Xξ.f , adjoint.Ladjunct (Φ# ∘ β.from) ⟩) ∘ β.from)
+               ≈⟨ adjoint.Ladjunct-resp-≈ (adjoint.Radjunct-resp-≈ project₂ ⟩∘⟨refl) ⟩
+             adjoint.Ladjunct (adjoint.Radjunct (adjoint.Ladjunct (Φ# ∘ β.from)) ∘ β.from)
+               ≈⟨ adjoint.Ladjunct-resp-≈ (adjoint.RLadjunct≈id ⟩∘⟨refl) ⟩
+             adjoint.Ladjunct ((Φ# ∘ β.from) ∘ β.from)
+               ≈⟨ adjoint.Ladjunct-resp-≈ assoc ⟩
+             adjoint.Ladjunct (Φ# ∘ (β.from ∘ β.from))
+               ≈⟨ adjoint.Ladjunct-resp-≈ (elimʳ commutative) ⟩
+             adjoint.Ladjunct Φ#
+               ≈⟨ adjoint.LRadjunct≈id ⟩
+             Xξ.Φ
+               ≈˘⟨ identityˡ ⟩
+             id ∘ Xξ.Φ
+               ≈˘⟨ Functor.identity [-,-] ⟩∘⟨refl ⟩
+             [ id , id ]₁ ∘ Xξ.Φ ∎)
          }
        ; η⁻¹ = λ X →
          let module X = iMR2ᴸ₀ X
              module Xξ = iMR2 X.ξ
+             Φ# = adjoint.Radjunct Xξ.Φ
          in record
          { u = id
-         ; eqf = Equiv.sym identityʳ ○
-           (begin Xξ.f ≈⟨ {!   !} ⟩
-                  {!   !} ≈⟨ {!   !} ⟩
-                  {!   !} ≈˘⟨ {!   !} ⟩
-                  {!   !} ∎) ⟩∘⟨refl
-         ; eqΦ = {!  begin ? ≈⟨ ? ⟩ ? ≈⟨ ? ⟩ ? ≈⟨ ? ⟩ ? ∎ !}
+         ; eqf = Equiv.sym identityʳ ○ (Equiv.sym project₁ ⟩∘⟨refl)
+         ; eqΦ = Equiv.sym
+           (elimˡ (Functor.identity [-,-]) ○ (begin
+             adjoint.Ladjunct (adjoint.Radjunct (π₂ ∘ ⟨ Xξ.f , adjoint.Ladjunct (Φ# ∘ β.from) ⟩) ∘ β.from)
+               ≈⟨ adjoint.Ladjunct-resp-≈ (adjoint.Radjunct-resp-≈ project₂ ⟩∘⟨refl) ⟩
+             adjoint.Ladjunct (adjoint.Radjunct (adjoint.Ladjunct (Φ# ∘ β.from)) ∘ β.from)
+               ≈⟨ adjoint.Ladjunct-resp-≈ (adjoint.RLadjunct≈id ⟩∘⟨refl) ⟩
+             adjoint.Ladjunct ((Φ# ∘ β.from) ∘ β.from)
+               ≈⟨ adjoint.Ladjunct-resp-≈ assoc ⟩
+             adjoint.Ladjunct (Φ# ∘ (β.from ∘ β.from))
+               ≈⟨ adjoint.Ladjunct-resp-≈ (elimʳ commutative) ⟩
+             adjoint.Ladjunct Φ#
+               ≈⟨ adjoint.LRadjunct≈id ⟩
+             Xξ.Φ ∎))
          }
-       ; commute = λ X → {! begin ? ≈⟨ ? ⟩ ? ≈⟨ ? ⟩ ? ≈⟨ ? ⟩ ? ∎  !}
+       ; commute = λ X → identityˡ ○ Equiv.sym identityʳ
        ; iso = λ X → record { isoˡ = identityˡ ; isoʳ = identityˡ } })
     }
   }
