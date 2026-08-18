@@ -1,10 +1,10 @@
 {-# OPTIONS --without-K --warning=noUserWarning --warning=noUselessPrivate --warning=noUnsupportedIndexedMatch #-}
 
-open import Level using (Level; 0ℓ; _⊔_; suc; lift; Lift)
 open import Categories.Category using (Category)
-open import Categories.Functor using (Functor;_∘F_)
 open import Categories.Category.Instance.Sets using (Sets)
+open import Categories.Functor using (Functor;_∘F_)
 open import Categories.NaturalTransformation.NaturalIsomorphism as NI
+open import Level using (Level; 0ℓ; _⊔_; suc; lift; Lift)
 open import Relation.Binary.PropositionalEquality using (_≡_; isEquivalence; subst) renaming (refl to ≡-refl; sym to ≡-sym)
 
 module Categories.Rosen.Incoherent.IteratedTruncatedSimplicialObject
@@ -29,8 +29,8 @@ private
   Cl = Sets-Closed
 
 open import Categories.Rosen.Incoherent.Core Cl using (τ[iMR2];⟪_,_⟫;iMR2;iMR2₀;iMR2⇒)
-open import Categories.Rosen.Incoherent.Iterated Cl using (iMRSᴵᴵ;comp;deg₀²;deg₂²;iMRSᴵᴵ⇒)
 open import Categories.Rosen.Incoherent.Functors Cl
+open import Categories.Rosen.Incoherent.Iterated Cl using (iMRSᴵᴵ;comp;deg₀²;deg₂²;iMRSᴵᴵ⇒)
 
 open Category C
 
