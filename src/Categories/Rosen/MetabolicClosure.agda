@@ -27,7 +27,6 @@ open MR2
 record MetabolicClosure {A B : Obj} (ξ : MR2 A B) : Set (ℓ ⊔ e) where
   field
     b₀ : unit ⇒ B
-    -- closureR : adjoint.Radjunct (Φη₀ ξ) ∘ (b₀ ⊗₁ id) ≈ f ξ ∘ unitorˡ.from
     closureL : Φη₀ ξ ∘ b₀ ≈ adjoint.Ladjunct (f ξ ∘ unitorˡ.from)
 
 open MetabolicClosure
@@ -103,7 +102,12 @@ reindexMR2 u v ξ = record
 ReindexingPreservesClosure : {A A′ B B′ : Obj} (u : A′ ⇒ A) (v : B ⇒ B′) {ξ : MR2 A B} → MetabolicClosure ξ → MetabolicClosure (reindexMR2 u v ξ)
 ReindexingPreservesClosure u v {ξ} x = record 
   { b₀ = v ∘ b₀ x 
-  ; closureL = begin
-      Φη₀ (reindexMR2 u v ξ) ∘ v ∘ b₀ x                            ≈⟨ {!  !} ⟩
+  ; closureL = let module Φ = NaturalTransformation (Φ ξ)
+                   Φvfu = Φ.η (record { arr = v ∘ f ξ ∘ u }) 
+               in begin
+      ([ u , id ]₁ ∘ Φvfu) ∘ v ∘ b₀ x ≈⟨ {!   !} ⟩
+      {!   !} ≈⟨ {!  !} ⟩
+      {!   !} ≈⟨ {!  !} ⟩
+      {!   !} ≈⟨ {!  !} ⟩
       adjoint.Ladjunct ((v ∘ f ξ ∘ u) ∘ unitorˡ.from) ∎ 
   }
