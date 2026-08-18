@@ -1,12 +1,12 @@
 {-# OPTIONS --without-K --warning=noUserWarning --warning=noUselessPrivate --warning=noUnsupportedIndexedMatch #-}
 
-open import Level using (_⊔_)
 open import Categories.Category using (Category)
+open import Level using (_⊔_)
 -- open import Categories.Category.Cartesian using (BinaryProducts)
+open import Categories.Category.BinaryProducts using (BinaryProducts)
 open import Categories.Category.Monoidal using (Monoidal)
 open import Categories.Category.Monoidal.Closed using (Closed)
 open import Categories.Category.Monoidal.Symmetric using (Symmetric)
-open import Categories.Category.BinaryProducts using (BinaryProducts)
 
 module Categories.Rosen.Incoherent.Slice
   {o ℓ e} {C : Category o ℓ e}
@@ -24,15 +24,15 @@ module Categories.Rosen.Incoherent.Slice
 
 open Category C
 
-open import Data.Product using (_,_)
 open import Categories.Category.Equivalence using (StrongEquivalence)
 open import Categories.Functor using (Functor; _∘F_)
+open import Categories.Functor.Bifunctor using (appˡ; appʳ)
+open import Categories.Functor.Bifunctor.Properties using ([_]-decompose₁;[_]-commute)
 import Categories.Morphism.Reasoning as MR
 open import Categories.NaturalTransformation.NaturalIsomorphism using (niHelper)
 open import Categories.Rosen.Incoherent.Core Cl
-open import Categories.Functor.Bifunctor using (appˡ; appʳ)
-open import Categories.Functor.Bifunctor.Properties using ([_]-decompose₁;[_]-commute)
 open import Categories.Rosen.Incoherent.Displayed Cl using (iMR2ᴸ; iMR2ᴸ₀; iMR2ᴸ⇒)
+open import Data.Product using (_,_)
 
 import Categories.Category.Slice as Sl
 
