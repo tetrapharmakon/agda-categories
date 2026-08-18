@@ -1,22 +1,22 @@
 {-# OPTIONS --without-K --warning=noUserWarning --warning=noUselessPrivate --warning=noUnsupportedIndexedMatch #-}
 
-open import Level using (0ℓ; _⊔_)
 open import Categories.Category using (Category)
 open import Categories.Category.Monoidal using (Monoidal)
 open import Categories.Category.Monoidal.Closed using (Closed)
+open import Level using (0ℓ; _⊔_)
 
 module Categories.Rosen.Incoherent.HigherMRS
   {o ℓ e} {C : Category o ℓ e} {M : Monoidal C} (Cl : Closed M)
   where
 
+open import Data.Empty using (⊥-elim)
 open import Data.Nat using (ℕ; zero; suc; _≟_; _≤_; z≤n; s≤s; _+_)
 open import Data.Nat.Properties using (≤-poset; ≤-refl; ≤-trans; n≤1+n)
-open import Data.Sum using (_⊎_; inj₁; inj₂)
 open import Data.Product using (Σ; _,_; proj₁; proj₂; ∃; ∃-syntax; Σ-syntax)
-open import Relation.Binary.PropositionalEquality using (_≡_; isEquivalence; subst) renaming (refl to ≡-refl; sym to ≡-sym)
+open import Data.Sum using (_⊎_; inj₁; inj₂)
 open import Relation.Binary using (Antisymmetric)
+open import Relation.Binary.PropositionalEquality using (_≡_; isEquivalence; subst) renaming (refl to ≡-refl; sym to ≡-sym)
 open import Relation.Nullary using (yes; no; ¬_)
-open import Data.Empty using (⊥-elim)
 
 open import Categories.Category.Construction.Arrow
 open import Categories.Category.Construction.IsoComma
@@ -33,10 +33,10 @@ open import Categories.Morphism.Reasoning as MR
 open import Categories.NaturalTransformation.NaturalIsomorphism as NI
   using (NaturalIsomorphism; niHelper; _ⓘˡ_; _ⓘʳ_;_ⓘᵥ_)
 
+open import Categories.Rosen.Coherent.Tabulator Cl using (V₁; 𝕋MRS)
 open import Categories.Rosen.Incoherent.Core Cl
 open import Categories.Rosen.Incoherent.Elements Cl
 open import Categories.Rosen.Incoherent.Functors Cl
-open import Categories.Rosen.Coherent.Tabulator Cl using (V₁; 𝕋MRS)
 
 import Reason
 open Reason C
