@@ -6,20 +6,20 @@ open import Level
 -- In this setting, V₁ and U₁ acquire left adjoints (L and Lʹ).
 module Categories.Rosen.Cartesian.Adjoints (o : Level) where
 
+open import Categories.Adjoint using (_⊣_)
 open import Categories.Category using (Category)
-open import Categories.Category.Instance.Sets
-open import Data.Product using (_×_; _,_; proj₁; proj₂)
-open import Relation.Binary.PropositionalEquality as ≡
-open import Data.Empty using (⊥)
-open import Data.Unit using (⊤; tt)
-import Relation.Binary.Reasoning.Setoid as SetoidR
 open import Categories.Category.Construction.Arrow
+open import Categories.Category.Instance.Sets
 open import Categories.Category.Monoidal using (Monoidal)
 open import Categories.Category.Monoidal.Closed using (Closed)
 open import Categories.Functor using (Functor; _∘F_)
 open import Categories.NaturalTransformation using (NaturalTransformation; _∘ᵥ_; _∘ʳ_;ntHelper)
 open import Categories.NaturalTransformation.Equivalence using (_≃_)
-open import Categories.Adjoint using (_⊣_)
+open import Data.Empty using (⊥)
+open import Data.Product using (_×_; _,_; proj₁; proj₂)
+open import Data.Unit using (⊤; tt)
+open import Relation.Binary.PropositionalEquality as ≡
+import Relation.Binary.Reasoning.Setoid as SetoidR
 
 open import Categories.Rosen.Cartesian.Sets
 open Sets-MonoidalClosed {o}
@@ -40,8 +40,8 @@ open HomReasoning
 open Closed Cl using ([-,-]; [_,_]₀; [_,-]; [-,_]; [_,_]₁)
 
 open import Categories.Rosen.Coherent.Core Cl
-open import Categories.Rosen.Coherent.Tabulator Cl using (𝕋MRS; V₁)
 open import Categories.Rosen.Coherent.ProElements Cl {F = MRS-Profunctor} using (ElMRS;Elts₀;Elts⇒;U₁)
+open import Categories.Rosen.Coherent.Tabulator Cl using (𝕋MRS; V₁)
 
 open import Categories.Functor.Profunctor.Tabulator
 
