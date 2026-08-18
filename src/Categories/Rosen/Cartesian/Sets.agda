@@ -3,16 +3,16 @@
 -- The category of Sets as a Cartesian closed monoidal category.
 -- Used to instantiate the Rosen constructions concretely.
 
-open import Level
-open import Relation.Binary.PropositionalEquality using (_≡_; refl; cong₂; sym; trans)
 open import Data.Product using (_×_; _,_; proj₁; proj₂)
 open import Data.Unit.Polymorphic using (⊤; tt)
+open import Level
+open import Relation.Binary.PropositionalEquality using (_≡_; refl; cong₂; sym; trans)
 
-open import Categories.Category.Instance.Sets
-open import Categories.Category.CartesianClosed.Canonical as Canonical
-open import Categories.Category.CartesianClosed as CCC
-open import Categories.Category.Monoidal
 open import Categories.Category.Cartesian.Monoidal
+open import Categories.Category.CartesianClosed as CCC
+open import Categories.Category.CartesianClosed.Canonical as Canonical
+open import Categories.Category.Instance.Sets
+open import Categories.Category.Monoidal
 open import Categories.Category.Monoidal.Closed
 open import Categories.Functor.Bifunctor using (Bifunctor)
 
