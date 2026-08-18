@@ -1,11 +1,11 @@
 {-# OPTIONS --without-K --warning=noUserWarning --warning=noUselessPrivate --warning=noUnsupportedIndexedMatch #-}
 
-open import Level using (_⊔_)
 open import Categories.Category using (Category)
 open import Categories.Category.Monoidal using (Monoidal)
 open import Categories.Category.Monoidal.Closed using (Closed)
 open import Categories.Functor using (Functor)
 open import Categories.NaturalTransformation using (NaturalTransformation; _∘ᵥ_; _∘ʳ_)
+open import Level using (_⊔_)
 
 module Categories.Rosen.MetabolicClosure
   {o ℓ e} {C : Category o ℓ e} {M : Monoidal C} (Cl : Closed M) where
