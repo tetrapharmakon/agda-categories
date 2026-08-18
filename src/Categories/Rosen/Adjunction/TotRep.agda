@@ -1,9 +1,9 @@
 {-# OPTIONS --without-K --warning=noUserWarning --warning=noUselessPrivate --warning=noUnsupportedIndexedMatch #-}
 
-open import Level using (_⊔_)
 open import Categories.Category using (Category)
 open import Categories.Category.Monoidal using (Monoidal)
 open import Categories.Category.Monoidal.Closed using (Closed)
+open import Level using (_⊔_)
 
 module Categories.Rosen.Adjunction.TotRep {o ℓ e} {C : Category o ℓ e} {M : Monoidal C} (Cl : Closed M) where
 
@@ -18,9 +18,9 @@ open import Categories.Functor.Profunctor.Tabulator
 open import Categories.Morphism.Reasoning as MR
 open import Categories.NaturalTransformation using (ntHelper; _∘ᵥ_; _∘ʳ_) renaming (NaturalTransformation to NT)
 open import Categories.Rosen.Coherent.Core Cl
+open import Categories.Rosen.Coherent.ProElements Cl {F = MRS-Profunctor}
 open import Categories.Rosen.Coherent.Repairs Cl
 open import Categories.Rosen.Coherent.TotalCategory Cl using (tot⇒; total; [_,_∥_,_])
-open import Categories.Rosen.Coherent.ProElements Cl {F = MRS-Profunctor}
 
 open Closed Cl using ([-,-]; [_,_]₀; [_,-]; [_,_]₁)
 open HomReasoning
