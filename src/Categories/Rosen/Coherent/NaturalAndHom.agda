@@ -1,12 +1,12 @@
 {-# OPTIONS --without-K --warning=noUserWarning --warning=noUselessPrivate --warning=noUnsupportedIndexedMatch #-}
 
-open import Level using (_⊔_)
 open import Categories.Category using (Category)
 open import Categories.Category.Monoidal using (Monoidal)
 open import Categories.Category.Monoidal.Closed using (Closed)
 open import Categories.Category.Monoidal.Properties using (coherence₂)
 open import Categories.Category.Monoidal.Utilities using (unitor-coherenceʳ; unitorˡ-naturalIsomorphism)
 import Categories.NaturalTransformation.NaturalIsomorphism.Properties as NIProps
+open import Level using (_⊔_)
 
 module Categories.Rosen.Coherent.NaturalAndHom {o ℓ e} {C : Category o ℓ e} {M : Monoidal C} (Cl : Closed M) where
 
@@ -20,8 +20,8 @@ open import Categories.Category.Construction.Arrow
 open import Categories.Functor using (Functor; _∘F_) renaming (id to idF)
 open import Categories.Functor.Bifunctor using (appˡ; appʳ)
 open import Categories.Functor.Bifunctor.Properties using ([_]-commute;[_]-decompose₁;[_]-decompose₂;[_]-merge)
-open import Categories.NaturalTransformation using (NaturalTransformation;ntHelper; _∘ᵥ_; _∘ₕ_; _∘ˡ_; _∘ʳ_) renaming (id to idN)
 open import Categories.Morphism.Reasoning as MR
+open import Categories.NaturalTransformation using (NaturalTransformation;ntHelper; _∘ᵥ_; _∘ₕ_; _∘ˡ_; _∘ʳ_) renaming (id to idN)
 
 import Reason
 open Reason C
