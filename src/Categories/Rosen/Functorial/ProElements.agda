@@ -1,12 +1,12 @@
 {-# OPTIONS --without-K --warning=noUserWarning --warning=noUselessPrivate --warning=noUnsupportedIndexedMatch #-}
 
-open import Level using (_⊔_)
 open import Categories.Category using (Category)
 open import Categories.Category.Instance.Setoids using (Setoids)
 open import Categories.Category.Monoidal using (Monoidal)
 open import Categories.Category.Monoidal.Closed using (Closed)
 open import Categories.Functor using (Functor)
 open import Categories.Functor.Bifunctor using (Bifunctor; appˡ; appʳ)
+open import Level using (_⊔_)
 
 module Categories.Rosen.Functorial.ProElements {o ℓ e} {C : Category o ℓ e} {E : Category (o ⊔ ℓ) (ℓ ⊔ e) e} {M : Monoidal C} (Cl : Closed M) (U : Functor E C) {F : Bifunctor (Category.op C) C (Setoids (o ⊔ ℓ ⊔ e) (o ⊔ ℓ ⊔ e))} where
 
@@ -18,15 +18,15 @@ private
 -- EltsCat is a generic (modified) category-of-elements construction; ElMRS is its instance.
 -- Exports: EltsCat, ElMRS, ℝ, U₁.
 
-open import Data.Product using (_,_; proj₁; proj₂; _×_)
-open import Relation.Binary.Bundles using (Setoid)
 open import Categories.Category.Construction.Arrow
-import Relation.Binary.Reasoning.Setoid as SetoidR
 open import Categories.Category.Construction.TwistedArrow C renaming (Morphism to tMorphism; Morphism⇒ to tMorphism⇒)
 open import Categories.Functor.Bifunctor.Properties using ([_]-decompose₁;[_]-commute)
 open import Categories.Functor.Profunctor.Tabulator
 open import Categories.NaturalTransformation using (NaturalTransformation)
 open import Categories.Rosen.Functorial.Core Cl U
+open import Data.Product using (_,_; proj₁; proj₂; _×_)
+open import Relation.Binary.Bundles using (Setoid)
+import Relation.Binary.Reasoning.Setoid as SetoidR
 
 open import Function.Equality using (_⟨$⟩_; cong)
 
