@@ -1,9 +1,9 @@
 {-# OPTIONS --without-K --warning=noUserWarning --warning=noUselessPrivate --warning=noUnsupportedIndexedMatch #-}
 
-open import Level using (0ℓ; _⊔_)
 open import Categories.Category using (Category)
 open import Categories.Category.Monoidal using (Monoidal)
 open import Categories.Category.Monoidal.Closed using (Closed)
+open import Level using (0ℓ; _⊔_)
 
 module Categories.Rosen.Functorial.HigherMRS {o ℓ e} {C : Category o ℓ e} {M : Monoidal C} (Cl : Closed M) where
 
@@ -26,16 +26,16 @@ open import Categories.Category.Construction.IsoComma using (IsoComma;IsoCommaOb
 open import Categories.Category.Construction.Thin 0ℓ ≤-poset
 open import Categories.Category.Instance.Cats using (Cats)
 open import Categories.Functor using (Functor; _∘F_) renaming (id to idF)
-open import Categories.Functor.Properties using ([_]-resp-Iso)
 open import Categories.Functor.Profunctor.Tabulator using (tab₀;tab⇒)
-open import Categories.Morphism.Reasoning as MR
+open import Categories.Functor.Properties using ([_]-resp-Iso)
 open import Categories.Morphism as BaseMorphism using (_≅_; Iso)
 open import Categories.Morphism.Properties as Morphismₚ using (Iso-∘; Iso-swap)
-import Relation.Binary.Reasoning.Setoid as SetoidR
+open import Categories.Morphism.Reasoning as MR
 open import Categories.NaturalTransformation.NaturalIsomorphism as NI using (NaturalIsomorphism;niHelper; _ⓘˡ_; _ⓘʳ_)
 open import Categories.Rosen.Functorial.Core Cl
 open import Categories.Rosen.Functorial.ProElements Cl {F = MRS-Profunctor}
 open import Categories.Rosen.Functorial.Tabulator Cl using (V₁; 𝕋MRS)
+import Relation.Binary.Reasoning.Setoid as SetoidR
 
 import Reason
 open Reason C
