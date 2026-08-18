@@ -1,10 +1,10 @@
 {-# OPTIONS --without-K --allow-unsolved-metas --warning=noUserWarning --warning=noUselessPrivate --warning=noUnsupportedIndexedMatch #-}
 
-open import Level using (Level; 0ℓ; _⊔_; suc; lift; Lift)
 open import Categories.Category using (Category)
-open import Categories.Functor using (Functor;_∘F_)
 open import Categories.Category.Instance.Sets using (Sets)
+open import Categories.Functor using (Functor;_∘F_)
 open import Categories.NaturalTransformation.NaturalIsomorphism as NI
+open import Level using (Level; 0ℓ; _⊔_; suc; lift; Lift)
 open import Relation.Binary.PropositionalEquality using (_≡_; isEquivalence; subst) renaming (refl to ≡-refl; sym to ≡-sym)
 
 module Categories.Rosen.Coherent.HigherTruncatedSimplicialObject
@@ -29,8 +29,8 @@ private
   Cl = Sets-Closed
 
 open import Categories.Rosen.Coherent.Core Cl
-open import Categories.Rosen.Coherent.Tabulator Cl
 open import Categories.Rosen.Coherent.HigherMRS Cl
+open import Categories.Rosen.Coherent.Tabulator Cl
 
 open Category C
 
