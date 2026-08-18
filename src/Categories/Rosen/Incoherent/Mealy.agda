@@ -1,12 +1,12 @@
 {-# OPTIONS --without-K --warning=noUserWarning --warning=noUselessPrivate --warning=noUnsupportedIndexedMatch #-}
 
-open import Level
 open import Categories.Category
-open import Categories.Object.Terminal
-import Categories.Morphism.Reasoning as MR
-open import Categories.Functor renaming (id to idF)
 open import Categories.Category.Monoidal using (Monoidal)
 open import Categories.Category.Monoidal.Closed using (Closed)
+open import Categories.Functor renaming (id to idF)
+import Categories.Morphism.Reasoning as MR
+open import Categories.Object.Terminal
+open import Level
 
 module Categories.Rosen.Incoherent.Mealy {o ℓ e} {C : Category o ℓ e} {M : Monoidal C} (Cl : Closed M) where
 
@@ -15,9 +15,9 @@ open import Relation.Binary.Bundles using (Setoid)
 
 open import Categories.Category.Construction.Arrow
 open import Categories.Category.Instance.Setoids using (Setoids)
+open import Categories.Category.Product using (Product;_⁂_;πʳ)
 open import Categories.Functor using (Functor; _∘F_) renaming (id to idF)
 open import Categories.Functor.Bifunctor using (Bifunctor; appˡ; appʳ)
-open import Categories.Category.Product using (Product;_⁂_;πʳ)
 open import Categories.Functor.Bifunctor.Properties using ([_]-commute)
 open import Categories.Morphism.Reasoning as MR
 open import Categories.NaturalTransformation using (NaturalTransformation;ntHelper; _∘ᵥ_; _∘ₕ_; _∘ˡ_; _∘ʳ_) renaming (id to idN)
