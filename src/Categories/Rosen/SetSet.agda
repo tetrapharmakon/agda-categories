@@ -17,6 +17,7 @@ open import Categories.Category using (Category)
 open import Categories.Category.BinaryProducts using (BinaryProducts)
 open import Categories.Category.Cartesian using (Cartesian)
 open import Categories.Category.Cartesian.Monoidal using (module CartesianMonoidal)
+open import Categories.Category.CartesianClosed using (CartesianClosed)
 open import Categories.Category.Instance.Sets using (Sets)
 open import Categories.Category.Monoidal using (Monoidal)
 open import Categories.Category.Monoidal.Instance.Sets using (module Product)
@@ -80,3 +81,9 @@ module _ (o : Level) where
   -- Set × Set is Cartesian monoidal.
   SetSet-Monoidal : Monoidal (SetSet o)
   SetSet-Monoidal = CartesianMonoidal.monoidal SetSet-Cartesian
+
+  -- Set × Set is Cartesian closed. (stub: Sets itself is CCC, with
+  -- exponentials built componentwise the same way products were above;
+  -- not proved here.)
+  SetSet-CartesianClosed : CartesianClosed (SetSet o)
+  SetSet-CartesianClosed = {! !}
