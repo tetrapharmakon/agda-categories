@@ -1,4 +1,4 @@
-{-# OPTIONS --without-K --safe #-}
+{-# OPTIONS --without-K --warning=noUserWarning --safe #-}
 
 -- The product category Set × Set: objects are pairs of sets, morphisms
 -- are pairs of functions, everything else computed pointwise. It is
@@ -82,8 +82,16 @@ module _ (o : Level) where
   SetSet-Monoidal : Monoidal (SetSet o)
   SetSet-Monoidal = CartesianMonoidal.monoidal SetSet-Cartesian
 
-  -- Set × Set is Cartesian closed. (stub: Sets itself is CCC, with
-  -- exponentials built componentwise the same way products were above;
-  -- not proved here.)
+  -- Set × Set is Cartesian closed.
   SetSet-CartesianClosed : CartesianClosed (SetSet o)
-  SetSet-CartesianClosed = {! !}
+  SetSet-CartesianClosed = record 
+    { cartesian = SetSet-Cartesian 
+    ; exp = record
+      { B^A = {!   !}
+      ; product = {!   !}
+      ; eval = {!   !}
+      ; λg = {!   !}
+      ; β = {!   !}
+      ; λ-unique = {!   !}
+      } 
+    }
