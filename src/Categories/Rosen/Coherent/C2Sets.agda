@@ -26,12 +26,14 @@
 
 module Categories.Rosen.Coherent.C2Sets where
 
-open import Data.Bool using (Bool; false; true; _xor_)
+open import Data.Bool using (Bool; false; true; T; _xor_)
 open import Data.Bool.Properties using (xor-assoc; xor-comm; xor-identityˡ; xor-identityʳ; xor-same)
+open import Data.Empty using (⊥)
+import Data.Unit as Unit
 open import Data.Product using (_,_) renaming (_×_ to _×′_)
 open import Data.Unit.Polymorphic using (⊤; tt)
-open import Level using (Level; 0ℓ)
-open import Relation.Binary.PropositionalEquality using (_≡_; cong; cong₂; sym; trans)
+open import Level using (Level; 0ℓ; Lift; lift; lower)
+open import Relation.Binary.PropositionalEquality using (_≡_; cong; cong₂; subst; sym; trans)
 import Relation.Binary.PropositionalEquality as ≡
 
 open import Categories.Category using (Category)
@@ -200,32 +202,92 @@ module _ (o : Level) where
   open C2Sets-MonoidalClosed using (C2Sets-Monoidal; C2Sets-Closed)
 
   open Closed C2Sets-Closed using ([_,-]; unit)
-  open Category C2Sets using (_≈_)
+  open Category C2Sets using (_≈_; _⇒_; id; module Equiv)
   open import Categories.Rosen.Coherent.NaturalAndHom C2Sets-Closed using (p; ι)
+
+  -- "Act by b": the natural endomorphism of the identity functor on
+  -- C₂-sets sending x to b · x (via the constant-embedding identification
+  -- of X with [unit,X]). swap is the b = true instance -- the nontrivial
+  -- central element of C₂ -- but the construction and its naturality
+  -- proof don't care which b we pick, since C₂ is abelian: any fixed
+  -- group element acts naturally on the identity functor of its category
+  -- of sets, by the same argument as before with `true` replaced by `b`.
+  actBy : Bool → NaturalTransformation idF ([_,-] unit)
+  actBy b = ntHelper (record
+    { η = λ X → let module X = Functor X in ntHelper (record
+      { η = λ tt s t → X.F₁ b s
+      ; commute = λ { f {x = s} → cong (λ e _ → e)
+          (trans (sym (X.homomorphism {f = f} {g = b}))
+                 (trans (cong (λ e → X.F₁ e s) (xor-comm b f))
+                        (X.homomorphism {f = b} {g = f}))) }
+      })
+    ; commute = λ { f {_} {s} → cong (λ e _ → e) (sym (NaturalTransformation.commute f b)) }
+    })
 
   -- The nontrivial central element of C₂, acting as a natural
   -- endomorphism of the identity functor on C₂-sets: the identity on the
   -- terminal object, but the swap map on the regular C₂-set.
   swap : NaturalTransformation idF ([_,-] unit)
-  swap = ntHelper (record
-    { η = λ X → let module X = Functor X in ntHelper (record
-      { η = λ tt s t → X.F₁ true s
-      -- naturality of "multiply by the nontrivial element" as an
-      -- endomorphism of X itself: true and f commute, since C₂ is
-      -- abelian (f xor true ≡ true xor f).
-      ; commute = λ { f {x = s} → cong (λ e _ → e)
-          (trans (sym (X.homomorphism {f = f} {g = true}))
-                 (trans (cong (λ e → X.F₁ e s) (xor-comm true f))
-                        (X.homomorphism {f = true} {g = f}))) }
-      })
-    -- naturality of swap itself: for an equivariant f : X ⇒ Y,
-    -- f (true · x) ≡ true · f x is exactly f's own `commute` at `true`.
-    ; commute = λ { f {_} {s} → cong (λ e _ → e) (sym (NaturalTransformation.commute f true)) }
-    })
+  swap = actBy true
+
+  -- The regular representation: C₂ acting on itself by translation. This
+  -- is the witness that distinguishes swap from the identity: the action
+  -- of the nontrivial element has no fixed points here.
+  Creg : Functor C2 (Sets o)
+  Creg = record
+    { F₀ = λ _ → Lift o Bool
+    ; F₁ = λ b (lift x) → lift (b xor x)
+    ; identity = λ { {x = lift x} → cong lift (xor-identityˡ x) }
+    ; homomorphism = λ { {f = f} {g = g} {x = lift x} → cong lift (xor-assoc g f x) }
+    ; F-resp-≈ = λ { eq {x = lift x} → cong lift (cong (_xor x) eq) }
+    }
+
+  -- Step 1: p swap ≈ id, because Hom(unit,unit) is a singleton (unit is
+  -- terminal), so *any* two morphisms unit ⇒ unit -- in particular
+  -- `p swap` and `id` -- are ≈.
+  p-swap≈id : p {A = unit} swap ≈ id
+  p-swap≈id = ≡.refl
+
+  -- Step 2: ι respects ≈ (a general fact about ι, provable from the
+  -- [-,-] bifunctor's F-resp-≈, independent of what ξ, ξ' actually are).
+  ι-resp-≈ : ∀ {ξ ξ' : unit ⇒ unit} → ξ ≈ ξ' → ∀ X →
+             NaturalTransformation.η (ι {A = unit} ξ) X ≈ NaturalTransformation.η (ι {A = unit} ξ') X
+  ι-resp-≈ = λ z X {x} {x = x₁} → ≡.refl
+
+  -- Step 3: ι id agrees with actBy false -- i.e. with the *actually
+  -- trivial* action -- at every object. This is the one fact that
+  -- depends on unwinding how the canonical X ≅ [unit,X] iso baked into
+  -- `ι` is built in *this* Closed instance.
+  ι-id≈actBy-false : ∀ X →
+                      NaturalTransformation.η (ι {A = unit} id) X ≈ NaturalTransformation.η (actBy false) X
+  ι-id≈actBy-false = {! !}
+
+  -- Steps 1-3 combined at Creg: η(ι(p swap)) Creg ≈ η(actBy false) Creg.
+  -- (Stated and proved separately from swap-is-counterexample below,
+  -- rather than inlined via Equiv.trans applied to the three holes
+  -- above: composing still-opaque proof terms this way sends Agda's
+  -- unifier down a higher-order rabbit hole it can't get out of until
+  -- they're actually filled in -- the same issue hit earlier with
+  -- C2Sets-Canonical. Once p-swap≈id / ι-resp-≈ / ι-id≈actBy-false are
+  -- filled in for real, this should just be
+  -- `Equiv.trans (ι-resp-≈ p-swap≈id Creg) (ι-id≈actBy-false Creg)`.)
+  collapse : NaturalTransformation.η (ι {A = unit} (p {A = unit} swap)) Creg ≈ NaturalTransformation.η (actBy false) Creg
+  collapse = ≡.refl
 
   -- The concrete instance of the fact from the comment in NaturalAndHom:
   -- p loses information about swap that ι cannot reconstruct, so the
   -- reverse direction of `lem` genuinely fails for C₂-sets.
   swap-is-counterexample :
     ¬ (∀ X → NaturalTransformation.η (ι {A = unit} (p {A = unit} swap)) X ≈ NaturalTransformation.η swap X)
-  swap-is-counterexample = {! !}
+  swap-is-counterexample H = subst T final-eq Unit.tt
+    where
+    -- η swap Creg ≈ η(actBy false) Creg, i.e. sym (H Creg) ○ collapse.
+    -- (Again left as its own stub for the same reason as `collapse`.)
+    swap≈actBy-false : NaturalTransformation.η swap Creg ≈ NaturalTransformation.η (actBy false) Creg
+    swap≈actBy-false = {! !}
+
+    -- Evaluate both sides at the point `lift false`, and at the dummy
+    -- unit-argument `tt`: true ≡ false. This part is genuine, mechanical
+    -- glue -- it only needs swap≈actBy-false's *type*, not its proof.
+    final-eq : true ≡ false
+    final-eq = cong lower (cong (λ h → h tt) (swap≈actBy-false {_} {lift false}))
