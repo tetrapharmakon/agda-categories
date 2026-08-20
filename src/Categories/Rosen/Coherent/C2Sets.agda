@@ -18,13 +18,15 @@
 -- are built concretely (pointwise, with the internal hom's C₂-action
 -- given by conjugation), and all of the accompanying coherence proofs
 -- (naturality, functoriality, the CartesianClosed laws) are proved too.
--- Only the genuinely new mathematical content -- the specific swap
--- element and the proof that it is a real counterexample -- is left as
--- an open goal, to be proved later.
+-- The swap natural transformation itself is also constructed: its
+-- naturality is definitional, since being a morphism of C₂-sets already
+-- means commuting with the action of every element of C₂ (in particular
+-- the nontrivial one). Only `swap-is-counterexample` -- the actual
+-- impossibility proof -- is left as an open goal, to be proved later.
 
 module Categories.Rosen.Coherent.C2Sets where
 
-open import Data.Bool using (Bool; false; _xor_)
+open import Data.Bool using (Bool; false; true; _xor_)
 open import Data.Bool.Properties using (xor-assoc; xor-comm; xor-identityˡ; xor-identityʳ; xor-same)
 open import Data.Product using (_,_) renaming (_×_ to _×′_)
 open import Data.Unit.Polymorphic using (⊤; tt)
@@ -205,12 +207,20 @@ module _ (o : Level) where
   -- endomorphism of the identity functor on C₂-sets: the identity on the
   -- terminal object, but the swap map on the regular C₂-set.
   swap : NaturalTransformation idF ([_,-] unit)
-  swap = ntHelper (record 
-    { η = λ X → ntHelper (record 
-      { η = λ tt s t → {!  !} 
-      ; commute = {!   !} 
-      }) 
-    ; commute = {!   !} 
+  swap = ntHelper (record
+    { η = λ X → let module X = Functor X in ntHelper (record
+      { η = λ tt s t → X.F₁ true s
+      -- naturality of "multiply by the nontrivial element" as an
+      -- endomorphism of X itself: true and f commute, since C₂ is
+      -- abelian (f xor true ≡ true xor f).
+      ; commute = λ { f {x = s} → cong (λ e _ → e)
+          (trans (sym (X.homomorphism {f = f} {g = true}))
+                 (trans (cong (λ e → X.F₁ e s) (xor-comm true f))
+                        (X.homomorphism {f = true} {g = f}))) }
+      })
+    -- naturality of swap itself: for an equivariant f : X ⇒ Y,
+    -- f (true · x) ≡ true · f x is exactly f's own `commute` at `true`.
+    ; commute = λ { f {_} {s} → cong (λ e _ → e) (sym (NaturalTransformation.commute f true)) }
     })
 
   -- The concrete instance of the fact from the comment in NaturalAndHom:
