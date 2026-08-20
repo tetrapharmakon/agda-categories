@@ -21,8 +21,11 @@
 -- The swap natural transformation itself is also constructed: its
 -- naturality is definitional, since being a morphism of C₂-sets already
 -- means commuting with the action of every element of C₂ (in particular
--- the nontrivial one). Only `swap-is-counterexample` -- the actual
--- impossibility proof -- is left as an open goal, to be proved later.
+-- the nontrivial one). `swap-is-counterexample` -- the actual
+-- impossibility proof -- is proved too, via a small chain of lemmas
+-- (see the comments above each one); the only thing left open is
+-- `ι-id≈actBy-false`, an interesting fact in its own right that the
+-- final proof turned out not to need.
 
 module Categories.Rosen.Coherent.C2Sets where
 
@@ -254,23 +257,25 @@ module _ (o : Level) where
              NaturalTransformation.η (ι {A = unit} ξ) X ≈ NaturalTransformation.η (ι {A = unit} ξ') X
   ι-resp-≈ = λ z X {x} {x = x₁} → ≡.refl
 
-  -- Step 3: ι id agrees with actBy false -- i.e. with the *actually
-  -- trivial* action -- at every object. This is the one fact that
-  -- depends on unwinding how the canonical X ≅ [unit,X] iso baked into
-  -- `ι` is built in *this* Closed instance.
+  -- Step 3 (not needed below, see the note on `collapse`): ι id agrees
+  -- with actBy false -- i.e. with the *actually trivial* action -- at
+  -- every object X. Unlike the other steps this does NOT close by refl:
+  -- unfolding [unit,-].F₀ X reveals it's built via
+  -- Categories.Functor.Construction.Constant rather than reducing
+  -- straight to the "constant embedding" `⊤ → X.F₀ tt` I assumed by
+  -- analogy with actBy's own construction, so this would need actually
+  -- tracing through that (and the surrounding adjunction machinery) to
+  -- prove for a generic X. Left open as an interesting fact in its own
+  -- right, orthogonal to swap-is-counterexample below.
   ι-id≈actBy-false : ∀ X →
                       NaturalTransformation.η (ι {A = unit} id) X ≈ NaturalTransformation.η (actBy false) X
-  ι-id≈actBy-false = {! !}
+  ι-id≈actBy-false = λ X → {! !}
 
   -- Steps 1-3 combined at Creg: η(ι(p swap)) Creg ≈ η(actBy false) Creg.
-  -- (Stated and proved separately from swap-is-counterexample below,
-  -- rather than inlined via Equiv.trans applied to the three holes
-  -- above: composing still-opaque proof terms this way sends Agda's
-  -- unifier down a higher-order rabbit hole it can't get out of until
-  -- they're actually filled in -- the same issue hit earlier with
-  -- C2Sets-Canonical. Once p-swap≈id / ι-resp-≈ / ι-id≈actBy-false are
-  -- filled in for real, this should just be
-  -- `Equiv.trans (ι-resp-≈ p-swap≈id Creg) (ι-id≈actBy-false Creg)`.)
+  -- Closes by refl directly -- Creg's action computes by xor, which
+  -- unfolds far enough that Agda can see the equation hold without
+  -- needing ι-id≈actBy-false (or even p-swap≈id / ι-resp-≈) as a
+  -- separate step; it was really only needed as a proof *plan*.
   collapse : NaturalTransformation.η (ι {A = unit} (p {A = unit} swap)) Creg ≈ NaturalTransformation.η (actBy false) Creg
   collapse = ≡.refl
 
@@ -281,10 +286,14 @@ module _ (o : Level) where
     ¬ (∀ X → NaturalTransformation.η (ι {A = unit} (p {A = unit} swap)) X ≈ NaturalTransformation.η swap X)
   swap-is-counterexample H = subst T final-eq Unit.tt
     where
-    -- η swap Creg ≈ η(actBy false) Creg, i.e. sym (H Creg) ○ collapse.
-    -- (Again left as its own stub for the same reason as `collapse`.)
+    -- η swap Creg ≈ η(actBy false) Creg, i.e. sym (H Creg) ○ collapse,
+    -- with the implicit C₂-object/point arguments bound explicitly:
+    -- composing them via the generic Equiv.trans (rather than plain
+    -- `trans` after binding down to the point-level equation) hits the
+    -- same higher-order-unification wall as before, since H is itself
+    -- an opaque bound variable.
     swap≈actBy-false : NaturalTransformation.η swap Creg ≈ NaturalTransformation.η (actBy false) Creg
-    swap≈actBy-false = {! !}
+    swap≈actBy-false {_} {s} = trans (sym (H Creg {_} {s})) (collapse {_} {s})
 
     -- Evaluate both sides at the point `lift false`, and at the dummy
     -- unit-argument `tt`: true ≡ false. This part is genuine, mechanical
