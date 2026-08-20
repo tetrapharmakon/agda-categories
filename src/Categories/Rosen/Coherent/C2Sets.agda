@@ -267,9 +267,9 @@ module _ (o : Level) where
   -- tracing through that (and the surrounding adjunction machinery) to
   -- prove for a generic X. Left open as an interesting fact in its own
   -- right, orthogonal to swap-is-counterexample below.
-  ι-id≈actBy-false : ∀ X →
-                      NaturalTransformation.η (ι {A = unit} id) X ≈ NaturalTransformation.η (actBy false) X
-  ι-id≈actBy-false = λ X → {! !}
+  -- ι-id≈actBy-false : ∀ X →
+  --                     NaturalTransformation.η (ι {A = unit} id) X ≈ NaturalTransformation.η (actBy false) X
+  -- ι-id≈actBy-false = λ X → {! !}
 
   -- Steps 1-3 combined at Creg: η(ι(p swap)) Creg ≈ η(actBy false) Creg.
   -- Closes by refl directly -- Creg's action computes by xor, which
