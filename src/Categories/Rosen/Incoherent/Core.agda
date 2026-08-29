@@ -82,16 +82,16 @@ record iMR2⇒ (X Y : iMR2₀) : Set (o ⊔ ℓ ⊔ e) where
     }
   ; assoc = λ { {A} {B} {C} {D} {f} {g} {h} →
     ( assoc {f = iMR2⇒.l f} {g = iMR2⇒.l g} {h = iMR2⇒.l h})
-    , (assoc {f = iMR2⇒.r f} {g = iMR2⇒.r g} {h = iMR2⇒.r h}) } -- assoc , assoc
+    , (assoc {f = iMR2⇒.r f} {g = iMR2⇒.r g} {h = iMR2⇒.r h}) }
   ; sym-assoc = λ { {A} {B} {C} {D} {f} {g} {h} →
     ( sym-assoc {f = iMR2⇒.l f} {g = iMR2⇒.l g} {h = iMR2⇒.l h})
-    , (sym-assoc {f = iMR2⇒.r f} {g = iMR2⇒.r g} {h = iMR2⇒.r h}) } -- sym-assoc , sym-assoc
+    , (sym-assoc {f = iMR2⇒.r f} {g = iMR2⇒.r g} {h = iMR2⇒.r h}) }
   ; identityˡ = λ { {A} {B} {f} → identityˡ {f = iMR2⇒.l f}
                   , identityˡ {f = iMR2⇒.r f}
-                  } -- identityˡ , identityˡ
+                  }
   ; identityʳ = λ { {A} {B} {f} → identityʳ {f = iMR2⇒.l f}
                   , identityʳ {f = iMR2⇒.r f}
-                  } -- identityʳ , identityʳ
+                  }
   ; identity² = identity² , identity²
   ; equiv = record
     { refl = refl , refl

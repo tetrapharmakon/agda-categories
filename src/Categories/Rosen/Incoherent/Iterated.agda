@@ -118,9 +118,9 @@ deg₀² = record
     ; eqf = S.h.eqf
     ; eqΦ = S.h.eqΦ
     }
-  ; identity = λ {A} → refl , refl -- refl , refl , refl , refl
-  ; homomorphism = λ {X} {Y} {Z} {f} {g} → refl , refl -- refl , refl , refl , refl
-  ; F-resp-≈ = λ {A} {B} {f} {g} z → z .proj₁ -- λ z → z .proj₁ .proj₁ , z .proj₂ .proj₁
+  ; identity = λ {A} → refl , refl
+  ; homomorphism = λ {X} {Y} {Z} {f} {g} → refl , refl
+  ; F-resp-≈ = λ {A} {B} {f} {g} z → z .proj₁
   }
 
 deg₂² : Functor iMRSᴵᴵ τ[iMR2]
@@ -134,9 +134,9 @@ deg₂² = record
     ; eqf = S.k.eqf
     ; eqΦ = S.k.eqΦ
     }
-  ; identity = λ {A} → refl , refl -- refl , refl , refl , refl
-  ; homomorphism = λ {X} {Y} {Z} {f} {g} → refl , refl -- refl , refl , refl , refl
-  ; F-resp-≈ = λ {A} {B} {f} {g} z → z .proj₂ -- λ z → z .proj₁ .proj₁ , z .proj₂ .proj₁
+  ; identity = λ {A} → refl , refl
+  ; homomorphism = λ {X} {Y} {Z} {f} {g} → refl , refl
+  ; F-resp-≈ = λ {A} {B} {f} {g} z → z .proj₂
   }
 
 comp : Functor iMRSᴵᴵ τ[iMR2]

@@ -221,7 +221,7 @@ MRS-Profunctor = record
     { _⟨$⟩_ = λ {⟪ f , Φ ⟫ → ⟪ v ∘ f ∘ u , Φ ⟫ }
     ; cong = λ { {⟪ f , Φ ⟫} {⟪ g , Φ' ⟫} (f≈g , Φ≈Φ') →
         (∘-resp-≈ Equiv.refl (∘-resp-≈ f≈g Equiv.refl))
-      , Φ≈Φ' -- (λ {x} → ∘-resp-≈ʳ (Φ≈Φ' {x}))
+      , Φ≈Φ'
       }
     }}
   -- F₁ leaves Φ strictly alone, so every Φ-component below is the hypothesis itself.

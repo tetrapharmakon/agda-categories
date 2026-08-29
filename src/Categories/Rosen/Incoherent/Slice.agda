@@ -2,7 +2,6 @@
 
 open import Categories.Category using (Category)
 open import Level using (_⊔_)
--- open import Categories.Category.Cartesian using (BinaryProducts)
 open import Categories.Category.BinaryProducts using (BinaryProducts)
 open import Categories.Category.Monoidal using (Monoidal)
 open import Categories.Category.Monoidal.Closed using (Closed)
