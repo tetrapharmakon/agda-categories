@@ -28,6 +28,7 @@ open import Categories.NaturalTransformation.Equivalence using (_≃_)
 
 import Reason
 open Reason C
+open HomReasoning
 
 open Closed Cl using (adjoint; unitorˡ;unitorʳ-commute-to; unitorʳ-commute-from;unitorʳ; [-,-]; unit; [_,_]₀; [_,-]; [-,_]; [_,_]₁; _⊗₁_)
 
@@ -223,12 +224,15 @@ MRS-Profunctor = record
       , Φ≈Φ' -- (λ {x} → ∘-resp-≈ʳ (Φ≈Φ' {x}))
       }
     }}
-  ; identity = λ { {(A , B)} {⟪ f , Φ ⟫} {⟪ g , Φ' ⟫} →
-      let module Hom = Functor [-,-] in
-      let module CodF = Functor Cod in
-        ( λ (f≈g , Φ≈Φ') → Equiv.trans identityˡʳ f≈g
-        , λ { {h} → _ .proj₂ })
-     }
-  ; homomorphism = λ x → {!  !} , λ {x₂} → x .proj₂
+  -- F₁ leaves Φ strictly alone, so every Φ-component below is the hypothesis itself.
+  ; identity = λ { {(A , B)} {⟪ f , Φ ⟫} {⟪ g , Φ' ⟫} (f≈g , Φ≈Φ') →
+      Equiv.trans identityˡʳ f≈g , Φ≈Φ' }
+  ; homomorphism = λ { {f = (u₁ , v₁)} {g = (u₂ , v₂)} {⟪ f , Φ ⟫} {⟪ g , Φ' ⟫} (f≈g , Φ≈Φ') →
+      (begin (v₂ ∘ v₁) ∘ f ∘ u₁ ∘ u₂     ≈˘⟨ assoc ○ assoc ⟩
+             (((v₂ ∘ v₁) ∘ f) ∘ u₁) ∘ u₂ ≈⟨ (refl⟩∘⟨ f≈g) ⟩∘⟨refl ⟩∘⟨refl ⟩
+             (((v₂ ∘ v₁) ∘ g) ∘ u₁) ∘ u₂ ≈⟨ (assoc ⟩∘⟨refl) ○ (assoc ⟩∘⟨refl) ⟩
+             (v₂ ∘ (v₁ ∘ (g ∘ u₁))) ∘ u₂ ≈⟨ assoc ○ sym-assoc ○ assoc ⟩
+             v₂ ∘ (v₁ ∘ g ∘ u₁) ∘ u₂     ∎)
+    , Φ≈Φ' }
   ; F-resp-≈ = λ x x₁ → (∘-resp-≈ (x .proj₂) (∘-resp-≈ (x₁ .proj₁) (x .proj₁))) , (x₁ .proj₂)
   }

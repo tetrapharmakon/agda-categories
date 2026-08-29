@@ -11,7 +11,7 @@ module Categories.Rosen.Incoherent.HigherMRS
 
 open import Data.Empty using (⊥-elim)
 open import Data.Nat using (ℕ; zero; suc; _≟_; _≤_; z≤n; s≤s; _+_)
-open import Data.Nat.Properties using (≤-poset; ≤-refl; ≤-trans; n≤1+n)
+open import Data.Nat.Properties using (≤-poset; ≤-refl; ≤-trans; n≤1+n; ≡-irrelevant)
 open import Data.Product using (Σ; _,_; proj₁; proj₂; ∃; ∃-syntax; Σ-syntax)
 open import Data.Sum using (_⊎_; inj₁; inj₂)
 open import Relation.Binary using (Antisymmetric)
@@ -190,9 +190,18 @@ impossibl : ∀ {n} → ¬ (suc n ≤2 n)
 impossibl {zero} ()
 impossibl {suc n} r = impossibl {n = n} (inv r)
 
+-- ≤2-refl is the only inhabitant of m ≤2 m, but splitting on it twice *at the
+-- same index* asks the unifier to eliminate the reflexive equation m ≟ m of
+-- type ℕ, which is exactly axiom K.  Carrying the index equality as an explicit
+-- argument means each clause splits on a single proof, which is K-free.
+-- (ℕ has decidable equality, so UIP for it is available K-free from the
+-- standard library; that is what lets the ≤2-refl clause discharge its subst.)
+onlyrefl : ∀ {m n} (b : m ≤2 n) (e : m ≡ n) → subst (_≤′ n) e (reconvert b) ≈′ ≤′-refl
+onlyrefl ≤2-refl    e rewrite ≡-irrelevant e ≡-refl = refe
+onlyrefl (≤2-inc r) e = ⊥-elim (impossibl (subst (_≤2 _) e r))
+
 contractible-one-steeep : ∀ {m n} {a b : m ≤2 n} → reconvert a ≈′ reconvert b
-contractible-one-steeep {a = ≤2-refl} {b = ≤2-refl} = refe
-contractible-one-steeep {a = ≤2-refl} {b = ≤2-inc b} = ⊥-elim (impossibl b)
+contractible-one-steeep {a = ≤2-refl} {b = b} = symm (onlyrefl b ≡-refl)
 contractible-one-steeep {a = ≤2-inc a} {b = ≤2-refl} = ⊥-elim (impossibl a)
 contractible-one-steeep {a = ≤2-inc a} {b = ≤2-inc b} = trans-cong contractible-one-steeep refe
 
