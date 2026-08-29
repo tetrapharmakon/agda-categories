@@ -1,6 +1,6 @@
 .PHONY: check clean
 
-AGDA    := /tmp/agda-wrapper -i src --warning=noUserWarning --warning=noUnsupportedIndexedMatch --warning=noUselessPrivate
+AGDA    := agda -i src --warning=noUserWarning --warning=noUnsupportedIndexedMatch --warning=noUselessPrivate
 AGDA_OUT:= agda-check.log
 SOURCES := $(shell find . -name '*.agda' -not -path './Functorial/*')
 ALL     := $(sort $(SOURCES))
