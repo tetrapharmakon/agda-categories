@@ -117,7 +117,7 @@ module _ (o : Level) where
     { η = λ X x → f.η X x , g.η X x
     ; commute = λ h → cong₂ _,_ (f.commute h) (g.commute h)
     }
-    where module f = NaturalTransformation f 
+    where module f = NaturalTransformation f
           module g = NaturalTransformation g
 
   -- Every element of C₂ is self-inverse (b ∘ b ≈ e), so every C₂-set's

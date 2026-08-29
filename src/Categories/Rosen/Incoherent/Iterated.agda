@@ -31,7 +31,7 @@ open import Categories.Rosen.Incoherent.Functors Cl
 
 
 {-
-This implementation of the span composition 
+This implementation of the span composition
 
  ↙ iMRS  ↘  ↙ iMRS  ↘
 C         C          C
@@ -40,7 +40,7 @@ is simpler than the isoComma object.
 
 here I want to define a category iMRSᴵᴵ having:
 
-for objects iMRSᴵᴵ₀ a record containing as fields 
+for objects iMRSᴵᴵ₀ a record containing as fields
 - an iMRS A B
 - an iMRS B Y
 
@@ -76,22 +76,22 @@ iMRSᴵᴵ : Category (o ⊔ ℓ) (o ⊔ ℓ ⊔ e) e
 iMRSᴵᴵ = record
   { Obj = iMRSᴵᴵ₀
   ; _⇒_ = λ s t → iMRSᴵᴵ⇒ s t
-  ; _≈_ = λ p q → 
-    let module p = iMRSᴵᴵ⇒ p 
-        module q = iMRSᴵᴵ⇒ q 
+  ; _≈_ = λ p q →
+    let module p = iMRSᴵᴵ⇒ p
+        module q = iMRSᴵᴵ⇒ q
     in (p.h τ[iMR2].≈ q.h) × (p.k τ[iMR2].≈ q.k)
-  ; id = record 
-    { h = τ[iMR2].id 
-    ; k = τ[iMR2].id 
-    ; hᵣ≈kₗ = Equiv.refl 
+  ; id = record
+    { h = τ[iMR2].id
+    ; k = τ[iMR2].id
+    ; hᵣ≈kₗ = Equiv.refl
     }
-  ; _∘_ = λ p q → 
-    let module p = iMRSᴵᴵ⇒ p 
-        module q = iMRSᴵᴵ⇒ q 
-    in record 
-      { h = p.h τ[iMR2].∘ q.h 
-      ; k = p.k τ[iMR2].∘ q.k 
-      ; hᵣ≈kₗ = ∘-resp-≈ p.hᵣ≈kₗ q.hᵣ≈kₗ 
+  ; _∘_ = λ p q →
+    let module p = iMRSᴵᴵ⇒ p
+        module q = iMRSᴵᴵ⇒ q
+    in record
+      { h = p.h τ[iMR2].∘ q.h
+      ; k = p.k τ[iMR2].∘ q.k
+      ; hᵣ≈kₗ = ∘-resp-≈ p.hᵣ≈kₗ q.hᵣ≈kₗ
       }
   ; assoc = (assoc , assoc) , (assoc , assoc)
   ; sym-assoc = (sym-assoc , sym-assoc) , (sym-assoc , sym-assoc)
@@ -99,8 +99,8 @@ iMRSᴵᴵ = record
   ; identityʳ = (identityʳ , identityʳ) , identityʳ , identityʳ
   ; identity² = (identity² , identity²) , identity² , identity²
   -- junk automated proofs to refactor
-  ; equiv = record 
-    { refl = (refl , refl) , (refl , refl) 
+  ; equiv = record
+    { refl = (refl , refl) , (refl , refl)
     ; sym = λ x → (sym (x .proj₁ .proj₁) , sym (x .proj₁ .proj₂)) , sym (x .proj₂ .proj₁) , sym (x .proj₂ .proj₂)
     ; trans = λ x≈y y≈z → ((trans (x≈y .proj₁ .proj₁) (y≈z .proj₁ .proj₁)) , trans (x≈y .proj₁ .proj₂) (y≈z .proj₁ .proj₂)) , trans (x≈y .proj₂ .proj₁) (y≈z .proj₂ .proj₁) , trans (x≈y .proj₂ .proj₂) (y≈z .proj₂ .proj₂)
     }
@@ -109,13 +109,13 @@ iMRSᴵᴵ = record
 
 deg₀² : Functor iMRSᴵᴵ τ[iMR2]
 deg₀² = record
-  { F₀ = λ x → 
-    let module x = iMRSᴵᴵ₀ x 
+  { F₀ = λ x →
+    let module x = iMRSᴵᴵ₀ x
     in record { A = x.A ; B = x.B ; ξ = x.ξ₁ }
-  ; F₁ = λ S → let module S = iMRSᴵᴵ⇒ S in record 
-    { l = S.h.l 
-    ; r = S.h.r 
-    ; eqf = S.h.eqf 
+  ; F₁ = λ S → let module S = iMRSᴵᴵ⇒ S in record
+    { l = S.h.l
+    ; r = S.h.r
+    ; eqf = S.h.eqf
     ; eqΦ = S.h.eqΦ
     }
   ; identity = λ {A} → refl , refl -- refl , refl , refl , refl
@@ -125,13 +125,13 @@ deg₀² = record
 
 deg₂² : Functor iMRSᴵᴵ τ[iMR2]
 deg₂² = record
-  { F₀ = λ x → 
-    let module x = iMRSᴵᴵ₀ x 
+  { F₀ = λ x →
+    let module x = iMRSᴵᴵ₀ x
     in record { A = x.B ; B = x.Y ; ξ = x.ξ₂ }
-  ; F₁ = λ S → let module S = iMRSᴵᴵ⇒ S in record 
-    { l = S.k.l 
-    ; r = S.k.r 
-    ; eqf = S.k.eqf 
+  ; F₁ = λ S → let module S = iMRSᴵᴵ⇒ S in record
+    { l = S.k.l
+    ; r = S.k.r
+    ; eqf = S.k.eqf
     ; eqΦ = S.k.eqΦ
     }
   ; identity = λ {A} → refl , refl -- refl , refl , refl , refl
@@ -141,17 +141,17 @@ deg₂² = record
 
 comp : Functor iMRSᴵᴵ τ[iMR2]
 comp = record
-  { F₀ = λ x → 
-    let module x = iMRSᴵᴵ₀ x 
+  { F₀ = λ x →
+    let module x = iMRSᴵᴵ₀ x
         f = iMR2.f x.ξ₁
         g = iMR2.f x.ξ₂
         Φ = iMR2.Φ x.ξ₁
         Ψ = iMR2.Φ x.ξ₂
     in record { A = x.A ; B = x.Y ; ξ = ⟪ g ∘ f , [ f , id ]₁ ∘ Ψ ⟫ }
-  ; F₁ = λ S → let module S = iMRSᴵᴵ⇒ S in record 
-    { l = S.h.l 
-    ; r = S.k.r 
-    ; eqf = 
+  ; F₁ = λ S → let module S = iMRSᴵᴵ⇒ S in record
+    { l = S.h.l
+    ; r = S.k.r
+    ; eqf =
         let r' = S.k.r
             l' = S.k.l
             r = S.h.r

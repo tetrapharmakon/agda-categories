@@ -54,7 +54,7 @@ record MR2 (A B : Obj) : Set (o ⊔ ℓ ⊔ e) where
 
 -- MR2 as a Setoid: two MR2 elements are equal when their f components are equal
 -- and their Φ components are ≃-equal.
-  
+
 open import Categories.Functor.Construction.LiftSetoids using (LiftSetoids)
 
 MR2-Setoid : Obj → Obj → Setoid (o ⊔ ℓ ⊔ e) (o ⊔ ℓ ⊔ e)

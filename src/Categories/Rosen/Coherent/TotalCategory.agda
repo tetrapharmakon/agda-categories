@@ -32,22 +32,22 @@ record tot⇒ (x y : tab₀ MRS-Profunctor) : Set (o ⊔ ℓ ⊔ e) where
   module x = tab₀ x
   module y = tab₀ y
   field
-    l : x.L ⇒ y.L 
-    r : x.R ⇒ y.R 
-  
+    l : x.L ⇒ y.L
+    r : x.R ⇒ y.R
+
   f = MR2.f x.ξ
   g = MR2.f y.ξ
 
   module Φ = NT (MR2.Φ x.ξ)
   module ψ = NT (MR2.Φ y.ξ)
   module l*ψ = NT ((nHom l ∘ʳ Cod) ∘ᵥ MR2.Φ y.ξ)
-  
+
   field
     eqf : r ∘ f ≈ g ∘ l
     nat : ∀ {s t} (α : Arr.Morphism⇒ s t)
         → l*ψ.η t ∘ Arr.Morphism⇒.cod⇒ α
         ≈ Functor.F₁ [ x.L ,-] (Arr.Morphism⇒.cod⇒ α) ∘ Φ.η s
-  
+
   eqΦ : ∀ {t} → l*ψ.η t ≈ Φ.η t
   eqΦ {t} =
     Equiv.sym identityʳ
@@ -60,14 +60,14 @@ total = record
   { Obj = tab₀ MRS-Profunctor
   ; _⇒_ = λ s t → tot⇒ s t
   ; _≈_ = λ h k → tot⇒.l h ≈ tot⇒.l k × tot⇒.r h ≈ tot⇒.r k
-  ; id = λ { {(A , B) ∣ ⟪ f , Φ ⟫} → 
+  ; id = λ { {(A , B) ∣ ⟪ f , Φ ⟫} →
        let module ΦNT = NT Φ
            module l*Φ = NT ((nHom id ∘ʳ Cod) ∘ᵥ Φ)
        in
        [ id , id
        ∥ id-comm-sym C
-       , (λ {s} {t} α → 
-         elimˡ C [-,-].identity ⟩∘⟨refl 
+       , (λ {s} {t} α →
+         elimˡ C [-,-].identity ⟩∘⟨refl
          ○ ΦNT.commute α)
        ]}
   ; _∘_ = λ { {A} {B} {X} t t' →
@@ -78,7 +78,7 @@ total = record
            module Hx = Functor [ t'.x.L ,-]
            module Hy = Functor [ t.x.L ,-]
        in
-       [ t.l ∘ t'.l , t.r ∘ t'.r ∥ 
+       [ t.l ∘ t'.l , t.r ∘ t'.r ∥
          pullʳ C t'.eqf ○ pullˡ C t.eqf ○ assoc
        , (λ {s} {t₀} α →
            let r = Arr.Morphism⇒.cod⇒ α in

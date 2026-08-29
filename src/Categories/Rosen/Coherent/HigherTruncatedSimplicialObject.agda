@@ -73,7 +73,7 @@ MRS-defines-truncated-simplicial-object = record
   ; d₂²-s₁¹ = {!  !}
   ; face-degen₀₁ = {!  !}
   ; face-degen₂₀ = {!  !}
-  } 
+  }
 
 {-
   { X₀ = 𝟘-simplex

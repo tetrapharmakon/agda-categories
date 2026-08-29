@@ -97,7 +97,7 @@ MR2-Setoid A B = record
   }
 
 {-
-  X -- u --> Y 
+  X -- u --> Y
   |          |
 u |  u ⇒ id  |
   V          |
@@ -107,7 +107,7 @@ u⇒1 : ∀ {X Y} (u : X ⇒ Y) → Morphism⇒ C (record {arr = u}) (record {ar
 u⇒1 u = mor⇒ {dom⇒ = u} {cod⇒ = id} refl
 
 {-
-X -------- X 
+X -------- X
 |          |
 |  id ⇒ u  | u
 |          V
@@ -117,7 +117,7 @@ X ---u---> Y
 1⇒u u = mor⇒ {dom⇒ = id} {cod⇒ = u} refl
 
 {-
-X ---u---> Y 
+X ---u---> Y
 |          |
 |  id ⇒ id |
 |          |
@@ -140,47 +140,47 @@ module Naturalities {A B X Y} (ξ : MR2 A B) (u : X ⇒ Y) where
 
   Φid : (X Y : Obj) → Y ⇒ [ X , Y ]₀
   Φid X Y = Φη ξ (1⇒ {X} , 1⇒ {Y})
-  
+
   ΦYᵤ : Y ⇒ [ Y , Y ]₀
   ΦYᵤ = Φη ξ (1⇒ {Y} , u⇒)
 
   ΦXᵤ : Y ⇒ [ X , Y ]₀
   ΦXᵤ = Φη ξ (1⇒ {X} , u⇒)
-  
+
   Φᵤᵤ : Y ⇒ [ X , Y ]₀
-  Φᵤᵤ = Φη ξ (u⇒ , u⇒) 
+  Φᵤᵤ = Φη ξ (u⇒ , u⇒)
 
   ΦᵤY : Y ⇒ [ X , Y ]₀
   ΦᵤY = Φη ξ (u⇒ , 1⇒ {Y})
 
   ΦᵤX : X ⇒ [ X , X ]₀
   ΦᵤX = Φη ξ (u⇒ , 1⇒ {X})
-  
+
   --------------------
   -- naturality on 1⇒u:
-  -- 
+  --
   nat-1⇒uᴿ : Φᵤᵤ ∘ u ≈ [ id {X} , u ]₁ ∘ ΦᵤX
-  nat-1⇒uᴿ = Φcommute ξ (Category.id Arr.Arrow {A = u⇒} , 1⇒u u) 
-  
+  nat-1⇒uᴿ = Φcommute ξ (Category.id Arr.Arrow {A = u⇒} , 1⇒u u)
+
   nat-1⇒uᴸ : ΦXᵤ ≈ Φᵤᵤ -- ΦXᵤ ∘ id {Y} ≈ [ id {X} , id {Y} ]₁ ∘ Φᵤᵤ
   nat-1⇒uᴸ = sym-id-1 ∙ Φcommute ξ (1⇒u u , Category.id Arr.Arrow {A = u⇒}) ∙ cancel [-,-].identity
-  
+
   nat-1⇒u² : ΦXᵤ ∘ u ≈ [ id {X} , u ]₁ ∘ ΦᵤX
-  nat-1⇒u² = Φcommute ξ (1⇒u u , 1⇒u u)  
+  nat-1⇒u² = Φcommute ξ (1⇒u u , 1⇒u u)
   -- naturality on u⇒1:
-  -- 
+  --
   nat-u⇒1ᴿ : ΦᵤY ≈ Φᵤᵤ -- ΦᵤY ∘ id {Y} ≈ [ id {X} , id {Y} ]₁ ∘ Φᵤᵤ
   -- hence ΦXᵤ ≈ ΦᵤY by transitivity
   nat-u⇒1ᴿ = sym-id-1 ∙ Φcommute ξ (Category.id Arr.Arrow {A = u⇒} , u⇒1 u) ∙ cancel [-,-].identity
 
   nat-u⇒1ᴸ : Φᵤᵤ ≈ [ u , id {Y} ]₁ ∘ ΦYᵤ -- Φᵤᵤ ∘ id {Y} ≈ [ u , id {Y} ]₁ ∘ ΦYᵤ
-  nat-u⇒1ᴸ = sym-id-1 ∙ Φcommute ξ (u⇒1 u , Category.id Arr.Arrow {A = u⇒}) 
+  nat-u⇒1ᴸ = sym-id-1 ∙ Φcommute ξ (u⇒1 u , Category.id Arr.Arrow {A = u⇒})
 
   nat-u⇒1² : ΦᵤY ≈ [ u , id {Y} ]₁ ∘ ΦYᵤ -- ΦᵤY ∘ id {Y} ≈ [ u , id {Y} ]₁ ∘ ΦYᵤ
-  nat-u⇒1² = sym-id-1 ∙ Φcommute ξ (u⇒1 u , u⇒1 u) 
-  
+  nat-u⇒1² = sym-id-1 ∙ Φcommute ξ (u⇒1 u , u⇒1 u)
+
   -- naturality on 1⇒1:
-  -- 
+  --
   nat-1⇒1ᴿ : ΦᵤY ∘ u ≈ [ id {X} , u ]₁ ∘ ΦᵤX
   nat-1⇒1ᴿ = Φcommute ξ (Category.id Arr.Arrow {A = u⇒} , 1⇒1 u)
 

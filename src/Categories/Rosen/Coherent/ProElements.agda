@@ -41,39 +41,39 @@ module EltsCat (Fᵉ : Bifunctor (Category.op C) C (Setoids (o ⊔ ℓ ⊔ e) (o
       el : Setoid.Carrier (Functor.F₀ Fᵉ (A , B))
   -- Morphisms: (l : Y.A ⇒ X.A, r : X.B ⇒ Y.B) such that Fᵉ(l, r)(X.el) ≈ Y.el.
   record Elts⇒ (X Y : Elts₀) : Set (o ⊔ ℓ ⊔ e) where
-    module X = Elts₀ X 
+    module X = Elts₀ X
     module Y = Elts₀ Y
-    field 
-      l : Y.A ⇒ X.A 
-      r : X.B ⇒ Y.B 
-      eqElts : Setoid._≈_ (Functor.F₀ Fᵉ (Y.A , Y.B)) (Functor.F₁ Fᵉ (l , r) ⟨$⟩ X.el) Y.el 
+    field
+      l : Y.A ⇒ X.A
+      r : X.B ⇒ Y.B
+      eqElts : Setoid._≈_ (Functor.F₀ Fᵉ (Y.A , Y.B)) (Functor.F₁ Fᵉ (l , r) ⟨$⟩ X.el) Y.el
   -- The modified category of elements of Fᵉ.
   Elts : Category (o ⊔ ℓ ⊔ e) (o ⊔ ℓ ⊔ e) e
   Elts = record
     { Obj       = Elts₀
     ; _⇒_       = λ X Y → Elts⇒ X Y
-    ; _≈_       = λ f g → let module f = Elts⇒ f 
+    ; _≈_       = λ f g → let module f = Elts⇒ f
                               module g = Elts⇒ g
                           in f.l ≈ g.l × f.r ≈ g.r
-    ; id        = λ { {A} → record 
-      { l = id 
-      ; r = id 
+    ; id        = λ { {A} → record
+      { l = id
+      ; r = id
       ; eqElts = Functor.identity Fᵉ (Setoid.refl (Functor.F₀ Fᵉ (Elts₀.A A , Elts₀.B A)))
       }}
-    ; _∘_       = λ { {A} {B} {C} f g → 
-      let module f = Elts⇒ f 
+    ; _∘_       = λ { {A} {B} {C} f g →
+      let module f = Elts⇒ f
           module g = Elts⇒ g
           module F = Functor Fᵉ
           Fff = F.F₀ (f.Y.A , f.Y.B)
           Fgg = F.F₀ (g.X.A , g.X.B)
       in let module SR = SetoidR Fff
              open SR
-         in record 
-         { l = g.l ∘ f.l 
-         ; r = f.r ∘ g.r 
-         ; eqElts = begin F.F₁ (g.l ∘ f.l , f.r ∘ g.r) ⟨$⟩ g.X.el ≈⟨ F.homomorphism (Setoid.sym Fgg (Setoid.refl Fgg)) ⟩ 
-                          F.F₁ (f.l , f.r) ⟨$⟩ (F.F₁ (g.l , g.r) ⟨$⟩ g.X.el) ≈⟨ cong (F.F₁ (f.l , f.r)) g.eqElts ⟩ 
-                          F.F₁ (f.l , f.r) ⟨$⟩ f.X.el ≈⟨ f.eqElts ⟩ 
+         in record
+         { l = g.l ∘ f.l
+         ; r = f.r ∘ g.r
+         ; eqElts = begin F.F₁ (g.l ∘ f.l , f.r ∘ g.r) ⟨$⟩ g.X.el ≈⟨ F.homomorphism (Setoid.sym Fgg (Setoid.refl Fgg)) ⟩
+                          F.F₁ (f.l , f.r) ⟨$⟩ (F.F₁ (g.l , g.r) ⟨$⟩ g.X.el) ≈⟨ cong (F.F₁ (f.l , f.r)) g.eqElts ⟩
+                          F.F₁ (f.l , f.r) ⟨$⟩ f.X.el ≈⟨ f.eqElts ⟩
                           f.Y.el ∎
       } }
     ; assoc     = sym-assoc , assoc
@@ -81,13 +81,13 @@ module EltsCat (Fᵉ : Bifunctor (Category.op C) C (Setoids (o ⊔ ℓ ⊔ e) (o
     ; identityˡ = identityʳ , identityˡ
     ; identityʳ = identityˡ , identityʳ
     ; identity² = identity² , identity²
-    ; equiv = record 
-    { refl = refl , refl 
-    ; sym = λ x → (sym (proj₁ x)) , (sym (proj₂ x)) 
-    ; trans = λ eq eq' → (trans (proj₁ eq) (proj₁ eq')) , (trans (proj₂ eq) (proj₂ eq')) 
+    ; equiv = record
+    { refl = refl , refl
+    ; sym = λ x → (sym (proj₁ x)) , (sym (proj₂ x))
+    ; trans = λ eq eq' → (trans (proj₁ eq) (proj₁ eq')) , (trans (proj₂ eq) (proj₂ eq'))
     }
     ; ∘-resp-≈ = λ {(fst , snd) (fst' , snd') → (∘-resp-≈ fst' fst) , (∘-resp-≈ snd snd')}
-    } 
+    }
 
 open EltsCat F public
 
@@ -103,10 +103,10 @@ ElMRS = MRS.Elts
 ℝ : Functor ElMRS Arr.Arrow
 ℝ = record
   { F₀ = λ x → let module x = MRS.Elts₀ x in record { arr = MR2.Φη₀ x.el }
-  ; F₁ = λ { {X} {Y} f → 
-    let module X = MRS.Elts₀ X 
+  ; F₁ = λ { {X} {Y} f →
+    let module X = MRS.Elts₀ X
         module Y = MRS.Elts₀ Y
-        module f = MRS.Elts⇒ f 
+        module f = MRS.Elts⇒ f
     in let
       open NaturalTransformation
       open HomReasoning
@@ -133,7 +133,7 @@ ElMRS = MRS.Elts
       lem1 = begin
         η XE.Φ a           ≈˘⟨ identityʳ ⟩
         η XE.Φ a ∘ id     ≈⟨ commute XE.Φ t₁ ⟩
-        [ id , id ]₁ ∘ η XE.Φ b  ≈⟨ (Hom.identity ⟩∘⟨refl) ⟩ 
+        [ id , id ]₁ ∘ η XE.Φ b  ≈⟨ (Hom.identity ⟩∘⟨refl) ⟩
         id ∘ η XE.Φ b     ≈⟨ identityˡ ⟩
         η XE.Φ b          ∎
 
@@ -144,16 +144,16 @@ ElMRS = MRS.Elts
       lem3 = begin
         η YE.Φ c           ≈˘⟨ identityʳ ⟩
         η YE.Φ c ∘ id     ≈⟨ commute YE.Φ t₃ ⟩
-        [ id , id ]₁ ∘ η YE.Φ d ≈⟨ Hom.identity ⟩∘⟨refl ⟩ 
+        [ id , id ]₁ ∘ η YE.Φ d ≈⟨ Hom.identity ⟩∘⟨refl ⟩
         id ∘ η YE.Φ d     ≈⟨ identityˡ ⟩
         η YE.Φ d          ∎
 
       decompose : [ f.l , f.r ]₁ ≈ [ f.l , id ]₁ ∘ [ id , f.r ]₁
       decompose = [ [-,-] ]-decompose₁
 
-    in record 
+    in record
     { dom⇒ = f.r
-    ; cod⇒ = [ f.l , f.r ]₁  
+    ; cod⇒ = [ f.l , f.r ]₁
     ; square = begin
       [ f.l , f.r ]₁ ∘ η XE.Φ a
         ≈⟨ decompose ⟩∘⟨refl ○ assoc ⟩
@@ -176,10 +176,10 @@ ElMRS = MRS.Elts
 -- U₁: forgetful functor from ElMRS to the twisted arrow category of C.
 U₁ : Functor ElMRS TwistedArrow
 U₁ = record
-  { F₀ = λ {record { A = A ; B = B ; el = el } → 
+  { F₀ = λ {record { A = A ; B = B ; el = el } →
    record { arr = MR2.f el }}
   ; F₁ = λ {record { l = l ; r = r ; eqElts = eqElts } → mor⇒ {dom⇐ = l} {cod⇒ = r} (proj₁ eqElts) }
-  ; identity = let open HomReasoning in 
+  ; identity = let open HomReasoning in
     (sym identityˡ ○ identityʳ) , refl
   ; homomorphism = refl , refl
   ; F-resp-≈ = λ {A} {B} {f} {g} z → z

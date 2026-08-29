@@ -98,9 +98,9 @@ open import Categories.NaturalTransformation.NaturalIsomorphism as NI using (Nat
 MR2-Setoid : Obj → Obj → Setoid (o ⊔ suc ℓ ⊔ suc e) (o ⊔ ℓ ⊔ e) -- (o ⊔ ℓ ⊔ e) (o ⊔ ℓ ⊔ e)
 MR2-Setoid A B = record
   { Carrier = MR2 A B
-  ; _≈_ = λ (⟪ f , p , Φ ⟫) (⟪ g , q , Φ' ⟫) → 
-   (f ≈ g) × (Σ (NaturalIsomorphism p q) 
-     (λ t → let τ = NI.NaturalIsomorphism.F⇒G t 
+  ; _≈_ = λ (⟪ f , p , Φ ⟫) (⟪ g , q , Φ' ⟫) →
+   (f ≈ g) × (Σ (NaturalIsomorphism p q)
+     (λ t → let τ = NI.NaturalIsomorphism.F⇒G t
             in Φ ≃ Φ' ∘ᵥ τ))
   -- Every twist below has to be spelled out: the goal is an equality in Setoids,
   -- which Agda eta-expands into its pointwise "cong" form, so nothing about the

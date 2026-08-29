@@ -24,7 +24,7 @@ open MR
 open import Categories.Rosen.Incoherent.Core Cl
 open import Categories.Rosen.Incoherent.Elements Cl
 
-[_]A : Functor τ[iMR2] C 
+[_]A : Functor τ[iMR2] C
 [_]A = record
   { F₀ = λ x → let module x = iMR2₀ x in x.A
   ; F₁ = λ f → let module f = iMR2⇒ f in f.l
@@ -42,7 +42,7 @@ open import Categories.Rosen.Incoherent.Elements Cl
   ; F-resp-≈ = λ {A} {B} {f} {g} z → z .proj₂
   }
 
-[_]f : Functor τ[iMR2] Arr.Arrow 
+[_]f : Functor τ[iMR2] Arr.Arrow
 [_]f = record
   { F₀ = λ x → let module x = iMR2₀ x in record { dom = x.A ; cod = x.B ; arr = iMR2.f x.ξ }
   ; F₁ = λ f → let module f = iMR2⇒ f in mor⇒ f.eqf
@@ -55,12 +55,12 @@ open import Categories.Rosen.Incoherent.Repairs Cl
 
 [_]Φ : Functor τ[iMR2] irepairs
 [_]Φ = record
-  { F₀ = λ x → let module x = iMR2₀ x in record 
-    { A = x.A 
-    ; B = x.B 
-    ; Φ = iMR2.Φ x.ξ 
+  { F₀ = λ x → let module x = iMR2₀ x in record
+    { A = x.A
+    ; B = x.B
+    ; Φ = iMR2.Φ x.ξ
     }
-  ; F₁ = λ f → let module f = iMR2⇒ f in record 
+  ; F₁ = λ f → let module f = iMR2⇒ f in record
     { u = f.l
     ; v = f.r
     ; eq = f.eqΦ
@@ -79,10 +79,10 @@ open import Categories.Rosen.Incoherent.Mealy Cl
 
 module _ {X Y : iMR2₀} (f : twiMR2⇒ X Y) where
   module X = iMR2₀ X
-  ΦX = iMR2.Φ X.ξ 
+  ΦX = iMR2.Φ X.ξ
   ΦX* = adjoint.Radjunct ΦX
   module Y = iMR2₀ Y
-  ΦY = iMR2.Φ Y.ξ 
+  ΦY = iMR2.Φ Y.ξ
   ΦY* = adjoint.Radjunct ΦY
   module F = twiMR2⇒ f
   ε = adjoint.counit.η
@@ -91,23 +91,23 @@ module _ {X Y : iMR2₀} (f : twiMR2⇒ X Y) where
 
   lemma-epsilon :
     F.r ∘ ε X.B ∘ id ⊗₁ F.l ≈ ε Y.B ∘ [ F.l , F.r ]₁ ⊗₁ id
-  lemma-epsilon = 
+  lemma-epsilon =
     begin F.r ∘ ε X.B ∘ id ⊗₁ F.l                             ≈⟨ pullˡ C (adjoint.counit.sym-commute F.r) ∙ assoc ⟩
           ε Y.B ∘ [ id , F.r ]₁ ⊗₁ id ∘ id ⊗₁ F.l             ≈⟨ (refl⟩∘⟨ Equiv.sym [ ⊗ ]-commute) ⟩
           ε Y.B ∘ id ⊗₁ F.l ∘ [ id , F.r ]₁ ⊗₁ id             ≈⟨ pullˡ C (Equiv.sym (mate.commute₂ F.l {F.Y.B})) ⟩
           (ε Y.B ∘ [ F.l , id ]₁ ⊗₁ id) ∘ [ id , F.r ]₁ ⊗₁ id ≈⟨ assoc ⟩
           ε Y.B ∘ [ F.l , id ]₁ ⊗₁ id ∘ [ id , F.r ]₁ ⊗₁ id   ≈˘⟨ refl⟩∘⟨ -⊗A.homomorphism ⟩
-          ε Y.B ∘ ([ F.l , id ]₁ ∘ [ id , F.r ]₁) ⊗₁ id       ≈˘⟨ refl⟩∘⟨ -⊗A.F-resp-≈ [ [-,-] ]-decompose₁ ⟩ 
-          ε Y.B ∘ [ F.l , F.r ]₁ ⊗₁ id                                                     ∎ 
+          ε Y.B ∘ ([ F.l , id ]₁ ∘ [ id , F.r ]₁) ⊗₁ id       ≈˘⟨ refl⟩∘⟨ -⊗A.F-resp-≈ [ [-,-] ]-decompose₁ ⟩
+          ε Y.B ∘ [ F.l , F.r ]₁ ⊗₁ id                                                     ∎
 
   lemma-delta :
     [ F.l , F.r ]₁ ∘ adjoint.Ladjunct (ΦX* ∘ (ε X.B ⊗₁ id)) ∘ id ⊗₁ F.l
       ≈
     adjoint.Ladjunct (ΦY* ∘ (ε Y.B ⊗₁ id)) ∘ [ F.l , F.r ]₁ ⊗₁ id
-  lemma-delta = 
-    begin [ F.l , F.r ]₁ ∘ adjoint.Ladjunct (ΦX* ∘ ε F.X.B ⊗₁ id) ∘ id ⊗₁ F.l                 ≈⟨ refl⟩∘⟨ (adjoint.Ladjunct-comm′ ∙ ((adjoint.LRadjunct≈id ⟩∘⟨refl)) ⟩∘⟨refl) ⟩ 
-          [ F.l , F.r ]₁ ∘ (ΦX ∘ ε F.X.B) ∘ id ⊗₁ F.l                                         ≈⟨ refl⟩∘⟨ pullʳ C (Equiv.sym (mate.commute₂ F.l)) ⟩ 
-          [ F.l , F.r ]₁ ∘ ΦX ∘ ε F.X.B ∘ ([ F.l , id ]₁ ⊗₁ id)                               ≈⟨ refl⟩∘⟨ pullˡ C (adjoint.counit.sym-commute F.ξX.Φ) ⟩ 
+  lemma-delta =
+    begin [ F.l , F.r ]₁ ∘ adjoint.Ladjunct (ΦX* ∘ ε F.X.B ⊗₁ id) ∘ id ⊗₁ F.l                 ≈⟨ refl⟩∘⟨ (adjoint.Ladjunct-comm′ ∙ ((adjoint.LRadjunct≈id ⟩∘⟨refl)) ⟩∘⟨refl) ⟩
+          [ F.l , F.r ]₁ ∘ (ΦX ∘ ε F.X.B) ∘ id ⊗₁ F.l                                         ≈⟨ refl⟩∘⟨ pullʳ C (Equiv.sym (mate.commute₂ F.l)) ⟩
+          [ F.l , F.r ]₁ ∘ ΦX ∘ ε F.X.B ∘ ([ F.l , id ]₁ ⊗₁ id)                               ≈⟨ refl⟩∘⟨ pullˡ C (adjoint.counit.sym-commute F.ξX.Φ) ⟩
           [ F.l , F.r ]₁ ∘ (ε _ ∘ [ id , ΦX ]₁ ⊗₁ id) ∘ ([ F.l , id ]₁ ⊗₁ id)                 ≈⟨ sym-assoc ∙ (pullˡ C (adjoint.counit.sym-commute _) ⟩∘⟨refl) ⟩
           ((ε _ ∘ [ id , [ F.l , F.r ]₁ ]₁ ⊗₁ id) ∘ [ id , ΦX ]₁ ⊗₁ id) ∘ [ F.l , id ]₁ ⊗₁ id ≈⟨ anti-assoc-4 ∙ (refl⟩∘⟨ Equiv.sym ((-⊗A.homomorphism ○ refl⟩∘⟨ -⊗A.homomorphism))) ⟩
           ε _ ∘ ([ id , [ F.l , F.r ]₁ ]₁ ∘ [ id , ΦX ]₁ ∘ [ F.l , id ]₁) ⊗₁ id               ≈⟨ refl⟩∘⟨ -⊗A.F-resp-≈ (pullˡ C (Equiv.sym ([A-].homomorphism))) ⟩
@@ -124,31 +124,31 @@ module _ {X Y : iMR2₀} (f : twiMR2⇒ X Y) where
 
 Arbib : Functor τ'[iMR2] totalMealy
 Arbib = record
-  { F₀ = λ x → 
-    let module x = iMR2₀ x 
+  { F₀ = λ x →
+    let module x = iMR2₀ x
         module ξX = iMR2 x.ξ
         Φ* = adjoint.Radjunct ξX.Φ
-    in record 
-    { A = x.A 
-    ; B = x.B 
-    ; m = record 
-      { E = [ x.A , x.B ]₀ 
-      ; d = adjoint.Ladjunct (Φ* ∘ (adjoint.counit.η x.B ⊗₁ id)) 
-      ; s = adjoint.counit.η x.B 
-      } 
+    in record
+    { A = x.A
+    ; B = x.B
+    ; m = record
+      { E = [ x.A , x.B ]₀
+      ; d = adjoint.Ladjunct (Φ* ∘ (adjoint.counit.η x.B ⊗₁ id))
+      ; s = adjoint.counit.η x.B
+      }
     }
-  ; F₁ = λ f → 
-    let module f = twiMR2⇒ f 
+  ; F₁ = λ f →
+    let module f = twiMR2⇒ f
         module AX = adjoint {f.X.A}
         module AY = adjoint {f.Y.A}
         εXB = AX.counit.η f.X.B
         εYB = AY.counit.η f.Y.B
-    in record 
+    in record
       { l = f.l
-      ; r = f.r 
-      ; u = [ f.l , f.r ]₁ 
-      ; d-eq = lemma-delta f 
-      ; s-eq = lemma-epsilon f 
+      ; r = f.r
+      ; u = [ f.l , f.r ]₁
+      ; d-eq = lemma-delta f
+      ; s-eq = lemma-epsilon f
       }
   ; identity = refl , refl , [-,-].identity
   ; homomorphism = refl , refl , [-,-].homomorphism

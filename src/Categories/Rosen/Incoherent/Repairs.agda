@@ -60,10 +60,10 @@ irepairs = record
   ; _∘_ = λ f g →
     let module f = irep⇒ f
         module g = irep⇒ g
-    in record { u = f.u ∘ g.u ; v = f.v ∘ g.v 
-         ; eq = begin [ f.u ∘ g.u , id ]₁ ∘ f.Y.Φ ∘ f.v ∘ g.v ≈⟨ Functor.homomorphism ([-, _ ]) ⟩∘⟨refl ⟩ 
-                      ([ g.u , id ]₁ ∘ [ f.u , id ]₁ ) ∘ f.Y.Φ ∘ f.v ∘ g.v ≈⟨ (refl⟩∘⟨ sym-assoc) ○ assoc ○ (refl⟩∘⟨ sym-assoc) ○ refl⟩∘⟨ (f.eq ⟩∘⟨refl ) ⟩ 
-                      [ g.u , id ]₁ ∘ ([ id , f.v ]₁ ∘ g.Y.Φ) ∘ g.v ≈⟨ refl⟩∘⟨ assoc ○ pullˡ C ((Equiv.sym [ [-,-] ]-commute)) ⟩ 
+    in record { u = f.u ∘ g.u ; v = f.v ∘ g.v
+         ; eq = begin [ f.u ∘ g.u , id ]₁ ∘ f.Y.Φ ∘ f.v ∘ g.v ≈⟨ Functor.homomorphism ([-, _ ]) ⟩∘⟨refl ⟩
+                      ([ g.u , id ]₁ ∘ [ f.u , id ]₁ ) ∘ f.Y.Φ ∘ f.v ∘ g.v ≈⟨ (refl⟩∘⟨ sym-assoc) ○ assoc ○ (refl⟩∘⟨ sym-assoc) ○ refl⟩∘⟨ (f.eq ⟩∘⟨refl ) ⟩
+                      [ g.u , id ]₁ ∘ ([ id , f.v ]₁ ∘ g.Y.Φ) ∘ g.v ≈⟨ refl⟩∘⟨ assoc ○ pullˡ C ((Equiv.sym [ [-,-] ]-commute)) ⟩
                       ([ id , f.v ]₁ ∘ [ g.u , id ]₁) ∘ g.Y.Φ ∘ g.v ≈⟨ pullʳ C (g.eq) ⟩
                       [ id , f.v ]₁ ∘ [ id , g.v ]₁ ∘ g.X.Φ ≈⟨ pullˡ C (Equiv.sym (Functor.homomorphism [ _ ,-])) ⟩
                       [ id , f.v ∘ g.v ]₁ ∘ g.X.Φ ∎ }

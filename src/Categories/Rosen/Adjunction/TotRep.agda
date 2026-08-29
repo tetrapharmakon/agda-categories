@@ -30,14 +30,14 @@ open MR
 -- The coreflector of total on the category of repairs
 K : Functor total repairs
 K = record
-  { F₀ = λ x → 
+  { F₀ = λ x →
       let module x = tab₀ x
-          module ξx = MR2 x.ξ 
+          module ξx = MR2 x.ξ
       in record { A = x.L ; Φ = ξx.Φ }
-  ; F₁ = λ { {x} {y} f → 
+  ; F₁ = λ { {x} {y} f →
       let module x = tab₀ x
           module y = tab₀ y
-          module f = tot⇒ f 
+          module f = tot⇒ f
       in record { u = f.l ; eq = f.eqΦ } }
   ; identity = λ {A} → Equiv.refl
   ; homomorphism = Equiv.refl
@@ -45,17 +45,17 @@ K = record
   }
 
 -- [_,Cod] : (X : Obj) → Functor C C
--- [ X ,Cod] = 
+-- [ X ,Cod] =
 
 [_,Cod]₁ : ∀ {A A'} → (u : A ⇒ A') → NT ([ A' ,-] ∘F Cod) ([ A ,-] ∘F Cod)
 [ u ,Cod]₁ = nHom u ∘ʳ Cod
 
 -- the inclusion of repairs in total
-𝕁 : Functor repairs total 
+𝕁 : Functor repairs total
 𝕁 = record
   { F₀ = λ {(record { A = A ; Φ = Φ }) → (A , A) ∣ ⟪ id , Φ ⟫}
   ; F₁ = λ { {X} {Y} f → let module f = rep⇒ f in
-  [ f.u , f.u 
+  [ f.u , f.u
   ∥ id-comm C , (λ {s} {t} α →
       let module X₀ = rep₀ X
           module Y₀ = rep₀ Y
@@ -73,13 +73,13 @@ K = record
   ; F-resp-≈ = λ x → x , x
   }
 
--- J and K are adjoint 
-𝕁⊣K : 𝕁 ⊣ K 
+-- J and K are adjoint
+𝕁⊣K : 𝕁 ⊣ K
 -- note that J is full and faithful (unit is id)
-𝕁⊣K = record 
- { unit = ntHelper (record 
-   { η = λ {record { A = A ; Φ = Φ } → record 
-      { u = id 
+𝕁⊣K = record
+ { unit = ntHelper (record
+   { η = λ {record { A = A ; Φ = Φ } → record
+      { u = id
       ; eq =  elimˡ C [-,-].identity
       } }
     ; commute = λ f →
@@ -87,11 +87,11 @@ K = record
         begin
           id ∘ f.u ≈⟨ identityˡ ⟩
           f.u      ≈⟨ Equiv.sym identityʳ ⟩
-          f.u ∘ id ∎ }) 
-  ; counit = ntHelper (record 
-    { η = λ {((L , R) ∣ ξ) → 
-      [ id , MR2.f ξ 
-      ∥ Equiv.refl 
+          f.u ∘ id ∎ })
+  ; counit = ntHelper (record
+    { η = λ {((L , R) ∣ ξ) →
+      [ id , MR2.f ξ
+      ∥ Equiv.refl
      , (λ {s} {t} α →
            let module Φ = NT (MR2.Φ ξ)
                r = Arr.Morphism⇒.cod⇒ α
@@ -103,7 +103,7 @@ K = record
     ; commute = λ f →
         let module f = tot⇒ f in
         ( Equiv.trans identityˡ (Equiv.sym identityʳ)
-        , Equiv.sym f.eqf ) }) 
-  ; zig = identity² , identity² 
-  ; zag = λ {B} → identity² 
+        , Equiv.sym f.eqf ) })
+  ; zig = identity² , identity²
+  ; zag = λ {B} → identity²
   }

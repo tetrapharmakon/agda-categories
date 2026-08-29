@@ -30,7 +30,7 @@ open MR
 
 
 -- Eq: functor from the total category to the tabulator (identity on objects).
-Eq : Functor total (Tabulator MRS-Profunctor) 
+Eq : Functor total (Tabulator MRS-Profunctor)
 Eq = record
   { F₀ = λ x → x
   ; F₁ = λ { {x} {y} f →
@@ -57,7 +57,7 @@ Eq = record
   }
 
 -- Eq⁻¹: functor from the tabulator to the total category (identity on objects).
-Eq⁻¹ : Functor (Tabulator MRS-Profunctor) total 
+Eq⁻¹ : Functor (Tabulator MRS-Profunctor) total
 Eq⁻¹ = record
   { F₀ = λ x → x
   ; F₁ = λ { {x} {y} f →
@@ -79,8 +79,8 @@ Eq⁻¹ = record
       , (λ {s} {t} α →
           let r = Arr.Morphism⇒.cod⇒ α
               eqΦt : l*ψ.η t ≈ Φ.η t
-              eqΦt = begin l*ψ.η t ≈⟨ Equiv.sym eqΦ ⟩ 
-                           [ id , id ]₁ ∘ Φ.η t ≈⟨ (elimˡ C [-,-].identity) ⟩ 
+              eqΦt = begin l*ψ.η t ≈⟨ Equiv.sym eqΦ ⟩
+                           [ id , id ]₁ ∘ Φ.η t ≈⟨ (elimˡ C [-,-].identity) ⟩
                            Φ.η t ∎
           in eqΦt ⟩∘⟨refl ○ Φ.commute α) ] }
   ; identity = Equiv.refl , Equiv.refl

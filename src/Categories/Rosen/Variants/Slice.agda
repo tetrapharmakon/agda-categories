@@ -63,9 +63,9 @@ MR2-Setoid A B = record
   { Carrier = MR2 A B
   ; _≈_ = λ (⟪ f , Φ ⟫) (⟪ g , Φ' ⟫) → (f ≈ g)
   ; isEquivalence = record
-    { refl = Equiv.refl 
-    ; sym = λ pf → Equiv.sym pf 
-    ; trans = λ pf₁ pf₂ → Equiv.trans pf₁ pf₂ 
+    { refl = Equiv.refl
+    ; sym = λ pf → Equiv.sym pf
+    ; trans = λ pf₁ pf₂ → Equiv.trans pf₁ pf₂
     }
   }
 

@@ -39,26 +39,26 @@ record twiMR2⇒ (X Y : iMR2₀) : Set (o ⊔ ℓ ⊔ e) where
     eqΦ : ξY.Φ ∘ r ≈ [ l , r ]₁ ∘ ξX.Φ
 
 -- τ'[iMR2]: twisted category of incoherent (M,R)-systems.
-τ'[iMR2] : Category (o ⊔ ℓ) (o ⊔ ℓ ⊔ e) e 
+τ'[iMR2] : Category (o ⊔ ℓ) (o ⊔ ℓ ⊔ e) e
 τ'[iMR2] = record
   { Obj = iMR2₀
   ; _⇒_ = λ s t → twiMR2⇒ s t
   ; _≈_ = λ f g → let open twiMR2⇒ in f .l ≈ g .l × f .r ≈ g .r
-  ; id = record 
-    { l = id 
-    ; r = id 
-    ; eqf = trans identityˡ identityʳ 
-    ; eqΦ = id-swap ○ Equiv.sym [-,-].identity ⟩∘⟨refl 
+  ; id = record
+    { l = id
+    ; r = id
+    ; eqf = trans identityˡ identityʳ
+    ; eqΦ = id-swap ○ Equiv.sym [-,-].identity ⟩∘⟨refl
     }
-  ; _∘_ = λ f g → 
-    let module f = twiMR2⇒ f  
-        module g = twiMR2⇒ g 
+  ; _∘_ = λ f g →
+    let module f = twiMR2⇒ f
+        module g = twiMR2⇒ g
         module Hom  {A} = Functor (appʳ [-,-] A)
         module Hom' {A} = Functor (appˡ [-,-] A)
-    in record 
-      { l = g.l ∘ f.l 
-      ; r = f.r ∘ g.r 
-      ; eqf = assoc ○ refl⟩∘⟨ rw-3-1 g.eqf ○ f.eqf 
+    in record
+      { l = g.l ∘ f.l
+      ; r = f.r ∘ g.r
+      ; eqf = assoc ○ refl⟩∘⟨ rw-3-1 g.eqf ○ f.eqf
       ; eqΦ = pullˡ C f.eqΦ ○ pullʳ C g.eqΦ ○ pullˡ C (Equiv.sym [-,-].homomorphism) }
   ; assoc = sym-assoc , assoc
   ; sym-assoc = assoc , sym-assoc

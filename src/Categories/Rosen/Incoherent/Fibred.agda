@@ -31,13 +31,13 @@ open MR
 record iMR2ᴿ₀ (A : Obj) : Set (o ⊔ ℓ ⊔ e) where
   field
     B : Obj
-    ξ : iMR2 A B 
+    ξ : iMR2 A B
 
 -- iMR2ᴿ⇒: morphisms in the fibre over A: v : X.B ⇒ Y.B compatible with f and Φ.
 record iMR2ᴿ⇒ {A : Obj} (X Y : iMR2ᴿ₀ A) : Set (o ⊔ ℓ ⊔ e) where
   module X = iMR2ᴿ₀ X
-  module Y = iMR2ᴿ₀ Y   
-  module ξX = iMR2 X.ξ  
+  module Y = iMR2ᴿ₀ Y
+  module ξX = iMR2 X.ξ
   module ξY = iMR2 Y.ξ
   field
     v : X.B ⇒ Y.B
@@ -49,26 +49,26 @@ iMR2ᴿ : (A : Obj) → Category (o ⊔ ℓ ⊔ e) (o ⊔ ℓ ⊔ e) e
 iMR2ᴿ A = record
   { Obj = iMR2ᴿ₀ A
   ; _⇒_ = λ X Y → iMR2ᴿ⇒ {A} X Y
-  ; _≈_ = λ p q → let module p = iMR2ᴿ⇒ p 
+  ; _≈_ = λ p q → let module p = iMR2ᴿ⇒ p
                       module q = iMR2ᴿ⇒ q
                   in p.v ≈ q.v
-  ; id = record 
-    { v = id 
-    ; eqf = id-0 
+  ; id = record
+    { v = id
+    ; eqf = id-0
     ; eqΦ = Equiv.trans (cancel (Functor.identity [-,-])) (sym-id-1) }
-  ; _∘_ = λ p q → 
-    let module p = iMR2ᴿ⇒ p 
+  ; _∘_ = λ p q →
+    let module p = iMR2ᴿ⇒ p
         module q = iMR2ᴿ⇒ q
-    in record 
+    in record
       { v = p.v ∘ q.v
-      ; eqf = pullʳ C q.eqf ∙ p.eqf 
+      ; eqf = pullʳ C q.eqf ∙ p.eqf
       ; eqΦ = let module Hom = Functor [-,-]
                   module Hom[1-] {A} = Functor (appˡ [-,-] A)
-                  module Hom[-1] {A} = Functor (appʳ [-,-] A) 
-              in (begin [ id , p.v ∘ q.v ]₁ ∘ q.ξX.Φ ≈⟨ pushˡ C Hom[1-].homomorphism ⟩  
-                        [ id , p.v ]₁ ∘ [ id , q.v ]₁ ∘ q.ξX.Φ ≈⟨ refl⟩∘⟨ q.eqΦ ⟩  
-                        [ id , p.v ]₁ ∘ q.ξY.Φ ∘ q.v ≈⟨ rw-2-1 p.eqΦ ∙ assoc ⟩  
-                        p.ξY.Φ ∘ p.v ∘ q.v ∎) 
+                  module Hom[-1] {A} = Functor (appʳ [-,-] A)
+              in (begin [ id , p.v ∘ q.v ]₁ ∘ q.ξX.Φ ≈⟨ pushˡ C Hom[1-].homomorphism ⟩
+                        [ id , p.v ]₁ ∘ [ id , q.v ]₁ ∘ q.ξX.Φ ≈⟨ refl⟩∘⟨ q.eqΦ ⟩
+                        [ id , p.v ]₁ ∘ q.ξY.Φ ∘ q.v ≈⟨ rw-2-1 p.eqΦ ∙ assoc ⟩
+                        p.ξY.Φ ∘ p.v ∘ q.v ∎)
       }
   ; assoc = assoc
   ; sym-assoc = sym-assoc
@@ -86,27 +86,27 @@ private
 -- MRSreindex u: reindexing functor iMR2ᴿ A' → iMR2ᴿ A along u : A ⇒ A'.
 MRSreindex : (u : A ⇒ A') → Functor (iMR2ᴿ A') (iMR2ᴿ A)
 MRSreindex {A} {A'} u = record
-  { F₀ = λ { x → 
+  { F₀ = λ { x →
     let module x = iMR2ᴿ₀ x
         f =  iMR2.f x.ξ
         Φ = iMR2.Φ x.ξ
-    in record 
+    in record
     { B = x.B
-    ; ξ = ⟪ f ∘ u , [ u , id ]₁ ∘ Φ ⟫ 
+    ; ξ = ⟪ f ∘ u , [ u , id ]₁ ∘ Φ ⟫
     }}
-  ; F₁ = λ { {x} {y} f → 
+  ; F₁ = λ { {x} {y} f →
       let module x   = iMR2ᴿ₀ x
           module ξx  = iMR2 x.ξ
           module y   = iMR2ᴿ₀ y
           module ξy  = iMR2 y.ξ
-          module f = iMR2ᴿ⇒ f 
-      in record 
+          module f = iMR2ᴿ⇒ f
+      in record
     { v = f.v
-    ; eqf = begin f.v ∘ f.ξX.f ∘ u   ≈⟨ sym-assoc ⟩ 
-                  (f.v ∘ f.ξX.f) ∘ u ≈⟨ f.eqf ⟩∘⟨refl ⟩ 
+    ; eqf = begin f.v ∘ f.ξX.f ∘ u   ≈⟨ sym-assoc ⟩
+                  (f.v ∘ f.ξX.f) ∘ u ≈⟨ f.eqf ⟩∘⟨refl ⟩
                   f.ξY.f ∘ u         ∎
     ; eqΦ = begin [ id , f.v ]₁ ∘ [ u , id ]₁ ∘ f.ξX.Φ ≈⟨ sym-assoc ∙ ([ [-,-] ]-commute ⟩∘⟨refl) ∙ assoc ⟩
-                  [ u , id ]₁ ∘ [ id , f.v ]₁ ∘ f.ξX.Φ ≈⟨ (refl⟩∘⟨ f.eqΦ) ∙ sym-assoc ⟩ 
+                  [ u , id ]₁ ∘ [ id , f.v ]₁ ∘ f.ξX.Φ ≈⟨ (refl⟩∘⟨ f.eqΦ) ∙ sym-assoc ⟩
                   ([ u , id ]₁ ∘ f.ξY.Φ) ∘ f.v ∎
     }}
   ; identity = λ {A} → refl
@@ -116,5 +116,5 @@ MRSreindex {A} {A'} u = record
 
   {-
   ⟪ f , Φ ⟫ → ⟪ g , \Psi ⟫
-  
+
    -}

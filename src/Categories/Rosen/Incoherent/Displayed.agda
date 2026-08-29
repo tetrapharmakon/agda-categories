@@ -31,13 +31,13 @@ open MR
 record iMR2ᴸ₀ (B : Obj) : Set (o ⊔ ℓ ⊔ e) where
   field
     A : Obj
-    ξ : iMR2 A B 
+    ξ : iMR2 A B
 
 -- iMR2ᴸ⇒: morphisms in the left-fibre over B: u : X.A ⇒ Y.A compatible with f and Φ.
 record iMR2ᴸ⇒ {B : Obj} (X Y : iMR2ᴸ₀ B) : Set (o ⊔ ℓ ⊔ e) where
   module X = iMR2ᴸ₀ X
-  module Y = iMR2ᴸ₀ Y   
-  module ξX = iMR2 X.ξ  
+  module Y = iMR2ᴸ₀ Y
+  module ξX = iMR2 X.ξ
   module ξY = iMR2 Y.ξ
   field
     u : X.A ⇒ Y.A
@@ -49,26 +49,26 @@ iMR2ᴸ : (B : Obj) → Category (o ⊔ ℓ ⊔ e) (o ⊔ ℓ ⊔ e) e
 iMR2ᴸ B = record
   { Obj = iMR2ᴸ₀ B
   ; _⇒_ = λ X Y → iMR2ᴸ⇒ {B} X Y
-  ; _≈_ = λ p q → let module p = iMR2ᴸ⇒ p 
+  ; _≈_ = λ p q → let module p = iMR2ᴸ⇒ p
                       module q = iMR2ᴸ⇒ q
                   in p.u ≈ q.u
-  ; id = record 
-    { u = id 
-    ; eqf = sym-id-1 
-    ; eqΦ = Equiv.sym (cancel (Functor.identity [-,-])) 
+  ; id = record
+    { u = id
+    ; eqf = sym-id-1
+    ; eqΦ = Equiv.sym (cancel (Functor.identity [-,-]))
     }
-  ; _∘_ = λ p q → 
-    let module p = iMR2ᴸ⇒ p 
+  ; _∘_ = λ p q →
+    let module p = iMR2ᴸ⇒ p
         module q = iMR2ᴸ⇒ q
-    in record 
-      { u = p.u ∘ q.u 
-      ; eqf = q.eqf ∙ rw-1-2 p.eqf 
+    in record
+      { u = p.u ∘ q.u
+      ; eqf = q.eqf ∙ rw-1-2 p.eqf
       ; eqΦ = let module Hom = Functor [-,-]
                   module Hom[1-] {A} = Functor (appˡ [-,-] A)
-                  module Hom[-1] {A} = Functor (appʳ [-,-] A) 
-              in Equiv.sym (begin [ p.u ∘ q.u , id ]₁ ∘ p.ξY.Φ ≈⟨ pushˡ C Hom[-1].homomorphism ⟩ 
-                                  [ q.u , id ]₁ ∘ [ p.u , id ]₁ ∘ p.ξY.Φ ≈⟨ Equiv.sym (refl⟩∘⟨ p.eqΦ) ⟩ 
-                                  [ q.u , id ]₁ ∘ q.ξY.Φ ≈⟨ Equiv.sym q.eqΦ ⟩ 
+                  module Hom[-1] {A} = Functor (appʳ [-,-] A)
+              in Equiv.sym (begin [ p.u ∘ q.u , id ]₁ ∘ p.ξY.Φ ≈⟨ pushˡ C Hom[-1].homomorphism ⟩
+                                  [ q.u , id ]₁ ∘ [ p.u , id ]₁ ∘ p.ξY.Φ ≈⟨ Equiv.sym (refl⟩∘⟨ p.eqΦ) ⟩
+                                  [ q.u , id ]₁ ∘ q.ξY.Φ ≈⟨ Equiv.sym q.eqΦ ⟩
                                   q.ξX.Φ ∎)
       }
   ; assoc = assoc
@@ -88,10 +88,10 @@ private
 -- capturing the *pro*functorial structure in the codomain parameter.
 MRSdisplay : (v : B ⇒ B') → Bifunctor (Category.op (iMR2ᴸ B)) (iMR2ᴸ B') (Setoids (ℓ ⊔ e) e)
 MRSdisplay v = record
-  { F₀ = λ {(x , y) → 
-     let module x  = iMR2ᴸ₀ x 
+  { F₀ = λ {(x , y) →
+     let module x  = iMR2ᴸ₀ x
          module ξx = iMR2 x.ξ
-         module y  = iMR2ᴸ₀ y 
+         module y  = iMR2ᴸ₀ y
          module ξy = iMR2 y.ξ
      in record
        { Carrier = Σ (x.A ⇒ y.A) (λ u →

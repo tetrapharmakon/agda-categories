@@ -82,8 +82,8 @@ unique-Φ A Φ = yoneda-argument A (const-Φ A) Φ
 -- L: left adjoint to V₁; sends an arrow (A → X) to the trivial (M,R)-system with Φ = const-Φ A.
 L : Functor Arr.Arrow 𝕋MRS
 L = record
-  { F₀ = λ x → 
-    let module x = Arr.Morphism x 
+  { F₀ = λ x →
+    let module x = Arr.Morphism x
     in (x.dom , x.cod) ∣ ⟪ x.arr , const-Φ (x.dom) ⟫
   ; F₁ = λ { {m} {n} α@(record { dom⇒ = u ; cod⇒ = v ; square = square }) →
     let A = Arr.Morphism.dom m -- m : A ⇒ X
@@ -99,7 +99,7 @@ L = record
     in record
       { l = u
       ; r = v
-      ; eq = square 
+      ; eq = square
            , (λ {x} {z} →
                yoneda-argument A
                  ((nHom (id {A}) ∘ʳ Cod) ∘ᵥ const-Φ A)
@@ -114,12 +114,12 @@ L = record
 open import Categories.Category.Construction.TwistedArrow S renaming (Morphism to tMorphism; Morphism⇒ to tMorphism⇒)
 
 TwSet = TwistedArrow
--- the other functor exists from the twisted arrow category 
+-- the other functor exists from the twisted arrow category
 -- Lʹ: left adjoint to U₁; sends a twisted arrow (A → X) to the corresponding element of ElMRS.
 L' : Functor TwSet ElMRS
 L' = record
-  { F₀ = λ x → 
-    let module x = tMorphism x 
+  { F₀ = λ x →
+    let module x = tMorphism x
     in record { A = x.dom ; B = x.cod ; el = ⟪ x.arr , const-Φ x.dom ⟫ }
   ; F₁ = λ { {m} {n} α@(record { dom⇐ = u ; cod⇒ = v ; square = square }) →
     let A = tMorphism.dom m -- m : A ⇒ X
@@ -137,17 +137,17 @@ L' = record
   ; homomorphism = λ {X} {Y} {Z} {f} {g} → (λ {x} → refl) , (λ {x} → refl)
   ; F-resp-≈ = λ {A} {B} {f} {g} z → z
   }
-  
+
 -- L⊣V₁: adjunction L ⊣ V₁.
 L⊣V₁ : L ⊣ V₁
-L⊣V₁ = record 
-  { unit = ntHelper 
-    (record 
-      { η = λ X → mor⇒ {dom⇒ = λ z → z} {cod⇒ = λ z → z} λ {x} → refl 
-      ; commute = λ f → (λ {x} → refl) , (λ {x} → refl) 
-      }) 
-  ; counit = ntHelper 
-    (record 
+L⊣V₁ = record
+  { unit = ntHelper
+    (record
+      { η = λ X → mor⇒ {dom⇒ = λ z → z} {cod⇒ = λ z → z} λ {x} → refl
+      ; commute = λ f → (λ {x} → refl) , (λ {x} → refl)
+      })
+  ; counit = ntHelper
+    (record
       { η = λ { ((A , B) ∣ ξ) →
           let Φ = MR2.Φ ξ in
           (λ z → z) , (λ z → z) ∥
@@ -159,31 +159,31 @@ L⊣V₁ = record
                   {x} {z})
             ) }
       ; commute = λ _ → (λ {x} → refl) , (λ {x} → refl)
-      }) 
-  ; zig = refl 
-        , refl 
-  ; zag = refl 
-        , refl 
+      })
+  ; zig = refl
+        , refl
+  ; zag = refl
+        , refl
   }
 
 -- L'⊣U₁: adjunction L' ⊣ U₁
 L'⊣U₁ : L' ⊣ U₁
-L'⊣U₁ = record 
-  { unit = ntHelper (record 
-    { η = λ X → mor⇒ {dom⇐ = id} {cod⇒ = id} λ {x} → refl 
-    ; commute = λ {X} {Y} f → (λ {x} → refl) , (λ {x} → refl) 
-    }) 
-  ; counit = ntHelper (record 
-    { η = λ X → record 
-      { l = id 
-      ; r = id 
+L'⊣U₁ = record
+  { unit = ntHelper (record
+    { η = λ X → mor⇒ {dom⇐ = id} {cod⇒ = id} λ {x} → refl
+    ; commute = λ {X} {Y} f → (λ {x} → refl) , (λ {x} → refl)
+    })
+  ; counit = ntHelper (record
+    { η = λ X → record
+      { l = id
+      ; r = id
       ; eqElts = refl ,
           let module X = Elts₀ X in
           yoneda-argument X.A ((nHom (id {X.A}) ∘ʳ Cod) ∘ᵥ const-Φ X.A) (MR2.Φ X.el)
-      } 
-    ; commute = λ _ → refl 
-              , (λ {x} → refl) 
-    }) 
+      }
+    ; commute = λ _ → refl
+              , (λ {x} → refl)
+    })
   ; zig = refl , refl
   ; zag = refl , refl
   }

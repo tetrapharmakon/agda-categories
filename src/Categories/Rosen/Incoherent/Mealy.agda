@@ -36,7 +36,7 @@ record Mealy A B : Set (o ⊔ ℓ ⊔ e) where
 
 record Mealy₀ : Set (o ⊔ ℓ ⊔ e) where
   field
-    A B : Obj 
+    A B : Obj
     m : Mealy A B
 
 record Mealy⇒ (X Y : Mealy₀) : Set (o ⊔ ℓ ⊔ e) where
@@ -45,15 +45,15 @@ record Mealy⇒ (X Y : Mealy₀) : Set (o ⊔ ℓ ⊔ e) where
   module mX = Mealy X.m
   module mY = Mealy Y.m
   field
-    l : Y.A ⇒ X.A 
-    r : X.B ⇒ Y.B 
-    u : mX.E ⇒ mY.E 
+    l : Y.A ⇒ X.A
+    r : X.B ⇒ Y.B
+    u : mX.E ⇒ mY.E
     d-eq : u ∘ mX.d ∘ id ⊗₁ l ≈ mY.d ∘ u ⊗₁ id
     s-eq : r ∘ mX.s ∘ id ⊗₁ l ≈ mY.s ∘ u ⊗₁ id
 
 Mealy⇒-≈ : {A B : Mealy₀} → Mealy⇒ A B → Mealy⇒ A B → Set e
-Mealy⇒-≈ f g = 
-  let module f = Mealy⇒ f 
+Mealy⇒-≈ f g =
+  let module f = Mealy⇒ f
       module g = Mealy⇒ g
   in
  f.l ≈ g.l × f.l ≈ g.l × f.u ≈ g.u
@@ -62,41 +62,41 @@ Mealy⇒-≈ f g =
 open HomReasoning
 open MR
 
--- !!! This is not the total category of Mealy automata that 
+-- !!! This is not the total category of Mealy automata that
 -- is usually recorded in the literature \cite{foo,bar}
 totalMealy : Category (o ⊔ ℓ ⊔ e) (o ⊔ ℓ ⊔ e) e
 totalMealy = record
   { Obj = Mealy₀
   ; _⇒_ = λ s t → Mealy⇒ s t
   ; _≈_ = Mealy⇒-≈
-  ; id = record 
-    { l = id ; r = id ; u = id 
+  ; id = record
+    { l = id ; r = id ; u = id
     ; d-eq = identityˡ ; s-eq = identityˡ }
-  ; _∘_ = λ f g → 
-    let module f = Mealy⇒ f 
+  ; _∘_ = λ f g →
+    let module f = Mealy⇒ f
         module g = Mealy⇒ g
-    in record { l = g.l ∘ f.l ; r = f.r ∘ g.r ; u = f.u ∘ g.u 
-              ; d-eq = (refl⟩∘⟨ pushʳ C (Functor.homomorphism (_ ⊗-))) 
-                     ∙ sym-assoc ∙ anti-assoc-4 
-                     ∙ (refl⟩∘⟨ pullˡ C g.d-eq) 
-                     ∙ (refl⟩∘⟨ pullʳ C (Equiv.sym [ ⊗ ]-commute)) 
-                     ∙ sym-assoc-3 ∙ (f.d-eq ⟩∘⟨refl) 
-                     ∙ pullʳ C (Equiv.sym (Functor.homomorphism (-⊗ _))) 
-              ; s-eq = (refl⟩∘⟨ pushʳ C (Functor.homomorphism (_ ⊗-))) 
-                     ∙ sym-assoc ∙ anti-assoc-4 
-                     ∙ (refl⟩∘⟨ pullˡ C g.s-eq) 
-                     ∙ (refl⟩∘⟨ pullʳ C (Equiv.sym [ ⊗ ]-commute)) 
-                     ∙ sym-assoc-3 ∙ (f.s-eq ⟩∘⟨refl) 
+    in record { l = g.l ∘ f.l ; r = f.r ∘ g.r ; u = f.u ∘ g.u
+              ; d-eq = (refl⟩∘⟨ pushʳ C (Functor.homomorphism (_ ⊗-)))
+                     ∙ sym-assoc ∙ anti-assoc-4
+                     ∙ (refl⟩∘⟨ pullˡ C g.d-eq)
+                     ∙ (refl⟩∘⟨ pullʳ C (Equiv.sym [ ⊗ ]-commute))
+                     ∙ sym-assoc-3 ∙ (f.d-eq ⟩∘⟨refl)
+                     ∙ pullʳ C (Equiv.sym (Functor.homomorphism (-⊗ _)))
+              ; s-eq = (refl⟩∘⟨ pushʳ C (Functor.homomorphism (_ ⊗-)))
+                     ∙ sym-assoc ∙ anti-assoc-4
+                     ∙ (refl⟩∘⟨ pullˡ C g.s-eq)
+                     ∙ (refl⟩∘⟨ pullʳ C (Equiv.sym [ ⊗ ]-commute))
+                     ∙ sym-assoc-3 ∙ (f.s-eq ⟩∘⟨refl)
                      ∙ pullʳ C (Equiv.sym (Functor.homomorphism (-⊗ _)))  }
   ; assoc = sym-assoc , sym-assoc , assoc
   ; sym-assoc = assoc , assoc , sym-assoc
   ; identityˡ = identityʳ , identityʳ , identityˡ
   ; identityʳ = identityˡ , identityˡ , identityʳ
   ; identity² = identityˡ , identity² , identity²
-  ; equiv = record 
+  ; equiv = record
     { refl = λ {x} → refl , refl , refl
     ; sym = λ x → (sym (x .proj₁)) , sym (x .proj₁) , sym (x .proj₂ .proj₂)
     ; trans = λ x x₁ → (trans (x .proj₁) (x₁ .proj₁)) , trans (x .proj₁) (x₁ .proj₁) , (trans (x .proj₂ .proj₂) (x₁ .proj₂ .proj₂))
-    } 
+    }
   ; ∘-resp-≈ = λ x x₁ → (∘-resp-≈ (x₁ .proj₁) (x .proj₁)) , (∘-resp-≈ (x₁ .proj₁) (x .proj₁)) , ∘-resp-≈ (x .proj₂ .proj₂) (x₁ .proj₂ .proj₂)
   }

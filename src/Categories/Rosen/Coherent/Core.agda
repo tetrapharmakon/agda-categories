@@ -77,7 +77,7 @@ MR2-Setoid A B = record
   }
 
 {-
-  X -- u --> Y 
+  X -- u --> Y
   |          |
 u |  u ⇒ id  |
   V          |
@@ -87,7 +87,7 @@ u⇒1 : ∀ {X Y} (u : X ⇒ Y) → Morphism⇒ C (record {arr = u}) (record {ar
 u⇒1 u = mor⇒ {dom⇒ = u} {cod⇒ = id} refl
 
 {-
-X -------- X 
+X -------- X
 |          |
 |  id ⇒ u  | u
 |          V
@@ -97,7 +97,7 @@ X ---u---> Y
 1⇒u u = mor⇒ {dom⇒ = id} {cod⇒ = u} refl
 
 {-
-X ---u---> Y 
+X ---u---> Y
 |          |
 |  id ⇒ id |
 |          |
@@ -120,29 +120,29 @@ module Naturalities {A B X Y} (ξ : MR2 A B) (u : X ⇒ Y) where
 
   Φᵤ : Y ⇒ [ A , Y ]₀
   Φᵤ = Φη ξ (record { arr = u })
-  
+
   -- naturality on 1⇒u:
   -- Φᵤ ∘ u ≈ [1,u] ∘ Φ₁
   nat-1⇒u : Φᵤ ∘ u ≈ [ id , u ]₁ ∘ Φid X
   nat-1⇒u = Φcommute ξ (1⇒u u)
-  
+
   -- naturality on u⇒1:
   -- Φᵤ ≈ Φ₁ (identity of cod(u))
   nat-u⇒1 : Φid Y ≈ Φᵤ
-  nat-u⇒1 = Equiv.sym identityʳ 
-          ○ Φcommute ξ (u⇒1 u) 
-          ○ (∘-resp-≈ˡ [-,-].identity) 
+  nat-u⇒1 = Equiv.sym identityʳ
+          ○ Φcommute ξ (u⇒1 u)
+          ○ (∘-resp-≈ˡ [-,-].identity)
           ○ identityˡ
 
   -- naturality on 1⇒1:
   -- this is what implies that Φ is reduced to components of type id ≡> [A,-]
   -- because the square
   {-
-    X ---- u ----> Y 
+    X ---- u ----> Y
     |              |
 Φ_{id X}           |Φ_{id Y}
     V              V
-  [A,X] --[A,u]--> [A,Y] 
+  [A,X] --[A,u]--> [A,Y]
   -}
   nat-1⇒1 : Φid Y ∘ u ≈ [ id , u ]₁ ∘ Φid X
   nat-1⇒1 = Φcommute ξ (1⇒1 u)
@@ -150,17 +150,17 @@ module Naturalities {A B X Y} (ξ : MR2 A B) (u : X ⇒ Y) where
 open Naturalities
 
 NICod⇒NIid : ∀ {A B} (ξ : MR2 A B) → NaturalTransformation idF ([_,-] A)
-NICod⇒NIid ξ = let module ξ = MR2 ξ in ntHelper (record 
-  { η = λ X → Naturalities.Φid ξ ξ.f X 
-  ; commute = λ f → nat-1⇒1 ξ f 
+NICod⇒NIid ξ = let module ξ = MR2 ξ in ntHelper (record
+  { η = λ X → Naturalities.Φid ξ ξ.f X
+  ; commute = λ f → nat-1⇒1 ξ f
   })
 
 NIid⇒NICod : ∀ {A B} → (f : A ⇒ B) (φ : NaturalTransformation idF ([_,-] A)) → MR2 A B
-NIid⇒NICod f φ = ⟪ f , ntHelper (record 
-  { η = λ X → 
-    let module X = Morphism X 
+NIid⇒NICod f φ = ⟪ f , ntHelper (record
+  { η = λ X →
+    let module X = Morphism X
         module φ = NaturalTransformation φ
-    in φ.η X.cod 
+    in φ.η X.cod
   ; commute = λ { {X} {Y} h → NaturalTransformation.commute φ (Morphism⇒.cod⇒ h) }
   }) ⟫
 
@@ -168,29 +168,29 @@ NIid⇒NICod f φ = ⟪ f , ntHelper (record
 open import Categories.NaturalTransformation.NaturalIsomorphism as NI using (NaturalIsomorphism;niHelper; _ⓘˡ_; _ⓘʳ_)
 
 fattoide : NaturalIsomorphism ([_,-] unit) idF
-fattoide = niHelper (record 
+fattoide = niHelper (record
   { η = λ X → adjoint.counit.η X ∘ unitorʳ.to
-  ; η⁻¹ = λ X → adjoint.Ladjunct unitorʳ.from 
+  ; η⁻¹ = λ X → adjoint.Ladjunct unitorʳ.from
   ; commute = λ f → assoc ○ refl⟩∘⟨ unitorʳ-commute-to ○ pullˡ C (adjoint.counit.commute f) ○ assoc
-  ; iso = λ X → 
-    let λ₀ = unitorʳ.from 
+  ; iso = λ X →
+    let λ₀ = unitorʳ.from
         λ₀' = adjoint.Ladjunct λ₀
         ρ = unitorʳ.to
         module ε = NaturalTransformation adjoint.counit
-    in record 
-    { isoˡ = begin 
+    in record
+    { isoˡ = begin
       λ₀' ∘ (ε.η X ∘ ρ)                                   ≈⟨ pullʳ C ((adjoint.unit.commute _)) ⟩
       [ id , λ₀ ]₁ ∘ adjoint.Ladjunct ((ε.η X ∘ ρ) ⊗₁ id) ≈˘⟨ pushˡ C ([ unit ,-] .Functor.homomorphism) ⟩
       adjoint.Ladjunct (λ₀ ∘ ((ε.η X ∘ ρ) ⊗₁ id))         ≈⟨ ([-,-].F-resp-≈ (Equiv.refl , unitorʳ-commute-from)) ⟩∘⟨refl ⟩
       adjoint.Ladjunct ((ε.η X ∘ ρ) ∘ λ₀)                 ≈⟨ ([-,-].F-resp-≈ (Equiv.refl , cancelʳ C unitorʳ.isoˡ)) ⟩∘⟨refl ⟩
       adjoint.Ladjunct (ε.η X)                            ≈⟨ adjoint.zag ⟩
       id                                                  ∎
-    ; isoʳ = begin 
+    ; isoʳ = begin
       (ε.η X ∘ ρ) ∘ λ₀'         ≈⟨ pullʳ C unitorʳ-commute-to ⟩
       ε.η X ∘ ((λ₀' ⊗₁ id) ∘ ρ) ≈⟨ sym-assoc ○ adjoint.RLadjunct≈id {f = λ₀} ⟩∘⟨refl ⟩
       λ₀ ∘ ρ                    ≈⟨ unitorʳ.isoʳ ⟩
       id                        ∎
-    } 
+    }
   })
 
 -- Type of the desired profunctor C.op × C → Sets

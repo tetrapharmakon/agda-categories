@@ -40,16 +40,16 @@ MRS3 = IsoComma ℝ V₁
 -- 𝕄ℝ𝕊 n: the n-th level category together with a functor to Arr.Arrow.
 𝕄ℝ𝕊 : (n : ℕ) → Σ (Category (o ⊔ ℓ ⊔ e) (o ⊔ ℓ ⊔ e) e) (λ x → Functor x Arr.Arrow)
 𝕄ℝ𝕊 zero = MRS3 , V₂
-  where 
+  where
     -- Base level: functor V₂ from MRS3 to Arr.Arrow.
-    V₂ : Functor MRS3 Arr.Arrow 
+    V₂ : Functor MRS3 Arr.Arrow
     V₂ = record
-      { F₀ = λ x → 
-        let module x = IsoCommaObj x 
+      { F₀ = λ x →
+        let module x = IsoCommaObj x
         in record { arr = MR2.f (tab₀.ξ x.b) }
-      ; F₁ = λ { {x} {y} f → 
-        let module x = IsoCommaObj x 
-            module y = IsoCommaObj y 
+      ; F₁ = λ { {x} {y} f →
+        let module x = IsoCommaObj x
+            module y = IsoCommaObj y
             module f = IsoComma⇒ f
         in mor⇒ {dom⇒ = tab⇒.l f.g} {cod⇒ = tab⇒.r f.g}
           (let open Category.HomReasoning C in begin _ ≈⟨ sym-id-1 ○ assoc ⟩
@@ -60,7 +60,7 @@ MRS3 = IsoComma ℝ V₁
       ; homomorphism = Equiv.refl , Equiv.refl
       ; F-resp-≈ = λ {(_ , dat) → (dat .proj₁) , (dat .proj₂)}
       }
-𝕄ℝ𝕊 (suc n) 
+𝕄ℝ𝕊 (suc n)
   = let MRSn = proj₂ (𝕄ℝ𝕊 n)
     in IsoComma ℝ MRSn
   , (proj₂ (𝕄ℝ𝕊 n) ∘F ICproj₂)
