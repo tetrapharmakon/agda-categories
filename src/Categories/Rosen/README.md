@@ -244,13 +244,6 @@ The category of Mealy automata internal to `C`, used as the target of the
 - `Mealy⇒-≈` — equality of automaton morphisms, componentwise from the morphism record.
 - `totalMealy` — the total category. The file's own comment flags that this is *not* the usual total category of Mealy automata found in the literature (an unresolved `\cite{...}` placeholder is left in the comment).
 
-**Note:** `Mealy⇒-≈` (and the `sym`/`trans`/`∘-resp-≈` of the total category it feeds)
-compares the `l` component twice and never the `r` component — the second
-conjunct duplicates the first. This looks like a latent bug in the equality
-datatype; it is documented here and in the file's comment rather than silently
-"fixed", since changing it is a semantic decision about what morphism equality
-should mean. `totalMealy`'s `_≈_` inherits the quirk.
-
 ### `Incoherent/HigherMRS.agda`
 The incoherent counterpart of `Coherent/HigherMRS.agda`: builds the tower of
 higher incoherent (M,R)-systems via iterated `IsoComma` and takes its limit.
