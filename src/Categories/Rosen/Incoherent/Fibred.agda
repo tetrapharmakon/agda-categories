@@ -8,7 +8,7 @@ open import Level using (_⊔_)
 module Categories.Rosen.Incoherent.Fibred {o ℓ e} {C : Category o ℓ e} {M : Monoidal C} (Cl : Closed M) where
 
 -- Fibred incoherent (M,R)-systems: the fibre over a fixed domain A.
--- Reindexing along u : A ⇒ A' is functorial (contravariant) in A.
+-- Reindexing along u : A ⇒ A′ is functorial (contravariant) in A.
 
 open import Data.Product using (_,_)
 
@@ -76,16 +76,16 @@ iMR2ᴿ A = record
   ; identityʳ = identityʳ
   ; identity² = identity²
   ; equiv = record { refl = refl ; sym = sym ; trans = trans }
-  ; ∘-resp-≈ = λ eq eq' → ∘-resp-≈ eq eq'
+  ; ∘-resp-≈ = λ eq eq′ → ∘-resp-≈ eq eq′
   }
 
 private
  variable
-  A A' B B' : Obj
+  A A′ B B′ : Obj
 
--- MRSreindex u: reindexing functor iMR2ᴿ A' → iMR2ᴿ A along u : A ⇒ A'.
-MRSreindex : (u : A ⇒ A') → Functor (iMR2ᴿ A') (iMR2ᴿ A)
-MRSreindex {A} {A'} u = record
+-- MRSreindex u: reindexing functor iMR2ᴿ A′ → iMR2ᴿ A along u : A ⇒ A′.
+MRSreindex : (u : A ⇒ A′) → Functor (iMR2ᴿ A′) (iMR2ᴿ A)
+MRSreindex {A} {A′} u = record
   { F₀ = λ { x →
     let module x = iMR2ᴿ₀ x
         f =  iMR2.f x.ξ

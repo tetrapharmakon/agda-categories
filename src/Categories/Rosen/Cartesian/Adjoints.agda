@@ -116,8 +116,8 @@ open import Categories.Category.Construction.TwistedArrow S renaming (Morphism t
 TwSet = TwistedArrow
 -- the other functor exists from the twisted arrow category
 -- Lʹ: left adjoint to U₁; sends a twisted arrow (A → X) to the corresponding element of ElMRS.
-L' : Functor TwSet ElMRS
-L' = record
+L′ : Functor TwSet ElMRS
+L′ = record
   { F₀ = λ x →
     let module x = tMorphism x
     in record { A = x.dom ; B = x.cod ; el = ⟪ x.arr , const-Φ x.dom ⟫ }
@@ -166,9 +166,9 @@ L⊣V₁ = record
         , refl
   }
 
--- L'⊣U₁: adjunction L' ⊣ U₁
-L'⊣U₁ : L' ⊣ U₁
-L'⊣U₁ = record
+-- L′⊣U₁: adjunction L′ ⊣ U₁
+L′⊣U₁ : L′ ⊣ U₁
+L′⊣U₁ = record
   { unit = ntHelper (record
     { η = λ X → mor⇒ {dom⇐ = id} {cod⇒ = id} λ {x} → refl
     ; commute = λ {X} {Y} f → (λ {x} → refl) , (λ {x} → refl)

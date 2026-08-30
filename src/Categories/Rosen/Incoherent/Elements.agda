@@ -38,9 +38,9 @@ record twiMR2⇒ (X Y : iMR2₀) : Set (o ⊔ ℓ ⊔ e) where
     eqf : r ∘ ξX.f ∘ l ≈ ξY.f
     eqΦ : ξY.Φ ∘ r ≈ [ l , r ]₁ ∘ ξX.Φ
 
--- τ'[iMR2]: twisted category of incoherent (M,R)-systems.
-τ'[iMR2] : Category (o ⊔ ℓ) (o ⊔ ℓ ⊔ e) e
-τ'[iMR2] = record
+-- τ′[iMR2]: twisted category of incoherent (M,R)-systems.
+τ′[iMR2] : Category (o ⊔ ℓ) (o ⊔ ℓ ⊔ e) e
+τ′[iMR2] = record
   { Obj = iMR2₀
   ; _⇒_ = λ s t → twiMR2⇒ s t
   ; _≈_ = λ f g → let open twiMR2⇒ in f .l ≈ g .l × f .r ≈ g .r
@@ -54,7 +54,7 @@ record twiMR2⇒ (X Y : iMR2₀) : Set (o ⊔ ℓ ⊔ e) where
     let module f = twiMR2⇒ f
         module g = twiMR2⇒ g
         module Hom  {A} = Functor (appʳ [-,-] A)
-        module Hom' {A} = Functor (appˡ [-,-] A)
+        module Hom′ {A} = Functor (appˡ [-,-] A)
     in record
       { l = g.l ∘ f.l
       ; r = f.r ∘ g.r
@@ -71,7 +71,7 @@ record twiMR2⇒ (X Y : iMR2₀) : Set (o ⊔ ℓ ⊔ e) where
 
 open import Categories.Category.Construction.TwistedArrow C renaming (Morphism to tMorphism; Morphism⇒ to tMorphism⇒)
 
-𝕃 : Functor τ'[iMR2] TwistedArrow
+𝕃 : Functor τ′[iMR2] TwistedArrow
 𝕃 = record
   { F₀ = λ x → let module x = iMR2₀ x in (record { arr = iMR2.f x.ξ })
   ; F₁ = λ f → let module f = twiMR2⇒ f in mor⇒ f.eqf
@@ -80,7 +80,7 @@ open import Categories.Category.Construction.TwistedArrow C renaming (Morphism t
   ; F-resp-≈ = λ x → x
   }
 
-ℝ : Functor τ'[iMR2] Arr.Arrow
+ℝ : Functor τ′[iMR2] Arr.Arrow
 ℝ = record
   { F₀ = λ x → let module x = iMR2₀ x in (record { dom = x.B ; cod = [ x.A , x.B ]₀ ; arr = iMR2.Φ x.ξ })
   ; F₁ = λ f → let module f = twiMR2⇒ f in mor⇒ (sym f.eqΦ)

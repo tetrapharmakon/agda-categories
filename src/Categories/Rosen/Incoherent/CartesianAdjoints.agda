@@ -35,7 +35,7 @@ open Closed Cl using ([_,_]₀)
 open HomReasoning
 
 open import Categories.Rosen.Incoherent.Core Cl
-open import Categories.Rosen.Incoherent.Elements Cl using (τ'[iMR2]; 𝕃)
+open import Categories.Rosen.Incoherent.Elements Cl using (τ′[iMR2]; 𝕃)
 open import Categories.Rosen.Incoherent.Functors Cl using ([_]f)
 
 -- module Arr = Categories.Category.Construction.Arrow S
@@ -59,8 +59,8 @@ L = record
 
 open import Categories.Category.Construction.TwistedArrow S renaming (Morphism to tMorphism; Morphism⇒ to tMorphism⇒; mor⇒ to tmor⇒)
 
-L' : Functor Tw.TwistedArrow τ'[iMR2]
-L' = record
+L′ : Functor Tw.TwistedArrow τ′[iMR2]
+L′ = record
   { F₀ = λ x → let module x = tMorphism x in record { A = x.dom ; B = x.cod ; ξ = ⟪ x.arr , (λ z z₁ → z) ⟫ }
   ; F₁ = λ f →  let module f = tMorphism⇒ f in record { l = f.dom⇐ ; r = f.cod⇒ ; eqf = f.square ; eqΦ = λ {x} → ≡-refl }
   ; identity = λ {A} → (λ {x} → ≡-refl) , (λ {x} → ≡-refl)
@@ -72,7 +72,7 @@ L' = record
 open import Categories.NaturalTransformation using (NaturalTransformation; ntHelper)
 
 -- The counits below cannot be constructed for arbitrary incoherent systems.
--- Since L and L' equip an arrow with the constant repair map, their eqΦ fields
+-- Since L and L′ equip an arrow with the constant repair map, their eqΦ fields
 -- would require every Φ : B → (A → B) to satisfy Φ b a ≡ b.  This is false for
 -- an unconstrained Φ, so the two sorry terms mark genuine obstructions rather
 -- than missing equational reasoning.
@@ -94,8 +94,8 @@ L⊣A = record
   ; zag = λ {B} → (λ {x} → ≡-refl) , (λ {x} → ≡-refl)
   }
 
-L'⊣𝕃 : L' ⊣ 𝕃
-L'⊣𝕃 = record
+L′⊣𝕃 : L′ ⊣ 𝕃
+L′⊣𝕃 = record
   { unit = ntHelper (record { η = λ X → tmor⇒ λ {x} → ≡-refl ; commute = λ f → (λ {x} → ≡-refl) , (λ {x} → ≡-refl) })
   ; counit = ntHelper (record { η = λ X → record { l = id ; r = id ; eqf = λ {x} → ≡-refl ; eqΦ = sorry } ; commute = λ {X} {Y} f → (λ {x} → ≡-refl) , (λ {x} → ≡-refl) })
   ; zig = λ {A} → (λ {x} → ≡-refl) , (λ {x} → ≡-refl)

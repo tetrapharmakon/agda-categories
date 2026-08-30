@@ -67,10 +67,10 @@ Eq⁻¹ = record
           module Φ  = NT (MR2.Φ x.ξ)
           module l*ψ = NT ((nHom f.l ∘ʳ Cod) ∘ᵥ MR2.Φ y.ξ)
           eqf =
-            let eqf' = proj₁ f.eq in
+            let eqf′ = proj₁ f.eq in
             begin
               f.r ∘ MR2.f x.ξ        ≈⟨ refl⟩∘⟨ Equiv.sym identityʳ ⟩
-              f.r ∘ MR2.f x.ξ ∘ id   ≈⟨ eqf' ○ identityˡ ⟩
+              f.r ∘ MR2.f x.ξ ∘ id   ≈⟨ eqf′ ○ identityˡ ⟩
               MR2.f y.ξ ∘ f.l        ∎
           eqΦ = proj₂ f.eq
       in

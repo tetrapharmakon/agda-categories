@@ -67,7 +67,7 @@ record iMR2⇒ (X Y : iMR2₀) : Set (o ⊔ ℓ ⊔ e) where
     let module f = iMR2⇒ f
         module g = iMR2⇒ g
         module Hom  {A} = Functor (appʳ [-,-] A)
-        module Hom' {A} = Functor (appˡ [-,-] A)
+        module Hom′ {A} = Functor (appˡ [-,-] A)
     in record { l = f.l ∘ g.l
               ; r = f.r ∘ g.r
               ; eqf = assoc ○ refl⟩∘⟨ g.eqf ○ rw-2-1 f.eqf ○ assoc
@@ -77,7 +77,7 @@ record iMR2⇒ (X Y : iMR2₀) : Set (o ⊔ ℓ ⊔ e) where
                             [ g.l , id ]₁ ∘ ([ id , f.r ]₁ ∘ g.ξY.Φ) ∘ g.r       ≈⟨ refl⟩∘⟨ assoc ⟩
                             [ g.l , id ]₁ ∘ [ id , f.r ]₁ ∘ g.ξY.Φ ∘ g.r         ≈⟨ sym-assoc ○ Equiv.sym [ [-,-] ]-commute ⟩∘⟨refl ⟩
                             ([ id , f.r ]₁ ∘ [ g.l , id ]₁) ∘ g.ξY.Φ ∘ g.r       ≈⟨ assoc ○ refl⟩∘⟨ g.eqΦ ⟩
-                            [ id , f.r ]₁ ∘ [ id , g.r ]₁ ∘ g.ξX.Φ               ≈⟨ pullˡ C (Equiv.sym Hom'.homomorphism) ⟩
+                            [ id , f.r ]₁ ∘ [ id , g.r ]₁ ∘ g.ξX.Φ               ≈⟨ pullˡ C (Equiv.sym Hom′.homomorphism) ⟩
                             [ id , f.r ∘ g.r ]₁ ∘ g.ξX.Φ ∎
     }
   ; assoc = λ { {A} {B} {C} {D} {f} {g} {h} →
@@ -96,7 +96,7 @@ record iMR2⇒ (X Y : iMR2₀) : Set (o ⊔ ℓ ⊔ e) where
   ; equiv = record
     { refl = refl , refl
     ; sym = λ x → (sym (proj₁ x)) , (sym (proj₂ x))
-    ; trans = λ { (eq-l , eq-r) (eq'-l , eq'-r) → (trans eq-l eq'-l) , (trans eq-r eq'-r) }
+    ; trans = λ { (eq-l , eq-r) (eq′-l , eq′-r) → (trans eq-l eq′-l) , (trans eq-r eq′-r) }
     }
-  ; ∘-resp-≈ = λ { (eq-l , eq-r) (eq'-l , eq'-r) → (∘-resp-≈ eq-l eq'-l) , (∘-resp-≈ eq-r eq'-r) }
+  ; ∘-resp-≈ = λ { (eq-l , eq-r) (eq′-l , eq′-r) → (∘-resp-≈ eq-l eq′-l) , (∘-resp-≈ eq-r eq′-r) }
   }

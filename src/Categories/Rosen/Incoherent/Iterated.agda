@@ -104,7 +104,7 @@ iMRSᴵᴵ = record
     ; sym = λ x → (sym (x .proj₁ .proj₁) , sym (x .proj₁ .proj₂)) , sym (x .proj₂ .proj₁) , sym (x .proj₂ .proj₂)
     ; trans = λ x≈y y≈z → ((trans (x≈y .proj₁ .proj₁) (y≈z .proj₁ .proj₁)) , trans (x≈y .proj₁ .proj₂) (y≈z .proj₁ .proj₂)) , trans (x≈y .proj₂ .proj₁) (y≈z .proj₂ .proj₁) , trans (x≈y .proj₂ .proj₂) (y≈z .proj₂ .proj₂)
     }
-  ; ∘-resp-≈ = λ f≈g f'≈g' → ((∘-resp-≈ (f≈g .proj₁ .proj₁) (f'≈g' .proj₁ .proj₁)) , ∘-resp-≈ (f≈g .proj₁ .proj₂) (f'≈g' .proj₁ .proj₂)) , (∘-resp-≈ (f≈g .proj₂ .proj₁) (f'≈g' .proj₂ .proj₁)) , ∘-resp-≈ (f≈g .proj₂ .proj₂) (f'≈g' .proj₂ .proj₂)
+  ; ∘-resp-≈ = λ f≈g f′≈g′ → ((∘-resp-≈ (f≈g .proj₁ .proj₁) (f′≈g′ .proj₁ .proj₁)) , ∘-resp-≈ (f≈g .proj₁ .proj₂) (f′≈g′ .proj₁ .proj₂)) , (∘-resp-≈ (f≈g .proj₂ .proj₁) (f′≈g′ .proj₂ .proj₁)) , ∘-resp-≈ (f≈g .proj₂ .proj₂) (f′≈g′ .proj₂ .proj₂)
   }
 
 deg₀² : Functor iMRSᴵᴵ τ[iMR2]
@@ -152,39 +152,39 @@ comp = record
     { l = S.h.l
     ; r = S.k.r
     ; eqf =
-        let r' = S.k.r
-            l' = S.k.l
+        let r′ = S.k.r
+            l′ = S.k.l
             r = S.h.r
             l = S.h.l
             g = S.h.ξX.f
             f = S.k.ξX.f
-            f' = S.k.ξY.f
-            g' = S.h.ξY.f
+            f′ = S.k.ξY.f
+            g′ = S.h.ξY.f
         in begin
-        r' ∘ (f ∘ g)  ≈⟨ sym-assoc ○ S.k.eqf ⟩∘⟨refl ⟩
-        (f' ∘ l') ∘ g ≈⟨ assoc ○ refl⟩∘⟨ (Equiv.sym S.hᵣ≈kₗ ⟩∘⟨refl) ⟩
-        f' ∘ (r ∘ g)  ≈⟨ refl⟩∘⟨ S.h.eqf ○ sym-assoc ⟩
-        (f' ∘ g') ∘ l ∎
+        r′ ∘ (f ∘ g)  ≈⟨ sym-assoc ○ S.k.eqf ⟩∘⟨refl ⟩
+        (f′ ∘ l′) ∘ g ≈⟨ assoc ○ refl⟩∘⟨ (Equiv.sym S.hᵣ≈kₗ ⟩∘⟨refl) ⟩
+        f′ ∘ (r ∘ g)  ≈⟨ refl⟩∘⟨ S.h.eqf ○ sym-assoc ⟩
+        (f′ ∘ g′) ∘ l ∎
     ; eqΦ = let module HomR {A} = Functor (appʳ [-,-] A)
                 module HomL {A} = Functor (appˡ [-,-] A)
-                r' = S.k.r
-                l' = S.k.l
+                r′ = S.k.r
+                l′ = S.k.l
                 r = S.h.r
                 l = S.h.l
                 g = S.h.ξX.f
                 f = S.k.ξX.f
-                f' = S.k.ξY.f
-                g' = S.h.ξY.f
+                f′ = S.k.ξY.f
+                g′ = S.h.ξY.f
                 Ψ = S.k.ξY.Φ
                 Φ = S.k.ξX.Φ
             in begin
-        [ l , id ]₁ ∘ ([ g' , id ]₁ ∘ Ψ) ∘ r' ≈⟨ refl⟩∘⟨ assoc ○ sym-assoc ○ (Equiv.sym HomR.homomorphism) ⟩∘⟨refl ⟩
-        [ g' ∘ l , id ]₁ ∘ Ψ ∘ r'             ≈⟨ HomR.F-resp-≈ (Equiv.sym S.h.eqf) ⟩∘⟨refl ⟩
-        [ r ∘ g , id ]₁ ∘ Ψ ∘ r'              ≈⟨ HomR.homomorphism ⟩∘⟨refl ○ assoc ⟩
-        [ g , id ]₁ ∘ [ r , id ]₁ ∘ Ψ ∘ r'    ≈⟨ refl⟩∘⟨ (HomR.F-resp-≈ S.hᵣ≈kₗ ⟩∘⟨refl) ⟩
-        [ g , id ]₁ ∘ [ l' , id ]₁ ∘ Ψ ∘ r'   ≈⟨ refl⟩∘⟨ S.k.eqΦ ○ sym-assoc ⟩
-        ([ g , id ]₁ ∘ [ id , r' ]₁) ∘ Φ      ≈⟨ (Equiv.sym [ [-,-] ]-commute) ⟩∘⟨refl ○ assoc ⟩
-        [ id , r' ]₁ ∘ [ g , id ]₁ ∘ Φ        ∎
+        [ l , id ]₁ ∘ ([ g′ , id ]₁ ∘ Ψ) ∘ r′ ≈⟨ refl⟩∘⟨ assoc ○ sym-assoc ○ (Equiv.sym HomR.homomorphism) ⟩∘⟨refl ⟩
+        [ g′ ∘ l , id ]₁ ∘ Ψ ∘ r′             ≈⟨ HomR.F-resp-≈ (Equiv.sym S.h.eqf) ⟩∘⟨refl ⟩
+        [ r ∘ g , id ]₁ ∘ Ψ ∘ r′              ≈⟨ HomR.homomorphism ⟩∘⟨refl ○ assoc ⟩
+        [ g , id ]₁ ∘ [ r , id ]₁ ∘ Ψ ∘ r′    ≈⟨ refl⟩∘⟨ (HomR.F-resp-≈ S.hᵣ≈kₗ ⟩∘⟨refl) ⟩
+        [ g , id ]₁ ∘ [ l′ , id ]₁ ∘ Ψ ∘ r′   ≈⟨ refl⟩∘⟨ S.k.eqΦ ○ sym-assoc ⟩
+        ([ g , id ]₁ ∘ [ id , r′ ]₁) ∘ Φ      ≈⟨ (Equiv.sym [ [-,-] ]-commute) ⟩∘⟨refl ○ assoc ⟩
+        [ id , r′ ]₁ ∘ [ g , id ]₁ ∘ Φ        ∎
     }
   ; identity = refl , refl
   ; homomorphism = refl , refl

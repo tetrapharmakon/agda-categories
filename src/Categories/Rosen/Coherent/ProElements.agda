@@ -84,9 +84,9 @@ module EltsCat (Fᵉ : Bifunctor (Category.op C) C (Setoids (o ⊔ ℓ ⊔ e) (o
     ; equiv = record
     { refl = refl , refl
     ; sym = λ x → (sym (proj₁ x)) , (sym (proj₂ x))
-    ; trans = λ eq eq' → (trans (proj₁ eq) (proj₁ eq')) , (trans (proj₂ eq) (proj₂ eq'))
+    ; trans = λ eq eq′ → (trans (proj₁ eq) (proj₁ eq′)) , (trans (proj₂ eq) (proj₂ eq′))
     }
-    ; ∘-resp-≈ = λ {(fst , snd) (fst' , snd') → (∘-resp-≈ fst' fst) , (∘-resp-≈ snd snd')}
+    ; ∘-resp-≈ = λ {(fst , snd) (fst′ , snd′) → (∘-resp-≈ fst′ fst) , (∘-resp-≈ snd snd′)}
     }
 
 open EltsCat F public

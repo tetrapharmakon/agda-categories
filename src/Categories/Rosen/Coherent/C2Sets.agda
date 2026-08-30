@@ -252,9 +252,9 @@ module _ (o : Level) where
   p-swap≈id = ≡.refl
 
   -- Step 2: ι respects ≈ (a general fact about ι, provable from the
-  -- [-,-] bifunctor's F-resp-≈, independent of what ξ, ξ' actually are).
-  ι-resp-≈ : ∀ {ξ ξ' : unit ⇒ unit} → ξ ≈ ξ' → ∀ X →
-             NaturalTransformation.η (ι {A = unit} ξ) X ≈ NaturalTransformation.η (ι {A = unit} ξ') X
+  -- [-,-] bifunctor's F-resp-≈, independent of what ξ, ξ′ actually are).
+  ι-resp-≈ : ∀ {ξ ξ′ : unit ⇒ unit} → ξ ≈ ξ′ → ∀ X →
+             NaturalTransformation.η (ι {A = unit} ξ) X ≈ NaturalTransformation.η (ι {A = unit} ξ′) X
   ι-resp-≈ = λ z X {x} {x = x₁} → ≡.refl
 
   -- Step 3 (not needed below, see the note on `collapse`): ι id agrees

@@ -83,10 +83,10 @@ open import Categories.NaturalTransformation.NaturalIsomorphism as NI using (Nat
 MR2-Setoid : Obj → Obj → Setoid (o ⊔ suc ℓ ⊔ suc e) (o ⊔ ℓ ⊔ e)
 MR2-Setoid A B = record
   { Carrier = MR2 A B
-  ; _≈_ = λ (⟪ f , p , Φ ⟫) (⟪ g , q , Φ' ⟫) →
+  ; _≈_ = λ (⟪ f , p , Φ ⟫) (⟪ g , q , Φ′ ⟫) →
    (f ≈ g) × (Σ (NaturalIsomorphism p q)
      (λ t → let τ = NI.NaturalIsomorphism.F⇒G t
-            in Φ ≃ Φ' ∘ᵥ τ))
+            in Φ ≃ Φ′ ∘ᵥ τ))
   -- Every twist below has to be spelled out: the goal is an equality in Setoids,
   -- which Agda eta-expands into its pointwise "cong" form, so nothing about the
   -- intermediate morphisms survives to be inferred.
@@ -101,19 +101,19 @@ MR2-Setoid A B = record
                            (NI.NaturalIsomorphism.⇒.η b X)
                            (NI.NaturalIsomorphism.⇐.η b X)
                            (NI.NaturalIsomorphism.iso.isoʳ b X) c) }
-    -- F⇒G (NI.trans b b') is F⇒G b' ∘ᵥ F⇒G b: paste and reassociate
+    -- F⇒G (NI.trans b b′) is F⇒G b′ ∘ᵥ F⇒G b: paste and reassociate
     ; trans = λ { {⟪ f , p , Φ ⟫} {⟪ g , q , Ψ ⟫} {⟪ h , r , Θ ⟫}
-                  (a , b , c) (a' , b' , c') → trans a a' , NI.trans b b' ,
+                  (a , b , c) (a′ , b′ , c′) → trans a a′ , NI.trans b b′ ,
         (λ {X} → twist-trans (NaturalTransformation.η Φ X)
                              (NaturalTransformation.η Ψ X)
                              (NaturalTransformation.η Θ X)
                              (NI.NaturalIsomorphism.⇒.η b  X)
-                             (NI.NaturalIsomorphism.⇒.η b' X)
-                             c c') }
+                             (NI.NaturalIsomorphism.⇒.η b′ X)
+                             c c′) }
     }
   }
 
-pollo : ∀ {A' A B B'} {u : A' ⇒ A} {v : B ⇒ B'} → Functor (Product (Category.op (coSlice A)) (Slice B)) (Product (Category.op (coSlice A')) (Slice B'))
+pollo : ∀ {A′ A B B′} {u : A′ ⇒ A} {v : B ⇒ B′} → Functor (Product (Category.op (coSlice A)) (Slice B)) (Product (Category.op (coSlice A′)) (Slice B′))
 pollo {u = u} {v = v} = Functor.op (u /C) ⁂ (C/ v)
 
 open HomReasoning
@@ -145,22 +145,22 @@ open MR
 MRS-Profunctor : Bifunctor (Category.op C) C (Setoids (o ⊔ suc ℓ ⊔ suc e) (o ⊔ ℓ ⊔ e))
 MRS-Profunctor = record
   { F₀ = (λ { (A , B) → MR2-Setoid A B })
-  ; F₁ = λ { {(A , B)} {(A' , B')} (u , v) → record
+  ; F₁ = λ { {(A , B)} {(A′ , B′)} (u , v) → record
     { _⟨$⟩_ = λ {⟪ f , p , Φ ⟫ → ⟪ v ∘ f ∘ u , sorry , sorry ⟫ }
-    ; cong = λ { {⟪ f , p , Φ ⟫} {⟪ g , q , Φ' ⟫} (f≈g , _) →
+    ; cong = λ { {⟪ f , p , Φ ⟫} {⟪ g , q , Φ′ ⟫} (f≈g , _) →
         (∘-resp-≈ Equiv.refl (∘-resp-≈ f≈g Equiv.refl))
       , sorry
       }
     }}
   ; identity = λ { (f≈g , _) → Equiv.trans identityˡʳ f≈g , sorry }
   ; homomorphism = λ { {f = (u₁ , v₁)} {g = (u₂ , v₂)}
-                       {⟪ f , p , Φ ⟫} {⟪ g , q , Φ' ⟫} (f≈g , _) →
+                       {⟪ f , p , Φ ⟫} {⟪ g , q , Φ′ ⟫} (f≈g , _) →
       (begin (v₂ ∘ v₁) ∘ f ∘ u₁ ∘ u₂     ≈˘⟨ assoc ○ assoc ⟩
              (((v₂ ∘ v₁) ∘ f) ∘ u₁) ∘ u₂ ≈⟨ (refl⟩∘⟨ f≈g) ⟩∘⟨refl ⟩∘⟨refl ⟩
              (((v₂ ∘ v₁) ∘ g) ∘ u₁) ∘ u₂ ≈⟨ (assoc ⟩∘⟨refl) ○ (assoc ⟩∘⟨refl) ⟩
              (v₂ ∘ (v₁ ∘ (g ∘ u₁))) ∘ u₂ ≈⟨ assoc ○ sym-assoc ○ assoc ⟩
              v₂ ∘ (v₁ ∘ g ∘ u₁) ∘ u₂     ∎)
     , sorry }
-  ; F-resp-≈ = λ { (u≈u' , v≈v') (f≈g , _) →
-      ∘-resp-≈ v≈v' (∘-resp-≈ f≈g u≈u') , sorry }
+  ; F-resp-≈ = λ { (u≈u′ , v≈v′) (f≈g , _) →
+      ∘-resp-≈ v≈v′ (∘-resp-≈ f≈g u≈u′) , sorry }
   }

@@ -40,7 +40,7 @@ open MR
 V₁ : Functor 𝕋MRS Arr.Arrow
 V₁ = record
   { F₀ = λ { ((A , B) ∣ ξ) → record { arr = MR2.f ξ } }
-  ; F₁ = λ { {(A , B) ∣ ⟪ f , Φ ⟫} {(A' , B') ∣ ⟪ g , Φ' ⟫} (l , r ∥ (eq , eq')) → mor⇒ {dom⇒ = l} {cod⇒ = r}
+  ; F₁ = λ { {(A , B) ∣ ⟪ f , Φ ⟫} {(A′ , B′) ∣ ⟪ g , Φ′ ⟫} (l , r ∥ (eq , eq′)) → mor⇒ {dom⇒ = l} {cod⇒ = r}
     (begin r ∘ f      ≈˘⟨ id-2 ⟩
            r ∘ f ∘ id ≈⟨ eq ○ identityˡ ⟩
            g ∘ l      ∎) }
@@ -58,8 +58,8 @@ V₁ = record
 ϵ = ntHelper record
   { η = λ { (A , B) → record
     { _⟨$⟩_ = λ {⟪ f , Φ ⟫ → lift f }
-    ; cong = λ { {⟪ f , Φ ⟫} {⟪ g , Φ' ⟫} eq → lift (proj₁ eq) }
+    ; cong = λ { {⟪ f , Φ ⟫} {⟪ g , Φ′ ⟫} eq → lift (proj₁ eq) }
     } }
-  ; commute = λ { {(A , B)} {(A' , B')} (u , v) {⟪ f , Φ ⟫} {⟪ g , Φ' ⟫} eq →
+  ; commute = λ { {(A , B)} {(A′ , B′)} (u , v) {⟪ f , Φ ⟫} {⟪ g , Φ′ ⟫} eq →
       lift (∘-resp-≈ʳ (∘-resp-≈ˡ (proj₁ eq))) }
   }

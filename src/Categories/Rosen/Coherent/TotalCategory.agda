@@ -70,25 +70,25 @@ total = record
          elimˡ C [-,-].identity ⟩∘⟨refl
          ○ ΦNT.commute α)
        ]}
-  ; _∘_ = λ { {A} {B} {X} t t' →
+  ; _∘_ = λ { {A} {B} {X} t t′ →
        let module t  = tot⇒ t
-           module t' = tot⇒ t'
+           module t′ = tot⇒ t′
            module ψ  = NT (MR2.Φ t.y.ξ)
            module Hom[-1] {X} = Functor (appʳ [-,-] X)
-           module Hx = Functor [ t'.x.L ,-]
+           module Hx = Functor [ t′.x.L ,-]
            module Hy = Functor [ t.x.L ,-]
        in
-       [ t.l ∘ t'.l , t.r ∘ t'.r ∥
-         pullʳ C t'.eqf ○ pullˡ C t.eqf ○ assoc
+       [ t.l ∘ t′.l , t.r ∘ t′.r ∥
+         pullʳ C t′.eqf ○ pullˡ C t.eqf ○ assoc
        , (λ {s} {t₀} α →
            let r = Arr.Morphism⇒.cod⇒ α in
            begin
-             ([ t.l ∘ t'.l , id ]₁ ∘ ψ.η t₀) ∘ r             ≈⟨ ∘-resp-≈ (∘-resp-≈ (Hom[-1].homomorphism) Equiv.refl) Equiv.refl ⟩
-             (([ t'.l , id ]₁ ∘ [ t.l , id ]₁) ∘ ψ.η t₀) ∘ r ≈⟨ ∘-resp-≈ assoc Equiv.refl ○ assoc ⟩
-             [ t'.l , id ]₁ ∘ (([ t.l , id ]₁ ∘ ψ.η t₀) ∘ r) ≈⟨ (refl⟩∘⟨ t.nat α) ○  sym-assoc ⟩
-            ([ t'.l , id ]₁ ∘ Hy.F₁ r) ∘ t.Φ.η s             ≈⟨ (∘-resp-≈ (Equiv.sym [ [-,-] ]-commute) Equiv.refl) ○ assoc ⟩
-             Hx.F₁ r ∘ ([ t'.l , id ]₁ ∘ t.Φ.η s)            ≈⟨ refl⟩∘⟨ t'.eqΦ {t = s} ⟩
-             Hx.F₁ r ∘ t'.Φ.η s                              ∎)
+             ([ t.l ∘ t′.l , id ]₁ ∘ ψ.η t₀) ∘ r             ≈⟨ ∘-resp-≈ (∘-resp-≈ (Hom[-1].homomorphism) Equiv.refl) Equiv.refl ⟩
+             (([ t′.l , id ]₁ ∘ [ t.l , id ]₁) ∘ ψ.η t₀) ∘ r ≈⟨ ∘-resp-≈ assoc Equiv.refl ○ assoc ⟩
+             [ t′.l , id ]₁ ∘ (([ t.l , id ]₁ ∘ ψ.η t₀) ∘ r) ≈⟨ (refl⟩∘⟨ t.nat α) ○  sym-assoc ⟩
+            ([ t′.l , id ]₁ ∘ Hy.F₁ r) ∘ t.Φ.η s             ≈⟨ (∘-resp-≈ (Equiv.sym [ [-,-] ]-commute) Equiv.refl) ○ assoc ⟩
+             Hx.F₁ r ∘ ([ t′.l , id ]₁ ∘ t.Φ.η s)            ≈⟨ refl⟩∘⟨ t′.eqΦ {t = s} ⟩
+             Hx.F₁ r ∘ t′.Φ.η s                              ∎)
        ]}
   ; assoc = assoc , assoc
   ; sym-assoc = sym-assoc , sym-assoc

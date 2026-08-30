@@ -249,13 +249,13 @@ pℕ = Thin 0ℓ prufa
 𝕚𝕄ℝ𝕊-η {n} {m} ≤′-refl = NI.unitorʳ
 𝕚𝕄ℝ𝕊-η {n} {m} (≤′-trans {m} {x} {n} m≤′x x≤′n) =
   let θ   = 𝕚𝕄ℝ𝕊-η {x} {m} m≤′x
-      θ'  = 𝕚𝕄ℝ𝕊-η {n} {x} x≤′n
+      θ′  = 𝕚𝕄ℝ𝕊-η {n} {x} x≤′n
       dis = 𝕚𝕄ℝ𝕊-F {x} {m} m≤′x
       dat = 𝕚𝕄ℝ𝕊-F {n} {x} x≤′n
-  in θ' ⓘᵥ (θ ⓘʳ dat) ⓘᵥ NI.sym-associator dat dis (V m)
+  in θ′ ⓘᵥ (θ ⓘʳ dat) ⓘᵥ NI.sym-associator dat dis (V m)
 𝕚𝕄ℝ𝕊-η {suc n} {n} ≤′+1 = VΠ n
 
-private module ElMRS = Category τ'[iMR2]
+private module ElMRS = Category τ′[iMR2]
 private module 𝕋MRS = Category 𝕋MRS
 
 lemma-id : ∀ {n : ℕ} →

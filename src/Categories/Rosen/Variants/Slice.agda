@@ -61,7 +61,7 @@ record MR2 (A B : Obj) : Set (o ⊔ ℓ ⊔ e) where
 MR2-Setoid : Obj → Obj → Setoid (o ⊔ ℓ ⊔ e) e
 MR2-Setoid A B = record
   { Carrier = MR2 A B
-  ; _≈_ = λ (⟪ f , Φ ⟫) (⟪ g , Φ' ⟫) → (f ≈ g)
+  ; _≈_ = λ (⟪ f , Φ ⟫) (⟪ g , Φ′ ⟫) → (f ≈ g)
   ; isEquivalence = record
     { refl = Equiv.refl
     ; sym = λ pf → Equiv.sym pf
@@ -76,14 +76,14 @@ open import Categories.NaturalTransformation.NaturalIsomorphism as NI using (Nat
 MRS-Profunctor : Bifunctor (Category.op C) C (Setoids (o ⊔ ℓ ⊔ e) e)
 MRS-Profunctor = record
   { F₀ = λ { (A , B) → MR2-Setoid A B }
-  ; F₁ = λ { {(A , B)} {(A' , B')} (u , v) → record
+  ; F₁ = λ { {(A , B)} {(A′ , B′)} (u , v) → record
     { _⟨$⟩_ = λ {⟪ f , Φ ⟫ → ⟪ v ∘ f ∘ u , sorry ⟫ }
-    ; cong = λ { {⟪ f , Φ ⟫} {⟪ g , Φ' ⟫} f≈g →
+    ; cong = λ { {⟪ f , Φ ⟫} {⟪ g , Φ′ ⟫} f≈g →
         (∘-resp-≈ Equiv.refl (∘-resp-≈ f≈g Equiv.refl))
       }
     }}
   ; identity = λ x → trans identityˡ (trans identityʳ x)
-  ; homomorphism = λ { {f = (u₁ , v₁)} {g = (u₂ , v₂)} {⟪ f , Φ ⟫} {⟪ g , Φ' ⟫} f≈g →
+  ; homomorphism = λ { {f = (u₁ , v₁)} {g = (u₂ , v₂)} {⟪ f , Φ ⟫} {⟪ g , Φ′ ⟫} f≈g →
       begin (v₂ ∘ v₁) ∘ f ∘ u₁ ∘ u₂     ≈˘⟨ assoc ○ assoc ⟩
             (((v₂ ∘ v₁) ∘ f) ∘ u₁) ∘ u₂ ≈⟨ (refl⟩∘⟨ f≈g) ⟩∘⟨refl ⟩∘⟨refl ⟩
             (((v₂ ∘ v₁) ∘ g) ∘ u₁) ∘ u₂ ≈⟨ (assoc ⟩∘⟨refl) ○ (assoc ⟩∘⟨refl) ⟩

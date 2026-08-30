@@ -39,7 +39,7 @@ open Closed Cl using (adjoint; [_,_]₀; [_,_]₁; [_,-])
 --
 -- 1. The category iMR2ᴿ A is the fibre of (incoherent) (M,R)-systems
 --    over A: objects are triples (B , f : A ⇒ B , Φ : B ⇒ [ A , B ])
---    and morphisms are maps v : B ⇒ B' compatible with both f and Φ.
+--    and morphisms are maps v : B ⇒ B′ compatible with both f and Φ.
 --
 -- 2. We consider the endofunctor X ↦ A + (X ⊗ A).  In settings where ⊗
 --    distributes over coproducts, this is (naturally isomorphic to)

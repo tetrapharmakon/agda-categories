@@ -47,7 +47,7 @@ K = record
 -- [_,Cod] : (X : Obj) → Functor C C
 -- [ X ,Cod] =
 
-[_,Cod]₁ : ∀ {A A'} → (u : A ⇒ A') → NT ([ A' ,-] ∘F Cod) ([ A ,-] ∘F Cod)
+[_,Cod]₁ : ∀ {A A′} → (u : A ⇒ A′) → NT ([ A′ ,-] ∘F Cod) ([ A ,-] ∘F Cod)
 [ u ,Cod]₁ = nHom u ∘ʳ Cod
 
 -- the inclusion of repairs in total

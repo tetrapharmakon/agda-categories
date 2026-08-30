@@ -55,7 +55,7 @@ module To {B : Obj} {X Y : iMR2ᴸ₀ B} (f : iMR2ᴸ⇒ X Y) where
   ε₀ = adjoint.counit.η
   η₀ = adjoint.unit.η
 
-  cowedge : ∀ {A A'} {u : A ⇒ A'} → ε₀ B ∘ id ⊗₁ u ≈ ε₀ B ∘ [ u , id ]₁ ⊗₁ id
+  cowedge : ∀ {A A′} {u : A ⇒ A′} → ε₀ B ∘ id ⊗₁ u ≈ ε₀ B ∘ [ u , id ]₁ ⊗₁ id
   cowedge = Equiv.sym (mate.commute₂ _)
 
   q-comm :

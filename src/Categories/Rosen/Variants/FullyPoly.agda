@@ -88,7 +88,7 @@ record MR2 (A B : Obj) : Set (o ⊔ ℓ ⊔ e) where
 MR2-Setoid : Obj → Obj → Setoid (o ⊔ ℓ ⊔ e) (o ⊔ ℓ ⊔ e)
 MR2-Setoid A B = record
   { Carrier = MR2 A B
-  ; _≈_ = λ (⟪ f , Φ ⟫) (⟪ g , Φ' ⟫) → (f ≈ g) × (Φ ≃ Φ')
+  ; _≈_ = λ (⟪ f , Φ ⟫) (⟪ g , Φ′ ⟫) → (f ≈ g) × (Φ ≃ Φ′)
   ; isEquivalence = record
     { refl = Equiv.refl , (λ {x₁} → Equiv.refl)
     ; sym = λ (pf , k) → Equiv.sym pf , Equiv.sym k
@@ -217,22 +217,22 @@ open Naturalities
 MRS-Profunctor : Bifunctor (Category.op C) C (Setoids (o ⊔ ℓ ⊔ e) (o ⊔ ℓ ⊔ e))
 MRS-Profunctor = record
   { F₀ = λ { (A , B) → MR2-Setoid A B }
-  ; F₁ = λ { {(A , B)} {(A' , B')} (u , v) → record
+  ; F₁ = λ { {(A , B)} {(A′ , B′)} (u , v) → record
     { _⟨$⟩_ = λ {⟪ f , Φ ⟫ → ⟪ v ∘ f ∘ u , Φ ⟫ }
-    ; cong = λ { {⟪ f , Φ ⟫} {⟪ g , Φ' ⟫} (f≈g , Φ≈Φ') →
+    ; cong = λ { {⟪ f , Φ ⟫} {⟪ g , Φ′ ⟫} (f≈g , Φ≈Φ′) →
         (∘-resp-≈ Equiv.refl (∘-resp-≈ f≈g Equiv.refl))
-      , Φ≈Φ'
+      , Φ≈Φ′
       }
     }}
   -- F₁ leaves Φ strictly alone, so every Φ-component below is the hypothesis itself.
-  ; identity = λ { {(A , B)} {⟪ f , Φ ⟫} {⟪ g , Φ' ⟫} (f≈g , Φ≈Φ') →
-      Equiv.trans identityˡʳ f≈g , Φ≈Φ' }
-  ; homomorphism = λ { {f = (u₁ , v₁)} {g = (u₂ , v₂)} {⟪ f , Φ ⟫} {⟪ g , Φ' ⟫} (f≈g , Φ≈Φ') →
+  ; identity = λ { {(A , B)} {⟪ f , Φ ⟫} {⟪ g , Φ′ ⟫} (f≈g , Φ≈Φ′) →
+      Equiv.trans identityˡʳ f≈g , Φ≈Φ′ }
+  ; homomorphism = λ { {f = (u₁ , v₁)} {g = (u₂ , v₂)} {⟪ f , Φ ⟫} {⟪ g , Φ′ ⟫} (f≈g , Φ≈Φ′) →
       (begin (v₂ ∘ v₁) ∘ f ∘ u₁ ∘ u₂     ≈˘⟨ assoc ○ assoc ⟩
              (((v₂ ∘ v₁) ∘ f) ∘ u₁) ∘ u₂ ≈⟨ (refl⟩∘⟨ f≈g) ⟩∘⟨refl ⟩∘⟨refl ⟩
              (((v₂ ∘ v₁) ∘ g) ∘ u₁) ∘ u₂ ≈⟨ (assoc ⟩∘⟨refl) ○ (assoc ⟩∘⟨refl) ⟩
              (v₂ ∘ (v₁ ∘ (g ∘ u₁))) ∘ u₂ ≈⟨ assoc ○ sym-assoc ○ assoc ⟩
              v₂ ∘ (v₁ ∘ g ∘ u₁) ∘ u₂     ∎)
-    , Φ≈Φ' }
+    , Φ≈Φ′ }
   ; F-resp-≈ = λ x x₁ → (∘-resp-≈ (x .proj₂) (∘-resp-≈ (x₁ .proj₁) (x .proj₁))) , (x₁ .proj₂)
   }
