@@ -7,6 +7,15 @@ open import Level using (_⊔_)
 
 module Categories.Rosen.Incoherent.Displayed {o ℓ e} {C : Category o ℓ e} {M : Monoidal C} (Cl : Closed M) where
 
+------------------------------------------------------------------------
+-- Displayed: incoherent (M,R)-systems over a fixed codomain B.
+--
+-- Fixing the codomain B and letting the domain A vary gives the left-
+-- fibre iMR2ᴸ B, whose morphisms act on A alone.  Reindexing along
+-- v : B ⇒ B′ is only *pro*functorial in B, recorded by the bifunctor
+-- MRSdisplay — so the structure is displayed, not fibred.
+------------------------------------------------------------------------
+
 -- Displayed incoherent (M,R)-systems: the fibre over a fixed codomain B.
 -- Reindexing along v : B ⇒ B′ is *pro*functorial in B (hence a displayed category).
 
@@ -28,6 +37,7 @@ open HomReasoning
 open MR
 
 -- iMR2ᴸ₀: object of the left-fibre over B: a domain A plus an iMR2 A B.
+--   The ᴸ superscript: the left (domain) side is the free variable.
 record iMR2ᴸ₀ (B : Obj) : Set (o ⊔ ℓ ⊔ e) where
   field
     A : Obj
@@ -35,6 +45,8 @@ record iMR2ᴸ₀ (B : Obj) : Set (o ⊔ ℓ ⊔ e) where
 
 
 -- iMR2ᴸ⇒: morphisms in the left-fibre over B: u : X.A ⇒ Y.A compatible with f and Φ.
+--   The codomain B is common to both systems, so the equations eqf and
+--   eqΦ only constrain the behaviour of u on the varying domain A.
 record iMR2ᴸ⇒ {B : Obj} (X Y : iMR2ᴸ₀ B) : Set (o ⊔ ℓ ⊔ e) where
   module X = iMR2ᴸ₀ X
   module Y = iMR2ᴸ₀ Y
@@ -46,6 +58,8 @@ record iMR2ᴸ⇒ {B : Obj} (X Y : iMR2ᴸ₀ B) : Set (o ⊔ ℓ ⊔ e) where
     eqΦ : ξX.Φ ≈ [ u , id ]₁ ∘ ξY.Φ
 
 -- iMR2ᴸ B: the left-fibre category over B (fibre over the codomain).
+--   Slice.agda proves iMR2ᴸ B ≃ Slice C (B × [B,B]₀), so this fibre is
+--   the "algebraic data" view of slice arrows under B × [B,B]₀.
 iMR2ᴸ : (B : Obj) → Category (o ⊔ ℓ ⊔ e) (o ⊔ ℓ ⊔ e) e
 iMR2ᴸ B = record
   { Obj = iMR2ᴸ₀ B
@@ -87,6 +101,8 @@ private
 
 -- MRSdisplay v: bifunctor (iMR2ᴸ B)^op × iMR2ᴸ B′ → Setoids,
 -- capturing the *pro*functorial structure in the codomain parameter.
+--   For a fixed v, the fibres over B and B′ are connected by the set of
+--   morphisms u : X.A ⇒ Y.A intertwining f and Φ along the reindex v.
 MRSdisplay : (v : B ⇒ B′) → Bifunctor (Category.op (iMR2ᴸ B)) (iMR2ᴸ B′) (Setoids (ℓ ⊔ e) e)
 MRSdisplay v = record
   { F₀ = λ {(x , y) →

@@ -10,6 +10,15 @@ module Categories.Rosen.Incoherent.Iterated {o ℓ e} {C : Category o ℓ e} {M 
 -- Incoherent (M,R)-systems: a simple diagram A —f→ B —Φ→ [A,B]
 -- without the natural transformation condition of full MR2.
 
+------------------------------------------------------------------------
+-- Iterated: pairs of composable incoherent (M,R)-systems.
+--
+-- iMRSᴵᴵ₀ holds two systems sharing their middle object: ξ₁ : iMR2 A B
+-- and ξ₂ : iMR2 B Y (projected as hor and vert).  iMRSᴵᴵ⇒ glues two
+-- system morphisms by requiring agreement on the shared object
+-- (hᵣ≈kₗ); deg₀² / deg₂² project onto each factor and comp composes.
+------------------------------------------------------------------------
+
 open import Data.Product using (_,_; proj₁; proj₂; _×_)
 
 open import Categories.Category.Construction.Arrow
@@ -48,6 +57,8 @@ for morphisms the "obvious" thing
 
 -}
 
+-- iMRSᴵᴵ₀: a composable pair of systems — A —ξ₁→ B and B —ξ₂→ Y —
+-- re-projectable as hor and vert.
 record iMRSᴵᴵ₀ : Set (o ⊔ ℓ) where
   field
     A B Y : Obj
@@ -60,6 +71,8 @@ record iMRSᴵᴵ₀ : Set (o ⊔ ℓ) where
   vert = record { A = B ; B = Y ; ξ = ξ₂ }
 
 
+-- iMRSᴵᴵ⇒: a morphism of the span category: a morphism h of the first
+-- system and k of the second, with the shared-middle condition hᵣ≈kₗ.
 record iMRSᴵᴵ⇒ (S T : iMRSᴵᴵ₀) : Set (o ⊔ ℓ ⊔ e) where
   module S = iMRSᴵᴵ₀ S
   module T = iMRSᴵᴵ₀ T
@@ -73,6 +86,8 @@ record iMRSᴵᴵ⇒ (S T : iMRSᴵᴵ₀) : Set (o ⊔ ℓ ⊔ e) where
 
 module τ[iMR2] = Category τ[iMR2]
 
+-- iMRSᴵᴵ: the category of such composable pairs — a direct substitute
+-- for the IsoComma span construction of HigherMRS.agda.
 iMRSᴵᴵ : Category (o ⊔ ℓ) (o ⊔ ℓ ⊔ e) e
 iMRSᴵᴵ = record
   { Obj = iMRSᴵᴵ₀
@@ -108,6 +123,8 @@ iMRSᴵᴵ = record
   ; ∘-resp-≈ = λ f≈g f′≈g′ → ((∘-resp-≈ (f≈g .proj₁ .proj₁) (f′≈g′ .proj₁ .proj₁)) , ∘-resp-≈ (f≈g .proj₁ .proj₂) (f′≈g′ .proj₁ .proj₂)) , (∘-resp-≈ (f≈g .proj₂ .proj₁) (f′≈g′ .proj₂ .proj₁)) , ∘-resp-≈ (f≈g .proj₂ .proj₂) (f′≈g′ .proj₂ .proj₂)
   }
 
+-- deg₀² : iMRSᴵᴵ → τ[iMR2] — the "first face" functor, projecting onto
+-- the horizontal system ξ₁ (forgetting ξ₂).
 deg₀² : Functor iMRSᴵᴵ τ[iMR2]
 deg₀² = record
   { F₀ = λ x →
@@ -124,6 +141,8 @@ deg₀² = record
   ; F-resp-≈ = λ {A} {B} {f} {g} z → z .proj₁
   }
 
+-- deg₂² : iMRSᴵᴵ → τ[iMR2] — the "second face" functor, projecting onto
+-- the vertical system ξ₂ (forgetting ξ₁).
 deg₂² : Functor iMRSᴵᴵ τ[iMR2]
 deg₂² = record
   { F₀ = λ x →
@@ -140,6 +159,8 @@ deg₂² = record
   ; F-resp-≈ = λ {A} {B} {f} {g} z → z .proj₂
   }
 
+-- comp : iMRSᴵᴵ → τ[iMR2] — the composite system A —→ Y: the process is
+-- g ∘ f; the repair is [ f , id ]₁ ∘ Ψ (horizontal composition).
 comp : Functor iMRSᴵᴵ τ[iMR2]
 comp = record
   { F₀ = λ x →

@@ -25,8 +25,15 @@ open HomReasoning
 open MR
 
 -- The total category of the MRS-profunctor tabulator.
+-- Its objects are elements of MRS-Profunctor (the tabulator's base, tab₀),
+-- i.e. (M,R)-systems; its morphisms make both f and Φ compatible.
 -- Equivalent to the tabulator of MRS-Profunctor (see Tabulator.agda).
+-- Used by the coreflection in Adjunction/TotRep.agda.
 
+-- A morphism in the total category between two (M,R)-systems x, y: a map
+-- l : x.L ⇒ y.L against the domain and r : x.R ⇒ y.R against the codomain,
+-- commuting with the process maps (eqf) and the natural repair maps (nat,
+-- which yields the pointwise equation eqΦ).
 record tot⇒ (x y : tab₀ MRS-Profunctor) : Set (o ⊔ ℓ ⊔ e) where
   constructor [_,_∥_,_]
   module x = tab₀ x
@@ -55,6 +62,8 @@ record tot⇒ (x y : tab₀ MRS-Profunctor) : Set (o ⊔ ℓ ⊔ e) where
     ○ elimˡ C [-,-].identity
 
 
+-- The total category: objects are the tabulator's points (M,R)-systems and
+-- morphisms are tot⇒ pairs; equality is componentwise on l and r.
 total : Category (o ⊔ ℓ ⊔ e) (o ⊔ ℓ ⊔ e) e
 total = record
   { Obj = tab₀ MRS-Profunctor

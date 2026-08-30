@@ -10,6 +10,14 @@ open import Level
 
 module Categories.Rosen.Incoherent.Mealy {o ℓ e} {C : Category o ℓ e} {M : Monoidal C} (Cl : Closed M) where
 
+------------------------------------------------------------------------
+-- Mealy: internal Mealy automata and their total category.
+--
+-- A Mealy A B automaton has a state object E, a transition d : E⊗A ⇒ E
+-- and an output s : E⊗A ⇒ B.  Mealy₀ / Mealy⇒ package them and
+-- totalMealy is the (twisted) total category, the target of Arbib.
+------------------------------------------------------------------------
+
 open import Data.Product using (_,_; proj₁; proj₂; _×_)
 open import Relation.Binary.Bundles using (Setoid)
 
@@ -28,19 +36,31 @@ open Reason C
 
 open Closed Cl using (adjoint; unitorˡ;unitorʳ-commute-to; unitorʳ-commute-from;unitorʳ; [-,-]; unit; [_,_]₀; [_,-]; [-,_]; [_,_]₁;⊗;_⊗₀_;_⊗₁_;_⊗-;-⊗_)
 
+-- Mealy A B: a Mealy automaton with input object A, output object B and
+-- state object E; d is the transition and s the output, both of which
+-- consume an input token while reading the current state.
 record Mealy A B : Set (o ⊔ ℓ ⊔ e) where
   field
+    -- E is the object of states; d and s are read as functions of the
+    -- current state and one input token.
     E : Obj
+    -- d : E ⊗₀ A ⇒ E  — the transition: input updates the state.
     d : E ⊗₀ A ⇒ E
+    -- s : E ⊗₀ A ⇒ B  — the output: input yields a value in B.
     s : E ⊗₀ A ⇒ B
 
 
+-- Mealy₀: an automaton together with the input/output objects A, B it
+-- is equipped with.
 record Mealy₀ : Set (o ⊔ ℓ ⊔ e) where
   field
     A B : Obj
     m : Mealy A B
 
 
+-- Mealy⇒: a morphism of automata — l is contravariant on inputs, r on
+-- outputs, and u on states; d-eq and s-eq require u to intertwine the
+-- transition and output maps up to the reindexing by l.
 record Mealy⇒ (X Y : Mealy₀) : Set (o ⊔ ℓ ⊔ e) where
   module X = Mealy₀ X
   module Y = Mealy₀ Y
@@ -53,6 +73,9 @@ record Mealy⇒ (X Y : Mealy₀) : Set (o ⊔ ℓ ⊔ e) where
     d-eq : u ∘ mX.d ∘ id ⊗₁ l ≈ mY.d ∘ u ⊗₁ id
     s-eq : r ∘ mX.s ∘ id ⊗₁ l ≈ mY.s ∘ u ⊗₁ id
 
+-- Mealy⇒-≈: equality of automata morphisms, componentwise from the
+-- morphism record (note: the second conjunct duplicates the first, so
+-- the l component is read twice).
 Mealy⇒-≈ : {A B : Mealy₀} → Mealy⇒ A B → Mealy⇒ A B → Set e
 Mealy⇒-≈ f g =
   let module f = Mealy⇒ f
@@ -66,6 +89,7 @@ open MR
 
 -- !!! This is not the total category of Mealy automata that
 -- is usually recorded in the literature \cite{foo,bar}
+-- (here the morphisms twist: inputs are acted on contravariantly).
 totalMealy : Category (o ⊔ ℓ ⊔ e) (o ⊔ ℓ ⊔ e) e
 totalMealy = record
   { Obj = Mealy₀

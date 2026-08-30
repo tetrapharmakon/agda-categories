@@ -8,6 +8,9 @@ open import Level using (_⊔_)
 module Categories.Rosen.Coherent.Core {o ℓ e} {C : Category o ℓ e} {M : Monoidal C} (Cl : Closed M) where
 
 -- Core definitions for the category of (M,R)-systems.
+-- An (M,R)-system (Rosen's "metabolic"/"repair" system) is a pair (f, Φ)
+-- where f : A ⇒ B is the metabolic process and Φ : Cod ⇒ [A,-]∘Cod gives,
+-- for every morphism into A, a repair map.  A family of natural repairs.
 -- Exports: Cod, nHom, nHom-identity, MR2, MR2-Setoid, MRS-Profunctor.
 
 open import Data.Product using (_,_; proj₁; proj₂; _×_)
@@ -51,6 +54,9 @@ nHom {A} {B} f = record
 nHom-identity : ∀ {A} → nHom (id {A}) ≃ idN
 nHom-identity = [-,-].identity
 
+-- An (M,R)-system according to Rosen (definition below): the pair (f, Φ) is
+-- the process f : A ⇒ B plus a natural family Φ (g : X ⇒ A) : B ⇒ [A,X]
+-- of repair maps, one for every arrow into A.
 -- definition of an (M,R)-system according to Rosen
 record MR2 (A B : Obj) : Set (o ⊔ ℓ ⊔ e) where
   eta-equality
@@ -63,6 +69,9 @@ record MR2 (A B : Obj) : Set (o ⊔ ℓ ⊔ e) where
   Φη₀ = Φη (record { arr = f })
   Φcommute = λ {X Y : Category.Obj Arr.Arrow} t → NaturalTransformation.commute Φ {X} {Y} t
 
+-- MR2 as a Setoid: two MR2 elements agree when their f components are equal
+-- (as arrows of C) and their Φ components are pointwise ≃-equal; this is the
+-- carrier equality underlying the profunctor below.
 -- MR2 as a Setoid: two MR2 elements are equal when their f components are equal
 -- and their Φ components are ≃-equal.
 MR2-Setoid : Obj → Obj → Setoid (o ⊔ ℓ ⊔ e) (o ⊔ ℓ ⊔ e)
@@ -149,6 +158,11 @@ module Naturalities {A B X Y} (ξ : MR2 A B) (u : X ⇒ Y) where
 
 open Naturalities
 
+-- An MR2 system is determined (up to data) by a natural transformation
+-- id ⇒ [A,-]: two functions interconverting an MR2 with a mere natural
+-- endo-arrow, by reading Φ at the identity arrow (NICod⇒NIid) and by
+-- realizing any such natural transformation at an arbitrary codomain
+-- (NIid⇒NICod).
 NICod⇒NIid : ∀ {A B} (ξ : MR2 A B) → NaturalTransformation idF ([_,-] A)
 NICod⇒NIid ξ = let module ξ = MR2 ξ in ntHelper (record
   { η = λ X → Naturalities.Φid ξ ξ.f X
@@ -167,6 +181,9 @@ NIid⇒NICod f φ = ⟪ f , ntHelper (record
 
 open import Categories.NaturalTransformation.NaturalIsomorphism as NI using (NaturalIsomorphism;niHelper; _ⓘˡ_; _ⓘʳ_)
 
+-- The natural isomorphism [unit,-] ≅ id: exponentiating by the monoidal unit
+-- is trivial, i.e. the closed structure agrees with the unitors.  Used to
+-- massage Φ into the standard form.
 fattoide : NaturalIsomorphism ([_,-] unit) idF
 fattoide = niHelper (record
   { η = λ X → adjoint.counit.η X ∘ unitorʳ.to
@@ -193,6 +210,8 @@ fattoide = niHelper (record
     }
   })
 
+-- MRS-Profunctor reindexes an (M,R)-system along a pair (u : A′ ⇒ A,
+-- v : B ⇒ B′) by pre/post-composing f and Φ; it is the profunctor below.
 -- Type of the desired profunctor C.op × C → Sets
 -- sending (A , B) ↦ MR2 A B.
 MRS-Profunctor : Bifunctor (Category.op C) C (Setoids (o ⊔ ℓ ⊔ e) (o ⊔ ℓ ⊔ e))

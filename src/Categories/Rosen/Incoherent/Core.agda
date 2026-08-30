@@ -7,6 +7,14 @@ open import Level using (_⊔_)
 
 module Categories.Rosen.Incoherent.Core {o ℓ e} {C : Category o ℓ e} {M : Monoidal C} (Cl : Closed M) where
 
+------------------------------------------------------------------------
+-- Core: incoherent (M,R)-systems, total category τ[iMR2].
+--
+-- An incoherent (M,R)-system is bare data — a process f : A ⇒ B and a
+-- repair Φ : B ⇒ [A,B]₀ — with no naturality condition (contrast
+-- Coherent.MR2); iMR2₀ / iMR2⇒ / τ[iMR2] package them as a category.
+------------------------------------------------------------------------
+
 -- Incoherent (M,R)-systems: a simple diagram A —f→ B —Φ→ [A,B]
 -- without the natural transformation condition of full MR2.
 
@@ -27,6 +35,9 @@ open MR
 module Arr = Categories.Category.Construction.Arrow C
 
 -- iMR2: an incoherent (M,R)-system: a pair (f, Φ).
+--   f : A ⇒ B is the "process" map; Φ : B ⇒ [ A , B ]₀ is the "repair"
+--   map, valued in the internal hom of the closed structure.  There is
+--   no constraint at all relating f and Φ.
 record iMR2 (A B : Obj) : Set (o ⊔ ℓ) where
   constructor ⟪_,_⟫
   field
@@ -35,6 +46,8 @@ record iMR2 (A B : Obj) : Set (o ⊔ ℓ) where
 
 
 -- iMR2₀: an object of the total category (a pair of objects plus an iMR2).
+--   A single kind of object: a system ξ : iMR2 A B together with the
+--   objects A, B it sits between.
 record iMR2₀ : Set (o ⊔ ℓ) where
   field
     A B : Obj
@@ -42,6 +55,9 @@ record iMR2₀ : Set (o ⊔ ℓ) where
 
 
 -- iMR2⇒: morphisms of the incoherent total category.
+--   One morphism is a pair (l, r) of arrows on the two components plus
+--   eqf / eqΦ: squares forcing (l, r) to be compatible with the f's and
+--   with the Φ's through the bifunctorial action of the internal hom.
 record iMR2⇒ (X Y : iMR2₀) : Set (o ⊔ ℓ ⊔ e) where
   module X = iMR2₀ X
   module Y = iMR2₀ Y
@@ -54,6 +70,8 @@ record iMR2⇒ (X Y : iMR2₀) : Set (o ⊔ ℓ ⊔ e) where
     eqΦ : [ l , id ]₁ ∘ ξY.Φ ∘ r ≈ [ id , r ]₁ ∘ ξX.Φ
 
 -- τ[iMR2]: total category of incoherent (M,R)-systems.
+--   Objects are iMR2₀ and morphisms iMR2⇒; equality is componentwise
+--   (l-part × r-part) and every law is inherited from C on each part.
 τ[iMR2] : Category (o ⊔ ℓ) (o ⊔ ℓ ⊔ e) e
 τ[iMR2] = record
   { Obj = iMR2₀

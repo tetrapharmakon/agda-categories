@@ -4,6 +4,11 @@ open import Level
 
 -- Instances of the Rosen constructions for the Cartesian (Sets) case.
 -- In this setting, V₁ and U₁ acquire left adjoints (L and Lʹ).
+-- Over Sets the repair data is rigid: Nat(Cod, [A,-]∘Cod) is a singleton,
+-- so the unique repair map is const-Φ and is available wherever needed: an
+-- arrow is sent to the (M,R)-system / element of ElMRS with that constant
+-- repair map.
+-- Exports: const-Φ, yoneda-argument, unique-Φ, L, L⊣V₁, L′, L′⊣U₁.
 module Categories.Rosen.Cartesian.Adjoints (o : Level) where
 
 open import Categories.Adjoint using (_⊣_)
@@ -50,6 +55,8 @@ private
 
 -- The unique natural transformation Cod ⇒ [A,-] ∘ Cod in Sets (constant).
 -- const-Φ A: the unique natural transformation Cod ⇒ [A,-]∘Cod in Sets (constant).
+-- Intuitively, for a metabolic arrow X → B this "repairs" B by returning the
+-- very element given: the map B → (A → B) that is constant in A (`a ↦ y`).
 const-Φ : (A : Obj) → NaturalTransformation Cod (([ A ,-] ∘F Cod))
 const-Φ A = record
   { η = λ m y a → y

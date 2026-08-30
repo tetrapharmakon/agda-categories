@@ -1,7 +1,10 @@
 {-# OPTIONS --without-K --warning=noUserWarning --warning=noUselessPrivate --warning=noUnsupportedIndexedMatch #-}
 
 -- The category of Sets as a Cartesian closed monoidal category.
+-- Everything is built from the standard categorical structure on Sets:
+-- products, exponentials, evaluation and currying.
 -- Used to instantiate the Rosen constructions concretely.
+-- Exports: Sets-CCC, Sets-Monoidal, Sets-Closed.
 
 open import Data.Product using (_×_; _,_; proj₁; proj₂)
 open import Data.Unit.Polymorphic using (⊤; tt)
@@ -18,6 +21,9 @@ open import Categories.Functor.Bifunctor using (Bifunctor)
 
 module Categories.Rosen.Cartesian.Sets where
 
+-- Function extensionality: a standard axiom for reasoning about Sets (two
+-- pointwise-equal functions are equal).  This is an ordinary axiom, not a
+-- *sorry*-style placeholder.
 postulate
   extensionality : ∀ {a b} {A : Set a} {B : A → Set b} {f g : (x : A) → B x}
                  → (∀ x → f x ≡ g x) → f ≡ g
@@ -26,6 +32,8 @@ module _ {o : Level} where
   private
     S = Sets o
 
+  -- The evident canonical Cartesian-closed structure on Sets: products,
+  -- terminal object, exponentials, evaluation and currying.
   Sets-Canonical : Canonical.CartesianClosed S
   Sets-Canonical = record
     { ⊤    = ⊤
@@ -47,6 +55,7 @@ module _ {o : Level} where
     ; curry-unique = λ {f g} h {c} → extensionality λ a → h {(c , a)}
     }
 
+  -- The Cartesian-closed structure on Sets derived from the canonical one.
   Sets-CCC : CCC.CartesianClosed S
   Sets-CCC = Canonical.Equivalence.fromCanonical _ Sets-Canonical
 
@@ -58,8 +67,11 @@ module Sets-MonoidalClosed {o : Level} where
     open CMC using (closedMonoidal)
     open CartesianMonoidal (CCC.CartesianClosed.cartesian (Sets-CCC {o})) using (monoidal)
 
+  -- The induced monoidal structure on Sets, with the Cartesian product.
   Sets-Monoidal : Monoidal S
   Sets-Monoidal = monoidal
 
+  -- The induced closed structure: exponentiating by the product (function
+  -- types).
   Sets-Closed : Closed Sets-Monoidal
   Sets-Closed = closedMonoidal

@@ -23,10 +23,11 @@ something is simply unfinished.
 
 ## Coherent (M,R)-systems
 
-The core coherent definitions live in the `Coherent/` subdirectory.
-A `Functorial/` copy generalizes `Cod` to an arbitrary functor `U : E → C`;
-see the note at the end of this section — it has diverged from being a
-literal copy and is not fully sound (see `Functorial/Core.agda` below).
+The core coherent definitions live in the `Coherent/` subdirectory. It also
+contains `Coherent/C2Sets.agda`, a fully self-contained companion that builds
+the category of C₂-sets concretely in order to exhibit a real counterexample
+to a claim the core files merely state to be unprovable (see the
+`Coherent/NaturalAndHom.agda` and `Coherent/C2Sets.agda` sections below).
 
 ### `Coherent/Core.agda`
 Core definitions for the category of (M,R)-systems.
@@ -53,6 +54,27 @@ of the identity that acts as the identity on the terminal object but swaps
 the regular C₂-set — so `p` genuinely discards information that `ι` cannot
 reconstruct. A natural transformation `id ⇒ [A,-]` is *not* determined by
 its component at the unit without an extra density/generator hypothesis.
+
+### `Coherent/C2Sets.agda`
+Self-contained module (no parameters) that makes the `NaturalAndHom` claim
+*concrete*: it builds the category of C₂-sets — functors `C2 → Sets`, where
+`C2` is the one-object category whose endomorphisms are the two elements of
+the cyclic group of order two, composed by xor — and exhibits it as Cartesian
+closed in the canonical style (explicit pointwise product `_C×_`, terminal
+`C⊤`, internal hom `_C^_` with the conjugation action, evaluation and
+currying), then *deduces* its `Monoidal`/`Closed` structure from that, exactly
+as `Cartesian/Sets.agda` does for Sets.
+- `C2` / `C2Sets` — the two-element group as a category, and its category of (C₂-)sets.
+- `C2Sets-CCC` / `C2Sets-Monoidal` / `C2Sets-Closed` — the Cartesian-closed, hence monoidal-closed, structures.
+- `actBy b` — the natural endomorphism of the identity sending `x` to `b · x`; `swap = actBy true`, the action of the nontrivial element.
+- `Creg` — the regular C₂-set, where the nontrivial action has no fixed points; this is what distinguishes `swap` from the identity.
+- `swap-is-counterexample` — `¬ (∀ X → η(ι (p swap)) X ≈ η swap X)`: the concrete proof that the reverse direction of `lem` fails for C₂-sets, via the chain `p-swap≈id`, `collapse`.
+
+**Status:** complete, no holes. The only thing left as a remarked-out sketch is
+`ι-id≈actBy-false`, an interesting fact in its own right that the final proof
+turned out not to need (it does not close by `refl` because `[unit,-].F₀` is
+built through `Functor.Construction.Constant` rather than reducing to the
+constant embedding).
 
 ### `Coherent/Repairs.agda`
 The "fibration of repairs": the category of elements of the functor `A ↦ Nat(Cod, [A,-]∘Cod)`.
@@ -129,6 +151,21 @@ transformation. This is the actively-developed part of the tree; several
 files here document, rather than paper over, the places where dropping
 naturality genuinely breaks a coherent-world construction.
 
+### `Incoherent/Algebras.agda`
+Characterizes the fibre of incoherent (M,R)-systems over a fixed domain
+object `A` as a category of algebras. It assumes only closed structure and
+binary coproducts (no symmetry of `⊗` is used anywhere — the transpositions
+between `Φ` and its curried form `Φ#` use only the closed structure).
+- `_⊗[_+I]` — the endofunctor `X ↦ A + (X ⊗ A)` on `C`.
+- `F-Algebra-Category` — the category of algebras for that endofunctor.
+- `to` — `iMR2ᴿ A → Alg(A + -⊗A)`: sends `(B, f, Φ)` to the algebra with structure map `[f, Φ#]`, where `Φ# = Radjunct Φ : B⊗A ⇒ B`.
+- `from` — `Alg(A + -⊗A) → iMR2ᴿ A`: given an algebra `α : A + (B⊗A) ⇒ B`, sets `f = α ∘ i₁` and `Φ = Ladjunct (α ∘ i₂)`.
+- `AlgA≣MRS^A` — the full `StrongEquivalence (iMR2ᴿ A) (F-Algebra-Category A)`, with constructive round-trip proofs.
+
+**Status:** complete, no holes. This complements `Incoherent/Slice.agda`
+(the `B`-fibre is a slice) by giving the dual/algebraic description of the
+`A`-fibre.
+
 ### `Incoherent/Core.agda`
 Incoherent (M,R)-systems: a simpler variant where `Φ : B ⇒ [A,B]` is just a
 morphism (not a natural transformation).
@@ -196,7 +233,7 @@ construction, the comparison with Mealy automata).
 - `[_]A` / `[_]B` — projections `τ[iMR2] → C` onto the domain/codomain.
 - `[_]f` — projection `τ[iMR2] → Arrow(C)` onto the process map `f`.
 - `[_]Φ` — projection `τ[iMR2] → irepairs` onto the repair map `Φ`.
-- `lemma-epsilon` / `lemma-delta` — the two compatibility squares needed to interpret a twisted MR-morphism as a morphism of Mealy automata.
+- `lemma-epsilon` / `lemma-delta` — the two compatibility squares (output and transition) needed to interpret a twisted MR-morphism as a morphism of Mealy automata; both live in a shared module parameterized by an MR-morphism `f : twiMR2⇒ X Y`.
 - `Arbib` — functor `τ'[iMR2] → totalMealy` sending an incoherent (M,R)-system to the Mealy automaton with state object `[A,B]`, transition `d` and output `s` built from the adjunction unit/counit (the construction attributed to Arbib in the file's comment).
 
 ### `Incoherent/Mealy.agda`
@@ -204,7 +241,15 @@ The category of Mealy automata internal to `C`, used as the target of the
 `Arbib` functor in `Functors.agda`.
 - `Mealy A B` — a Mealy automaton: state object `E`, transition `d : E⊗A ⇒ E`, output `s : E⊗A ⇒ B`.
 - `Mealy₀` / `Mealy⇒` — objects and morphisms (a state map `u` intertwining `d`/`s` up to reindexing by `l`,`r`).
+- `Mealy⇒-≈` — equality of automaton morphisms, componentwise from the morphism record.
 - `totalMealy` — the total category. The file's own comment flags that this is *not* the usual total category of Mealy automata found in the literature (an unresolved `\cite{...}` placeholder is left in the comment).
+
+**Note:** `Mealy⇒-≈` (and the `sym`/`trans`/`∘-resp-≈` of the total category it feeds)
+compares the `l` component twice and never the `r` component — the second
+conjunct duplicates the first. This looks like a latent bug in the equality
+datatype; it is documented here and in the file's comment rather than silently
+"fixed", since changing it is a semantic decision about what morphism equality
+should mean. `totalMealy`'s `_≈_` inherits the quirk.
 
 ### `Incoherent/HigherMRS.agda`
 The incoherent counterpart of `Coherent/HigherMRS.agda`: builds the tower of
@@ -284,45 +329,12 @@ like straightforward (if fiddly) equational reasoning about how `Φη₀`
 transports along `reindexMR2`. The file does not currently type-check
 standalone.
 
-## Functorial variant
-
-`Functorial/` was originally seeded as a literal copy of `Coherent/` (with
-`Categories.Rosen.Functorial.*` module paths) intended as a starting point
-for future variants. **It has since diverged and is no longer a literal
-copy**, nor is it fully sound — see `Functorial/Core.agda` below. Prefer
-`Variants/Functorial.agda` (documented below), which explores the same idea
-cleanly and with no postulates.
-
-### `Functorial/Core.agda`
-Generalizes `Coherent/Core.agda` by parameterizing over an arbitrary functor
-`U : E → C` in place of the fixed `Cod`; `MR2` gains a fourth
-existential-witness field `Ue≈f` recording that `f` literally comes from
-some `U`-image morphism.
-
-**Status:** zero `{! !}` holes, but relies on
-`postulate irrelevance : ∀ {ℓ}{A : Set ℓ} → A` — a `sorry` in all but
-name — used twice: once as an (unusual) *pattern* in `MR2-Setoid`'s `_≈_`
-(matching the witness field against the literal postulated term), and once
-to *construct* the witness field in `MRS-Profunctor`'s `F₁`. The file
-"compiles" only because it postulates a proof of anything wherever the
-`Ue≈f` witness is needed; the obligation itself has not actually been
-discharged.
-
-### `Functorial/Repairs.agda`, `Functorial/FibreA.agda`, `Functorial/TabEquivalence.agda`, `Functorial/Tabulator.agda`, `Functorial/TotalCategory.agda`
-Genuine, hole-free re-derivations of their `Coherent/` counterparts,
-mechanically re-parameterized by `U` (opening
-`Categories.Rosen.Functorial.Core Cl U` in place of
-`Categories.Rosen.Coherent.Core Cl`). No postulates of their own beyond
-what they inherit from `Functorial/Core.agda`.
-
-### `Functorial/HigherMRS.agda`, `Functorial/ProElements.agda`
-Diverge further from their `Coherent/` originals and pick up additional
-unfilled holes (21 and 3 `{! !}` holes respectively) not present upstream.
-
-**Status:** neither file currently type-checks (`UnsolvedInteractionMetas`),
-for the same reason as the unfinished `Variants/` files below.
-
 ## Variants (experimental)
+
+> A former `Functorial/` subdirectory (a would-be `U`-parametric variant that
+> diverged from `Coherent/` and relied on an escape-hatch
+> `postulate irrelevance`) was removed from the tree; the same idea is
+> developed cleanly by `Variants/Functorial.agda` below.
 
 Four independent explorations of ways to generalize where Φ's naturality
 data lives, kept side by side for comparison. Only one of the four
@@ -337,9 +349,9 @@ module is parameterized by `U`), redefining `MR2 A B` with
 - `MRS-Profunctor` — the full profunctor structure `C^op × C → Setoids`, proved completely (identity, homomorphism and `F-resp-≈` all filled in, by the same argument that works for `Cod`).
 
 **Status:** complete, no holes, no postulates. This is the road-tested
-version of the idea `Functorial/Core.agda` also attempts; unlike that file,
-this one carries no extra existential-witness field and needs no
-escape-hatch postulate.
+version of the `U`-parametric idea that the former `Functorial/` subdirectory
+also attempted; unlike that effort it carries no extra existential-witness
+field and needs no escape-hatch postulate.
 
 ### `Variants/FullyPoly.agda`
 An experimental "fully polymorphic" variant of `MR2` where Φ is natural in
@@ -393,23 +405,36 @@ the *domain* of Φ, not the `iMR2ᴸ B ≃ Slice C (B×[B,B]₀)` equivalence.
 ## Adjunction / Cartesian instantiation
 
 ### `Adjunction/TotRep.agda`
-Import module tying together `Core` and `Repairs` (no new definitions).
+Builds the incidence relation between the total category (see
+`Coherent/TotalCategory.agda`) and the repair fibration (see
+`Coherent/Repairs.agda`): the category of repairs *coreflects* into the
+total category.
+- `K` — the coreflector `total → repairs`, forgetting the metabolic map `f` and keeping only the repair component `Φ`.
+- `[_,Cod]₁` — precomposition of the hom functor `[A,-]` with `Cod`, reindexed by `u`.
+- `𝕁` — the inclusion `repairs → total`, sending a repair system `(A, Φ)` to the (M,R)-system `(A, A)` with identity metabolic map `id : A ⇒ A` and repair `Φ`.
+- `𝕁⊣K` — the adjunction `𝕁 ⊣ K`; since its unit is the identity, `𝕁` is full and faithful and the total category coreflects onto the repair fibration.
 
 ### `Cartesian/Sets.agda`
 The category of Sets as a Cartesian closed monoidal category,
 used to instantiate the Rosen constructions concretely.
+- `Sets-Canonical` / `Sets-CCC` — the canonical and bundled Cartesian-closed structures on Sets.
+- `Sets-Monoidal` / `Sets-Closed` — the induced monoidal and closed structures (product given by `×`, exponentials by function types).
 
 **Note:** postulates `extensionality` (function extensionality), a standard
 axiom for reasoning about `Sets`, not a `sorry`-style placeholder.
 
 ### `Cartesian/Concrete.agda`
-Generic instance: all Rosen modules instantiated for Sets,
-serving as a type-checking test.
+The parametric instantiation point `(o : Level)` for the Rosen constructions
+over Sets. As it stands it carries only the module declaration and imports —
+the concrete constructions it is meant to tie together live in
+`Cartesian/Sets.agda` and `Cartesian/Adjoints.agda`; no instantiations are
+defined here yet.
 
 ### `Cartesian/Adjoints.agda`
 Instances of the Rosen constructions for the Cartesian (Sets) case.
-In this setting, V₁ and U₁ acquire left adjoints.
-- `const-Φ` — the unique natural transformation `Cod ⇒ [A,-]∘Cod` in Sets.
+In this setting, the repair map is uniquely determined (Sets is a singleton
+for `Nat(Cod, [A,-]∘Cod)`), so `V₁` and `U₁` acquire left adjoints.
+- `const-Φ` — the unique natural transformation `Cod ⇒ [A,-]∘Cod` in Sets: the map `B → (A → B)` constant in its `A`-argument (`a ↦ y`).
 - `yoneda-argument` — `Nat(Cod, [A,-]∘Cod)` is a singleton.
 - `unique-Φ` — every such Φ equals `const-Φ A`.
 - `L` / `L⊣V₁` — left adjoint to V₁.

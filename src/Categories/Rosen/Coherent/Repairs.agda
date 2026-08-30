@@ -7,6 +7,9 @@ open import Level using (_⊔_)
 
 module Categories.Rosen.Coherent.Repairs {o ℓ e} {C : Category o ℓ e} {M : Monoidal C} (Cl : Closed M) where
 
+-- Intuitively, a repair system remembers only the repair component Φ of an
+-- (M,R)-system, dropping the metabolic map f.
+--
 -- The "fibration of repairs": the category of elements of the functor
 -- A ↦ Nat(Cod, [A,-]∘Cod).  Objects rep₀ are (A, Φ) with Φ : Cod ⇒ [A,-]∘Cod;
 -- morphisms rep⇒ are commuting pairs.  Exports rep₀, rep⇒, repairs.

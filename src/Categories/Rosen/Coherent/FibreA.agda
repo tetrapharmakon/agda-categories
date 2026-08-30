@@ -9,7 +9,10 @@ module Categories.Rosen.Coherent.FibreA {o ℓ e} {C : Category o ℓ e} {M : Mo
 
 -- Fibre-at-A: alternative construction for higher (M,R)-systems by
 -- fixing the domain object A, which simplifies the definitions.
+-- The fibre over A is the category totalAtA A; ∇ sends it into Arrow;
+-- commaNablaV is a weaker comma-object invariant (historical).
 -- Also includes commaNablaV, a weaker comma-object invariant (historical).
+-- Exports: totalAtA₀, totalAtA₁, totalAtA, ∇, commaNablaV.
 
 open import Data.Product using (_,_)
 open import Relation.Binary using () renaming (Setoid to S)
@@ -50,6 +53,8 @@ record totalAtA₁ {A : Obj} (x y : totalAtA₀ A) : Set (o ⊔ ℓ ⊔ e) where
     eqΦ : [ id , r ]₁ ∘ Φ.η (record { dom = A ; cod = x.B ; arr = f }) ≈ ψ.η (record { dom = A ; cod = y.B ; arr = g }) ∘ r
 
 
+-- totalAtA A: the category of (M,R)-systems whose metabolic domain is the
+-- fixed object A.
 -- Category totalAtA A: the fibre over A of the MRS profunctor.
 totalAtA : (A : Obj) → Category (o ⊔ ℓ ⊔ e) (o ⊔ ℓ ⊔ e) e
 totalAtA A = record

@@ -10,4 +10,6 @@ open import Level
 
 -- Generic instance: all Rosen modules instantiated for Sets,
 -- serving as a type-checking test and a concrete example.
+-- This module is the parametric instantiation point (o : Level); the concrete
+-- constructions themselves live in Cartesian/Sets.agda and Adjoints.agda.
 module Categories.Rosen.Cartesian.Concrete (o : Level) where

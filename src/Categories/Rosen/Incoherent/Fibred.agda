@@ -7,6 +7,15 @@ open import Level using (_⊔_)
 
 module Categories.Rosen.Incoherent.Fibred {o ℓ e} {C : Category o ℓ e} {M : Monoidal C} (Cl : Closed M) where
 
+------------------------------------------------------------------------
+-- Fibred: incoherent (M,R)-systems fibred over the domain A.
+--
+-- Fixing the domain A and letting the codomain B vary gives the fibre
+-- iMR2ᴿ A, whose morphisms act on B alone.  Reindexing along u : A ⇒ A′
+-- is genuinely functorial (contravariantly), so this is a fibration —
+-- contrast with the displayed left-fibre in Displayed.agda.
+------------------------------------------------------------------------
+
 -- Fibred incoherent (M,R)-systems: the fibre over a fixed domain A.
 -- Reindexing along u : A ⇒ A′ is functorial (contravariant) in A.
 
@@ -27,6 +36,7 @@ open MR
 
 
 -- iMR2ᴿ₀: object of the fibre over A: a codomain B plus an iMR2 A B.
+--   The ᴿ superscript: the right (codomain) side is the free variable.
 record iMR2ᴿ₀ (A : Obj) : Set (o ⊔ ℓ ⊔ e) where
   field
     B : Obj
@@ -34,6 +44,8 @@ record iMR2ᴿ₀ (A : Obj) : Set (o ⊔ ℓ ⊔ e) where
 
 
 -- iMR2ᴿ⇒: morphisms in the fibre over A: v : X.B ⇒ Y.B compatible with f and Φ.
+--   The domain A is common to both systems; the equations eqf and eqΦ
+--   say that v intertwines the f's and the Φ's over the fixed A.
 record iMR2ᴿ⇒ {A : Obj} (X Y : iMR2ᴿ₀ A) : Set (o ⊔ ℓ ⊔ e) where
   module X = iMR2ᴿ₀ X
   module Y = iMR2ᴿ₀ Y
@@ -45,6 +57,8 @@ record iMR2ᴿ⇒ {A : Obj} (X Y : iMR2ᴿ₀ A) : Set (o ⊔ ℓ ⊔ e) where
     eqΦ : [ id , v ]₁ ∘ ξX.Φ ≈ ξY.Φ ∘ v
 
 -- iMR2ᴿ A: the fibre category over A of the incoherent MRS profunctor.
+--   Algebras.agda shows iMR2ᴿ A is strongly equivalent to the category
+--   of algebras for the endofunctor X ↦ A + (X ⊗ A).
 iMR2ᴿ : (A : Obj) → Category (o ⊔ ℓ ⊔ e) (o ⊔ ℓ ⊔ e) e
 iMR2ᴿ A = record
   { Obj = iMR2ᴿ₀ A
@@ -84,6 +98,8 @@ private
   A A′ B B′ : Obj
 
 -- MRSreindex u: reindexing functor iMR2ᴿ A′ → iMR2ᴿ A along u : A ⇒ A′.
+--   On a system (B , f , Φ) this precomposes the process and re-indexes
+--   the repair through u: f ↦ f ∘ u and Φ ↦ [ u , id ]₁ ∘ Φ.
 MRSreindex : (u : A ⇒ A′) → Functor (iMR2ᴿ A′) (iMR2ᴿ A)
 MRSreindex {A} {A′} u = record
   { F₀ = λ { x →

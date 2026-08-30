@@ -10,6 +10,15 @@ module Categories.Rosen.Incoherent.Elements {o ℓ e} {C : Category o ℓ e} {M 
 -- Incoherent (M,R)-systems: a simple diagram A —f→ B —Φ→ [A,B]
 -- without the natural transformation condition of full MR2.
 
+------------------------------------------------------------------------
+-- Elements: the twisted category of elements of incoherent MRS.
+--
+-- The morphisms of the total category are recast in twisted form: the
+-- A-component is contravariant (l : Y.A ⇒ X.A) while the B-component
+-- stays covariant, matching the shape of the twisted-arrow category.
+-- The projection functors 𝕃 and ℝ forget respectively f and Φ.
+------------------------------------------------------------------------
+
 open import Data.Product using (_,_; proj₁; proj₂; _×_)
 
 open import Categories.Category.Construction.Arrow
@@ -27,6 +36,9 @@ open MR
 open import Categories.Rosen.Incoherent.Core Cl
 
 -- twiMR2⇒: twisted morphisms of the incoherent category of elements.
+--   l : Y.A ⇒ X.A is contravariant (reverse direction), while
+--   r : X.B ⇒ Y.B is covariant; eqf pastes the process maps and eqΦ
+--   the repair maps through the action of the internal-hom bifunctor.
 record twiMR2⇒ (X Y : iMR2₀) : Set (o ⊔ ℓ ⊔ e) where
   module X = iMR2₀ X
   module Y = iMR2₀ Y
@@ -39,6 +51,8 @@ record twiMR2⇒ (X Y : iMR2₀) : Set (o ⊔ ℓ ⊔ e) where
     eqΦ : ξY.Φ ∘ r ≈ [ l , r ]₁ ∘ ξX.Φ
 
 -- τ′[iMR2]: twisted category of incoherent (M,R)-systems.
+--   Same objects as τ[iMR2]; the twisting happens only in the arrows,
+--   so the category of elements matches the twisted-arrow shape.
 τ′[iMR2] : Category (o ⊔ ℓ) (o ⊔ ℓ ⊔ e) e
 τ′[iMR2] = record
   { Obj = iMR2₀
@@ -71,6 +85,9 @@ record twiMR2⇒ (X Y : iMR2₀) : Set (o ⊔ ℓ ⊔ e) where
 
 open import Categories.Category.Construction.TwistedArrow C renaming (Morphism to tMorphism; Morphism⇒ to tMorphism⇒)
 
+-- 𝕃 : τ′[iMR2] → TwistedArrow, the "left" projection: forget the repair
+-- map, keeping only the process arrow f : A ⇒ B as an object of the
+-- twisted arrow category of C.
 𝕃 : Functor τ′[iMR2] TwistedArrow
 𝕃 = record
   { F₀ = λ x → let module x = iMR2₀ x in (record { arr = iMR2.f x.ξ })
@@ -80,6 +97,9 @@ open import Categories.Category.Construction.TwistedArrow C renaming (Morphism t
   ; F-resp-≈ = λ x → x
   }
 
+-- ℝ : τ′[iMR2] → Arrow(C), the "right" projection: forget the process
+-- map, keeping only the repair arrow Φ : B ⇒ [A,B]₀ (used to build
+-- iMRS3 in HigherMRS.agda).
 ℝ : Functor τ′[iMR2] Arr.Arrow
 ℝ = record
   { F₀ = λ x → let module x = iMR2₀ x in (record { dom = x.B ; cod = [ x.A , x.B ]₀ ; arr = iMR2.Φ x.ξ })

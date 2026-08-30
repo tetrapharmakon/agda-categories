@@ -27,7 +27,17 @@ open HomReasoning
 open MR
 
 
+-- The coreflection between the total category (see TotalCategory.agda)
+-- and the repair fibration (see Repairs.agda).
+--   K   : total → repairs  forgets the metabolic map f, keeping only Φ;
+--   𝕁   : repairs → total  includes a repair system as the (M,R)-system
+--                          with identity metabolic map (l = r = u);
+--   𝕁⊣K : these are adjoint (𝕁 ⊣ K), the unit being the identity, so
+--                          repairs coreflects into the total category.
+-- Exports: K, 𝕁, 𝕁⊣K.
+
 -- The coreflector of total on the category of repairs
+-- (drops the metabolic map f, keeping only the repair component Φ).
 K : Functor total repairs
 K = record
   { F₀ = λ x →
@@ -47,10 +57,13 @@ K = record
 -- [_,Cod] : (X : Obj) → Functor C C
 -- [ X ,Cod] =
 
+-- Precomposition of the hom functor [A,-] with Cod, reindexed by u.
 [_,Cod]₁ : ∀ {A A′} → (u : A ⇒ A′) → NT ([ A′ ,-] ∘F Cod) ([ A ,-] ∘F Cod)
 [ u ,Cod]₁ = nHom u ∘ʳ Cod
 
 -- the inclusion of repairs in total
+-- (a repair system (A, Φ) becomes the (M,R)-system (A, A) with identity
+--  metabolic map id : A ⇒ A and repair Φ).
 𝕁 : Functor repairs total
 𝕁 = record
   { F₀ = λ {(record { A = A ; Φ = Φ }) → (A , A) ∣ ⟪ id , Φ ⟫}
@@ -73,6 +86,8 @@ K = record
   ; F-resp-≈ = λ x → x , x
   }
 
+-- 𝕁 and K are adjoint; since the unit is the identity, 𝕁 is full and
+-- faithful, so total coreflects onto the category of repairs.
 -- J and K are adjoint
 𝕁⊣K : 𝕁 ⊣ K
 -- note that J is full and faithful (unit is id)

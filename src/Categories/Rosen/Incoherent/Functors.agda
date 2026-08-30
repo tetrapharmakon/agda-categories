@@ -7,6 +7,15 @@ open import Level using (_⊔_)
 
 module Categories.Rosen.Incoherent.Functors {o ℓ e} {C : Category o ℓ e} {M : Monoidal C} (Cl : Closed M) where
 
+------------------------------------------------------------------------
+-- Functors: projections out of the total category τ[iMR2].
+--
+-- [_]A, [_]B, [_]f, [_]Φ recover respectively the domain, the
+-- codomain, the process arrow and the repair map of a system.  The
+-- file ends with the Arbib functor from twisted MR-systems to the
+-- internal Mealy automata of Mealy.agda (see the two lemmas below).
+------------------------------------------------------------------------
+
 open import Data.Product using (_,_; proj₁; proj₂; _×_)
 
 open import Categories.Category.Construction.Arrow
@@ -24,6 +33,7 @@ open MR
 open import Categories.Rosen.Incoherent.Core Cl
 open import Categories.Rosen.Incoherent.Elements Cl
 
+-- [_]A : τ[iMR2] → C — the projection onto the domain object A.
 [_]A : Functor τ[iMR2] C
 [_]A = record
   { F₀ = λ x → let module x = iMR2₀ x in x.A
@@ -33,6 +43,7 @@ open import Categories.Rosen.Incoherent.Elements Cl
   ; F-resp-≈ = λ {A} {B} {f} {g} z → z .proj₁
   }
 
+-- [_]B : τ[iMR2] → C — the projection onto the codomain object B.
 [_]B : Functor τ[iMR2] C
 [_]B = record
   { F₀ = λ x → let module x = iMR2₀ x in x.B
@@ -42,6 +53,8 @@ open import Categories.Rosen.Incoherent.Elements Cl
   ; F-resp-≈ = λ {A} {B} {f} {g} z → z .proj₂
   }
 
+-- [_]f : τ[iMR2] → Arrow(C) — the process arrow f : A ⇒ B as an object
+-- of the arrow category; morphisms are carried via the eqf square.
 [_]f : Functor τ[iMR2] Arr.Arrow
 [_]f = record
   { F₀ = λ x → let module x = iMR2₀ x in record { dom = x.A ; cod = x.B ; arr = iMR2.f x.ξ }
@@ -53,6 +66,8 @@ open import Categories.Rosen.Incoherent.Elements Cl
 
 open import Categories.Rosen.Incoherent.Repairs Cl
 
+-- [_]Φ : τ[iMR2] → irepairs — the repair map Φ for each system, as an
+-- object of the repair category (forgetting the process data).
 [_]Φ : Functor τ[iMR2] irepairs
 [_]Φ = record
   { F₀ = λ x → let module x = iMR2₀ x in record
@@ -76,6 +91,11 @@ open import Categories.Rosen.Incoherent.Mealy Cl
 -- A functor from the category of twisted MR systems to the category of twisted Mealy automata
 -- cf. Categories.Rosen.Incoherent.Mealy for the definition
 -- the functor was defined by Arbib in \cite{}
+--
+-- On objects the automaton has state E = [A,B]₀, transition d given by
+-- the Ladjunct of (Φ* ∘ (ε ⊗₁ id)) and output s given by the counit.
+-- The squares forced by a twisted morphism are exactly lemma-delta
+-- (transition component) and lemma-epsilon (output component).
 
 module _ {X Y : iMR2₀} (f : twiMR2⇒ X Y) where
   module X = iMR2₀ X
@@ -89,6 +109,8 @@ module _ {X Y : iMR2₀} (f : twiMR2⇒ X Y) where
   module -⊗A = Functor (appʳ ⊗ F.Y.A)
   module [A-] = Functor (appˡ [-,-] F.Y.A)
 
+  -- lemma-epsilon: the output square — the counit ε of the closed
+  -- adjunction conjugates the twisted (l, r) action on the output map.
   lemma-epsilon :
     F.r ∘ ε X.B ∘ id ⊗₁ F.l ≈ ε Y.B ∘ [ F.l , F.r ]₁ ⊗₁ id
   lemma-epsilon =
@@ -100,6 +122,9 @@ module _ {X Y : iMR2₀} (f : twiMR2⇒ X Y) where
           ε Y.B ∘ ([ F.l , id ]₁ ∘ [ id , F.r ]₁) ⊗₁ id       ≈˘⟨ refl⟩∘⟨ -⊗A.F-resp-≈ [ [-,-] ]-decompose₁ ⟩
           ε Y.B ∘ [ F.l , F.r ]₁ ⊗₁ id                                                     ∎
 
+  -- lemma-delta: the transition square — the Ladjunct of Φ* ∘ (ε ⊗₁ id)
+  -- (i.e. the transition of the Mealy automaton) transports along a
+  -- twisted MR-morphism.
   lemma-delta :
     [ F.l , F.r ]₁ ∘ adjoint.Ladjunct (ΦX* ∘ (ε X.B ⊗₁ id)) ∘ id ⊗₁ F.l
       ≈

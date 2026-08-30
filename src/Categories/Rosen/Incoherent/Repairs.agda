@@ -10,6 +10,15 @@ module Categories.Rosen.Incoherent.Repairs {o ℓ e} {C : Category o ℓ e} {M :
 -- Incoherent (M,R)-systems: a simple diagram A —f→ B —Φ→ [A,B]
 -- without the natural transformation condition of full MR2.
 
+------------------------------------------------------------------------
+-- Repairs: repair data Φ : B ⇒ [A,B]₀ and their total category.
+--
+-- irep₀ forgets the process map entirely and records only the repair
+-- map; irep⇒ is the compatible pair (u, v); irepairs is the resulting
+-- total category, used as the codomain of the projection [_]Φ in
+-- Functors.agda.
+------------------------------------------------------------------------
+
 open import Data.Product using (_,_; proj₁; proj₂; _×_)
 
 open import Categories.Category.Construction.Arrow
@@ -30,6 +39,8 @@ open import Categories.Rosen.Incoherent.Core Cl
 
 
 -- Objects of the incoherent repair fibration: objects A,B and a morphism Φ : B ⇒ [A,B].
+--   An object is "potential" (M,R)-system data: the repair map alone,
+--   with no attached process map and no compatibility condition.
 record irep₀ : Set (o ⊔ ℓ ⊔ e) where
   field
     A : Obj
@@ -39,15 +50,22 @@ record irep₀ : Set (o ⊔ ℓ ⊔ e) where
 
 -- Morphisms of the repair fibration: u : X.A ⇒ Y.A such that
 -- (nHom u ∘ʳ Cod) ∘ᵥ Y.Φ ≃ X.Φ.
+--   (That comment recalls the *coherent*, natural-transformation form;
+--   incoherently a morphism is concretely the pair (u, v) below.)
 record irep⇒ (X Y : irep₀) : Set (o ⊔ ℓ ⊔ e) where
   module X = irep₀ X
   module Y = irep₀ Y
   field
     u : X.A ⇒ Y.A
     v : X.B ⇒ Y.B
+    -- eq: (u, v) conjugate the repair maps through the two bifunctorial
+    -- actions of the internal hom:  [ u , id ]₁ ∘ Y.Φ ∘ v ≈
+    --                              [ id , v ]₁ ∘ X.Φ.
     eq : [ u , id ]₁ ∘ Y.Φ ∘ v ≈ [ id , v ]₁ ∘ X.Φ
 
 -- The category of repairs: the total category of the fibration.
+--   Carries no process data: Functors.agda's [_]Φ lands every morphism
+--   of the total category in here.
 irepairs : Category (o ⊔ ℓ ⊔ e) (o ⊔ ℓ ⊔ e) e
 irepairs = record
   { Obj = irep₀
