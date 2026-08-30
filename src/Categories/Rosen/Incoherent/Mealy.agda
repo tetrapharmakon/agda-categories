@@ -74,14 +74,13 @@ record Mealy⇒ (X Y : Mealy₀) : Set (o ⊔ ℓ ⊔ e) where
     s-eq : r ∘ mX.s ∘ id ⊗₁ l ≈ mY.s ∘ u ⊗₁ id
 
 -- Mealy⇒-≈: equality of automata morphisms, componentwise from the
--- morphism record (note: the second conjunct duplicates the first, so
--- the l component is read twice).
+-- morphism record.
 Mealy⇒-≈ : {A B : Mealy₀} → Mealy⇒ A B → Mealy⇒ A B → Set e
 Mealy⇒-≈ f g =
   let module f = Mealy⇒ f
       module g = Mealy⇒ g
   in
- f.l ≈ g.l × f.l ≈ g.l × f.u ≈ g.u
+ f.l ≈ g.l × f.r ≈ g.r × f.u ≈ g.u
 
 
 open HomReasoning
@@ -114,15 +113,15 @@ totalMealy = record
                      ∙ (refl⟩∘⟨ pullʳ C (Equiv.sym [ ⊗ ]-commute))
                      ∙ sym-assoc-3 ∙ (f.s-eq ⟩∘⟨refl)
                      ∙ pullʳ C (Equiv.sym (Functor.homomorphism (-⊗ _)))  }
-  ; assoc = sym-assoc , sym-assoc , assoc
-  ; sym-assoc = assoc , assoc , sym-assoc
-  ; identityˡ = identityʳ , identityʳ , identityˡ
-  ; identityʳ = identityˡ , identityˡ , identityʳ
+  ; assoc = sym-assoc , assoc , assoc
+  ; sym-assoc = assoc , sym-assoc , sym-assoc
+  ; identityˡ = identityʳ , identityˡ , identityˡ
+  ; identityʳ = identityˡ , identityʳ , identityʳ
   ; identity² = identityˡ , identity² , identity²
   ; equiv = record
     { refl = λ {x} → refl , refl , refl
-    ; sym = λ x → (sym (x .proj₁)) , sym (x .proj₁) , sym (x .proj₂ .proj₂)
-    ; trans = λ x x₁ → (trans (x .proj₁) (x₁ .proj₁)) , trans (x .proj₁) (x₁ .proj₁) , (trans (x .proj₂ .proj₂) (x₁ .proj₂ .proj₂))
+    ; sym = λ x → (sym (x .proj₁)) , sym (x .proj₂ .proj₁) , sym (x .proj₂ .proj₂)
+    ; trans = λ x x₁ → (trans (x .proj₁) (x₁ .proj₁)) , trans (x .proj₂ .proj₁) (x₁ .proj₂ .proj₁) , (trans (x .proj₂ .proj₂) (x₁ .proj₂ .proj₂))
     }
-  ; ∘-resp-≈ = λ x x₁ → (∘-resp-≈ (x₁ .proj₁) (x .proj₁)) , (∘-resp-≈ (x₁ .proj₁) (x .proj₁)) , ∘-resp-≈ (x .proj₂ .proj₂) (x₁ .proj₂ .proj₂)
+  ; ∘-resp-≈ = λ x x₁ → (∘-resp-≈ (x₁ .proj₁) (x .proj₁)) , ∘-resp-≈ (x .proj₂ .proj₁) (x₁ .proj₂ .proj₁) , ∘-resp-≈ (x .proj₂ .proj₂) (x₁ .proj₂ .proj₂)
   }

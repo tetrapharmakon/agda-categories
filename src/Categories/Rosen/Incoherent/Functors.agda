@@ -177,6 +177,6 @@ Arbib = record
       }
   ; identity = refl , refl , [-,-].identity
   ; homomorphism = refl , refl , [-,-].homomorphism
-  ; F-resp-≈ = λ z → z .proj₁ , z .proj₁ , [-,-].F-resp-≈ z
+  ; F-resp-≈ = λ z → z .proj₁ , z .proj₂ , [-,-].F-resp-≈ z
   }
 
