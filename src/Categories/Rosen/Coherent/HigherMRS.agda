@@ -111,6 +111,7 @@ data _≤′_ : Rel ℕ 0ℓ where
   ≤′-trans : ∀ {m n k} → m ≤′ n → n ≤′ k → m ≤′ k
   ≤′+1     : ∀ {n} → n ≤′ suc n
 
+
 data _≈′_ : ∀ {n m} → (p q : n ≤′ m) → Set 0ℓ where
   ≈-assoc : ∀ {n m k l}
             (p : n ≤′ m) (q : m ≤′ k) (r : k ≤′ l) →

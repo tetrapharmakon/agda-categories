@@ -34,10 +34,12 @@ record Mealy A B : Set (o ⊔ ℓ ⊔ e) where
     d : E ⊗₀ A ⇒ E
     s : E ⊗₀ A ⇒ B
 
+
 record Mealy₀ : Set (o ⊔ ℓ ⊔ e) where
   field
     A B : Obj
     m : Mealy A B
+
 
 record Mealy⇒ (X Y : Mealy₀) : Set (o ⊔ ℓ ⊔ e) where
   module X = Mealy₀ X

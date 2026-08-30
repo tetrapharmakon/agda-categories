@@ -11,6 +11,7 @@ open import Categories.Functor using (Functor)
 open import Data.Product using (_,_; Σ)
 open import Level using (Level; 0ℓ; suc)
 open import Relation.Binary.PropositionalEquality using (_≡_; isEquivalence; subst) renaming (refl to ≡-refl; sym to ≡-sym)
+
 module Categories.Rosen.Incoherent.CartesianAdjoints (o : Level) where
 
 private

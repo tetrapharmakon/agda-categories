@@ -33,6 +33,7 @@ record totalAtA₀ (A : Obj) : Set (o ⊔ ℓ ⊔ e) where
     B : Obj
     ξ : S.Carrier (Functor.F₀ MRS-Profunctor (A , B))
 
+
 -- Morphisms of the fibre at A: a map r : x.B ⇒ y.B compatible with Φ.
 record totalAtA₁ {A : Obj} (x y : totalAtA₀ A) : Set (o ⊔ ℓ ⊔ e) where
   module x = totalAtA₀ x

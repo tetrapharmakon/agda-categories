@@ -26,12 +26,12 @@ open HomReasoning
 open MR
 
 
-
 -- iMR2ᴿ₀: object of the fibre over A: a codomain B plus an iMR2 A B.
 record iMR2ᴿ₀ (A : Obj) : Set (o ⊔ ℓ ⊔ e) where
   field
     B : Obj
     ξ : iMR2 A B
+
 
 -- iMR2ᴿ⇒: morphisms in the fibre over A: v : X.B ⇒ Y.B compatible with f and Φ.
 record iMR2ᴿ⇒ {A : Obj} (X Y : iMR2ᴿ₀ A) : Set (o ⊔ ℓ ⊔ e) where

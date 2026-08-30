@@ -33,11 +33,13 @@ record iMR2 (A B : Obj) : Set (o ⊔ ℓ) where
     f : A ⇒ B
     Φ : B ⇒ [ A , B ]₀
 
+
 -- iMR2₀: an object of the total category (a pair of objects plus an iMR2).
 record iMR2₀ : Set (o ⊔ ℓ) where
   field
     A B : Obj
     ξ : iMR2 A B
+
 
 -- iMR2⇒: morphisms of the incoherent total category.
 record iMR2⇒ (X Y : iMR2₀) : Set (o ⊔ ℓ ⊔ e) where

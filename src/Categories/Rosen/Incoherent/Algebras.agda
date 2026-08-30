@@ -33,7 +33,7 @@ open BinaryCoproducts BC
 open Closed Cl using (adjoint; [_,_]₀; [_,_]₁; [_,-])
 
 ------------------------------------------------------------------------
--- Incoherent (M,R)-Systems as Algebras
+-- Incoherent (M,R)-systems as algebras
 --
 -- Fix an object A.
 --

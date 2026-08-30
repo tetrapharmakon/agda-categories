@@ -50,6 +50,7 @@ module _ {o : Level} where
   Sets-CCC : CCC.CartesianClosed S
   Sets-CCC = Canonical.Equivalence.fromCanonical _ Sets-Canonical
 
+
 module Sets-MonoidalClosed {o : Level} where
   private
     S = Sets o

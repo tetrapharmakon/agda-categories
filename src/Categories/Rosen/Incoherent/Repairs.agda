@@ -36,6 +36,7 @@ record irep₀ : Set (o ⊔ ℓ ⊔ e) where
     B : Obj
     Φ : B ⇒ [ A , B ]₀
 
+
 -- Morphisms of the repair fibration: u : X.A ⇒ Y.A such that
 -- (nHom u ∘ʳ Cod) ∘ᵥ Y.Φ ≃ X.Φ.
 record irep⇒ (X Y : irep₀) : Set (o ⊔ ℓ ⊔ e) where

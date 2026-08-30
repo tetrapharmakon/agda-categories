@@ -59,6 +59,7 @@ record iMRSᴵᴵ₀ : Set (o ⊔ ℓ) where
   vert : iMR2₀
   vert = record { A = B ; B = Y ; ξ = ξ₂ }
 
+
 record iMRSᴵᴵ⇒ (S T : iMRSᴵᴵ₀) : Set (o ⊔ ℓ ⊔ e) where
   module S = iMRSᴵᴵ₀ S
   module T = iMRSᴵᴵ₀ T

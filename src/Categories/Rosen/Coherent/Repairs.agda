@@ -32,6 +32,7 @@ record rep₀ : Set (o ⊔ ℓ ⊔ e) where
     A : Obj
     Φ : NaturalTransformation Cod (([_,-] A) ∘F Cod)
 
+
 -- Morphisms of the repair fibration: u : X.A ⇒ Y.A such that
 -- (nHom u ∘ʳ Cod) ∘ᵥ Y.Φ ≃ X.Φ.
 record rep⇒ (X Y : rep₀) : Set (o ⊔ ℓ ⊔ e) where

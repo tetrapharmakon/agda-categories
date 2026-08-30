@@ -33,6 +33,7 @@ record iMR2ᴸ₀ (B : Obj) : Set (o ⊔ ℓ ⊔ e) where
     A : Obj
     ξ : iMR2 A B
 
+
 -- iMR2ᴸ⇒: morphisms in the left-fibre over B: u : X.A ⇒ Y.A compatible with f and Φ.
 record iMR2ᴸ⇒ {B : Obj} (X Y : iMR2ᴸ₀ B) : Set (o ⊔ ℓ ⊔ e) where
   module X = iMR2ᴸ₀ X

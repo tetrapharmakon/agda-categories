@@ -15,11 +15,11 @@ module Categories.Rosen.Incoherent.Slice
   (BC : BinaryProducts C)
   where
 
-----------------------------------------------------------------------
--- Incoherent (M,R)-Systems as Algebras
+------------------------------------------------------------------------
+-- Incoherent (M,R)-systems as algebras
 --
 -- Fix an object B... (todo)
-----------------------------------------------------------------------
+------------------------------------------------------------------------
 
 open Category C
 
