@@ -21,12 +21,13 @@ open import Categories.Functor.Bifunctor using (Bifunctor)
 
 module Categories.Rosen.Cartesian.Sets where
 
--- Function extensionality: a standard axiom for reasoning about Sets (two
--- pointwise-equal functions are equal).  This is an ordinary axiom, not a
--- *sorry*-style placeholder.
-postulate
-  extensionality : ∀ {a b} {A : Set a} {B : A → Set b} {f g : (x : A) → B x}
-                 → (∀ x → f x ≡ g x) → f ≡ g
+-- Function extensionality is assumed, and is declared once for the whole
+-- development in Categories.Rosen.Axioms.  It is re-exported here so that the
+-- modules instantiated over Sets keep seeing it, but the assumption itself
+-- lives in one place.  This is an ordinary axiom, not a placeholder for a
+-- missing proof; note that it does prevent --safe on this module and on
+-- everything downstream of it.
+open import Categories.Rosen.Axioms using (extensionality) public
 
 module _ {o : Level} where
   private
