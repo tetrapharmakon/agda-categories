@@ -10,10 +10,6 @@ open import Relation.Binary.PropositionalEquality using (_≡_; isEquivalence; s
 module Categories.Rosen.Coherent.HigherTruncatedSimplicialObject
   (o : Level) where
 
-private
-  postulate
-    sorry : ∀ {u} {A : Set u} → A
-
 open import Categories.Category.Instance.Cats using (Cats)
 open import Categories.Category.Lift using (liftC;liftF)
 open import Categories.TruncatedSimplicialObject using (TruncatedSimplicialObject)

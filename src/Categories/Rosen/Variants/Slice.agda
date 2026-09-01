@@ -7,10 +7,6 @@ open import Level using (_⊔_)
 
 module Categories.Rosen.Variants.Slice {o ℓ e} {C : Category o ℓ e} {M : Monoidal C} (Cl : Closed M) where
 
-private
-  postulate
-    sorry : ∀ {u} {A : Set u} → A
-
 -- Core definitions for the category of (M,R)-systems.
 -- Exports: Cod, nHom, nHom-identity, MR2, MR2-Setoid, MRS-Profunctor.
 
@@ -71,13 +67,35 @@ MR2-Setoid A B = record
 
 open import Categories.NaturalTransformation.NaturalIsomorphism as NI using (NaturalIsomorphism;niHelper; _ⓘˡ_; _ⓘʳ_)
 
--- There is no profunctor C.op × C → Sets
--- sending (A , B) ↦ MR2 A B.
+-- ┌──────────────────────────────────────────────────────────────────────────┐
+-- │ KNOWN-FALSE POSTULATE.  Everything named UNSOUND-* in Categories.Rosen is │
+-- │ a statement this development knows to be FALSE.  It is postulated only so │
+-- │ that the shape of the obstruction is visible and typed; nothing that      │
+-- │ depends on it is verified.  `grep -rn UNSOUND src/Categories/Rosen/`      │
+-- │ enumerates the whole debt.                                               │
+-- └──────────────────────────────────────────────────────────────────────────┘
+--
+-- THERE IS NO PROFUNCTOR C.op × C → Sets sending (A , B) ↦ MR2 A B, so the
+-- Bifunctor below does not exist and must not be cited.  The obstruction is
+-- located precisely: reindexing Φ along (u : A′ ⇒ A , v : B ⇒ B′) needs a
+-- functor Slice B′ → Slice B, i.e. pullback along v, which this module does
+-- not assume.  Postcomposition with v runs the other way.
+--
+-- Everything NOT mentioning the reindexed Φ is proved outright below (the
+-- setoid structure, identity, homomorphism, F-resp-≈): the MR2-Setoid relation
+-- here drops the Φ-component, so those laws are the plain associativity
+-- shuffles of Coherent/Core.agda.  Only the datum itself is missing.
+postulate
+  UNSOUND-reindex-Φ :
+    ∀ {A A′ B B′} → A′ ⇒ A → B ⇒ B′ →
+    NaturalTransformation (Dom B) (([_,-] A) ∘F (Dom B)) →
+    NaturalTransformation (Dom B′) (([_,-] A′) ∘F (Dom B′))
+
 MRS-Profunctor : Bifunctor (Category.op C) C (Setoids (o ⊔ ℓ ⊔ e) e)
 MRS-Profunctor = record
   { F₀ = λ { (A , B) → MR2-Setoid A B }
   ; F₁ = λ { {(A , B)} {(A′ , B′)} (u , v) → record
-    { _⟨$⟩_ = λ {⟪ f , Φ ⟫ → ⟪ v ∘ f ∘ u , sorry ⟫ }
+    { _⟨$⟩_ = λ {⟪ f , Φ ⟫ → ⟪ v ∘ f ∘ u , UNSOUND-reindex-Φ u v Φ ⟫ }
     ; cong = λ { {⟪ f , Φ ⟫} {⟪ g , Φ′ ⟫} f≈g →
         (∘-resp-≈ Equiv.refl (∘-resp-≈ f≈g Equiv.refl))
       }

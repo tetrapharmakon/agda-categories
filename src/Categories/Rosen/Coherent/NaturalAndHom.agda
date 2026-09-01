@@ -10,10 +10,6 @@ open import Level using (_⊔_)
 
 module Categories.Rosen.Coherent.NaturalAndHom {o ℓ e} {C : Category o ℓ e} {M : Monoidal C} (Cl : Closed M) where
 
-private
-  postulate
-    sorry : ∀ {u} {A : Set u} → A
-
 open import Data.Product using (_,_; proj₁; proj₂; _×_)
 
 open import Categories.Category.Construction.Arrow
@@ -73,14 +69,29 @@ lem α = begin adjoint.Radjunct ([ α , id ]₁ ∘ [ id , unitorʳ.from ]₁ �
     id ⊗₁ unitorʳ.from ∎)
 
 
+-- ┌──────────────────────────────────────────────────────────────────────────┐
+-- │ KNOWN-FALSE POSTULATE.  Everything named UNSOUND-* in Categories.Rosen is │
+-- │ a statement this development knows to be FALSE.  It is postulated only so │
+-- │ that the shape of the obstruction is visible and typed; nothing that      │
+-- │ depends on it is verified.  `grep -rn UNSOUND src/Categories/Rosen/`      │
+-- │ enumerates the whole debt.                                               │
+-- └──────────────────────────────────────────────────────────────────────────┘
+--
 -- The reverse direction is not derivable for an arbitrary closed monoidal
 -- category: it would say that a natural transformation is determined by its
 -- component at the monoidal unit.  Naturality provides no way to recover its
 -- component at X without an additional density or generator hypothesis.
 --
--- For example, take the cartesian closed category of C₂-sets and A = unit.
--- The nontrivial central element of C₂ acts as a natural endomorphism of the
--- identity.  It is the identity on the terminal unit but swaps the regular
--- C₂-set, so p loses information that ι cannot reconstruct.
-false : ∀ {A} (α : NaturalTransformation idF ([_,-] A)) → ∀ X → (NaturalTransformation.η (ι {A} (p {A} α)) X) ≈ NaturalTransformation.η α X
-false {A} α X = sorry
+-- It is not merely underivable but false: Coherent/C2Sets.agda REFUTES it.
+-- In the cartesian closed category of C₂-sets with A = unit, the nontrivial
+-- central element of C₂ is a natural endomorphism of the identity; it is the
+-- identity on the terminal unit but swaps the regular C₂-set, so p loses
+-- information that ι cannot reconstruct.  See `swap-is-counterexample` there.
+--
+-- Consequently NOTHING in this tree may depend on UNSOUND-ι∘p≈id: doing so
+-- would prove a statement whose negation is already proved elsewhere in the
+-- same tree.  It is kept, unused, to record the shape of the failure.
+postulate
+  UNSOUND-ι∘p≈id :
+    ∀ {A} (α : NaturalTransformation idF ([_,-] A)) → ∀ X →
+    (NaturalTransformation.η (ι {A} (p {A} α)) X) ≈ NaturalTransformation.η α X

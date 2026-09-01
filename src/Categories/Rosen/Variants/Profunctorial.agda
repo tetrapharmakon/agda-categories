@@ -10,10 +10,6 @@ open import Level using (_⊔_;suc)
 
 module Categories.Rosen.Variants.Profunctorial {o ℓ e} {C E : Category o ℓ e} {M : Monoidal C} (Cl : Closed M) where
 
-private
-  postulate
-    sorry : ∀ {u} {A : Set u} → A
-
 open import Categories.Category.CoSlice C
 open import Categories.Category.Slice C
 
@@ -140,27 +136,59 @@ open MR
 -- Nothing outside p is affected, so below every component that only mentions the
 -- underlying process f is proved outright — they are literally the Coherent/Core
 -- proofs — and only the components mentioning the reindexed profunctor are
--- `sorry`.  Those are not parts left undone: they are unavailable without extra
--- hypotheses on C.
-MRS-Profunctor : Bifunctor (Category.op C) C (Setoids (o ⊔ suc ℓ ⊔ suc e) (o ⊔ ℓ ⊔ e))
-MRS-Profunctor = record
-  { F₀ = (λ { (A , B) → MR2-Setoid A B })
-  ; F₁ = λ { {(A , B)} {(A′ , B′)} (u , v) → record
-    { _⟨$⟩_ = λ {⟪ f , p , Φ ⟫ → ⟪ v ∘ f ∘ u , sorry , sorry ⟫ }
-    ; cong = λ { {⟪ f , p , Φ ⟫} {⟪ g , q , Φ′ ⟫} (f≈g , _) →
-        (∘-resp-≈ Equiv.refl (∘-resp-≈ f≈g Equiv.refl))
-      , sorry
-      }
-    }}
-  ; identity = λ { (f≈g , _) → Equiv.trans identityˡʳ f≈g , sorry }
-  ; homomorphism = λ { {f = (u₁ , v₁)} {g = (u₂ , v₂)}
-                       {⟪ f , p , Φ ⟫} {⟪ g , q , Φ′ ⟫} (f≈g , _) →
-      (begin (v₂ ∘ v₁) ∘ f ∘ u₁ ∘ u₂     ≈˘⟨ assoc ○ assoc ⟩
-             (((v₂ ∘ v₁) ∘ f) ∘ u₁) ∘ u₂ ≈⟨ (refl⟩∘⟨ f≈g) ⟩∘⟨refl ⟩∘⟨refl ⟩
-             (((v₂ ∘ v₁) ∘ g) ∘ u₁) ∘ u₂ ≈⟨ (assoc ⟩∘⟨refl) ○ (assoc ⟩∘⟨refl) ⟩
-             (v₂ ∘ (v₁ ∘ (g ∘ u₁))) ∘ u₂ ≈⟨ assoc ○ sym-assoc ○ assoc ⟩
-             v₂ ∘ (v₁ ∘ g ∘ u₁) ∘ u₂     ∎)
-    , sorry }
-  ; F-resp-≈ = λ { (u≈u′ , v≈v′) (f≈g , _) →
-      ∘-resp-≈ v≈v′ (∘-resp-≈ f≈g u≈u′) , sorry }
-  }
+-- postulated as UNSOUND-*.  Those are not parts left undone: they are
+-- unavailable without extra hypotheses on C.
+-- ┌──────────────────────────────────────────────────────────────────────────┐
+-- │ KNOWN-FALSE POSTULATE.  Everything named UNSOUND-* in Categories.Rosen is │
+-- │ a statement this development knows to be FALSE.  It is postulated only so │
+-- │ that the shape of the obstruction is visible and typed; nothing that      │
+-- │ depends on it is verified.  `grep -rn UNSOUND src/Categories/Rosen/`      │
+-- │ enumerates the whole debt.                                               │
+-- └──────────────────────────────────────────────────────────────────────────┘
+--
+-- The obstruction, precisely: reindexing along (u : A′ ⇒ A , v : B ⇒ B′) needs
+-- coSlice A′ → coSlice A and Slice B′ → Slice B.  The functors `pollo`
+-- assembles run the OTHER way; the right-way ones are pushout along u and
+-- pullback along v, which this module does not assume.  Adding those two
+-- hypotheses is what it would take to discharge the three postulates below.
+--
+-- NOTE ON THE PAPER.  §4's `proposition_assignment_profunctor_r` asserts that
+-- (A,B) ↦ proMRS(A,B) IS a profunctor, with no hypothesis on C and no proof.
+-- That proposition is exactly what is unproved here.
+postulate
+  -- The whole bifunctor, postulated as one named obstruction.
+  --
+  -- An earlier version built this as a record whose f-components were proved
+  -- and whose four Φ-components were `sorry`.  That is worse than useless: the
+  -- reindexed system is opaque, so none of the "proved" laws actually
+  -- constrain anything, and the record reads as a construction when it is not
+  -- one.  The attempted record is preserved verbatim in the comment below.
+  UNSOUND-MRS-Profunctor :
+    Bifunctor (Category.op C) C (Setoids (o ⊔ suc ℓ ⊔ suc e) (o ⊔ ℓ ⊔ e))
+
+-- THE ATTEMPTED CONSTRUCTION (does not typecheck without the postulates it
+-- used to carry; kept as a record of what was tried and of exactly which
+-- components are the obstruction).
+--
+-- MRS-Profunctor : Bifunctor (Category.op C) C (Setoids (o ⊔ suc ℓ ⊔ suc e) (o ⊔ ℓ ⊔ e))
+-- MRS-Profunctor = record
+--   { F₀ = (λ { (A , B) → MR2-Setoid A B })
+--   ; F₁ = λ { {(A , B)} {(A′ , B′)} (u , v) → record
+--     { _⟨$⟩_ = λ {⟪ f , p , Φ ⟫ → ⟪ v ∘ f ∘ u , UNSOUND-reindex-p u v p , UNSOUND-reindex-Φ u v p Φ ⟫ }
+--     ; cong = λ { {⟪ f , p , Φ ⟫} {⟪ g , q , Φ′ ⟫} (f≈g , _) →
+--         (∘-resp-≈ Equiv.refl (∘-resp-≈ f≈g Equiv.refl))
+--       , UNSOUND-reindex-twist
+--       }
+--     }}
+--   ; identity = λ { (f≈g , _) → Equiv.trans identityˡʳ f≈g , UNSOUND-reindex-twist }
+--   ; homomorphism = λ { {f = (u₁ , v₁)} {g = (u₂ , v₂)}
+--                        {⟪ f , p , Φ ⟫} {⟪ g , q , Φ′ ⟫} (f≈g , _) →
+--       (begin (v₂ ∘ v₁) ∘ f ∘ u₁ ∘ u₂     ≈˘⟨ assoc ○ assoc ⟩
+--              (((v₂ ∘ v₁) ∘ f) ∘ u₁) ∘ u₂ ≈⟨ (refl⟩∘⟨ f≈g) ⟩∘⟨refl ⟩∘⟨refl ⟩
+--              (((v₂ ∘ v₁) ∘ g) ∘ u₁) ∘ u₂ ≈⟨ (assoc ⟩∘⟨refl) ○ (assoc ⟩∘⟨refl) ⟩
+--              (v₂ ∘ (v₁ ∘ (g ∘ u₁))) ∘ u₂ ≈⟨ assoc ○ sym-assoc ○ assoc ⟩
+--              v₂ ∘ (v₁ ∘ g ∘ u₁) ∘ u₂     ∎)
+--     , UNSOUND-reindex-twist }
+--   ; F-resp-≈ = λ { (u≈u′ , v≈v′) (f≈g , _) →
+--       ∘-resp-≈ v≈v′ (∘-resp-≈ f≈g u≈u′) , UNSOUND-reindex-twist }
+--   }

@@ -10,10 +10,6 @@ open import Relation.Binary.PropositionalEquality using (_≡_; isEquivalence; s
 module Categories.Rosen.Incoherent.IteratedTruncatedSimplicialObject
   (o : Level) where
 
-private
-  postulate
-    sorry : ∀ {u} {A : Set u} → A
-
 open import Categories.Category.Instance.Cats using (Cats)
 open import Categories.Category.Lift using (liftC;liftF)
 open import Categories.TruncatedSimplicialObject using (TruncatedSimplicialObject)
@@ -165,9 +161,28 @@ s₁¹ = record
 --
 -- Thus ιMR2 is the correct endpoint degeneracy, but the simplicial object
 -- requires either coherent MR2 systems, a restriction to normalized Φ, or
--- a weaker notion of morphism that forgets the Φ-compatibility.  The two
--- sorry terms in d₁²-s₀¹ below mark the forward and inverse forms of exactly
--- this unprovable equality.
+-- a weaker notion of morphism that forgets the Φ-compatibility.
+--
+-- ┌──────────────────────────────────────────────────────────────────────────┐
+-- │ KNOWN-FALSE POSTULATE.  Everything named UNSOUND-* in Categories.Rosen is │
+-- │ a statement this development knows to be FALSE.  It is postulated only so │
+-- │ that the shape of the obstruction is visible and typed; nothing that      │
+-- │ depends on it is verified.  `grep -rn UNSOUND src/Categories/Rosen/`      │
+-- │ enumerates the whole debt.                                               │
+-- └──────────────────────────────────────────────────────────────────────────┘
+--
+-- NOTE ON THE PAPER.  §3 of "The Rosen fibration" claims only a SEMIsimplicial
+-- structure on the iMRS⁽ⁿ⁾ (faces, no degeneracies), and hedges it further with
+-- "at least in the low degrees".  That claim is not affected by the failure
+-- recorded here, which is entirely about the degeneracy s₀¹.  The record built
+-- below is a full TruncatedSimplicialObject, i.e. STRICTLY MORE than the paper
+-- asserts, and the surplus is exactly what is not proved.  Cite the paper's
+-- semisimplicial claim, not this record.
+postulate
+  -- C is Sets o here, so B ⇒ [ A , B ]₀ is literally B → (A → B).
+  UNSOUND-Φ-is-constant :
+    ∀ {A B : Obj} (Φ : B → (A → B)) {b : B} → Φ b ≡ (λ _ → b)
+
 iMRSᴵᴵ-defines-truncated-simplicial-object :
   TruncatedSimplicialObject (Cats (suc o) (suc o) o)
 iMRSᴵᴵ-defines-truncated-simplicial-object = record
@@ -251,17 +266,17 @@ iMRSᴵᴵ-defines-truncated-simplicial-object = record
   -- (s₀¹ ∘F s₀⁰) ≃ (s₁¹ ∘F s₀⁰).
   ; d₀²-s₀¹ = NI.refl
   ; d₁²-s₀¹ = NI.niHelper record
-      { η = λ _ → record
+      { η = λ X → record
           { l = id
           ; r = id
           ; eqf = λ {x} → ≡-refl
-          ; eqΦ = λ {x} → sorry
+          ; eqΦ = λ {x} → UNSOUND-Φ-is-constant (iMR2.Φ (iMR2₀.ξ X))
           }
-      ; η⁻¹ = λ _ → record
+      ; η⁻¹ = λ X → record
           { l = id
           ; r = id
           ; eqf = λ {x} → ≡-refl
-          ; eqΦ = λ {x} → sorry
+          ; eqΦ = λ {x} → ≡-sym (UNSOUND-Φ-is-constant (iMR2.Φ (iMR2₀.ξ X)))
           }
       ; commute = λ _ → (λ {x} → ≡-refl) , (λ {x} → ≡-refl)
       ; iso = λ _ → record

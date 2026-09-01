@@ -7,10 +7,6 @@ open import Level using (_⊔_)
 
 module Categories.Rosen.Variants.FullyPoly {o ℓ e} {C : Category o ℓ e} {M : Monoidal C} (Cl : Closed M) where
 
-private
-  postulate
-    sorry : ∀ {u} {A : Set u} → A
-
 -- Fully polymorphic natural MR systems
 
 open import Data.Product using (_,_; proj₁; proj₂; _×_)
