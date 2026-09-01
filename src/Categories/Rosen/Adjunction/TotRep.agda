@@ -17,7 +17,7 @@ open import Categories.Functor using (Functor;_∘F_)
 open import Categories.Functor.Profunctor.Tabulator
 open import Categories.Morphism.Reasoning as MR
 open import Categories.NaturalTransformation using (ntHelper; _∘ᵥ_; _∘ʳ_) renaming (NaturalTransformation to NT)
-open import Categories.Rosen.Coherent.Core Cl
+open import Categories.Rosen.Coherent.IdCore Cl
 open import Categories.Rosen.Coherent.ProElements Cl {F = MRS-Profunctor}
 open import Categories.Rosen.Coherent.Repairs Cl
 open import Categories.Rosen.Coherent.TotalCategory Cl using (tot⇒; total; [_,_∥_,_])
@@ -54,12 +54,9 @@ K = record
   ; F-resp-≈ = proj₁
   }
 
--- [_,Cod] : (X : Obj) → Functor C C
--- [ X ,Cod] =
-
--- Precomposition of the hom functor [A,-] with Cod, reindexed by u.
-[_,Cod]₁ : ∀ {A A′} → (u : A ⇒ A′) → NT ([ A′ ,-] ∘F Cod) ([ A ,-] ∘F Cod)
-[ u ,Cod]₁ = nHom u ∘ʳ Cod
+-- (The former `[_,Cod]₁`, the precomposition of nHom with Cod, is gone: with
+--  id-coherent repair data there is nothing to whisker with, and `nHom u` is
+--  already the natural transformation [ A′ ,-] ⇒ [ A ,-] that is wanted.)
 
 -- the inclusion of repairs in total
 -- (a repair system (A, Φ) becomes the (M,R)-system (A, A) with identity
@@ -69,18 +66,20 @@ K = record
   { F₀ = λ {(record { A = A ; Φ = Φ }) → (A , A) ∣ ⟪ id , Φ ⟫}
   ; F₁ = λ { {X} {Y} f → let module f = rep⇒ f in
   [ f.u , f.u
-  ∥ id-comm C , (λ {s} {t} α →
+  -- Naturality is now over C: one square per morphism h : X ⇒ Y, where before
+  -- there was one per morphism of Arr(C).  The chain has the same three steps,
+  -- but each is a different square.
+  ∥ id-comm C , (λ {P} {Q} h →
       let module X₀ = rep₀ X
           module Y₀ = rep₀ Y
           module ΦX = NT X₀.Φ
           module ΦY = NT Y₀.Φ
-          r = Arr.Morphism⇒.cod⇒ α
       in
       begin
-        (NT.η ([ f.u ,Cod]₁ ∘ᵥ Y₀.Φ) t) ∘ r                      ≈⟨ assoc ○ (refl⟩∘⟨ ΦY.commute α) ○ sym-assoc ⟩
-        (NT.η [ f.u ,Cod]₁ t ∘ Functor.F₁ [ Y₀.A ,-] r) ∘ ΦY.η s ≈⟨ (∘-resp-≈ (NT.commute [ f.u ,Cod]₁ α) Equiv.refl) ○ assoc ⟩
-        Functor.F₁ [ X₀.A ,-] r ∘ (NT.η [ f.u ,Cod]₁ s ∘ ΦY.η s) ≈⟨ refl⟩∘⟨ f.eq {x = s} ⟩
-        Functor.F₁ [ X₀.A ,-] r ∘ ΦX.η s                         ∎) ]}
+        (NT.η (nHom f.u ∘ᵥ Y₀.Φ) Q) ∘ h                          ≈⟨ assoc ○ (refl⟩∘⟨ ΦY.commute h) ○ sym-assoc ⟩
+        (NT.η (nHom f.u) Q ∘ Functor.F₁ [ Y₀.A ,-] h) ∘ ΦY.η P   ≈⟨ (∘-resp-≈ (NT.commute (nHom f.u) h) Equiv.refl) ○ assoc ⟩
+        Functor.F₁ [ X₀.A ,-] h ∘ (NT.η (nHom f.u) P ∘ ΦY.η P)   ≈⟨ refl⟩∘⟨ f.eq {x = P} ⟩
+        Functor.F₁ [ X₀.A ,-] h ∘ ΦX.η P                         ∎) ]}
   ; identity = Equiv.refl , Equiv.refl
   ; homomorphism = Equiv.refl , Equiv.refl
   ; F-resp-≈ = λ x → x , x
@@ -107,14 +106,13 @@ K = record
     { η = λ {((L , R) ∣ ξ) →
       [ id , MR2.f ξ
       ∥ Equiv.refl
-     , (λ {s} {t} α →
+     , (λ {X} {Y} h →
            let module Φ = NT (MR2.Φ ξ)
-               r = Arr.Morphism⇒.cod⇒ α
            in
            begin
-             (([ id , id ]₁ ∘ Φ.η t) ∘ r) ≈⟨ assoc ○ (elimˡ C [-,-].identity) ⟩
-             Φ.η t ∘ r                    ≈⟨ Φ.commute α ⟩
-             Functor.F₁ [ L ,-] r ∘ Φ.η s ∎) ] }
+             (([ id , id ]₁ ∘ Φ.η Y) ∘ h) ≈⟨ assoc ○ (elimˡ C [-,-].identity) ⟩
+             Φ.η Y ∘ h                    ≈⟨ Φ.commute h ⟩
+             Functor.F₁ [ L ,-] h ∘ Φ.η X ∎) ] }
     ; commute = λ f →
         let module f = tot⇒ f in
         ( Equiv.trans identityˡ (Equiv.sym identityʳ)

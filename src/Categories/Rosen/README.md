@@ -41,6 +41,36 @@ the category of C₂-sets concretely in order to exhibit a real counterexample
 to a claim the core files merely state to be unprovable (see the
 `Coherent/NaturalAndHom.agda` and `Coherent/C2Sets.agda` sections below).
 
+### id-coherent vs cod-coherent: which core to use
+
+Two cores coexist while the tree migrates from one notion to the other.
+
+- **`Coherent/IdCore.agda`** — the id-coherent (M,R)-system, `Φ : id ⇒ [A,-]`,
+  with a component at every *object*.  **This is the notion the paper settles
+  on, and the one new work should use.**
+- **`Coherent/Core.agda`** — the cod-coherent one, `Φ : Cod ⇒ [A,-]∘Cod`, with a
+  component at every *arrow*.  Historically first, still used by the modules
+  not yet migrated.
+- **`Coherent/CodCoherentEqualIdCoherent.agda`** — the proof that the two agree.
+  This is the paper's `cod_lax_epi`.
+
+The two are equivalent but not by definition: naturality over `Arr(C)` is
+id-naturality *plus* the condition that `Φ`'s component depends only on the
+codomain (`Φ-const-on-slices`).  A proof that used a naturality square of
+`Arr(C)` outside that shape therefore has no id-world translation and has to be
+re-derived; the bridge guarantees the *statements* correspond, not the proofs.
+
+Currently on `IdCore`: `Coherent/Repairs`, `Coherent/TotalCategory`,
+`Coherent/TabEquivalence`, `Adjunction/TotRep`, `MetabolicClosure`.
+Still on `Core`: `Coherent/ProElements`, `Coherent/Tabulator` and its consumers
+(`Cartesian/Adjoints`, `Coherent/FibreA`, `Coherent/HigherMRS`,
+`Coherent/HigherTruncatedSimplicialObject`, `Incoherent/HigherMRS`).
+
+`IdCore`'s setoid relation is wrapped in `Level.Lift`.  That is Agda universe
+bookkeeping with no mathematical content — see the long comment at the top of
+that file — and exists only because the upstream tabulator pins its profunctor's
+levels.
+
 ### `Coherent/Core.agda`
 Core definitions for the category of (M,R)-systems.
 - `Cod` — Codomain functor `Arrow(C) → C`.

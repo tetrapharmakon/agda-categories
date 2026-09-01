@@ -17,8 +17,8 @@ open import Categories.Functor.Bifunctor using (appʳ)
 open import Categories.Functor.Bifunctor.Properties using ([_]-commute)
 open import Categories.Functor.Profunctor.Tabulator
 open import Categories.Morphism.Reasoning as MR
-open import Categories.NaturalTransformation using (_∘ᵥ_; _∘ʳ_) renaming (NaturalTransformation to NT)
-open import Categories.Rosen.Coherent.Core Cl
+open import Categories.NaturalTransformation using (_∘ᵥ_) renaming (NaturalTransformation to NT)
+open import Categories.Rosen.Coherent.IdCore Cl
 
 open Closed Cl using ([-,-]; [_,-]; [_,_]₁)
 open HomReasoning
@@ -47,18 +47,19 @@ record tot⇒ (x y : tab₀ MRS-Profunctor) : Set (o ⊔ ℓ ⊔ e) where
 
   module Φ = NT (MR2.Φ x.ξ)
   module ψ = NT (MR2.Φ y.ξ)
-  module l*ψ = NT ((nHom l ∘ʳ Cod) ∘ᵥ MR2.Φ y.ξ)
+  module l*ψ = NT (nHom l ∘ᵥ MR2.Φ y.ξ)
 
   field
     eqf : r ∘ f ≈ g ∘ l
-    nat : ∀ {s t} (α : Arr.Morphism⇒ s t)
-        → l*ψ.η t ∘ Arr.Morphism⇒.cod⇒ α
-        ≈ Functor.F₁ [ x.L ,-] (Arr.Morphism⇒.cod⇒ α) ∘ Φ.η s
+    -- Naturality is now over C, not over Arr(C): one square per morphism of C.
+    nat : ∀ {X Y} (h : X ⇒ Y)
+        → l*ψ.η Y ∘ h
+        ≈ Functor.F₁ [ x.L ,-] h ∘ Φ.η X
 
-  eqΦ : ∀ {t} → l*ψ.η t ≈ Φ.η t
-  eqΦ {t} =
+  eqΦ : ∀ {X} → l*ψ.η X ≈ Φ.η X
+  eqΦ {X} =
     Equiv.sym identityʳ
-    ○ nat (Category.id Arr.Arrow {A = t})
+    ○ nat (id {X})
     ○ elimˡ C [-,-].identity
 
 
@@ -71,13 +72,13 @@ total = record
   ; _≈_ = λ h k → tot⇒.l h ≈ tot⇒.l k × tot⇒.r h ≈ tot⇒.r k
   ; id = λ { {(A , B) ∣ ⟪ f , Φ ⟫} →
        let module ΦNT = NT Φ
-           module l*Φ = NT ((nHom id ∘ʳ Cod) ∘ᵥ Φ)
+           module l*Φ = NT (nHom id ∘ᵥ Φ)
        in
        [ id , id
        ∥ id-comm-sym C
-       , (λ {s} {t} α →
+       , (λ {X} {Y} h →
          elimˡ C [-,-].identity ⟩∘⟨refl
-         ○ ΦNT.commute α)
+         ○ ΦNT.commute h)
        ]}
   ; _∘_ = λ { {A} {B} {X} t t′ →
        let module t  = tot⇒ t
@@ -89,15 +90,14 @@ total = record
        in
        [ t.l ∘ t′.l , t.r ∘ t′.r ∥
          pullʳ C t′.eqf ○ pullˡ C t.eqf ○ assoc
-       , (λ {s} {t₀} α →
-           let r = Arr.Morphism⇒.cod⇒ α in
+       , (λ {X} {Y} h →
            begin
-             ([ t.l ∘ t′.l , id ]₁ ∘ ψ.η t₀) ∘ r             ≈⟨ ∘-resp-≈ (∘-resp-≈ (Hom[-1].homomorphism) Equiv.refl) Equiv.refl ⟩
-             (([ t′.l , id ]₁ ∘ [ t.l , id ]₁) ∘ ψ.η t₀) ∘ r ≈⟨ ∘-resp-≈ assoc Equiv.refl ○ assoc ⟩
-             [ t′.l , id ]₁ ∘ (([ t.l , id ]₁ ∘ ψ.η t₀) ∘ r) ≈⟨ (refl⟩∘⟨ t.nat α) ○  sym-assoc ⟩
-            ([ t′.l , id ]₁ ∘ Hy.F₁ r) ∘ t.Φ.η s             ≈⟨ (∘-resp-≈ (Equiv.sym [ [-,-] ]-commute) Equiv.refl) ○ assoc ⟩
-             Hx.F₁ r ∘ ([ t′.l , id ]₁ ∘ t.Φ.η s)            ≈⟨ refl⟩∘⟨ t′.eqΦ {t = s} ⟩
-             Hx.F₁ r ∘ t′.Φ.η s                              ∎)
+             ([ t.l ∘ t′.l , id ]₁ ∘ ψ.η Y) ∘ h             ≈⟨ ∘-resp-≈ (∘-resp-≈ (Hom[-1].homomorphism) Equiv.refl) Equiv.refl ⟩
+             (([ t′.l , id ]₁ ∘ [ t.l , id ]₁) ∘ ψ.η Y) ∘ h ≈⟨ ∘-resp-≈ assoc Equiv.refl ○ assoc ⟩
+             [ t′.l , id ]₁ ∘ (([ t.l , id ]₁ ∘ ψ.η Y) ∘ h) ≈⟨ (refl⟩∘⟨ t.nat h) ○  sym-assoc ⟩
+            ([ t′.l , id ]₁ ∘ Hy.F₁ h) ∘ t.Φ.η X            ≈⟨ (∘-resp-≈ (Equiv.sym [ [-,-] ]-commute) Equiv.refl) ○ assoc ⟩
+             Hx.F₁ h ∘ ([ t′.l , id ]₁ ∘ t.Φ.η X)           ≈⟨ refl⟩∘⟨ t′.eqΦ {X = X} ⟩
+             Hx.F₁ h ∘ t′.Φ.η X                             ∎)
        ]}
   ; assoc = assoc , assoc
   ; sym-assoc = sym-assoc , sym-assoc

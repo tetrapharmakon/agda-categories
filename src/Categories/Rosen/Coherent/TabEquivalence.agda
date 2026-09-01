@@ -3,7 +3,7 @@
 open import Categories.Category using (Category)
 open import Categories.Category.Monoidal using (Monoidal)
 open import Categories.Category.Monoidal.Closed using (Closed)
-open import Level using (_⊔_)
+open import Level using (_⊔_; lift; lower)
 
 module Categories.Rosen.Coherent.TabEquivalence {o ℓ e} {C : Category o ℓ e} {M : Monoidal C} (Cl : Closed M) where
 
@@ -20,7 +20,7 @@ open import Categories.Functor using (Functor)
 open import Categories.Functor.Profunctor.Tabulator
 open import Categories.Morphism.Reasoning as MR
 open import Categories.NaturalTransformation using (ntHelper; _∘ᵥ_; _∘ʳ_) renaming (NaturalTransformation to NT)
-open import Categories.Rosen.Coherent.Core Cl
+open import Categories.Rosen.Coherent.IdCore Cl
 open import Categories.Rosen.Coherent.ProElements Cl {F = MRS-Profunctor}
 open import Categories.Rosen.Coherent.TotalCategory Cl using (tot⇒; total; [_,_∥_,_])
 
@@ -28,6 +28,20 @@ open Closed Cl using ([-,-]; [_,_]₀; [_,-]; [_,_]₁)
 open HomReasoning
 open MR
 
+
+-- ---------------------------------------------------------------------------
+-- A NOTE ON `lift` / `lower`, which have NO mathematical content.
+--
+-- The equality of id-coherent (M,R)-systems quantifies over the objects of C,
+-- so it naturally lives at universe level o ⊔ e.  The upstream tabulator
+-- (Categories.Functor.Profunctor.Tabulator) hard-wires its profunctor to land
+-- in Setoids (o ⊔ ℓ ⊔ e) (o ⊔ ℓ ⊔ e), and Agda's universe levels do not
+-- subsume.  Coherent/IdCore.agda therefore wraps the relation in Level.Lift.
+--
+-- `lift` and `lower` below are that wrapper being put on and taken off.  They
+-- are pure Agda bookkeeping: in the human-readable mathematics there is nothing
+-- there at all, and a reader should mentally erase them.
+-- ---------------------------------------------------------------------------
 
 -- Eq: functor from the total category to the tabulator (identity on objects).
 Eq : Functor total (Tabulator MRS-Profunctor)
@@ -38,18 +52,18 @@ Eq = record
           module y = tab₀ y
           module f = tot⇒ f
           module Φ = NT (MR2.Φ x.ξ)
-          module l*ψ = NT ((nHom f.l ∘ʳ Cod) ∘ᵥ MR2.Φ y.ξ)
+          module l*ψ = NT (nHom f.l ∘ᵥ MR2.Φ y.ξ)
       in
       f.l , f.r ∥
-        ( (begin
+        lift ( (begin
              f.r ∘ MR2.f x.ξ ∘ id   ≈⟨ refl⟩∘⟨ identityʳ ⟩
              f.r ∘ MR2.f x.ξ        ≈⟨ f.eqf ⟩
              MR2.f y.ξ ∘ f.l        ≈⟨ Equiv.sym identityˡ ⟩
              id ∘ (MR2.f y.ξ ∘ f.l) ∎)
         , (λ {t} →
             begin
-              NT.η ((nHom id ∘ʳ Cod) ∘ᵥ MR2.Φ x.ξ) t ≈⟨ elimˡ C [-,-].identity ⟩
-              Φ.η t                                  ≈⟨ Equiv.sym (f.eqΦ {t = t}) ⟩
+              NT.η (nHom id ∘ᵥ MR2.Φ x.ξ) t ≈⟨ elimˡ C [-,-].identity ⟩
+              Φ.η t                                  ≈⟨ Equiv.sym (f.eqΦ {X = t}) ⟩
               l*ψ.η t                                ∎)) }
   ; identity = Equiv.refl , Equiv.refl
   ; homomorphism = Equiv.refl , Equiv.refl
@@ -65,24 +79,23 @@ Eq⁻¹ = record
           module y  = tab₀ y
           module f  = tab⇒ f
           module Φ  = NT (MR2.Φ x.ξ)
-          module l*ψ = NT ((nHom f.l ∘ʳ Cod) ∘ᵥ MR2.Φ y.ξ)
+          module l*ψ = NT (nHom f.l ∘ᵥ MR2.Φ y.ξ)
           eqf =
-            let eqf′ = proj₁ f.eq in
+            let eqf′ = proj₁ (lower f.eq) in
             begin
               f.r ∘ MR2.f x.ξ        ≈⟨ refl⟩∘⟨ Equiv.sym identityʳ ⟩
               f.r ∘ MR2.f x.ξ ∘ id   ≈⟨ eqf′ ○ identityˡ ⟩
               MR2.f y.ξ ∘ f.l        ∎
-          eqΦ = proj₂ f.eq
+          eqΦ = proj₂ (lower f.eq)
       in
       [ f.l , f.r
       ∥ eqf
-      , (λ {s} {t} α →
-          let r = Arr.Morphism⇒.cod⇒ α
-              eqΦt : l*ψ.η t ≈ Φ.η t
-              eqΦt = begin l*ψ.η t ≈⟨ Equiv.sym eqΦ ⟩
-                           [ id , id ]₁ ∘ Φ.η t ≈⟨ (elimˡ C [-,-].identity) ⟩
-                           Φ.η t ∎
-          in eqΦt ⟩∘⟨refl ○ Φ.commute α) ] }
+      , (λ {X} {Y} h →
+          let eqΦt : l*ψ.η Y ≈ Φ.η Y
+              eqΦt = begin l*ψ.η Y ≈⟨ Equiv.sym eqΦ ⟩
+                           [ id , id ]₁ ∘ Φ.η Y ≈⟨ (elimˡ C [-,-].identity) ⟩
+                           Φ.η Y ∎
+          in eqΦt ⟩∘⟨refl ○ Φ.commute h) ] }
   ; identity = Equiv.refl , Equiv.refl
   ; homomorphism = Equiv.refl , Equiv.refl
   ; F-resp-≈ = λ x → x

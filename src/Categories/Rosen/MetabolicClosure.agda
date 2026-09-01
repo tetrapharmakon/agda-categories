@@ -13,8 +13,7 @@ module Categories.Rosen.MetabolicClosure
 open import Categories.Adjoint.Mate using (Mate)
 open import Categories.Functor.Bifunctor.Properties using ([_]-commute)
 
-open import Categories.Rosen.Coherent.Core Cl using
-  (MR2; Cod; nHom; NICod⇒NIid; u⇒1)
+open import Categories.Rosen.Coherent.IdCore Cl using (MR2; nHom)
 
 import Reason
 open Reason C
@@ -23,6 +22,12 @@ open Closed Cl using
   (adjoint; mate; unit; unitorˡ; unitorˡ-commute-from
   ; [-,-]; [_,_]₀; [_,_]₁; [_,-]; _⊗₀_; _⊗₁_; -⊗_)
 open MR2
+
+-- The component "at the process f" is simply the component at B = cod f.
+-- Kept under its old name so that the closure conditions below read unchanged.
+Φη₀ : ∀ {A B : Obj} → MR2 A B → B ⇒ [ A , B ]₀
+Φη₀ {B = B} ξ = Φη ξ B
+
 
 -- A generalized element
 -- b₀ : I ⇒ B is a closure point when evaluating the uncurried repair at
@@ -47,23 +52,20 @@ fact {A} {ξ = ξ} 𝕓 =
     f ξ ∘ unitorˡ.from
       ∎
 
--- The component of the repair family at the identity process on X.
+-- The component of the repair family at an object X.
 Φ-id : ∀ {A B : Obj} → MR2 A B → (X : Obj) → X ⇒ [ A , X ]₀
-Φ-id ξ X = NaturalTransformation.η (NICod⇒NIid ξ) X
+Φ-id ξ X = Φη ξ X
 
--- The repair component at an arbitrary process g agrees with the component at
--- the identity of its codomain: the Φ family is constant along Cod.
-Φ-id≈Φ-g : ∀ {A B : Obj} (ξ : MR2 A B) {X Y : Obj} (g : X ⇒ Y) →
-  Φ-id ξ Y ≈ Φη ξ (record { arr = g })
-Φ-id≈Φ-g ξ g =
-  sym identityʳ
-    ∙ Φcommute ξ (u⇒1 g)
-    ∙ ∘-resp-≈ˡ [-,-].identity
-    ∙ identityˡ
-
--- The repair component at f agrees with the component at id_B.
+-- In the cod-coherent presentation these two were genuinely different terms ---
+-- a component indexed by the arrow f versus one indexed by the object id_B ---
+-- and identifying them took an argument (the former `Φ-id≈Φ-g`, an instance of
+-- the surplus of cod-naturality over id-naturality).  That argument has not
+-- disappeared: it has moved to `Φ-const-on-slices` in
+-- Coherent/CodCoherentEqualIdCoherent.agda, where it is what makes the two
+-- notions of (M,R)-system agree.  Here, with a single family indexed by
+-- objects, the identification is definitional.
 Φ-id≈Φ-f : ∀ {A B : Obj} (ξ : MR2 A B) → Φ-id ξ B ≈ Φη₀ ξ
-Φ-id≈Φ-f ξ = Φ-id≈Φ-g ξ (f ξ)
+Φ-id≈Φ-f ξ = Equiv.refl
 
 -- Currying commutes with postcomposition.
 curry-post : ∀ {A X Y Z : Obj} (g : Y ⇒ Z) (h : X ⊗₀ A ⇒ Y) →
@@ -106,13 +108,12 @@ record UnivClosurePoint {A B : Obj} (ξ : MR2 A B) : Set (ℓ ⊔ e) where
 Univ⇒Metabolic : {A B : Obj} {ξ : MR2 A B} (𝕒 : UnivClosurePoint ξ) → MetabolicClosure ξ
 Univ⇒Metabolic {A} {B} {ξ} 𝕒 =
   let module 𝕒 = UnivClosurePoint 𝕒
-      φ = NICod⇒NIid ξ
   in record
   { b₀ = f ξ ∘ 𝕒.a₀
   ; closureL = begin
       Φη₀ ξ ∘ f ξ ∘ 𝕒.a₀                            ≈⟨ ∘-resp-≈ˡ (sym (Φ-id≈Φ-f ξ)) ⟩
       Φ-id ξ B ∘ f ξ ∘ 𝕒.a₀                         ≈⟨ sym-assoc ⟩
-      (Φ-id ξ B ∘ f ξ) ∘ 𝕒.a₀                       ≈⟨ NaturalTransformation.commute φ (f ξ) ⟩∘⟨refl ⟩
+      (Φ-id ξ B ∘ f ξ) ∘ 𝕒.a₀                       ≈⟨ Φcommute ξ (f ξ) ⟩∘⟨refl ⟩
       ([ id , f ξ ]₁ ∘ Φ-id ξ A) ∘ 𝕒.a₀             ≈⟨ assoc ⟩
       [ id , f ξ ]₁ ∘ Φ-id ξ A ∘ 𝕒.a₀               ≈⟨ refl⟩∘⟨ 𝕒.univClosure ⟩
       [ id , f ξ ]₁ ∘ adjoint.Ladjunct unitorˡ.from ≈⟨ curry-process (f ξ) ⟩
@@ -125,22 +126,28 @@ reindexMR2 : ∀ {A A′ B B′ : Obj} →
   A′ ⇒ A → B ⇒ B′ → MR2 A B → MR2 A′ B′
 reindexMR2 u v ξ = record
   { f = v ∘ f ξ ∘ u
-  ; Φ = (nHom u ∘ʳ Cod) ∘ᵥ Φ ξ
+  ; Φ = nHom u ∘ᵥ Φ ξ
   }
 
 -- Proposition to inhabit: reindexing sends a closure point b₀ to v ∘ b₀.
 ReindexingPreservesClosure : {A A′ B B′ : Obj} (u : A′ ⇒ A) (v : B ⇒ B′) {ξ : MR2 A B} → MetabolicClosure ξ → MetabolicClosure (reindexMR2 u v ξ)
 ReindexingPreservesClosure {A} {A′} {B} {B′} u v {ξ} x = record
   { b₀ = v ∘ b₀ x
+  -- The cod-coherent version of this chain needed an extra step here: the
+  -- reindexed system's repair component was indexed by the ARROW v ∘ f ξ ∘ u,
+  -- and had to be identified with the component at the identity of its
+  -- codomain B′ (that was the step `Φ-id≈Φ-g`).  With id-coherent repair data
+  -- the component simply IS the one at B′, so the step disappears --- not
+  -- because it was redundant, but because the indexing that made it necessary
+  -- is gone.  The argument it carried now lives, once and for all, in
+  -- Coherent/CodCoherentEqualIdCoherent.agda.
   ; closureL = let module Φ = NaturalTransformation (Φ ξ)
-                   φ = NICod⇒NIid ξ
-                   Φvfu = Φ.η (record { arr = v ∘ f ξ ∘ u })
+                   Φvfu = Φ.η B′
                    λ⇒ = unitorˡ.from
                in begin
       ([ u , id ]₁ ∘ Φvfu) ∘ v ∘ b₀ x                    ≈⟨ assoc ⟩
-      [ u , id ]₁ ∘ Φvfu ∘ v ∘ b₀ x                      ≈˘⟨ refl⟩∘⟨ Φ-id≈Φ-g ξ (v ∘ f ξ ∘ u) ⟩∘⟨refl ⟩
       [ u , id ]₁ ∘ Φ-id ξ B′ ∘ v ∘ b₀ x                 ≈⟨ refl⟩∘⟨ sym-assoc ⟩
-      [ u , id ]₁ ∘ (Φ-id ξ B′ ∘ v) ∘ b₀ x               ≈⟨ refl⟩∘⟨ NaturalTransformation.commute φ v ⟩∘⟨refl ⟩
+      [ u , id ]₁ ∘ (Φ-id ξ B′ ∘ v) ∘ b₀ x               ≈⟨ refl⟩∘⟨ Φcommute ξ v ⟩∘⟨refl ⟩
       [ u , id ]₁ ∘ ([ id , v ]₁ ∘ Φ-id ξ B) ∘ b₀ x      ≈⟨ refl⟩∘⟨ assoc ⟩
       [ u , id ]₁ ∘ [ id , v ]₁ ∘ Φ-id ξ B ∘ b₀ x        ≈⟨ refl⟩∘⟨ refl⟩∘⟨ Φ-id≈Φ-f ξ ⟩∘⟨refl ⟩
       [ u , id ]₁ ∘ [ id , v ]₁ ∘ Φη₀ ξ ∘ b₀ x           ≈⟨ refl⟩∘⟨ refl⟩∘⟨ closureL x ⟩
