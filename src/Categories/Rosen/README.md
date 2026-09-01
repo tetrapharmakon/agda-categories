@@ -331,9 +331,9 @@ restriction to normalized Φ, or a weaker notion of morphism that forgets
 unfinished work.
 
 ### `Incoherent/CartesianAdjoints.agda`
-The incoherent counterpart of `Cartesian/Adjoints.agda`, instantiated at
-`Sets`, attempting to exhibit left adjoints to `[_]f`/`𝕃` analogous to the
-coherent case.
+Attempts to exhibit left adjoints to `[_]f`/`𝕃`, instantiated at `Sets`.
+(The coherent counterpart, a former `Cartesian/Adjoints.agda`, has been removed:
+see the note under `Cartesian/WellPointed.agda` below.)
 - `const-Φ` — the constant repair map `B → (A → B)`, `const-Φ A a b = a`.
 - `L` / `L'` — the incoherent counterparts of the coherent left adjoints, equipping an arrow with the constant repair map.
 - `L⊣A`, `L′⊣𝕃` — the claimed adjunctions. **These assert the opposite of what
@@ -476,15 +476,28 @@ lists every module that depends on an axiom.
 The parametric instantiation point `(o : Level)` for the Rosen constructions
 over Sets. As it stands it carries only the module declaration and imports —
 the concrete constructions it is meant to tie together live in
-`Cartesian/Sets.agda` and `Cartesian/Adjoints.agda`; no instantiations are
+`Cartesian/Sets.agda` and `Cartesian/WellPointed.agda`; no instantiations are
 defined here yet.
 
-### `Cartesian/Adjoints.agda`
-Instances of the Rosen constructions for the Cartesian (Sets) case.
-In this setting, the repair map is uniquely determined (Sets is a singleton
-for `Nat(Cod, [A,-]∘Cod)`), so `V₁` and `U₁` acquire left adjoints.
-- `const-Φ` — the unique natural transformation `Cod ⇒ [A,-]∘Cod` in Sets: the map `B → (A → B)` constant in its `A`-argument (`a ↦ y`).
-- `yoneda-argument` — `Nat(Cod, [A,-]∘Cod)` is a singleton.
-- `unique-Φ` — every such Φ equals `const-Φ A`.
-- `L` / `L⊣V₁` — left adjoint to V₁.
-- `L'` / `L'⊣U₁` — left adjoint to U₁.
+### `Cartesian/WellPointed.agda`
+Well-pointedness of Sets, and the one consequence the development needs from it:
+a natural transformation `id ⇒ [A,-]` over Sets is forced to be the constant
+family, so `Nat(id, [A,-])` is a singleton.
+- `point` — the map `1 → X` naming an element.
+- `α-is-const` — every `α : id ⇒ [A,-]` satisfies `η α X z ≡ λ _ → z`.
+- `Nat-id-hom-unique` — hence any two such agree.
+
+**Status:** complete, no holes.  Not `--safe`, only because it reaches
+`extensionality` through `Cartesian/Sets.agda`; the proof itself does not use it.
+
+This module formalises the paper's `lem_onset_trivials`.  Its header explains why
+the hypothesis deserves a name of its own: in the topos of C₂-sets 1 is not a
+generator, nothing here applies, and that is exactly what the paper's
+`cartesian_w_nontrivial_MRs` exploits.
+
+A former `Cartesian/Adjoints.agda` built left adjoints to `V₁` and `U₁` out of
+this singleton property.  It was removed: the adjunctions exist only when every
+coherent (M,R)-system is trivial, so they relate categories whose objects the
+rest of the development is at pains to escape.  The paper records the
+obstruction in a footnote in §3 instead of claiming the result.
+
