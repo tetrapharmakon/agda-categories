@@ -15,7 +15,7 @@ module Categories.Rosen.Incoherent.Mealy {o ℓ e} {C : Category o ℓ e} {M : M
 --
 -- A Mealy A B automaton has a state object E, a transition d : E⊗A ⇒ E
 -- and an output s : E⊗A ⇒ B.  Mealy₀ / Mealy⇒ package them and
--- totalMealy is the (twisted) total category, the target of Arbib.
+-- twMealy is the twisted category of Mealy automata, the target of Arbib.
 ------------------------------------------------------------------------
 
 open import Data.Product using (_,_; proj₁; proj₂; _×_)
@@ -86,11 +86,15 @@ Mealy⇒-≈ f g =
 open HomReasoning
 open MR
 
--- !!! This is not the total category of Mealy automata that
--- is usually recorded in the literature \cite{foo,bar}
--- (here the morphisms twist: inputs are acted on contravariantly).
-totalMealy : Category (o ⊔ ℓ ⊔ e) (o ⊔ ℓ ⊔ e) e
-totalMealy = record
+-- twMealy: the TWISTED category of Mealy automata.  Its morphisms twist ---
+-- inputs are acted on contravariantly, outputs covariantly --- so this is
+-- deliberately not the total category of Mealy automata usually recorded in
+-- the literature.  It was called `totalMealy` while that was read as a defect;
+-- it is not one.  It is the category the paper defines as 𝜏Mly in
+-- definition_twisted_category_mealy_automata, and it is the right target for
+-- the Arbib functor, whose source τ′[iMR2] twists in exactly the same way.
+twMealy : Category (o ⊔ ℓ ⊔ e) (o ⊔ ℓ ⊔ e) e
+twMealy = record
   { Obj = Mealy₀
   ; _⇒_ = λ s t → Mealy⇒ s t
   ; _≈_ = Mealy⇒-≈

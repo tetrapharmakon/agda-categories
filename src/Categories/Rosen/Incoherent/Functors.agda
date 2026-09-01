@@ -147,7 +147,7 @@ module _ {X Y : iMR2₀} (f : twiMR2⇒ X Y) where
           ((adjoint.Ladjunct ΦY*) ∘ ε F.Y.B) ∘ [ F.l , F.r ]₁ ⊗₁ id                           ≈˘⟨ adjoint.Ladjunct-comm′ ⟩∘⟨refl ⟩
           adjoint.Ladjunct (ΦY* ∘ ε F.Y.B ⊗₁ id) ∘ [ F.l , F.r ]₁ ⊗₁ id                       ∎
 
-Arbib : Functor τ′[iMR2] totalMealy
+Arbib : Functor τ′[iMR2] twMealy
 Arbib = record
   { F₀ = λ x →
     let module x = iMR2₀ x

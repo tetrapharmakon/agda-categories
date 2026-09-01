@@ -276,15 +276,21 @@ construction, the comparison with Mealy automata).
 - `[_]f` — projection `τ[iMR2] → Arrow(C)` onto the process map `f`.
 - `[_]Φ` — projection `τ[iMR2] → irepairs` onto the repair map `Φ`.
 - `lemma-epsilon` / `lemma-delta` — the two compatibility squares (output and transition) needed to interpret a twisted MR-morphism as a morphism of Mealy automata; both live in a shared module parameterized by an MR-morphism `f : twiMR2⇒ X Y`.
-- `Arbib` — functor `τ'[iMR2] → totalMealy` sending an incoherent (M,R)-system to the Mealy automaton with state object `[A,B]`, transition `d` and output `s` built from the adjunction unit/counit (the construction attributed to Arbib in the file's comment).
+- `Arbib` — functor `τ'[iMR2] → twMealy` sending an incoherent (M,R)-system to the Mealy automaton with state object `[A,B]`, transition `d` and output `s` built from the adjunction unit/counit (the construction attributed to Arbib in the file's comment).
 
 ### `Incoherent/Mealy.agda`
-The category of Mealy automata internal to `C`, used as the target of the
-`Arbib` functor in `Functors.agda`.
+The twisted category of Mealy automata internal to `C`, used as the target of
+the `Arbib` functor in `Functors.agda`.
 - `Mealy A B` — a Mealy automaton: state object `E`, transition `d : E⊗A ⇒ E`, output `s : E⊗A ⇒ B`.
 - `Mealy₀` / `Mealy⇒` — objects and morphisms (a state map `u` intertwining `d`/`s` up to reindexing by `l`,`r`).
 - `Mealy⇒-≈` — equality of automaton morphisms, componentwise from the morphism record.
-- `totalMealy` — the total category. The file's own comment flags that this is *not* the usual total category of Mealy automata found in the literature (an unresolved `\cite{...}` placeholder is left in the comment).
+- `twMealy` — the *twisted* category of Mealy automata: morphisms act
+  contravariantly on inputs and covariantly on outputs.  This is deliberately
+  not the total category usually recorded in the literature; it is the paper's
+  `𝜏Mly` (`definition_twisted_category_mealy_automata`), and it is the right
+  target for `Arbib`, whose source `τ'[iMR2]` twists the same way.  It was
+  called `totalMealy` while the mismatch with the literature was being read as
+  a defect.
 
 ### `Incoherent/HigherMRS.agda`
 The incoherent counterpart of `Coherent/HigherMRS.agda`: builds the tower of
