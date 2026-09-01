@@ -42,7 +42,7 @@ open Reason C
 
 open Closed Cl using ([-,-]; [_,_]₀; [_,-]; [_,_]₁)
 
-open import Categories.Rosen.Coherent.Core Cl
+open import Categories.Rosen.Coherent.CodCore Cl
 import Categories.Rosen.Coherent.IdCore
 module Id = Categories.Rosen.Coherent.IdCore Cl
 

@@ -48,9 +48,10 @@ Two cores coexist while the tree migrates from one notion to the other.
 - **`Coherent/IdCore.agda`** — the id-coherent (M,R)-system, `Φ : id ⇒ [A,-]`,
   with a component at every *object*.  **This is the notion the paper settles
   on, and the one new work should use.**
-- **`Coherent/Core.agda`** — the cod-coherent one, `Φ : Cod ⇒ [A,-]∘Cod`, with a
-  component at every *arrow*.  Historically first, still used by the modules
-  not yet migrated.
+- **`Coherent/CodCore.agda`** — the cod-coherent one, `Φ : Cod ⇒ [A,-]∘Cod`,
+  with a component at every *arrow*.  Historically first, which is the only
+  reason it used to be called `Core`; nothing depends on it now except the
+  bridge.
 - **`Coherent/CodCoherentEqualIdCoherent.agda`** — the proof that the two agree.
   This is the paper's `cod_lax_epi`.
 
@@ -60,18 +61,15 @@ codomain (`Φ-const-on-slices`).  A proof that used a naturality square of
 `Arr(C)` outside that shape therefore has no id-world translation and has to be
 re-derived; the bridge guarantees the *statements* correspond, not the proofs.
 
-Currently on `IdCore`: `Coherent/Repairs`, `Coherent/TotalCategory`,
-`Coherent/TabEquivalence`, `Adjunction/TotRep`, `MetabolicClosure`.
-Still on `Core`: `Coherent/ProElements`, `Coherent/Tabulator` and its consumers
-(`Cartesian/Adjoints`, `Coherent/FibreA`, `Coherent/HigherMRS`,
-`Coherent/HigherTruncatedSimplicialObject`, `Incoherent/HigherMRS`).
+**The whole tree is on `IdCore`.**  `Coherent/CodCore.agda` is reached only by
+the bridge module, which needs both sides in order to state that they agree.
 
 `IdCore`'s setoid relation is wrapped in `Level.Lift`.  That is Agda universe
 bookkeeping with no mathematical content — see the long comment at the top of
 that file — and exists only because the upstream tabulator pins its profunctor's
 levels.
 
-### `Coherent/Core.agda`
+### `Coherent/CodCore.agda`
 Core definitions for the category of (M,R)-systems.
 - `Cod` — Codomain functor `Arrow(C) → C`.
 - `nHom` — sends `f : A ⇒ B` to the induced natural transformation `[-,f] : [B,-] ⇒ [A,-]`.
@@ -384,7 +382,7 @@ postulated as `UNSOUND-*`, so read their **Status:** lines before using them.
 Generalizes `Cod : Arrow(C) → C` to an arbitrary functor `U : E → C` (the
 module is parameterized by `U`), redefining `MR2 A B` with
 `Φ : NaturalTransformation U ([A,-] ∘F U)` in place of `Cod`.
-- `nHom`, `nHom-identity` — as in `Coherent/Core.agda`, but stated once and reused.
+- `nHom`, `nHom-identity` — as in `Coherent/CodCore.agda`, but stated once and reused.
 - `MR2`, `MR2-Setoid` — the `U`-parametric (M,R)-system.
 - `MRS-Profunctor` — the full profunctor structure `C^op × C → Setoids`, proved completely (identity, homomorphism and `F-resp-≈` all filled in, by the same argument that works for `Cod`).
 
@@ -431,7 +429,7 @@ without proof.
 A slice-category-flavoured take on the same "fully polymorphic Φ" idea as
 `FullyPoly.agda`, but phrased via `Categories.Category.Slice` rather than
 raw arrow-pairs; a large commented-out block sketches an intended
-`nHom`-based `MRS-Profunctor` construction mirroring `Coherent/Core.agda`'s,
+`nHom`-based `MRS-Profunctor` construction mirroring `Coherent/CodCore.agda`'s,
 ported to this setting.
 - `MR2` — `⟪ f , Φ ⟫` with `Φ : NaturalTransformation (Dom B) ([A,-] ∘F Dom B)`.
 - `MR2-Setoid` — equality up to `f ≈ g` and `Φ ≃ Φ'`.

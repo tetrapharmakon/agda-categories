@@ -5,13 +5,23 @@ open import Categories.Category.Monoidal using (Monoidal)
 open import Categories.Category.Monoidal.Closed using (Closed)
 open import Level using (_⊔_)
 
-module Categories.Rosen.Coherent.Core {o ℓ e} {C : Category o ℓ e} {M : Monoidal C} (Cl : Closed M) where
+module Categories.Rosen.Coherent.CodCore {o ℓ e} {C : Category o ℓ e} {M : Monoidal C} (Cl : Closed M) where
 
--- Core definitions for the category of (M,R)-systems.
--- An (M,R)-system (Rosen's "metabolic"/"repair" system) is a pair (f, Φ)
--- where f : A ⇒ B is the metabolic process and Φ : Cod ⇒ [A,-]∘Cod gives,
--- for every morphism into A, a repair map.  A family of natural repairs.
--- Exports: Cod, nHom, nHom-identity, MR2, MR2-Setoid, MRS-Profunctor.
+-- COD-coherent (M,R)-systems: the pair (f, Φ) where f : A ⇒ B is the metabolic
+-- process and Φ : Cod ⇒ [A,-]∘Cod has a component at every ARROW of C.
+--
+-- This is not the notion the paper settles on.  The paper uses the id-coherent
+-- systems of Coherent/IdCore.agda, Φ : id ⇒ [A,-] with a component at every
+-- OBJECT, and so does the rest of this tree.  The two are equivalent --- that
+-- is Coherent/CodCoherentEqualIdCoherent.agda, the paper's `cod_lax_epi` ---
+-- and this module is kept because the equivalence has to be stated between
+-- something and something else.  Nothing else depends on it.
+--
+-- The file used to be called Coherent/Core.agda, which was a historical
+-- accident: it was written first, not because it is the central notion.
+--
+-- Exports: Cod, nHom, nHom-identity, MR2, MR2-Setoid, MRS-Profunctor,
+-- NICod⇒NIid, NIid⇒NICod, Naturalities, fattoide.
 
 open import Data.Product using (_,_; proj₁; proj₂; _×_)
 open import Relation.Binary.Bundles using (Setoid)
