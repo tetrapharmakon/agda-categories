@@ -10,28 +10,28 @@ naturality of the curry/braid transpose across a change of exponent.
 Completing that file was the occasion for auditing and documenting the rest
 of the tree below.
 
-**A number of other files in the tree carry gaps that are recorded
-mathematical obstructions, not unfinished routine proofs.** Every one of them
-is now postulated under a name beginning `UNSOUND-`, next to a comment
-explaining the obstruction, so that
+**The tree contains exactly one `postulate`: function extensionality, in
+`Axioms.agda`.** A `grep -rn postulate src/Categories/Rosen/` returns that line
+and nothing else.
 
-    grep -rn UNSOUND src/Categories/Rosen/
+It did not always. Five statements this development had found to be *false*
+were for a while postulated under names beginning `UNSOUND-`, so that the debt
+would at least be greppable. They have since been removed together with the
+results they propped up, because a postulate asserting a falsehood is worse than
+an absence: it reads as a result. Where a claim turned out to be false, the file
+now says so in prose at the point where the claim used to stand, and — where the
+development can — proves the refutation instead (`Coherent/C2Sets.agda`) or
+states the weaker thing that is actually true
+(`Incoherent/IteratedTruncatedSemisimplicialObject.agda`).
 
-enumerates the whole debt, typed. **A statement postulated as `UNSOUND-*` is
-one this development knows to be FALSE**; nothing depending on one is verified,
-and none of them may be cited as a result. There are five, in four files
-(`Coherent/NaturalAndHom.agda`, `Incoherent/CartesianAdjoints.agda`,
-`Incoherent/IteratedTruncatedSimplicialObject.agda`, `Variants/Slice.agda`,
-`Variants/Profunctorial.agda`).
-
-The tree's only other `postulate` is function extensionality, which is an
-ordinary axiom and lives alone in `Axioms.agda`.
-
-**A green `make check` is therefore not evidence that a statement is proved.**
-`sorry`/`UNSOUND-*` postulates typecheck by construction, and
-`Coherent/HigherTruncatedSimplicialObject.agda` passes only because it sets
-`--allow-unsolved-metas`. Read the **Status:** line of a file before relying on
-anything in it.
+**A green `make check` is still not by itself evidence that a statement is
+proved**: `Coherent/HigherTruncatedSimplicialObject.agda` passes only because it
+sets `--allow-unsolved-metas`, and it carries 23 open holes. That is now the
+only such file. For everything else, `--safe` is the check that matters: 29 of
+the 37 modules pass it, and the eight that do not are the ones reaching
+`Axioms.agda`, the one with `--allow-unsolved-metas`, and
+`Variants/Profunctorial.agda`, which is clean but imports an upstream module
+that sets `--allow-unsolved-metas` itself.
 
 ## A note on the projection functors
 

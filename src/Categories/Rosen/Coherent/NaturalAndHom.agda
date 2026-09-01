@@ -1,4 +1,4 @@
-{-# OPTIONS --without-K --warning=noUserWarning --warning=noUselessPrivate --warning=noUnsupportedIndexedMatch #-}
+{-# OPTIONS --safe --without-K --warning=noUserWarning --warning=noUselessPrivate --warning=noUnsupportedIndexedMatch #-}
 
 open import Categories.Category using (Category)
 open import Categories.Category.Monoidal using (Monoidal)
@@ -69,29 +69,18 @@ lem α = begin adjoint.Radjunct ([ α , id ]₁ ∘ [ id , unitorʳ.from ]₁ �
     id ⊗₁ unitorʳ.from ∎)
 
 
--- ┌──────────────────────────────────────────────────────────────────────────┐
--- │ KNOWN-FALSE POSTULATE.  Everything named UNSOUND-* in Categories.Rosen is │
--- │ a statement this development knows to be FALSE.  It is postulated only so │
--- │ that the shape of the obstruction is visible and typed; nothing that      │
--- │ depends on it is verified.  `grep -rn UNSOUND src/Categories/Rosen/`      │
--- │ enumerates the whole debt.                                               │
--- └──────────────────────────────────────────────────────────────────────────┘
+-- THE REVERSE DIRECTION IS FALSE, and this development proves it false.
 --
--- The reverse direction is not derivable for an arbitrary closed monoidal
--- category: it would say that a natural transformation is determined by its
--- component at the monoidal unit.  Naturality provides no way to recover its
--- component at X without an additional density or generator hypothesis.
+-- One might hope for ι (p α) ≈ α, i.e. that a natural transformation id ⇒ [A,-]
+-- is determined by its component at the monoidal unit.  Naturality gives no way
+-- to recover the component at X, and the gap is real, not merely underivable:
+-- Coherent/C2Sets.agda REFUTES it.  In the cartesian closed category of C₂-sets
+-- with A = unit, the nontrivial central element of C₂ is a natural endomorphism
+-- of the identity; it is the identity on the terminal unit but swaps the
+-- regular C₂-set, so p discards information ι cannot reconstruct.  See
+-- `swap-is-counterexample` there.
 --
--- It is not merely underivable but false: Coherent/C2Sets.agda REFUTES it.
--- In the cartesian closed category of C₂-sets with A = unit, the nontrivial
--- central element of C₂ is a natural endomorphism of the identity; it is the
--- identity on the terminal unit but swaps the regular C₂-set, so p loses
--- information that ι cannot reconstruct.  See `swap-is-counterexample` there.
---
--- Consequently NOTHING in this tree may depend on UNSOUND-ι∘p≈id: doing so
--- would prove a statement whose negation is already proved elsewhere in the
--- same tree.  It is kept, unused, to record the shape of the failure.
-postulate
-  UNSOUND-ι∘p≈id :
-    ∀ {A} (α : NaturalTransformation idF ([_,-] A)) → ∀ X →
-    (NaturalTransformation.η (ι {A} (p {A} α)) X) ≈ NaturalTransformation.η α X
+-- There is accordingly nothing to state here.  A postulate asserting it stood
+-- in this file for a while, named to warn the reader; it has been removed,
+-- since a refuted statement is better recorded by its refutation than by an
+-- assumption of its truth.

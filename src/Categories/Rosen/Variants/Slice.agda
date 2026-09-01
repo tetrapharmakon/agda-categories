@@ -1,4 +1,4 @@
-{-# OPTIONS --without-K --warning=noUserWarning --warning=noUselessPrivate --warning=noUnsupportedIndexedMatch #-}
+{-# OPTIONS --safe --without-K --warning=noUserWarning --warning=noUselessPrivate --warning=noUnsupportedIndexedMatch #-}
 
 open import Categories.Category using (Category)
 open import Categories.Category.Monoidal using (Monoidal)
@@ -67,45 +67,16 @@ MR2-Setoid A B = record
 
 open import Categories.NaturalTransformation.NaturalIsomorphism as NI using (NaturalIsomorphism;niHelper; _ⓘˡ_; _ⓘʳ_)
 
--- ┌──────────────────────────────────────────────────────────────────────────┐
--- │ KNOWN-FALSE POSTULATE.  Everything named UNSOUND-* in Categories.Rosen is │
--- │ a statement this development knows to be FALSE.  It is postulated only so │
--- │ that the shape of the obstruction is visible and typed; nothing that      │
--- │ depends on it is verified.  `grep -rn UNSOUND src/Categories/Rosen/`      │
--- │ enumerates the whole debt.                                               │
--- └──────────────────────────────────────────────────────────────────────────┘
+-- THERE IS NO PROFUNCTOR C.op x C -> Sets sending (A , B) to MR2 A B, and this
+-- file no longer declares one.
 --
--- THERE IS NO PROFUNCTOR C.op × C → Sets sending (A , B) ↦ MR2 A B, so the
--- Bifunctor below does not exist and must not be cited.  The obstruction is
--- located precisely: reindexing Φ along (u : A′ ⇒ A , v : B ⇒ B′) needs a
--- functor Slice B′ → Slice B, i.e. pullback along v, which this module does
--- not assume.  Postcomposition with v runs the other way.
+-- The obstruction is precise: reindexing the repair datum along
+-- (u : A' => A , v : B => B') needs a functor Slice B' -> Slice B, i.e. pullback
+-- along v, which this module does not assume; postcomposition with v runs the
+-- other way.  A Bifunctor asserting the profunctor's existence, with the missing
+-- datum postulated, used to stand here.  It has been removed: the comment above
+-- it denied the object exists while the term below it asserted the opposite.
 --
--- Everything NOT mentioning the reindexed Φ is proved outright below (the
--- setoid structure, identity, homomorphism, F-resp-≈): the MR2-Setoid relation
--- here drops the Φ-component, so those laws are the plain associativity
--- shuffles of Coherent/Core.agda.  Only the datum itself is missing.
-postulate
-  UNSOUND-reindex-Φ :
-    ∀ {A A′ B B′} → A′ ⇒ A → B ⇒ B′ →
-    NaturalTransformation (Dom B) (([_,-] A) ∘F (Dom B)) →
-    NaturalTransformation (Dom B′) (([_,-] A′) ∘F (Dom B′))
-
-MRS-Profunctor : Bifunctor (Category.op C) C (Setoids (o ⊔ ℓ ⊔ e) e)
-MRS-Profunctor = record
-  { F₀ = λ { (A , B) → MR2-Setoid A B }
-  ; F₁ = λ { {(A , B)} {(A′ , B′)} (u , v) → record
-    { _⟨$⟩_ = λ {⟪ f , Φ ⟫ → ⟪ v ∘ f ∘ u , UNSOUND-reindex-Φ u v Φ ⟫ }
-    ; cong = λ { {⟪ f , Φ ⟫} {⟪ g , Φ′ ⟫} f≈g →
-        (∘-resp-≈ Equiv.refl (∘-resp-≈ f≈g Equiv.refl))
-      }
-    }}
-  ; identity = λ x → trans identityˡ (trans identityʳ x)
-  ; homomorphism = λ { {f = (u₁ , v₁)} {g = (u₂ , v₂)} {⟪ f , Φ ⟫} {⟪ g , Φ′ ⟫} f≈g →
-      begin (v₂ ∘ v₁) ∘ f ∘ u₁ ∘ u₂     ≈˘⟨ assoc ○ assoc ⟩
-            (((v₂ ∘ v₁) ∘ f) ∘ u₁) ∘ u₂ ≈⟨ (refl⟩∘⟨ f≈g) ⟩∘⟨refl ⟩∘⟨refl ⟩
-            (((v₂ ∘ v₁) ∘ g) ∘ u₁) ∘ u₂ ≈⟨ (assoc ⟩∘⟨refl) ○ (assoc ⟩∘⟨refl) ⟩
-            (v₂ ∘ (v₁ ∘ (g ∘ u₁))) ∘ u₂ ≈⟨ assoc ○ sym-assoc ○ assoc ⟩
-            v₂ ∘ (v₁ ∘ g ∘ u₁) ∘ u₂     ∎ }
-  ; F-resp-≈ = λ x x₁ → ∘-resp-≈ (x .proj₂) (∘-resp-≈ x₁ (x .proj₁))
-  }
+-- What survives is what is true and proved: MR2 and MR2-Setoid.  Adding pullback
+-- along v to this module's hypotheses is what it would take to build the
+-- profunctor for real.

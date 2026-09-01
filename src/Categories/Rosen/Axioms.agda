@@ -8,10 +8,13 @@
 --
 -- What is here is an ORDINARY AXIOM: consistent with Agda's type theory, and
 -- of the kind mathematicians assume without comment.  It is not a placeholder
--- for a missing proof.  Do not add anything else to this file: statements this
--- development knows to be FALSE are postulated at their point of use under the
--- name UNSOUND-*, deliberately kept next to the comment explaining the
--- obstruction.  See `grep -rn UNSOUND src/Categories/Rosen/`.
+-- for a missing proof, and it is the ONLY postulate in Categories.Rosen: a
+-- `grep -rn postulate src/Categories/Rosen/` returns this line and nothing else.
+--
+-- Keep it that way.  Statements this development finds to be false are recorded
+-- by removing them and documenting the obstruction where they stood, not by
+-- postulating them; several such postulates existed for a while and each one
+-- put a name asserting a falsehood into the tree.
 --
 -- Consequence to be aware of: any module in the transitive closure of this one
 -- cannot be checked with --safe.  Today that is Cartesian/Sets.agda and

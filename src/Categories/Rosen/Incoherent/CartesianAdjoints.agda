@@ -68,50 +68,25 @@ L′ = record
 
 open import Categories.NaturalTransformation using (NaturalTransformation; ntHelper)
 
--- ┌──────────────────────────────────────────────────────────────────────────┐
--- │ KNOWN-FALSE POSTULATE.  Everything named UNSOUND-* in Categories.Rosen is │
--- │ a statement this development knows to be FALSE.  It is postulated only so │
--- │ that the shape of the obstruction is visible and typed; nothing that      │
--- │ depends on it is verified.  `grep -rn UNSOUND src/Categories/Rosen/`      │
--- │ enumerates the whole debt.                                               │
--- └──────────────────────────────────────────────────────────────────────────┘
+-- THE ADJUNCTIONS DO NOT EXIST, and this file no longer pretends otherwise.
 --
--- The counits below cannot be constructed for arbitrary incoherent systems.
--- Since L and L′ equip an arrow with the constant repair map, their eqΦ fields
--- would require every Φ : B → (A → B) to be that constant map.  That is false
--- for an unconstrained Φ (take A = B = Bool and Φ b a = a), so the statement
--- below is an obstruction, not missing equational reasoning.
+-- L and L′ above are complete and unconditional: they equip an arrow with the
+-- constant repair map, and every law is refl.  They are the paper's `ell` and
+-- `ell_prime`.
 --
--- In the coherent Cartesian construction, Φ is natural in the arrow variable
--- and a Yoneda argument proves that it is the unique constant repair map
--- (Cartesian/Adjoints.agda, `yoneda-argument`/`unique-Φ`, both proved).  An
--- iMR2 stores no such naturality data, so that argument is unavailable here.
+-- What does not exist is their adjointness to [_]f and ⟅_⟆f.  The counit at an
+-- incoherent system ⟨f,Φ⟩ would be a morphism ⟨f,const-Φ⟩ → ⟨f,Φ⟩ over the
+-- identities, whose eqΦ field forces Φ = const-Φ -- that is, forces every
+-- Φ : B → (A → B) to satisfy Φ b a ≡ b, which is false for an unconstrained Φ
+-- (take A = B = Bool and Φ b a = a).
 --
--- NOTE ON THE PAPER.  §3 of "The Rosen fibration" states the matching claim
--- correctly and negatively: the displayed diagram there is labelled
--- `not_adjoints`, and the prose reads "one can check that L and L′ fall just
--- short of satisfying the adjunction property".  The two results below assert
--- the opposite of what the paper asserts, and are retained only to record the
--- shape of the failed construction.  THEY MUST NOT BE CITED AS RESULTS.
-postulate
-  UNSOUND-Φ-is-constant :
-    ∀ {A B : Obj} (Φ : B ⇒ [ A , B ]₀) {b : B} → Φ b ≡ (λ _ → b)
-
-L⊣A : L ⊣ [_]f
-L⊣A = record
-  { unit = ntHelper (record { η = λ X → mor⇒ {dom⇒ = id} {cod⇒ = id} ≡-refl ; commute = λ {X} {Y} f → (λ {x} → ≡-refl) , (λ {x} → ≡-refl) })
-  ; counit = ntHelper (record
-    { η = λ X → record { l = id ; r = id ; eqf = λ {x} → ≡-refl
-      ; eqΦ = λ {x} → UNSOUND-Φ-is-constant (iMR2.Φ (iMR2₀.ξ X)) }
-    ; commute = λ f → (λ {x} → ≡-refl) , (λ {x} → ≡-refl) })
-  ; zig = λ {A} → (λ {x} → ≡-refl) , (λ {x} → ≡-refl)
-  ; zag = λ {B} → (λ {x} → ≡-refl) , (λ {x} → ≡-refl)
-  }
-
-L′⊣⟅⟆f : L′ ⊣ ⟅_⟆f
-L′⊣⟅⟆f = record
-  { unit = ntHelper (record { η = λ X → tmor⇒ λ {x} → ≡-refl ; commute = λ f → (λ {x} → ≡-refl) , (λ {x} → ≡-refl) })
-  ; counit = ntHelper (record { η = λ X → record { l = id ; r = id ; eqf = λ {x} → ≡-refl ; eqΦ = UNSOUND-Φ-is-constant (iMR2.Φ (iMR2₀.ξ X)) } ; commute = λ {X} {Y} f → (λ {x} → ≡-refl) , (λ {x} → ≡-refl) })
-  ; zig = λ {A} → (λ {x} → ≡-refl) , (λ {x} → ≡-refl)
-  ; zag = λ {B} → (λ {x} → ≡-refl) , (λ {x} → ≡-refl)
-  }
+-- In the coherent Cartesian setting the same computation goes through, but only
+-- because Nat(id,[A,-]) is a singleton over Sets, which needs 1 to be a
+-- generator (Cartesian/WellPointed.agda).  That hypothesis is exactly what the
+-- paper's cartesian_w_nontrivial_MRs shows one must abandon to have nontrivial
+-- coherent systems at all, so the repair buys nothing.
+--
+-- §3 of the paper says the same, and says it negatively: the displayed diagram
+-- there is labelled `not_adjoints`, and a footnote locates the obstruction.
+-- Two results asserting the adjunctions, each inhabited by a postulate, used to
+-- stand here; they have been removed.
