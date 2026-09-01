@@ -1,4 +1,4 @@
-{-# OPTIONS --without-K --warning=noUserWarning --warning=noUselessPrivate --warning=noUnsupportedIndexedMatch #-}
+{-# OPTIONS --safe --without-K --warning=noUserWarning --warning=noUselessPrivate --warning=noUnsupportedIndexedMatch #-}
 
 open import Categories.Category using (Category)
 open import Categories.Category.Monoidal using (Monoidal)
