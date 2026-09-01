@@ -10,16 +10,28 @@ naturality of the curry/braid transpose across a change of exponent.
 Completing that file was the occasion for auditing and documenting the rest
 of the tree below.
 
-**A number of other files in the tree carry `sorry`-postulated gaps that are
-recorded mathematical obstructions, not unfinished routine proofs.** For
-example, `Incoherent/CartesianAdjoints.agda` and `Coherent/NaturalAndHom.agda`
-each contain a `sorry` immediately next to a comment proving the
-corresponding statement is false in general (a Yoneda argument that is
-unavailable to incoherent systems; a genuine counterexample in C₂-sets,
-respectively). Every file below that contains a `sorry`, a `postulate`, or an
-open `{! !}` interaction hole is marked with an explicit **Status:** line
-explaining what is being left open and why — read those before assuming
-something is simply unfinished.
+**A number of other files in the tree carry gaps that are recorded
+mathematical obstructions, not unfinished routine proofs.** Every one of them
+is now postulated under a name beginning `UNSOUND-`, next to a comment
+explaining the obstruction, so that
+
+    grep -rn UNSOUND src/Categories/Rosen/
+
+enumerates the whole debt, typed. **A statement postulated as `UNSOUND-*` is
+one this development knows to be FALSE**; nothing depending on one is verified,
+and none of them may be cited as a result. There are five, in four files
+(`Coherent/NaturalAndHom.agda`, `Incoherent/CartesianAdjoints.agda`,
+`Incoherent/IteratedTruncatedSimplicialObject.agda`, `Variants/Slice.agda`,
+`Variants/Profunctorial.agda`).
+
+The tree's only other `postulate` is function extensionality, which is an
+ordinary axiom and lives alone in `Axioms.agda`.
+
+**A green `make check` is therefore not evidence that a statement is proved.**
+`sorry`/`UNSOUND-*` postulates typecheck by construction, and
+`Coherent/HigherTruncatedSimplicialObject.agda` passes only because it sets
+`--allow-unsolved-metas`. Read the **Status:** line of a file before relying on
+anything in it.
 
 ## Coherent (M,R)-systems
 
@@ -44,10 +56,12 @@ Proves that natural transformations `id ⇒ [A,-]` correspond to morphisms
 - `p` — sends `α : NaturalTransformation id [A,-]` to its component at `unit`, transposed: `A ⇒ unit`.
 - `ι` — the converse direction, currying a map `A ⇒ unit` back into a natural transformation.
 - `lem` — `p (ι α) ≈ α`, proved by an explicit equational chain using the closed/symmetric-monoidal unitor coherence.
-- `false` — the statement that `ι (p α) ≈ α` pointwise, which is **not** provable in general.
+- `UNSOUND-ι∘p≈id` — the statement that `ι (p α) ≈ α` pointwise, which is **not**
+  provable in general, and is in fact **refuted** by `Coherent/C2Sets.agda`.
+  Postulated, unused, to record the shape of the failure.
 
-**Status:** compiles, with one `sorry` (`false`) marking a genuine
-counterexample, not a missing proof. The comment above `false` gives the
+**Status:** compiles. `UNSOUND-ι∘p≈id` (formerly `false`) marks a genuine
+counterexample, not a missing proof. The comment above it gives the
 actual counterexample: in the cartesian closed category of C₂-sets with
 `A = unit`, the nontrivial central element of C₂ is a natural endomorphism
 of the identity that acts as the identity on the terminal object but swaps
@@ -274,9 +288,11 @@ genuinely breaks down for *incoherent* MR-systems.
 - `s₀⁰`, `s₀¹`, `s₁¹` — the three degeneracy functors of the truncated simplicial object.
 - `iMRSᴵᴵ-defines-truncated-simplicial-object` — the resulting `TruncatedSimplicialObject (Cats ...)`.
 
-**Status:** compiles, but with two `sorry`s (both in `d₁²-s₀¹`, the forward
-and inverse directions) marking a genuine mathematical obstruction, not
-missing routine work. The file's own comment proves this explicitly:
+**Status:** compiles, but `d₁²-s₀¹` (forward and inverse directions) rests on
+the postulate `UNSOUND-Φ-is-constant`, marking a genuine mathematical
+obstruction, not missing routine work. Note that the paper claims only a
+*semi*simplicial structure (faces, no degeneracies); the record built here is a
+full `TruncatedSimplicialObject`, and the surplus is exactly what is unproved. The file's own comment proves this explicitly:
 choosing `⊤MR2` as the degeneracy point forces `⊤ ≅ A` for every set `A`
 (absurd); choosing `ιMR2` instead makes the simplicial identity
 `d₁² ∘ s₀¹ ≈ id` require every incoherent repair map `Φ : B → (A → B)` to be
@@ -292,10 +308,14 @@ The incoherent counterpart of `Cartesian/Adjoints.agda`, instantiated at
 coherent case.
 - `const-Φ` — the constant repair map `B → (A → B)`, `const-Φ A a b = a`.
 - `L` / `L'` — the incoherent counterparts of the coherent left adjoints, equipping an arrow with the constant repair map.
-- `L⊣A`, `L'⊣𝕃` — the claimed adjunctions.
+- `L⊣A`, `L′⊣𝕃` — the claimed adjunctions. **These assert the opposite of what
+  the paper asserts**: §3 of "The Rosen fibration" labels the corresponding
+  diagram `not_adjoints` and says in so many words that `L` and `L′` "fall just
+  short of satisfying the adjunction property". They must not be cited.
 
-**Status:** compiles, but with two `sorry`s, both marking a documented
-genuine obstruction: in the coherent construction, Φ's naturality plus a
+**Status:** compiles, but both counits rest on the postulate
+`UNSOUND-Φ-is-constant`, marking a documented genuine obstruction: in the
+coherent construction, Φ's naturality plus a
 Yoneda argument forces it to *be* the constant map uniquely; an `iMR2` stores
 no naturality data, so that argument is simply unavailable, and the
 counit's `eqΦ` field would require an *arbitrary* `Φ : B → (A → B)` to
@@ -315,12 +335,8 @@ original process `f`.
 - `reindexMR2` — reindexing a coherent `MR2` system along `u : A' ⇒ A`, `v : B ⇒ B'`.
 - `ReindexingPreservesClosure` — the (intended) statement that reindexing sends `b₀` to `v ∘ b₀`.
 
-**Status:** one open `{! !}` hole, in the final step of
-`ReindexingPreservesClosure`. Unlike the `sorry`s above, this is plain
-unfinished routine work with no comment claiming an obstruction — it looks
-like straightforward (if fiddly) equational reasoning about how `Φη₀`
-transports along `reindexMR2`. The file does not currently type-check
-standalone.
+**Status:** complete, no holes, no postulates. The interaction hole that used
+to sit in the final step of `ReindexingPreservesClosure` was closed.
 
 ## Variants (experimental)
 
@@ -330,8 +346,9 @@ standalone.
 > developed cleanly by `Variants/Functorial.agda` below.
 
 Four independent explorations of ways to generalize where Φ's naturality
-data lives, kept side by side for comparison. Only one of the four
-(`Variants/Functorial.agda`) currently type-checks cleanly.
+data lives, kept side by side for comparison. All four type-check; two of them
+(`Slice`, `Profunctorial`) do so only because their missing pieces are
+postulated as `UNSOUND-*`, so read their **Status:** lines before using them.
 
 ### `Variants/Functorial.agda`
 Generalizes `Cod : Arrow(C) → C` to an arbitrary functor `U : E → C` (the
@@ -355,11 +372,9 @@ extensive catalogue of the naturality squares this induces.
 - `Naturalities` — a module deriving 14 named naturality consequences (`nat-1⇒uᴿ`, `nat-u⇒1ᴸ`, the "cross naturalities" `nat-1⇒u×u⇒1` etc.) from the two-variable naturality of Φ.
 - `MRS-Profunctor` — the attempted profunctor structure on `MR2`.
 
-**Status: does not currently type-check.** One open `{! !}` hole in
-`MRS-Profunctor`'s `homomorphism` field, plus a `private postulate sorry`
-that is declared but never actually invoked (dead scaffolding). Since the
-file lacks `--allow-unsolved-metas`, `agda` reports a hard error on it as it
-stands.
+**Status:** complete, no holes, no postulates. The `homomorphism` hole was
+closed and the dead `private postulate sorry` (declared, never invoked) was
+removed.
 
 ### `Variants/Profunctorial.agda`
 The most speculative variant: replaces the fixed `[A,-] ∘F Cod`-shaped
@@ -372,12 +387,15 @@ its own bespoke notion of naturality rather than reusing one fixed shape.
 - `pollo` — the reindexing functor on `(coSlice A)^op × Slice B` induced by `u : A' ⇒ A`, `v : B ⇒ B'`.
 - `MRS-Profunctor` — the attempted profunctor structure (essentially entirely unfilled).
 
-**Status: does not currently type-check**, and is the least-finished file in
-the tree. 15 open `{! !}` holes (three in `MR2-Setoid`'s `isEquivalence`,
-the rest scattered through `MRS-Profunctor`'s `F₁`/`identity`/
-`homomorphism`/`F-resp-≈`, which are essentially stubs), plus a
-declared-but-unused `private postulate sorry`. Read this as an initial
-sketch rather than a working construction.
+**Status:** type-checks, but `MRS-Profunctor` rests on three postulates —
+`UNSOUND-reindex-p`, `UNSOUND-reindex-Φ`, `UNSOUND-reindex-twist`. `MR2-Setoid`
+really is proved to be a setoid, and every component of `MRS-Profunctor` not
+mentioning the reindexed profunctor is proved outright. The obstruction is
+precise: reindexing along `(u : A′ ⇒ A, v : B ⇒ B′)` needs `coSlice A′ →
+coSlice A` and `Slice B′ → Slice B`, i.e. pushout along `u` and pullback along
+`v`, which this module does not assume (`pollo` assembles the functors that run
+the other way). This is what §4's `proposition_assignment_profunctor_r` asserts
+without proof.
 
 ### `Variants/Slice.agda`
 A slice-category-flavoured take on the same "fully polymorphic Φ" idea as
@@ -389,8 +407,12 @@ ported to this setting.
 - `MR2-Setoid` — equality up to `f ≈ g` and `Φ ≃ Φ'`.
 - `MRS-Profunctor` — the attempted profunctor structure; only `F₀` and part of `F₁.cong` are filled in.
 
-**Status: does not currently type-check.** Seven open `{! !}` holes (mostly
-in `MRS-Profunctor`), plus a declared-but-unused `private postulate sorry`.
+**Status:** type-checks, but `MRS-Profunctor` rests on the postulate
+`UNSOUND-reindex-Φ`. The comment above it states flatly that **there is no
+profunctor** `C.op × C → Sets` sending `(A , B) ↦ MR2 A B`, so the bifunctor
+declared there does not exist and must not be cited; the same pullback-along-`v`
+obstruction as in `Variants/Profunctorial.agda` is at work. Everything not
+mentioning the reindexed Φ is proved outright.
 This file's `MR2` is *unrelated* to the construction in `Incoherent/Slice.agda`
 described above — despite the shared filename, `Variants/Slice.agda` slices
 the *domain* of Φ, not the `iMR2ᴸ B ≃ Slice C (B×[B,B]₀)` equivalence.
@@ -413,8 +435,14 @@ used to instantiate the Rosen constructions concretely.
 - `Sets-Canonical` / `Sets-CCC` — the canonical and bundled Cartesian-closed structures on Sets.
 - `Sets-Monoidal` / `Sets-Closed` — the induced monoidal and closed structures (product given by `×`, exponentials by function types).
 
-**Note:** postulates `extensionality` (function extensionality), a standard
-axiom for reasoning about `Sets`, not a `sorry`-style placeholder.
+**Note:** re-exports `extensionality` (function extensionality) from
+`Axioms.agda`. That is a standard axiom, not a placeholder for a missing proof,
+but it does prevent `--safe` on this module and on everything downstream.
+
+### `Axioms.agda`
+The one place where the development's non-logical assumptions are declared.
+Contains function extensionality and nothing else. `grep -rn Rosen.Axioms`
+lists every module that depends on an axiom.
 
 ### `Cartesian/Concrete.agda`
 The parametric instantiation point `(o : Level)` for the Rosen constructions
