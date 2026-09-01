@@ -33,7 +33,7 @@ open import Categories.Morphism.Reasoning as MR
 open import Categories.NaturalTransformation.NaturalIsomorphism as NI
   using (NaturalIsomorphism; niHelper; _ⓘˡ_; _ⓘʳ_;_ⓘᵥ_)
 
-open import Categories.Rosen.Coherent.Tabulator Cl using (V₁; 𝕋MRS)
+open import Categories.Rosen.Coherent.Tabulator Cl using (⟅_⟆f; 𝕋MRS)
 open import Categories.Rosen.Incoherent.Core Cl
 open import Categories.Rosen.Incoherent.Elements Cl
 open import Categories.Rosen.Incoherent.Functors Cl
@@ -46,7 +46,7 @@ open Closed Cl using ([-,-]; [_,_]₀; [_,_]₁)
 -- A —f→ B —Φ→ [A,B] —Φ₂→ [B,[A,B]] —Φ₃→ [[A,B],[B,[A,B]]] —→ ...
 -- without the natural transformation condition of full MR2.
 
--- iMRS3: the 3rd level, IsoComma of ℝ (from ProElements) and V₁ (from
+-- iMRS3: the 3rd level, IsoComma of ℝ (from ProElements) and ⟅_⟆f (from
 -- Tabulator).
 iMRS3 : Category (o ⊔ ℓ ⊔ e) (o ⊔ ℓ ⊔ e) e
 iMRS3 = IsoComma ℝ [_]f

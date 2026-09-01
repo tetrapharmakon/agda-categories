@@ -12,7 +12,7 @@ module Categories.Rosen.Coherent.ProElements {o ℓ e} {C : Category o ℓ e} {M
 
 -- Modified category of elements for a bifunctor F : C^op × C → Sets, specialised to MRS-Profunctor.
 -- EltsCat is a generic (modified) category-of-elements construction; ElMRS is its instance.
--- Exports: EltsCat, ElMRS, ℝ, U₁.
+-- Exports: EltsCat, ElMRS, ⟅_⟆Φ, U₁.
 
 open import Categories.Category.Construction.Arrow
 open import Categories.Category.Construction.TwistedArrow C renaming (Morphism to tMorphism; Morphism⇒ to tMorphism⇒)
@@ -112,7 +112,9 @@ ElMRS : Category (o ⊔ ℓ ⊔ e) (o ⊔ ℓ ⊔ e) e
 ElMRS = MRS.Elts
 
 
--- A functor from ElMRS to Arrow(C) extracting repair maps (without fixing the domain).
+-- ⟅_⟆Φ: the last edge functor.  Extracts the repair map Φ_B from a coherent
+-- (M,R)-system, without fixing the domain; this is the paper's ⦇-⦈_Φ of
+-- definition_last_edge_functor.
 --
 -- The cod-coherent version of the square below could not be proved by
 -- naturality alone.  Φ's components were indexed by ARROWS, and the four that
@@ -123,8 +125,8 @@ ElMRS = MRS.Elts
 -- OBJECT, all four collapse to the components at X.B and Y.B, and what remains
 -- is a single naturality square in C.  The proof is shorter, but it is not the
 -- old proof shortened: the reason it works is different.
-ℝ : Functor ElMRS Arr.Arrow
-ℝ = record
+⟅_⟆Φ : Functor ElMRS Arr.Arrow
+⟅_⟆Φ = record
   { F₀ = λ x → let module x = MRS.Elts₀ x in record { arr = MR2.Φη x.el x.B }
   ; F₁ = λ { {X} {Y} f →
     let module X = MRS.Elts₀ X

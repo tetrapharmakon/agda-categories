@@ -132,8 +132,8 @@ The total category of the MRS-profunctor tabulator.
 ### `Coherent/HigherMRS.agda`
 Higher-order (M,R)-systems in a Fibonacci-style construction: each step
 `A → B → [A,B] → [B,[A,B]] → ...` embeds the two previous levels into an
-internal hom. Built as iterated IsoCommas of ℝ and Vᵢ.
-- `MRS3` — the 3rd level: `IsoComma ℝ V₁`.
+internal hom. Built as iterated IsoCommas of `⟅_⟆Φ` and `⟅_⟆f`.
+- `MRS3` — the 3rd level: `IsoComma ⟅_⟆Φ ⟅_⟆f`.
 - `𝕄ℝ𝕊` — the n-th level category + functor to `Arr.Arrow`.
 - `𝕄ℝ𝕊ₒ` / `𝕄ℝ𝕊ₐ` — projections to the category / functor.
 - `Π-MRS` — projection `(suc n) → n`.
@@ -162,7 +162,7 @@ profunctor `MRS-Profunctor : C^op × C → Sets`, equipped with a universal 2-ce
 - `𝕋MRS` — the tabulator category of `MRS-Profunctor`.
 - `π` — left projection `𝕋MRS → C`.
 - `þ` — the universal terminal 2-cell.
-- `V₁` — extracts the "f" component from each `MR2` object.
+- `⟅_⟆f` — the **first edge functor**: extracts the process map `f` from a coherent (M,R)-system.  This is the paper's `⦇-⦈_f` (`definition_first_edge_functor`).
 - `ϵ` — natural transformation from `MRS-Profunctor` to the lifted hom functor.
 
 ### `Coherent/FibreA.agda`
@@ -171,7 +171,7 @@ the domain object `A`, which simplifies the definitions.
 - `totalAtA₀` / `totalAtA₁` — objects and morphisms of the fibre over `A`.
 - `totalAtA` — the category totalAtA A (fibre over `A` of `MRS-Profunctor`).
 - `∇` — functor from the fibre to `Arrow`, sending `(B, ξ)` to `Φ : B → [A,B]`.
-- `commaNablaV` — comma category `∇ ↓ V₁` (weaker invariant, historical).
+- `commaNablaV` — comma category `∇ ↓ ⟅_⟆f` (weaker invariant, historical).
 
 ### `Coherent/TabEquivalence.agda`
 Equivalence between the total category (see `TotalCategory.agda`) and the
@@ -183,7 +183,7 @@ tabulator of `MRS-Profunctor` (see `Tabulator.agda`).
 Modified category of elements for a bifunctor `F : C^op × C → Sets`, specialised to `MRS-Profunctor`.
 - `EltsCat` — generic (modified) category-of-elements construction.
 - `ElMRS` — the category of elements of `MRS-Profunctor`.
-- `ℝ` — functor from `ElMRS` to `Arrow(C)` extracting repair maps.
+- `⟅_⟆Φ` — the **last edge functor**: extracts the repair component `Φ_B : B ⇒ [A,B]` from a coherent (M,R)-system, without fixing the domain.  This is the paper's `⦇-⦈_Φ` (`definition_last_edge_functor`).  Note the asymmetry with `⟅_⟆f`: the process map is already functorial on the tabulator, the repair map only after passing to twisted elements.
 - `U₁` — functor from `ElMRS` to the twisted arrow category of `C`.
 
 ## Incoherent (M,R)-systems

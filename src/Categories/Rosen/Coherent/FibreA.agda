@@ -25,7 +25,7 @@ open import Categories.Category.Construction.Comma
 open import Categories.Functor using (Functor)
 open import Categories.NaturalTransformation using (NaturalTransformation)
 open import Categories.Rosen.Coherent.IdCore Cl
-open import Categories.Rosen.Coherent.Tabulator Cl using (𝕋MRS; V₁)
+open import Categories.Rosen.Coherent.Tabulator Cl using (𝕋MRS; ⟅_⟆f)
 
 import Reason
 open Reason C
@@ -101,10 +101,10 @@ totalAtA A = record
   }
 
 -- The same construction of HigherMRS.agda, but with a comma category instead of PB.
--- Objects are commutative squares in Arrow(C):  ∇ x ⇒ V₁ y.
+-- Objects are commutative squares in Arrow(C):  ∇ x ⇒ ⟅_⟆f y.
 
--- commaNablaV: comma category ∇ ↓ V₁.  Weaker than the pullback in HigherMRS.
+-- commaNablaV: comma category ∇ ↓ ⟅_⟆f.  Weaker than the pullback in HigherMRS.
 commaNablaV : {T : Obj} → Category (ℓ ⊔ e ⊔ (o ⊔ ℓ ⊔ e)) (e ⊔ (o ⊔ ℓ ⊔ e)) e
-commaNablaV {T} = (∇ {T} ↓ V₁)
+commaNablaV {T} = (∇ {T} ↓ ⟅_⟆f)
 
 
