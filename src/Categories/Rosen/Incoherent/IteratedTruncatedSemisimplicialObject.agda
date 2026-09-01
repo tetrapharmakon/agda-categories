@@ -7,12 +7,13 @@ open import Categories.NaturalTransformation.NaturalIsomorphism as NI
 open import Level using (Level; 0ℓ; _⊔_; suc; lift; Lift)
 open import Relation.Binary.PropositionalEquality using (_≡_; isEquivalence; subst) renaming (refl to ≡-refl; sym to ≡-sym)
 
-module Categories.Rosen.Incoherent.IteratedTruncatedSimplicialObject
+module Categories.Rosen.Incoherent.IteratedTruncatedSemisimplicialObject
   (o : Level) where
 
 open import Categories.Category.Instance.Cats using (Cats)
 open import Categories.Category.Lift using (liftC;liftF)
-open import Categories.TruncatedSimplicialObject using (TruncatedSimplicialObject)
+open import Categories.Rosen.TruncatedSemisimplicialObject
+  using (TruncatedSemisimplicialObject; AlmostTruncatedSimplicialObject)
 
 open import Categories.Rosen.Cartesian.Sets
 open Sets-MonoidalClosed {o}
@@ -163,29 +164,47 @@ s₁¹ = record
 -- requires either coherent MR2 systems, a restriction to normalized Φ, or
 -- a weaker notion of morphism that forgets the Φ-compatibility.
 --
--- ┌──────────────────────────────────────────────────────────────────────────┐
--- │ KNOWN-FALSE POSTULATE.  Everything named UNSOUND-* in Categories.Rosen is │
--- │ a statement this development knows to be FALSE.  It is postulated only so │
--- │ that the shape of the obstruction is visible and typed; nothing that      │
--- │ depends on it is verified.  `grep -rn UNSOUND src/Categories/Rosen/`      │
--- │ enumerates the whole debt.                                               │
--- └──────────────────────────────────────────────────────────────────────────┘
---
--- NOTE ON THE PAPER.  §3 of "The Rosen fibration" claims only a SEMIsimplicial
--- structure on the iMRS⁽ⁿ⁾ (faces, no degeneracies), and hedges it further with
--- "at least in the low degrees".  That claim is not affected by the failure
--- recorded here, which is entirely about the degeneracy s₀¹.  The record built
--- below is a full TruncatedSimplicialObject, i.e. STRICTLY MORE than the paper
--- asserts, and the surplus is exactly what is not proved.  Cite the paper's
--- semisimplicial claim, not this record.
-postulate
-  -- C is Sets o here, so B ⇒ [ A , B ]₀ is literally B → (A → B).
-  UNSOUND-Φ-is-constant :
-    ∀ {A B : Obj} (Φ : B → (A → B)) {b : B} → Φ b ≡ (λ _ → b)
+-- THE RESULT.  The faces alone form a truncated SEMIsimplicial object, and that
+-- much holds outright.  This is exactly what the paper claims.
+iMRSᴵᴵ-defines-truncated-semisimplicial-object :
+  TruncatedSemisimplicialObject (Cats (suc o) (suc o) o)
+iMRSᴵᴵ-defines-truncated-semisimplicial-object = record
+  { X₀ = 𝟘-simplex
+  ; X₁ = τ[iMR2]
+  ; X₂ = iMRSᴵᴵ
+  ; d₀¹ = l ∘F [_]A
+  ; d₁¹ = l ∘F [_]B
+  ; d₀² = deg₀²
+  ; d₁² = comp
+  ; d₂² = deg₂²
+  ; face-face₀₁ = NI.refl
+  ; face-face₀₂ = NI.niHelper record
+      { η = λ _ → lift (Category.id C)
+       ; η⁻¹ = λ _ → lift (Category.id C)
+       ; commute = λ {X} {Y} f →
+           let module f = iMRSᴵᴵ⇒ f in
+           lift {o} (λ {x} → ≡-sym (f.hᵣ≈kₗ {x}))
+      ; iso = λ _ → record
+          { isoˡ = lift identity²
+          ; isoʳ = lift identity²
+          }
+      }
+  ; face-face₁₂ = NI.refl
+  }
 
-iMRSᴵᴵ-defines-truncated-simplicial-object :
-  TruncatedSimplicialObject (Cats (suc o) (suc o) o)
-iMRSᴵᴵ-defines-truncated-simplicial-object = record
+-- HOW CLOSE IT COMES.  Of the thirteen laws of a truncated simplicial object,
+-- twelve hold; the construction below carries all of them, and the only one it
+-- omits is d₁² ∘ s₀¹ ≈ id.  Constructing this record is what makes "exactly one
+-- identity fails" a checked statement rather than a claim.
+--
+-- The failing identity fails for a reason, spelled out above: with ιMR2 as the
+-- degeneracy, d₁² ∘ s₀¹ ≈ id would force every incoherent repair map
+-- Φ : B → (A → B) to be the constant map (b , a) ↦ b, which is false for a
+-- generic Φ.  Coherent MR2 systems, or a restriction to normalised Φ, or a
+-- weaker notion of morphism forgetting Φ-compatibility, would each repair it.
+iMRSᴵᴵ-almost-defines-truncated-simplicial-object :
+  AlmostTruncatedSimplicialObject (Cats (suc o) (suc o) o)
+iMRSᴵᴵ-almost-defines-truncated-simplicial-object = record
   { X₀ = 𝟘-simplex
   ; X₁ = τ[iMR2]
   ; X₂ = iMRSᴵᴵ
@@ -265,25 +284,6 @@ iMRSᴵᴵ-defines-truncated-simplicial-object = record
   -- Goal: construct a natural isomorphism
   -- (s₀¹ ∘F s₀⁰) ≃ (s₁¹ ∘F s₀⁰).
   ; d₀²-s₀¹ = NI.refl
-  ; d₁²-s₀¹ = NI.niHelper record
-      { η = λ X → record
-          { l = id
-          ; r = id
-          ; eqf = λ {x} → ≡-refl
-          ; eqΦ = λ {x} → UNSOUND-Φ-is-constant (iMR2.Φ (iMR2₀.ξ X))
-          }
-      ; η⁻¹ = λ X → record
-          { l = id
-          ; r = id
-          ; eqf = λ {x} → ≡-refl
-          ; eqΦ = λ {x} → ≡-sym (UNSOUND-Φ-is-constant (iMR2.Φ (iMR2₀.ξ X)))
-          }
-      ; commute = λ _ → (λ {x} → ≡-refl) , (λ {x} → ≡-refl)
-      ; iso = λ _ → record
-          { isoˡ = (λ {x} → ≡-refl) , (λ {x} → ≡-refl)
-          ; isoʳ = (λ {x} → ≡-refl) , (λ {x} → ≡-refl)
-          }
-      }
   ; d₁²-s₁¹ = NI.niHelper record
       { η = λ _ → record
           { l = id
