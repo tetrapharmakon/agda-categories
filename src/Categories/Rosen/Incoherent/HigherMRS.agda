@@ -33,7 +33,7 @@ open import Categories.Morphism.Reasoning as MR
 open import Categories.NaturalTransformation.NaturalIsomorphism as NI
   using (NaturalIsomorphism; niHelper; _ⓘˡ_; _ⓘʳ_;_ⓘᵥ_)
 
-open import Categories.Rosen.Coherent.Tabulator Cl using (⟅_⟆f; 𝕋MRS)
+open import Categories.Rosen.Coherent.Tabulator Cl using (𝕋MRS)
 open import Categories.Rosen.Incoherent.Core Cl
 open import Categories.Rosen.Incoherent.Elements Cl
 open import Categories.Rosen.Incoherent.Functors Cl
@@ -46,10 +46,10 @@ open Closed Cl using ([-,-]; [_,_]₀; [_,_]₁)
 -- A —f→ B —Φ→ [A,B] —Φ₂→ [B,[A,B]] —Φ₃→ [[A,B],[B,[A,B]]] —→ ...
 -- without the natural transformation condition of full MR2.
 
--- iMRS3: the 3rd level, IsoComma of ℝ (from ProElements) and ⟅_⟆f (from
+-- iMRS3: the 3rd level, IsoComma of ⟅_⟆Φ (from ProElements) and ⟅_⟆f (from
 -- Tabulator).
 iMRS3 : Category (o ⊔ ℓ ⊔ e) (o ⊔ ℓ ⊔ e) e
-iMRS3 = IsoComma ℝ [_]f
+iMRS3 = IsoComma ⟅_⟆Φ [_]f
 
 -- 𝕚𝕄ℝ𝕊 n: the n-th level category together with a functor to Arr.Arrow.
 𝕚𝕄ℝ𝕊 : (n : ℕ) → Σ (Category (o ⊔ ℓ ⊔ e) (o ⊔ ℓ ⊔ e) e)
@@ -70,7 +70,7 @@ iMRS3 = IsoComma ℝ [_]f
   }
 𝕚𝕄ℝ𝕊 (suc n)
   = let MRSn = proj₂ (𝕚𝕄ℝ𝕊 n)
-    in IsoComma ℝ MRSn
+    in IsoComma ⟅_⟆Φ MRSn
   , (proj₂ (𝕚𝕄ℝ𝕊 n) ∘F ICproj₂)
 
 -- 𝕚𝕄ℝ𝕊ₒ n: the n-th level category.

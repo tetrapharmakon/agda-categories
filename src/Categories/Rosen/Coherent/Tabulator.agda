@@ -10,7 +10,7 @@ module Categories.Rosen.Coherent.Tabulator {o ℓ e} {C : Category o ℓ e} {M :
 -- Tabulator of MRS-Profunctor: a canonical category 𝕋MRS attached to the
 -- profunctor MRS-Profunctor : C^op × C → Sets, equipped with a universal
 -- 2-cell. This is the heart of the Rosen fibration.
--- Exports: 𝕋MRS, π, þ, ⟅_⟆f, ϵ.
+-- Exports: 𝕋MRS, π, þ, [_]f, ϵ.
 
 open import Data.Product using (_,_; proj₁)
 
@@ -47,10 +47,10 @@ private
 -- The universal terminal 2-cell of the tabulator.
 þ  = cell {p = MRS-Profunctor}
 
--- ⟅_⟆f: the first edge functor.  Extracts the process map f from a coherent
+-- [_]f: the first edge functor.  Extracts the process map f from a coherent
 -- (M,R)-system; this is the paper's ⦇-⦈_f of definition_first_edge_functor.
-⟅_⟆f : Functor 𝕋MRS Arr.Arrow
-⟅_⟆f = record
+[_]f : Functor 𝕋MRS Arr.Arrow
+[_]f = record
   { F₀ = λ { ((A , B) ∣ ξ) → record { arr = MR2.f ξ } }
   ; F₁ = λ { {(A , B) ∣ ⟪ f , Φ ⟫} {(A′ , B′) ∣ ⟪ g , Φ′ ⟫} (l , r ∥ E) → mor⇒ {dom⇒ = l} {cod⇒ = r}
     (let eq = proj₁ (lower E) in

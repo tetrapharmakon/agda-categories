@@ -12,7 +12,7 @@ module Categories.Rosen.Coherent.ProElements {o ℓ e} {C : Category o ℓ e} {M
 
 -- Modified category of elements for a bifunctor F : C^op × C → Sets, specialised to MRS-Profunctor.
 -- EltsCat is a generic (modified) category-of-elements construction; ElMRS is its instance.
--- Exports: EltsCat, ElMRS, ⟅_⟆Φ, U₁.
+-- Exports: EltsCat, ElMRS, ⟅_⟆Φ, ⟅_⟆f.
 
 open import Categories.Category.Construction.Arrow
 open import Categories.Category.Construction.TwistedArrow C renaming (Morphism to tMorphism; Morphism⇒ to tMorphism⇒)
@@ -167,9 +167,12 @@ ElMRS = MRS.Elts
   ; F-resp-≈ = λ (f≈gL , f≈gR) → f≈gR , ([-,-].F-resp-≈ (f≈gL , f≈gR))
   }
 
--- U₁: forgetful functor from ElMRS to the twisted arrow category of C.
-U₁ : Functor ElMRS TwistedArrow
-U₁ = record
+-- ⟅_⟆f: the left leg of the twisted-elements span.  Like Tabulator's [_]f it
+-- selects the process map, but it lands in Tw(C) rather than Arr(C), which is
+-- what the twisting of ElMRS forces.  Coherent counterpart of
+-- Incoherent/Elements.⟅_⟆f.
+⟅_⟆f : Functor ElMRS TwistedArrow
+⟅_⟆f = record
   { F₀ = λ {record { A = A ; B = B ; el = el } →
    record { arr = MR2.f el }}
   ; F₁ = λ {record { l = l ; r = r ; eqElts = eqElts } → mor⇒ {dom⇐ = l} {cod⇒ = r} (proj₁ (lower eqElts)) }

@@ -32,7 +32,7 @@ open Closed Cl using ([_,_]₀)
 open HomReasoning
 
 open import Categories.Rosen.Incoherent.Core Cl
-open import Categories.Rosen.Incoherent.Elements Cl using (τ′[iMR2]; 𝕃)
+open import Categories.Rosen.Incoherent.Elements Cl using (τ′[iMR2]; ⟅_⟆f)
 open import Categories.Rosen.Incoherent.Functors Cl using ([_]f)
 
 -- module Arr = Categories.Category.Construction.Arrow S
@@ -108,8 +108,8 @@ L⊣A = record
   ; zag = λ {B} → (λ {x} → ≡-refl) , (λ {x} → ≡-refl)
   }
 
-L′⊣𝕃 : L′ ⊣ 𝕃
-L′⊣𝕃 = record
+L′⊣⟅⟆f : L′ ⊣ ⟅_⟆f
+L′⊣⟅⟆f = record
   { unit = ntHelper (record { η = λ X → tmor⇒ λ {x} → ≡-refl ; commute = λ f → (λ {x} → ≡-refl) , (λ {x} → ≡-refl) })
   ; counit = ntHelper (record { η = λ X → record { l = id ; r = id ; eqf = λ {x} → ≡-refl ; eqΦ = UNSOUND-Φ-is-constant (iMR2.Φ (iMR2₀.ξ X)) } ; commute = λ {X} {Y} f → (λ {x} → ≡-refl) , (λ {x} → ≡-refl) })
   ; zig = λ {A} → (λ {x} → ≡-refl) , (λ {x} → ≡-refl)

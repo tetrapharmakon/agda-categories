@@ -27,7 +27,7 @@ open import Categories.Morphism.Reasoning as MR
 open import Categories.NaturalTransformation.NaturalIsomorphism as NI using (NaturalIsomorphism;niHelper; _ⓘʳ_; _ⓘᵥ_)
 open import Categories.Rosen.Coherent.IdCore Cl
 open import Categories.Rosen.Coherent.ProElements Cl {F = MRS-Profunctor}
-open import Categories.Rosen.Coherent.Tabulator Cl using (⟅_⟆f)
+open import Categories.Rosen.Coherent.Tabulator Cl using ([_]f)
 
 import Reason
 open Reason C
@@ -36,9 +36,9 @@ open MR
 -- Arrow(C); see the note in Coherent/ProElements.agda.
 module Arr = Categories.Category.Construction.Arrow C
 
--- MRS3: the 3rd level, IsoComma of ⟅_⟆Φ (from ProElements) and ⟅_⟆f (from Tabulator).
+-- MRS3: the 3rd level, IsoComma of ⟅_⟆Φ (from ProElements) and [_]f (from Tabulator).
 MRS3 : Category (o ⊔ ℓ ⊔ e) (o ⊔ ℓ ⊔ e) e
-MRS3 = IsoComma ⟅_⟆Φ ⟅_⟆f
+MRS3 = IsoComma ⟅_⟆Φ [_]f
 
 -- 𝕄ℝ𝕊 n: the n-th level category together with a functor to Arr.Arrow.
 𝕄ℝ𝕊 : (n : ℕ) → Σ (Category (o ⊔ ℓ ⊔ e) (o ⊔ ℓ ⊔ e) e) (λ x → Functor x Arr.Arrow)

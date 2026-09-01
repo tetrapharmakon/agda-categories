@@ -33,6 +33,24 @@ ordinary axiom and lives alone in `Axioms.agda`.
 `--allow-unsolved-metas`. Read the **Status:** line of a file before relying on
 anything in it.
 
+## A note on the projection functors
+
+Six functors project an (M,R)-system onto one edge of its defining diagram
+`A → B → [A,B]`, three in each world, and the notation says which is which:
+
+|  | picks out | source | target | name |
+|---|---|---|---|---|
+| incoherent | `f` | total `τ[iMR2]` | `Arrow(C)` | `[_]f` |
+| incoherent | `f` | twisted elements | `Tw(C)`    | `⟅_⟆f` |
+| incoherent | `Φ` | twisted elements | `Arrow(C)` | `⟅_⟆Φ` |
+| coherent   | `f` | tabulator `𝕋MRS` | `Arrow(C)` | `[_]f` |
+| coherent   | `f` | `ElMRS`          | `Tw(C)`    | `⟅_⟆f` |
+| coherent   | `Φ` | `ElMRS`          | `Arrow(C)` | `⟅_⟆Φ` |
+
+**Square brackets for a functor out of a total category, bags for one out of
+twisted elements.**  This is the paper's own convention: `\atF`/`\atPhi` render
+as `[-]_f`/`[-]_Φ` and `\lbag-\rbag_f`/`\lbag-\rbag_Φ` as the bags.
+
 ## Coherent (M,R)-systems
 
 The core coherent definitions live in the `Coherent/` subdirectory. It also
@@ -132,8 +150,8 @@ The total category of the MRS-profunctor tabulator.
 ### `Coherent/HigherMRS.agda`
 Higher-order (M,R)-systems in a Fibonacci-style construction: each step
 `A → B → [A,B] → [B,[A,B]] → ...` embeds the two previous levels into an
-internal hom. Built as iterated IsoCommas of `⟅_⟆Φ` and `⟅_⟆f`.
-- `MRS3` — the 3rd level: `IsoComma ⟅_⟆Φ ⟅_⟆f`.
+internal hom. Built as iterated IsoCommas of `⟅_⟆Φ` and `[_]f`.
+- `MRS3` — the 3rd level: `IsoComma ⟅_⟆Φ [_]f`.
 - `𝕄ℝ𝕊` — the n-th level category + functor to `Arr.Arrow`.
 - `𝕄ℝ𝕊ₒ` / `𝕄ℝ𝕊ₐ` — projections to the category / functor.
 - `Π-MRS` — projection `(suc n) → n`.
@@ -162,7 +180,7 @@ profunctor `MRS-Profunctor : C^op × C → Sets`, equipped with a universal 2-ce
 - `𝕋MRS` — the tabulator category of `MRS-Profunctor`.
 - `π` — left projection `𝕋MRS → C`.
 - `þ` — the universal terminal 2-cell.
-- `⟅_⟆f` — the **first edge functor**: extracts the process map `f` from a coherent (M,R)-system.  This is the paper's `⦇-⦈_f` (`definition_first_edge_functor`).
+- `[_]f` — the **first edge functor**: extracts the process map `f` from a coherent (M,R)-system.  This is the paper's `[-]_f` (`\atF`, `definition_first_edge_functor`) --- the process selector that `def_atF` wants and cannot have incoherently, available here because the tabulator resolves the variance.
 - `ϵ` — natural transformation from `MRS-Profunctor` to the lifted hom functor.
 
 ### `Coherent/FibreA.agda`
@@ -171,7 +189,7 @@ the domain object `A`, which simplifies the definitions.
 - `totalAtA₀` / `totalAtA₁` — objects and morphisms of the fibre over `A`.
 - `totalAtA` — the category totalAtA A (fibre over `A` of `MRS-Profunctor`).
 - `∇` — functor from the fibre to `Arrow`, sending `(B, ξ)` to `Φ : B → [A,B]`.
-- `commaNablaV` — comma category `∇ ↓ ⟅_⟆f` (weaker invariant, historical).
+- `commaNablaV` — comma category `∇ ↓ [_]f` (weaker invariant, historical).
 
 ### `Coherent/TabEquivalence.agda`
 Equivalence between the total category (see `TotalCategory.agda`) and the
@@ -184,7 +202,7 @@ Modified category of elements for a bifunctor `F : C^op × C → Sets`, speciali
 - `EltsCat` — generic (modified) category-of-elements construction.
 - `ElMRS` — the category of elements of `MRS-Profunctor`.
 - `⟅_⟆Φ` — the **last edge functor**: extracts the repair component `Φ_B : B ⇒ [A,B]` from a coherent (M,R)-system, without fixing the domain.  This is the paper's `⦇-⦈_Φ` (`definition_last_edge_functor`).  Note the asymmetry with `⟅_⟆f`: the process map is already functorial on the tabulator, the repair map only after passing to twisted elements.
-- `U₁` — functor from `ElMRS` to the twisted arrow category of `C`.
+- `⟅_⟆f` — the left leg of the twisted-elements span (see the table above).
 
 ## Incoherent (M,R)-systems
 
@@ -266,8 +284,8 @@ variance to `iMR2⇒`: morphisms twist the `A`-component contravariantly
 against the `B`-component, matching the shape of the twisted-arrow category.
 - `twiMR2⇒` — twisted morphisms `(l : Y.A ⇒ X.A, r : X.B ⇒ Y.B)` with `eqf`/`eqΦ` compatibility.
 - `τ'[iMR2]` — the twisted total category.
-- `𝕃` — functor `τ'[iMR2] → TwistedArrow` remembering only `f`.
-- `ℝ` — functor `τ'[iMR2] → Arrow` remembering only `Φ` (used to build `iMRS3` in `Incoherent/HigherMRS.agda`).
+- `⟅_⟆f` — functor `τ'[iMR2] → TwistedArrow` remembering only `f`.
+- `⟅_⟆Φ` — functor `τ'[iMR2] → Arrow` remembering only `Φ` (used to build `iMRS3` in `Incoherent/HigherMRS.agda`).
 
 ### `Incoherent/Functors.agda`
 Collects the basic projection functors out of `τ[iMR2]` (and, via Arbib's
@@ -295,7 +313,7 @@ the `Arbib` functor in `Functors.agda`.
 ### `Incoherent/HigherMRS.agda`
 The incoherent counterpart of `Coherent/HigherMRS.agda`: builds the tower of
 higher incoherent (M,R)-systems via iterated `IsoComma` and takes its limit.
-- `iMRS3` — 3rd level, `IsoComma ℝ [_]f`.
+- `iMRS3` — 3rd level, `IsoComma ⟅_⟆Φ [_]f`.
 - `𝕚𝕄ℝ𝕊` / `𝕚𝕄ℝ𝕊ₒ` — the n-th level category paired with (resp. projected from) its functor to `Arrow(C)`.
 - `Π-MRS` — projection `(suc n) → n`.
 - `pℕ` — ℕ as a thin poset category, built via a hand-rolled `_≤′_`/`_≈′_`/`_≤2_` development proving `≤′`-proofs are contractible (generic order-theory scaffolding, not specific to MR-systems, but needed to index the tower).
@@ -337,12 +355,12 @@ restriction to normalized Φ, or a weaker notion of morphism that forgets
 unfinished work.
 
 ### `Incoherent/CartesianAdjoints.agda`
-Attempts to exhibit left adjoints to `[_]f`/`𝕃`, instantiated at `Sets`.
+Attempts to exhibit left adjoints to `[_]f`/`⟅_⟆f`, instantiated at `Sets`.
 (The coherent counterpart, a former `Cartesian/Adjoints.agda`, has been removed:
 see the note under `Cartesian/WellPointed.agda` below.)
 - `const-Φ` — the constant repair map `B → (A → B)`, `const-Φ A a b = a`.
 - `L` / `L'` — the incoherent counterparts of the coherent left adjoints, equipping an arrow with the constant repair map.
-- `L⊣A`, `L′⊣𝕃` — the claimed adjunctions. **These assert the opposite of what
+- `L⊣A`, `L′⊣⟅⟆f` — the claimed adjunctions. **These assert the opposite of what
   the paper asserts**: §3 of "The Rosen fibration" labels the corresponding
   diagram `not_adjoints` and says in so many words that `L` and `L′` "fall just
   short of satisfying the adjunction property". They must not be cited.
@@ -501,7 +519,7 @@ the hypothesis deserves a name of its own: in the topos of C₂-sets 1 is not a
 generator, nothing here applies, and that is exactly what the paper's
 `cartesian_w_nontrivial_MRs` exploits.
 
-A former `Cartesian/Adjoints.agda` built left adjoints to `V₁` and `U₁` out of
+A former `Cartesian/Adjoints.agda` built left adjoints to `[_]f` and `⟅_⟆f` out of
 this singleton property.  It was removed: the adjunctions exist only when every
 coherent (M,R)-system is trivial, so they relate categories whose objects the
 rest of the development is at pains to escape.  The paper records the

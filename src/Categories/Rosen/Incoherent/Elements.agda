@@ -16,7 +16,11 @@ module Categories.Rosen.Incoherent.Elements {o ℓ e} {C : Category o ℓ e} {M 
 -- The morphisms of the total category are recast in twisted form: the
 -- A-component is contravariant (l : Y.A ⇒ X.A) while the B-component
 -- stays covariant, matching the shape of the twisted-arrow category.
--- The projection functors 𝕃 and ℝ forget respectively f and Φ.
+-- The projection functors ⟅_⟆f and ⟅_⟆Φ are the two legs of the span of the
+-- paper's proposition_incoherent_elements: they remember respectively the
+-- process and the repair map.  Bag brackets, as opposed to the square brackets
+-- of Incoherent/Functors, mark that these come out of the TWISTED elements
+-- category rather than out of the total one.
 ------------------------------------------------------------------------
 
 open import Data.Product using (_,_; proj₁; proj₂; _×_)
@@ -85,11 +89,11 @@ record twiMR2⇒ (X Y : iMR2₀) : Set (o ⊔ ℓ ⊔ e) where
 
 open import Categories.Category.Construction.TwistedArrow C renaming (Morphism to tMorphism; Morphism⇒ to tMorphism⇒)
 
--- 𝕃 : τ′[iMR2] → TwistedArrow, the "left" projection: forget the repair
+-- ⟅_⟆f : τ′[iMR2] → TwistedArrow, the "left" projection: forget the repair
 -- map, keeping only the process arrow f : A ⇒ B as an object of the
 -- twisted arrow category of C.
-𝕃 : Functor τ′[iMR2] TwistedArrow
-𝕃 = record
+⟅_⟆f : Functor τ′[iMR2] TwistedArrow
+⟅_⟆f = record
   { F₀ = λ x → let module x = iMR2₀ x in (record { arr = iMR2.f x.ξ })
   ; F₁ = λ f → let module f = twiMR2⇒ f in mor⇒ f.eqf
   ; identity = refl , refl
@@ -97,11 +101,11 @@ open import Categories.Category.Construction.TwistedArrow C renaming (Morphism t
   ; F-resp-≈ = λ x → x
   }
 
--- ℝ : τ′[iMR2] → Arrow(C), the "right" projection: forget the process
+-- ⟅_⟆Φ : τ′[iMR2] → Arrow(C), the "right" projection: forget the process
 -- map, keeping only the repair arrow Φ : B ⇒ [A,B]₀ (used to build
 -- iMRS3 in HigherMRS.agda).
-ℝ : Functor τ′[iMR2] Arr.Arrow
-ℝ = record
+⟅_⟆Φ : Functor τ′[iMR2] Arr.Arrow
+⟅_⟆Φ = record
   { F₀ = λ x → let module x = iMR2₀ x in (record { dom = x.B ; cod = [ x.A , x.B ]₀ ; arr = iMR2.Φ x.ξ })
   ; F₁ = λ f → let module f = twiMR2⇒ f in mor⇒ (sym f.eqΦ)
   ; identity = refl , [-,-].identity
