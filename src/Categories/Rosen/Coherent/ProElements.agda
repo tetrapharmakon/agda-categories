@@ -6,9 +6,9 @@ open import Categories.Category.Monoidal using (Monoidal)
 open import Categories.Category.Monoidal.Closed using (Closed)
 open import Categories.Functor using (Functor)
 open import Categories.Functor.Bifunctor using (Bifunctor; appˡ; appʳ)
-open import Level using (_⊔_)
+open import Level using (Level; _⊔_)
 
-module Categories.Rosen.Coherent.ProElements {o ℓ e} {C : Category o ℓ e} {M : Monoidal C} (Cl : Closed M) {F : Bifunctor (Category.op C) C (Setoids (o ⊔ ℓ ⊔ e) (o ⊔ ℓ ⊔ e))} where
+module Categories.Rosen.Coherent.ProElements {o ℓ e} {C : Category o ℓ e} {M : Monoidal C} (Cl : Closed M) {c′ e′ : Level} {F : Bifunctor (Category.op C) C (Setoids c′ e′)} where
 
 -- Modified category of elements for a bifunctor F : C^op × C → Sets, specialised to MRS-Profunctor.
 -- EltsCat is a generic (modified) category-of-elements construction; ElMRS is its instance.
@@ -32,15 +32,21 @@ open Reason C
 open Closed Cl using ([-,-]; [_,_]₁)
 
 {- Modified category of elements for a bifunctor Fᵉ : C^op × C → Sets. -}
-module EltsCat (Fᵉ : Bifunctor (Category.op C) C (Setoids (o ⊔ ℓ ⊔ e) (o ⊔ ℓ ⊔ e))) where
+-- Level-generalised: Fᵉ may land in Setoids at any levels.  This is needed
+-- because the profunctor of id-coherent (M,R)-systems lands in
+-- Setoids (o ⊔ ℓ ⊔ e) (o ⊔ e) while the cod-coherent one lands in
+-- Setoids (o ⊔ ℓ ⊔ e) (o ⊔ ℓ ⊔ e); both give Elts at the SAME levels, since
+-- o ⊔ (o ⊔ ℓ ⊔ e) = ℓ ⊔ (o ⊔ e) = o ⊔ ℓ ⊔ e, so no consumer of ElMRS sees a
+-- change.
+module EltsCat {c₀ e₀ : Level} (Fᵉ : Bifunctor (Category.op C) C (Setoids c₀ e₀)) where
   -- Objects of the category of elements: (A, B, el) with el ∈ Fᵉ(A, B).
-  record Elts₀ : Set (o ⊔ ℓ ⊔ e) where
+  record Elts₀ : Set (o ⊔ c₀) where
     field
       A : Obj
       B : Obj
       el : Setoid.Carrier (Functor.F₀ Fᵉ (A , B))
   -- Morphisms: (l : Y.A ⇒ X.A, r : X.B ⇒ Y.B) such that Fᵉ(l, r)(X.el) ≈ Y.el.
-  record Elts⇒ (X Y : Elts₀) : Set (o ⊔ ℓ ⊔ e) where
+  record Elts⇒ (X Y : Elts₀) : Set (ℓ ⊔ e₀) where
     module X = Elts₀ X
     module Y = Elts₀ Y
     field
@@ -48,7 +54,7 @@ module EltsCat (Fᵉ : Bifunctor (Category.op C) C (Setoids (o ⊔ ℓ ⊔ e) (o
       r : X.B ⇒ Y.B
       eqElts : Setoid._≈_ (Functor.F₀ Fᵉ (Y.A , Y.B)) (Functor.F₁ Fᵉ (l , r) ⟨$⟩ X.el) Y.el
   -- The modified category of elements of Fᵉ.
-  Elts : Category (o ⊔ ℓ ⊔ e) (o ⊔ ℓ ⊔ e) e
+  Elts : Category (o ⊔ c₀) (ℓ ⊔ e₀) e
   Elts = record
     { Obj       = Elts₀
     ; _⇒_       = λ X Y → Elts⇒ X Y
