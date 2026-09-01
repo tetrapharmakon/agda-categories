@@ -18,10 +18,13 @@ open import Data.Product using (_,_)
 open import Relation.Binary using () renaming (Setoid to S)
 
 open import Categories.Category.Construction.Arrow C using (Morphism; Morphism⇒; mor⇒)
+import Categories.Category.Construction.Arrow
+-- Arrow(C); see the note in Coherent/ProElements.agda.
+module Arr = Categories.Category.Construction.Arrow C
 open import Categories.Category.Construction.Comma
 open import Categories.Functor using (Functor)
 open import Categories.NaturalTransformation using (NaturalTransformation)
-open import Categories.Rosen.Coherent.Core Cl
+open import Categories.Rosen.Coherent.IdCore Cl
 open import Categories.Rosen.Coherent.Tabulator Cl using (𝕋MRS; V₁)
 
 import Reason
@@ -50,7 +53,7 @@ record totalAtA₁ {A : Obj} (x y : totalAtA₀ A) : Set (o ⊔ ℓ ⊔ e) where
   module Φ = NaturalTransformation (MR2.Φ x.ξ)
   module ψ = NaturalTransformation (MR2.Φ y.ξ)
   field
-    eqΦ : [ id , r ]₁ ∘ Φ.η (record { dom = A ; cod = x.B ; arr = f }) ≈ ψ.η (record { dom = A ; cod = y.B ; arr = g }) ∘ r
+    eqΦ : [ id , r ]₁ ∘ Φ.η x.B ≈ ψ.η y.B ∘ r
 
 
 -- totalAtA A: the category of (M,R)-systems whose metabolic domain is the
@@ -90,7 +93,7 @@ totalAtA A = record
 ∇ {A} = record
   { F₀ = λ (B ∣ ξ) →
   let module phi = NaturalTransformation (MR2.Φ ξ)
-  in record { dom = B ; cod = [ A , B ]₀ ; arr = phi.η (record { dom = A ; cod = B ; arr = MR2.f ξ }) }
+  in record { dom = B ; cod = [ A , B ]₀ ; arr = phi.η B }
   ; F₁ = λ { {X ∣ ⟪ f , Φ ⟫} {Y ∣ ⟪ g , ψ ⟫} (record { r = r ; eqΦ = eqΦ }) → mor⇒ {dom⇒ = r} {cod⇒ = Functor.F₁ [ A ,-] r} eqΦ }
   ; identity = λ { {X} → Equiv.refl , (Functor.identity [ A ,-])}
   ; homomorphism = λ { {X} {Y} {Z} {f} {g} → Equiv.refl , Functor.homomorphism [ A ,-] }

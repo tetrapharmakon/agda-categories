@@ -3,7 +3,7 @@
 open import Categories.Category using (Category)
 open import Categories.Category.Monoidal using (Monoidal)
 open import Categories.Category.Monoidal.Closed using (Closed)
-open import Level using (0ℓ; _⊔_)
+open import Level using (0ℓ; _⊔_; lower)
 
 module Categories.Rosen.Coherent.HigherMRS {o ℓ e} {C : Category o ℓ e} {M : Monoidal C} (Cl : Closed M) where
 
@@ -25,13 +25,16 @@ open import Categories.Functor using (Functor; _∘F_) renaming (id to idF)
 open import Categories.Functor.Profunctor.Tabulator using (tab₀;tab⇒)
 open import Categories.Morphism.Reasoning as MR
 open import Categories.NaturalTransformation.NaturalIsomorphism as NI using (NaturalIsomorphism;niHelper; _ⓘʳ_; _ⓘᵥ_)
-open import Categories.Rosen.Coherent.Core Cl
+open import Categories.Rosen.Coherent.IdCore Cl
 open import Categories.Rosen.Coherent.ProElements Cl {F = MRS-Profunctor}
 open import Categories.Rosen.Coherent.Tabulator Cl using (V₁)
 
 import Reason
 open Reason C
 open MR
+
+-- Arrow(C); see the note in Coherent/ProElements.agda.
+module Arr = Categories.Category.Construction.Arrow C
 
 -- MRS3: the 3rd level, IsoComma of ℝ (from ProElements) and V₁ (from Tabulator).
 MRS3 : Category (o ⊔ ℓ ⊔ e) (o ⊔ ℓ ⊔ e) e
@@ -53,7 +56,7 @@ MRS3 = IsoComma ℝ V₁
             module f = IsoComma⇒ f
         in mor⇒ {dom⇒ = tab⇒.l f.g} {cod⇒ = tab⇒.r f.g}
           (let open Category.HomReasoning C in begin _ ≈⟨ sym-id-1 ○ assoc ⟩
-                  _ ≈⟨ proj₁ (tab⇒.eq f.g) ⟩
+                  _ ≈⟨ proj₁ (lower (tab⇒.eq f.g)) ⟩
                   _ ≈⟨ id-0 ⟩
                   _ ∎)}
       ; identity = Equiv.refl , Equiv.refl

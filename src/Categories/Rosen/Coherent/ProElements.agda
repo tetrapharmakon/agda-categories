@@ -6,7 +6,7 @@ open import Categories.Category.Monoidal using (Monoidal)
 open import Categories.Category.Monoidal.Closed using (Closed)
 open import Categories.Functor using (Functor)
 open import Categories.Functor.Bifunctor using (Bifunctor; appˡ; appʳ)
-open import Level using (Level; _⊔_)
+open import Level using (Level; _⊔_; lower)
 
 module Categories.Rosen.Coherent.ProElements {o ℓ e} {C : Category o ℓ e} {M : Monoidal C} (Cl : Closed M) {c′ e′ : Level} {F : Bifunctor (Category.op C) C (Setoids c′ e′)} where
 
@@ -19,7 +19,7 @@ open import Categories.Category.Construction.TwistedArrow C renaming (Morphism t
 open import Categories.Functor.Bifunctor.Properties using ([_]-decompose₁)
 open import Categories.Functor.Profunctor.Tabulator
 open import Categories.NaturalTransformation using (NaturalTransformation)
-open import Categories.Rosen.Coherent.Core Cl
+open import Categories.Rosen.Coherent.IdCore Cl
 open import Data.Product using (_,_; proj₁; proj₂; _×_)
 open import Relation.Binary.Bundles using (Setoid)
 import Relation.Binary.Reasoning.Setoid as SetoidR
@@ -30,6 +30,13 @@ import Reason
 open Reason C
 
 open Closed Cl using ([-,-]; [_,_]₁)
+
+-- Arrow(C).  Coherent/Core exported this because it needs it to state Cod;
+-- Coherent/IdCore has no use for it, so consumers declare it themselves.
+-- Private, so that a module importing several of these does not see the same
+-- alias arrive from two directions at once.
+private
+  module Arr = Categories.Category.Construction.Arrow C
 
 {- Modified category of elements for a bifunctor Fᵉ : C^op × C → Sets. -}
 -- Level-generalised: Fᵉ may land in Setoids at any levels.  This is needed
@@ -106,9 +113,19 @@ ElMRS = MRS.Elts
 
 
 -- A functor from ElMRS to Arrow(C) extracting repair maps (without fixing the domain).
+--
+-- The cod-coherent version of the square below could not be proved by
+-- naturality alone.  Φ's components were indexed by ARROWS, and the four that
+-- occur here -- at XE.f, at XE.f ∘ l, at r ∘ XE.f ∘ l, and at YE.f -- are four
+-- different indices, so the proof had to build three morphisms of Arr(C)
+-- (t₁, t₂, t₃, none of them of the degenerate `1⇒1` shape) and three lemmas to
+-- travel between them.  With id-coherent repair data there is one component per
+-- OBJECT, all four collapse to the components at X.B and Y.B, and what remains
+-- is a single naturality square in C.  The proof is shorter, but it is not the
+-- old proof shortened: the reason it works is different.
 ℝ : Functor ElMRS Arr.Arrow
 ℝ = record
-  { F₀ = λ x → let module x = MRS.Elts₀ x in record { arr = MR2.Φη₀ x.el }
+  { F₀ = λ x → let module x = MRS.Elts₀ x in record { arr = MR2.Φη x.el x.B }
   ; F₁ = λ { {X} {Y} f →
     let module X = MRS.Elts₀ X
         module Y = MRS.Elts₀ Y
@@ -119,40 +136,11 @@ ElMRS = MRS.Elts
 
       module XE = MR2 X.el
       module YE = MR2 Y.el
-      a = record { arr = XE.f }
-      b = record { arr = XE.f ∘ f.l }
-      c = record { arr = f.r ∘ XE.f ∘ f.l }
-      d = record { arr = YE.f }
-      module Hom  {A} = Functor (appʳ [-,-] A)
 
-      t₁ : Arr.Morphism⇒ b a
-      t₁ = record { dom⇒ = f.l ; cod⇒ = id ; square = identityˡ }
-      t₂ : Arr.Morphism⇒ b c
-      t₂ = record { dom⇒ = id ; cod⇒ = f.r ; square = Equiv.sym identityʳ }
-      t₃ : Arr.Morphism⇒ d c
-      t₃ = record { dom⇒ = id ; cod⇒ = id ; square = identityˡ ○ Equiv.sym (proj₁ f.eqElts) ○ Equiv.sym identityʳ }
-
-      eqΦ : ∀ (m : Arr.Morphism) → [ f.l , id ]₁ ∘ η XE.Φ m ≈ η YE.Φ m
-      eqΦ m = proj₂ f.eqElts {x = m}
-
-      lem1 : η XE.Φ a ≈ η XE.Φ b
-      lem1 = begin
-        η XE.Φ a           ≈˘⟨ identityʳ ⟩
-        η XE.Φ a ∘ id     ≈⟨ commute XE.Φ t₁ ⟩
-        [ id , id ]₁ ∘ η XE.Φ b  ≈⟨ (Hom.identity ⟩∘⟨refl) ⟩
-        id ∘ η XE.Φ b     ≈⟨ identityˡ ⟩
-        η XE.Φ b          ∎
-
-      lem2 : η XE.Φ c ∘ f.r ≈ [ id , f.r ]₁ ∘ η XE.Φ b
-      lem2 = commute XE.Φ t₂
-
-      lem3 : η YE.Φ c ≈ η YE.Φ d
-      lem3 = begin
-        η YE.Φ c           ≈˘⟨ identityʳ ⟩
-        η YE.Φ c ∘ id     ≈⟨ commute YE.Φ t₃ ⟩
-        [ id , id ]₁ ∘ η YE.Φ d ≈⟨ Hom.identity ⟩∘⟨refl ⟩
-        id ∘ η YE.Φ d     ≈⟨ identityˡ ⟩
-        η YE.Φ d          ∎
+      -- The Φ-component of the element equation, at the object Y.B.
+      -- (`lower` strips IdCore's Level.Lift; it has no mathematical content.)
+      eqΦ : ∀ (Z : Obj) → [ f.l , id ]₁ ∘ η XE.Φ Z ≈ η YE.Φ Z
+      eqΦ Z = proj₂ (lower f.eqElts) {Z}
 
       decompose : [ f.l , f.r ]₁ ≈ [ f.l , id ]₁ ∘ [ id , f.r ]₁
       decompose = [ [-,-] ]-decompose₁
@@ -161,17 +149,15 @@ ElMRS = MRS.Elts
     { dom⇒ = f.r
     ; cod⇒ = [ f.l , f.r ]₁
     ; square = begin
-      [ f.l , f.r ]₁ ∘ η XE.Φ a
+      [ f.l , f.r ]₁ ∘ η XE.Φ X.B
         ≈⟨ decompose ⟩∘⟨refl ○ assoc ⟩
-      [ f.l , id ]₁ ∘ ([ id , f.r ]₁ ∘ η XE.Φ a)
-        ≈˘⟨ refl⟩∘⟨ Equiv.trans lem2 (refl⟩∘⟨ Equiv.sym lem1) ⟩
-      [ f.l , id ]₁ ∘ (η XE.Φ c ∘ f.r)
+      [ f.l , id ]₁ ∘ ([ id , f.r ]₁ ∘ η XE.Φ X.B)
+        ≈˘⟨ refl⟩∘⟨ commute XE.Φ f.r ⟩
+      [ f.l , id ]₁ ∘ (η XE.Φ Y.B ∘ f.r)
         ≈⟨ sym-assoc ⟩
-      ([ f.l , id ]₁ ∘ η XE.Φ c) ∘ f.r
-        ≈⟨ ∘-resp-≈ (eqΦ c) refl ⟩
-      (η YE.Φ c) ∘ f.r
-        ≈⟨ ∘-resp-≈ lem3 refl ⟩
-      η YE.Φ d ∘ f.r
+      ([ f.l , id ]₁ ∘ η XE.Φ Y.B) ∘ f.r
+        ≈⟨ ∘-resp-≈ (eqΦ Y.B) refl ⟩
+      η YE.Φ Y.B ∘ f.r
         ∎
     } }
   ; identity = Equiv.refl , [-,-].identity
@@ -184,7 +170,7 @@ U₁ : Functor ElMRS TwistedArrow
 U₁ = record
   { F₀ = λ {record { A = A ; B = B ; el = el } →
    record { arr = MR2.f el }}
-  ; F₁ = λ {record { l = l ; r = r ; eqElts = eqElts } → mor⇒ {dom⇐ = l} {cod⇒ = r} (proj₁ eqElts) }
+  ; F₁ = λ {record { l = l ; r = r ; eqElts = eqElts } → mor⇒ {dom⇐ = l} {cod⇒ = r} (proj₁ (lower eqElts)) }
   ; identity = let open HomReasoning in
     (sym identityˡ ○ identityʳ) , refl
   ; homomorphism = refl , refl

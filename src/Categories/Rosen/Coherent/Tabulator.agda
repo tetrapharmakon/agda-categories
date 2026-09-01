@@ -3,7 +3,7 @@
 open import Categories.Category using (Category)
 open import Categories.Category.Monoidal using (Monoidal)
 open import Categories.Category.Monoidal.Closed using (Closed)
-open import Level using (_⊔_; lift)
+open import Level using (_⊔_; lift; lower)
 
 module Categories.Rosen.Coherent.Tabulator {o ℓ e} {C : Category o ℓ e} {M : Monoidal C} (Cl : Closed M) where
 
@@ -21,12 +21,23 @@ open import Categories.Functor.Hom using (Hom[_][-,-])
 open import Categories.Functor.Profunctor.Tabulator
 open import Categories.Morphism.Reasoning as MR
 open import Categories.NaturalTransformation using (NaturalTransformation; ntHelper)
-open import Categories.Rosen.Coherent.Core Cl
+open import Categories.Rosen.Coherent.IdCore Cl
 
 import Reason
 open Reason C
 open HomReasoning
 open MR
+
+-- Arrow(C).  Coherent/Core exported this because it needs it to state Cod;
+-- Coherent/IdCore has no use for it, so consumers declare it themselves.
+-- Private, so that a module importing several of these does not see the same
+-- alias arrive from two directions at once.
+private
+  module Arr = Categories.Category.Construction.Arrow C
+
+-- `lift`/`lower` below strip IdCore's Level.Lift on the setoid relation.  They
+-- are Agda universe bookkeeping with no mathematical content; see the comment
+-- at the top of Coherent/IdCore.agda.
 
 -- The tabulator category of MRS-Profunctor.
 𝕋MRS = Tabulator MRS-Profunctor
@@ -40,8 +51,9 @@ open MR
 V₁ : Functor 𝕋MRS Arr.Arrow
 V₁ = record
   { F₀ = λ { ((A , B) ∣ ξ) → record { arr = MR2.f ξ } }
-  ; F₁ = λ { {(A , B) ∣ ⟪ f , Φ ⟫} {(A′ , B′) ∣ ⟪ g , Φ′ ⟫} (l , r ∥ (eq , eq′)) → mor⇒ {dom⇒ = l} {cod⇒ = r}
-    (begin r ∘ f      ≈˘⟨ id-2 ⟩
+  ; F₁ = λ { {(A , B) ∣ ⟪ f , Φ ⟫} {(A′ , B′) ∣ ⟪ g , Φ′ ⟫} (l , r ∥ E) → mor⇒ {dom⇒ = l} {cod⇒ = r}
+    (let eq = proj₁ (lower E) in
+     begin r ∘ f      ≈˘⟨ id-2 ⟩
            r ∘ f ∘ id ≈⟨ eq ○ identityˡ ⟩
            g ∘ l      ∎) }
   ; identity =
@@ -58,8 +70,8 @@ V₁ = record
 ϵ = ntHelper record
   { η = λ { (A , B) → record
     { _⟨$⟩_ = λ {⟪ f , Φ ⟫ → lift f }
-    ; cong = λ { {⟪ f , Φ ⟫} {⟪ g , Φ′ ⟫} eq → lift (proj₁ eq) }
+    ; cong = λ { {⟪ f , Φ ⟫} {⟪ g , Φ′ ⟫} eq → lift (proj₁ (lower eq)) }
     } }
   ; commute = λ { {(A , B)} {(A′ , B′)} (u , v) {⟪ f , Φ ⟫} {⟪ g , Φ′ ⟫} eq →
-      lift (∘-resp-≈ʳ (∘-resp-≈ˡ (proj₁ eq))) }
+      lift (∘-resp-≈ʳ (∘-resp-≈ˡ (proj₁ (lower eq)))) }
   }

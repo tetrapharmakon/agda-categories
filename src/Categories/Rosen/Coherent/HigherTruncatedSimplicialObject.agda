@@ -24,7 +24,7 @@ private
   M = Sets-Monoidal
   Cl = Sets-Closed
 
-open import Categories.Rosen.Coherent.Core Cl
+open import Categories.Rosen.Coherent.IdCore Cl
 open import Categories.Rosen.Coherent.HigherMRS Cl
 open import Categories.Rosen.Coherent.Tabulator Cl
 
