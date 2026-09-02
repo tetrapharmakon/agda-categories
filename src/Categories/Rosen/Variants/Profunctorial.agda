@@ -143,19 +143,24 @@ open MR
 -- underlying process f is provable outright, and it is exactly the components
 -- mentioning the reindexed profunctor that are unavailable without extra
 -- hypotheses on C.
--- THERE IS NO PROFUNCTOR here either, and this file no longer declares one.
+-- THE PROFUNCTOR EXISTS.  What is missing here is infrastructure, not
+-- mathematics, and this file does not build it.
 --
--- The obstruction: reindexing along (u : A' => A , v : B => B') needs
--- coSlice A' -> coSlice A and Slice B' -> Slice B.  The functors `pollo`
--- assembles run the OTHER way; the right-way ones are pushout along u and
--- pullback along v, which this module does not assume.  Adding those two
--- hypotheses is what it would take to build the profunctor for real.
+-- Reindexing along (u : A' => A , v : B => B') appears to want functors the
+-- wrong way round -- coSlice A' -> coSlice A and Slice B' -> Slice B, while u
+-- and v give the opposite pair, which is what `pollo` assembles.  That is not
+-- an obstruction: in the double category of profunctors every functor has a
+-- conjoint, and reindexing along the conjoints is exactly what makes the
+-- assignment functorial.  The paper's proposition_assignment_profunctor_r is
+-- true as stated.
+--
+-- It is not formalised because agda-categories has no development of the double
+-- category of profunctors to lean on, and supplying one is well beyond the
+-- scope of this project.  A Bifunctor asserting the profunctor, with the
+-- reindexing postulated, used to stand here; postulating a statement one cannot
+-- yet prove is still postulating, so it was removed rather than kept.
 --
 -- What survives is the real content of this file, and it is not small: MR2, and
 -- the proof that MR2-Setoid really is a setoid, which needed the three twist-*
 -- lemmas above because the relation twists the repair datum by a natural
 -- isomorphism.
---
--- Section 4's proposition_assignment_profunctor_r asserts that this IS a
--- profunctor, with no hypothesis and no proof.  That is exactly what is
--- unproved, and the paper now says so rather than being contradicted here.

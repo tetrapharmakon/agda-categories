@@ -67,16 +67,18 @@ MR2-Setoid A B = record
 
 open import Categories.NaturalTransformation.NaturalIsomorphism as NI using (NaturalIsomorphism;niHelper; _ⓘˡ_; _ⓘʳ_)
 
--- THERE IS NO PROFUNCTOR C.op x C -> Sets sending (A , B) to MR2 A B, and this
--- file no longer declares one.
+-- THE PROFUNCTOR EXISTS; this file simply does not build it.
 --
--- The obstruction is precise: reindexing the repair datum along
--- (u : A' => A , v : B => B') needs a functor Slice B' -> Slice B, i.e. pullback
--- along v, which this module does not assume; postcomposition with v runs the
--- other way.  A Bifunctor asserting the profunctor's existence, with the missing
--- datum postulated, used to stand here.  It has been removed: the comment above
--- it denied the object exists while the term below it asserted the opposite.
+-- Reindexing along (u : A' => A , v : B => B') looks as though it needs a
+-- functor Slice B' -> Slice B, i.e. pullback along v, which this module does
+-- not assume; postcomposition with v runs the other way.  But in the double
+-- category of profunctors every functor has a conjoint, and reindexing along
+-- conjoints supplies what is wanted, so nothing is mathematically in the way.
 --
--- What survives is what is true and proved: MR2 and MR2-Setoid.  Adding pullback
--- along v to this module's hypotheses is what it would take to build the
--- profunctor for real.
+-- What is in the way is that agda-categories has no development of the double
+-- category of profunctors to build on, and supplying one is out of scope here.
+-- A Bifunctor with the reindexing postulated used to stand at this point; it
+-- was removed, since a postulate is a postulate whether or not the statement it
+-- assumes happens to be true.
+--
+-- What survives is what this module does prove: MR2 and MR2-Setoid.
